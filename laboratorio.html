@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Laboratorio – valores corregidos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: misma línea que la Calculadora Neonatal — tarjetas por área (medio interno, gases, hematología, LCR, renal, respiratorio); acento verde lima para Laboratorio */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#eef3fb; --line:#e2e4f1; --fg:#2e3147; --muted:#6c7090; --accent:#3f7d22; --accent-soft:#dcf1cf; --mint:#dcf2ec; --mint-fg:#2b6a60; --peach:#fff4d6; --peach-fg:#86590a; --rose:#ffe3e8; --rose-fg:#a12d40; --sky:#e6f0fb; --sky-fg:#2f5f93;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#b4e48f; --accent-soft:#25351f; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }}
+:root[data-theme="dark"]{ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#b4e48f; --accent-soft:#25351f; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+header h1{font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.btns{display:flex;gap:6px}
+.btn{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer}
+nav.jump{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+nav.jump a{flex:none;font-size:.8rem;text-decoration:none;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:999px;font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:10px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.card h3{margin:6px 0 0;font-size:.95rem;font-weight:700;padding-top:12px;border-top:1px solid var(--line)}
+.card h3:first-of-type{border-top:0;padding-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+label .u{font-family:var(--mono);font-size:.7rem;opacity:.8}
+label .lh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+select.us{width:auto;min-height:34px;font-family:var(--mono);font-size:.82rem;padding:6px 26px 6px 10px;border-radius:9px;background-color:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:700}
+input,select{font:inherit;font-family:var(--mono);font-size:1rem;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+select{font-family:var(--body);font-size:.9rem}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.res{display:flex;flex-direction:column;gap:8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-family:var(--mono);font-size:1.45rem;font-weight:500;font-variant-numeric:tabular-nums}
+.tile .s{font-size:.75rem;color:var(--muted)}
+.tile.main{background:var(--accent-soft)}
+.pill{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;font-size:.85rem}
+.pill.warn{background:var(--peach);color:var(--peach-fg)}
+.pill.crit{background:var(--rose);color:var(--rose-fg)}
+.pill.ok{background:var(--mint);color:var(--mint-fg)}
+.pill.info{background:var(--sky);color:var(--sky-fg)}
+.alerta{display:flex;gap:10px;align-items:flex-start;background:var(--rose);color:var(--rose-fg);border:2px solid currentColor;border-radius:12px;padding:10px 12px;font-size:.88rem;line-height:1.4}
+.alerta .ic{font-size:1.4rem;line-height:1}
+.alerta b{display:block;font-size:.95rem;margin-bottom:2px}
+.empty{font-size:.82rem;color:var(--muted);font-style:italic}
+footer{font-size:.75rem;color:var(--muted);text-align:center}
+</style>
+<style id="tema-vivo">
+:root{--bg:#f4faee;--sunk:#e6f4da;--line:#d5e9c6;--accent:#367a14;--accent-soft:#cdeeb6;--mint:#c9efe2;--mint-fg:#0d6b5a;--peach:#ffecb8;--sky:#d6e6fb;--glow:#ddf3cc;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#22331c;}}
+:root[data-theme="dark"]{--glow:#22331c;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Laboratorio: valores corregidos</h1>
+      <p>Correcciones y cálculos derivados de uso frecuente en UCIN. Completá solo lo que tengas.</p>
+    </div>
+    <div class="btns"><button type="button" class="btn" id="ej">Ejemplo</button><button type="button" class="btn" id="clr">Limpiar</button></div>
+  </header>
+
+  <nav class="jump" aria-label="Ir a sección">
+    <a href="#s-mi">Medio interno</a><a href="#s-gas">Gases</a><a href="#s-hem">Hematología</a><a href="#s-lcr">LCR</a><a href="#s-ren">Renal</a><a href="#s-resp">Respiratorio</a>
+  </nav>
+
+  <!-- MEDIO INTERNO -->
+  <section class="card" id="s-mi">
+    <h2>Medio interno</h2>
+    <div class="grid">
+      <label for="na">Na <span class="u">mEq/L = mmol/L</span><input id="na" inputmode="decimal" autocomplete="off" placeholder="135"></label>
+      <label for="k">K <span class="u">mEq/L = mmol/L</span><input id="k" inputmode="decimal" autocomplete="off" placeholder="4,5"></label>
+      <label for="cl">Cl <span class="u">mEq/L = mmol/L</span><input id="cl" inputmode="decimal" autocomplete="off" placeholder="105"></label>
+      <label for="hco3">HCO₃ <span class="u">mEq/L = mmol/L</span><input id="hco3" inputmode="decimal" autocomplete="off" placeholder="22"></label>
+      <label for="glu">Glucemia <span class="u">mg/dL</span><input id="glu" inputmode="decimal" autocomplete="off" placeholder="90"></label>
+      <label for="alb">Albúmina <span class="u">g/dL</span><input id="alb" inputmode="decimal" autocomplete="off" placeholder="3"></label>
+      <label for="ca">Ca total <span class="u">mg/dL</span><input id="ca" inputmode="decimal" autocomplete="off" placeholder="8,5"></label>
+      <label for="cai">Ca iónico <span class="u">mmol/L · opc.</span><input id="cai" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="urea">Urea / BUN <span class="u">mg/dL</span><input id="urea" inputmode="decimal" autocomplete="off" placeholder="20"></label>
+      <label for="ureaT">Informado como<select id="ureaT"><option value="urea">Urea</option><option value="bun">BUN</option></select></label>
+      <label for="osmM">Osm medida <span class="u">mOsm/kg · opc.</span><input id="osmM" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <p class="hint">Tocá la unidad al lado de cada campo para cambiarla (mg/dL ↔ mmol/L, g/dL ↔ g/L, mmHg ↔ kPa): la app convierte sola y recuerda tu elección. Na, K, Cl y HCO₃ se cargan igual en mEq/L o mmol/L.</p>
+    <p class="hint">pH y pCO₂ se cargan en <a href="#s-gas" style="color:var(--accent)">Gases</a>: se usan para el K corregido.</p>
+
+    <h3>Calcio corregido por albúmina</h3>
+    <div class="alerta" role="note"><span class="ic">⚠️</span><div><b>Poco confiable en neonatos</b>La corrección por albúmina se correlaciona mal con el calcio iónico, sobre todo en prematuros y en el paciente crítico. Si hay Ca iónico disponible, decidí con el iónico.</div></div>
+    <div class="res" id="rCa"></div>
+    <p class="hint">Ca corregido (mg/dL) = Ca total + 0,8 × (4 − albúmina).</p>
+
+    <h3>Potasio corregido por pH</h3>
+    <div class="alerta" role="note"><span class="ic">⚠️</span><div><b>Estimación aproximada</b>El cambio de K por cada 0,1 de pH varía mucho (≈ 0,2–1,2 mEq/L). Sirve para acidosis metabólica inorgánica (hiperclorémica); es mucho menos válido en acidosis láctica, cetoacidosis o trastornos respiratorios. No reemplaza el valor medido.</div></div>
+    <div class="grid"><label for="kf">mEq/L por cada 0,1 de pH<input id="kf" inputmode="decimal" autocomplete="off" value="0,6"></label></div>
+    <div class="res" id="rK"></div>
+    <p class="hint">K estimado a pH 7,40 = K medido − factor × (7,40 − pH) ÷ 0,1.</p>
+
+    <h3>Sodio corregido por glucemia</h3>
+    <div class="grid"><label for="naf">Factor por cada 100 mg/dL<select id="naf"><option value="1.6">1,6 (Katz)</option><option value="2.4">2,4 (Hillier)</option></select></label></div>
+    <div class="res" id="rNa"></div>
+    <p class="hint">Na corregido = Na + factor × (glucemia − 100) ÷ 100.</p>
+
+    <h3>Anión gap</h3>
+    <div class="res" id="rAG"></div>
+    <p class="hint">AG = Na − (Cl + HCO₃) · AG corregido = AG + 2,5 × (4 − albúmina). Referencia habitual 8–16 mEq/L (sin K); usá la de tu laboratorio. La hipoalbuminemia del neonato baja el AG y puede ocultar una acidosis con AG alto.</p>
+
+    <h3>Osmolaridad calculada y gap osmolar</h3>
+    <div class="res" id="rOsm"></div>
+    <p class="hint">Valores en mg/dL (si cargás en mmol/L, la app convierte). Osm = 2 × Na + glucemia ÷ 18 + BUN ÷ 2,8 (o urea ÷ 6) · Gap osmolar = medida − calculada (normal &lt; 10).</p>
+  </section>
+
+  <!-- GASES -->
+  <section class="card" id="s-gas">
+    <h2>Gases: trastornos mixtos</h2>
+    <div class="grid">
+      <label for="ph">pH<input id="ph" inputmode="decimal" autocomplete="off" placeholder="7,30"></label>
+      <label for="pco2">pCO₂ <span class="u">mmHg</span><input id="pco2" inputmode="decimal" autocomplete="off" placeholder="40"></label>
+    </div>
+    <p class="hint">Usa también Na, Cl, HCO₃ y albúmina de Medio interno.</p>
+
+    <h3>pCO₂ esperada (Winters)</h3>
+    <div class="res" id="rWin"></div>
+    <p class="hint">pCO₂ esperada = 1,5 × HCO₃ + 8 (± 2). Válida solo en acidosis metabólica.</p>
+
+    <h3>Delta gap / delta ratio</h3>
+    <div class="res" id="rDelta"></div>
+    <p class="hint">Delta ratio = (AG − 12) ÷ (24 − HCO₃). Usa el AG corregido por albúmina si la cargaste.</p>
+  </section>
+
+  <!-- HEMATOLOGÍA -->
+  <section class="card" id="s-hem">
+    <h2>Hematología / infección</h2>
+    <div class="grid">
+      <label for="gb">Leucocitos <span class="u">/mm³</span><input id="gb" inputmode="decimal" autocomplete="off" placeholder="15000"></label>
+      <label for="eb">Eritroblastos <span class="u">/100 leuc.</span><input id="eb" inputmode="decimal" autocomplete="off" placeholder="10"></label>
+      <label for="seg">Segmentados <span class="u">%</span><input id="seg" inputmode="decimal" autocomplete="off" placeholder="55"></label>
+      <label for="cay">Cayados <span class="u">%</span><input id="cay" inputmode="decimal" autocomplete="off" placeholder="8"></label>
+      <label for="meta">Metamielocitos <span class="u">%</span><input id="meta" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <label for="mie">Mielocitos y prom. <span class="u">%</span><input id="mie" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+    </div>
+
+    <h3>Leucocitos corregidos por eritroblastos</h3>
+    <div class="res" id="rGB"></div>
+    <p class="hint">Leucocitos corregidos = leucocitos × 100 ÷ (100 + eritroblastos/100 leucocitos). Muchos contadores informan los eritroblastos dentro de los leucocitos.</p>
+
+    <h3>Recuento absoluto de neutrófilos e índice I/T</h3>
+    <div class="res" id="rRAN"></div>
+    <p class="hint">RAN = leucocitos (corregidos) × (segmentados + inmaduros) ÷ 100 · I/T = inmaduros ÷ (inmaduros + segmentados); inmaduros = cayados + metamielocitos + mielocitos/promielocitos. Interpretar el RAN con las curvas de Manroe o Mouzinho según horas de vida y edad gestacional.</p>
+  </section>
+
+  <!-- LCR -->
+  <section class="card" id="s-lcr">
+    <h2>LCR: punción traumática</h2>
+    <div class="grid">
+      <label for="lgb">Leucocitos LCR <span class="u">/mm³</span><input id="lgb" inputmode="decimal" autocomplete="off" placeholder="40"></label>
+      <label for="lgr">Hematíes LCR <span class="u">/mm³</span><input id="lgr" inputmode="decimal" autocomplete="off" placeholder="5000"></label>
+      <label for="sgb">Leucocitos sangre <span class="u">/mm³</span><input id="sgb" inputmode="decimal" autocomplete="off" placeholder="15000"></label>
+      <label for="sgr">Hematíes sangre <span class="u">mill./mm³</span><input id="sgr" inputmode="decimal" autocomplete="off" placeholder="4,5"></label>
+    </div>
+    <div class="res" id="rLCR"></div>
+    <p class="hint">Leucocitos LCR corregidos = leuc. LCR − (hematíes LCR × leuc. sangre ÷ hematíes sangre). Si falta el hemograma, se muestra la regla aproximada de 1 leucocito por cada 500 hematíes. La corrección puede subestimar una meningitis: interpretar con cultivo, glucorraquia y proteínas.</p>
+  </section>
+
+  <!-- RENAL -->
+  <section class="card" id="s-ren">
+    <h2>Función renal</h2>
+    <h3>Filtrado glomerular (Schwartz)</h3>
+    <div class="grid">
+      <label for="talla">Talla <span class="u">cm</span><input id="talla" inputmode="decimal" autocomplete="off" placeholder="45"></label>
+      <label for="cr">Creatinina <span class="u">mg/dL</span><input id="cr" inputmode="decimal" autocomplete="off" placeholder="0,8"></label>
+      <label for="kS">Constante k<select id="kS"><option value="0.33">0,33 · prematuro</option><option value="0.45">0,45 · RN término / lactante &lt; 1 año</option><option value="0.413">0,413 · Schwartz bedside (≥ 1 año)</option></select></label>
+    </div>
+    <div class="res" id="rFG"></div>
+    <p class="hint">FG (mL/min/1,73 m²) = k × talla ÷ creatinina. En la primera semana la creatinina refleja la materna y el FG neonatal es fisiológicamente bajo.</p>
+
+    <h3>Fracción excretada de sodio (FENa)</h3>
+    <div class="grid">
+      <label for="una">Na urinario <span class="u">mEq/L = mmol/L</span><input id="una" inputmode="decimal" autocomplete="off" placeholder="20"></label>
+      <label for="ucr">Creatinina urinaria <span class="u">mg/dL</span><input id="ucr" inputmode="decimal" autocomplete="off" placeholder="20"></label>
+    </div>
+    <div class="res" id="rFENa"></div>
+    <p class="hint">FENa (%) = (Na urinario × creatinina plasmática) ÷ (Na plasmático × creatinina urinaria) × 100. Usa el Na de Medio interno y la creatinina de arriba. No interpretable con diuréticos.</p>
+  </section>
+
+  <!-- RESPIRATORIO -->
+  <section class="card" id="s-resp">
+    <h2>Respiratorio</h2>
+    <div class="grid">
+      <label for="map">Presión media (MAP) <span class="u">cmH₂O</span><input id="map" inputmode="decimal" autocomplete="off" placeholder="12"></label>
+      <label for="fio2">FiO₂ <span class="u">%</span><input id="fio2" inputmode="decimal" autocomplete="off" placeholder="60"></label>
+      <label for="pao2">PaO₂ <span class="u">mmHg · arterial</span><input id="pao2" inputmode="decimal" autocomplete="off" placeholder="50"></label>
+      <label for="spo2">SpO₂ <span class="u">%</span><input id="spo2" inputmode="decimal" autocomplete="off" placeholder="90"></label>
+    </div>
+    <div class="res" id="rIO"></div>
+    <p class="hint">IO = MAP × FiO₂ (%) ÷ PaO₂ · OSI = MAP × FiO₂ (%) ÷ SpO₂ (no invasivo; aprox. la mitad del IO; poco fiable con SpO₂ &gt; 97 %). Usar PaO₂ posductal o según criterio de la unidad.</p>
+  </section>
+
+  <footer>Herramienta de apoyo. Las correcciones son estimaciones: verificá con el laboratorio, la clínica y el protocolo de tu unidad.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const v = id => { const s = String($(id).value).trim(); if (s === '') return NaN; const n = parseFloat(s.replace(',', '.')); return isFinite(n) ? n : NaN; };
+const ok = (...a) => a.every(x => isFinite(x));
+// Unidades: factor para pasar el valor cargado a la unidad interna de cálculo
+const UNITS = {
+  glu:[['mg/dL',1],['mmol/L',18.016]],
+  alb:[['g/dL',1],['g/L',0.1]],
+  ca:[['mg/dL',1],['mmol/L',4.008]],
+  cai:[['mmol/L',1],['mg/dL',1/4.008]],
+  urea:[['mg/dL',1],['mmol/L',() => $('ureaT').value === 'bun' ? 2.801 : 6.006]],
+  pco2:[['mmHg',1],['kPa',7.5006]],
+  pao2:[['mmHg',1],['kPa',7.5006]],
+  cr:[['mg/dL',1],['µmol/L',1/88.42]],
+  ucr:[['mg/dL',1],['µmol/L',1/88.42]]
+};
+let US = {}; try { US = JSON.parse(localStorage.getItem('lab_units') || '{}'); } catch(e) {}
+const fac = id => { const o = UNITS[id][US[id] || 0][1]; return typeof o === 'function' ? o() : o; };
+const ul = id => UNITS[id][US[id] || 0][0];
+const u = id => v(id) * fac(id);
+const fmtIn = n => String(+n.toPrecision(4)).replace('.', ',');
+for (const id of Object.keys(UNITS)){
+  const lab = document.querySelector(`label[for="${id}"]`), sp = lab.querySelector('.u');
+  const extra = sp.textContent.includes('·') ? ' · ' + sp.textContent.split('·')[1].trim() : '';
+  const name = lab.firstChild.textContent.trim();
+  const sel = document.createElement('select'); sel.className = 'us'; sel.id = 'u_' + id; sel.setAttribute('aria-label', 'Unidad de ' + name);
+  UNITS[id].forEach(([t], i) => sel.add(new Option(t, i)));
+  sel.value = US[id] || 0;
+  const lh = document.createElement('span'); lh.className = 'lh'; lh.append(name + ' ', sel);
+  if (extra) { const e = document.createElement('span'); e.className = 'u'; e.textContent = extra; lh.append(e); }
+  lab.firstChild.remove(); sp.replaceWith(lh);
+  sel.addEventListener('change', () => {
+    const before = u(id); US[id] = +sel.value;
+    try { localStorage.setItem('lab_units', JSON.stringify(US)); } catch(e) {}
+    if (isFinite(before)) $(id).value = fmtIn(before / fac(id));
+    calc();
+  });
+}
+const f = (n, d=1) => isFinite(n) ? n.toLocaleString('es-AR', {maximumFractionDigits:d, minimumFractionDigits:0}) : '–';
+const tile = (k, val, s, main) => `<div class="tile${main?' main':''}"><span class="k">${k}</span><span class="v">${val}</span>${s?`<span class="s">${s}</span>`:''}</div>`;
+const tiles = (...t) => `<div class="tiles">${t.join('')}</div>`;
+const pill = (cls, t) => `<div class="pill ${cls}"><span>${t}</span></div>`;
+const empty = t => `<div class="empty">Faltan datos: ${t}.</div>`;
+const set = (id, html) => $(id).innerHTML = html;
+
+function calc(){
+  const na=v('na'), k=v('k'), cl=v('cl'), hco3=v('hco3'), glu=u('glu'), alb=u('alb'), ca=u('ca'), cai=u('cai'),
+        urea=u('urea'), osmM=v('osmM'), ph=v('ph'), pco2=u('pco2');
+
+  // Calcio corregido
+  if (ok(ca, alb)){
+    const cc = ca + 0.8*(4-alb);
+    const ccTxt = ul('ca') === 'mmol/L' ? f(cc/4.008,2)+' mmol/L' : f(cc,1)+' mg/dL';
+    const ccAlt = ul('ca') === 'mmol/L' ? `= ${f(cc,1)} mg/dL` : `= ${f(cc/4.008,2)} mmol/L`;
+    let h = tiles(tile('Ca corregido', ccTxt, `${ccAlt} · medido ${f(v('ca'),2)} ${ul('ca')} · albúmina ${f(alb,1)} g/dL`, true));
+    if (isFinite(cai)) h += pill('info', `Hay Ca iónico cargado (<b>${f(cai,2)} mmol/L</b>): usá el iónico para decidir, no el corregido.`);
+    else h += pill('warn', 'Sin Ca iónico: tomá el corregido solo como orientación y pedí iónico si vas a tratar.');
+    set('rCa', h);
+  } else set('rCa', empty('Ca total y albúmina'));
+
+  // Potasio corregido por pH
+  const kf = v('kf');
+  if (ok(k, ph, kf)){
+    const kc = k - kf*(7.40-ph)/0.1;
+    let txt = Math.abs(ph-7.40) < 0.005 ? 'pH normal: no hay corrección.' :
+      ph < 7.40 ? `Acidosis: el K medido está aumentado por el pH. Al corregir la acidosis el K tendería a <b>bajar</b> hacia ~${f(kc,1)} mEq/L.`
+                : `Alcalosis: el K medido está disminuido por el pH. Al corregir la alcalosis el K tendería a <b>subir</b> hacia ~${f(kc,1)} mEq/L.`;
+    set('rK', tiles(tile('K estimado a pH 7,40', '≈ '+f(kc,1)+' mEq/L', `medido ${f(k,1)} a pH ${f(ph,2)}`, true)) + pill('info', txt));
+  } else set('rK', empty('K y pH (en Gases)'));
+
+  // Sodio corregido
+  if (ok(na, glu)){
+    const nf = +$('naf').value;
+    if (glu <= 100) set('rNa', tiles(tile('Na corregido', f(na,0)+' mEq/L', 'sin corrección', true)) + pill('ok','Glucemia ≤ 100 mg/dL: no requiere corrección.'));
+    else { const nc = na + nf*(glu-100)/100;
+      let h = tiles(tile('Na corregido', f(nc,1)+' mEq/L', `medido ${f(na,0)} · glucemia ${f(glu,0)} mg/dL`, true));
+      if (nc > 145) h += pill('warn','El Na corregido muestra hipernatremia real enmascarada por la hiperglucemia.');
+      else if (na < 135 && nc >= 135) h += pill('info','Hiponatremia por dilución (hiperglucemia): el Na corregido es normal.');
+      else if (nc < 135) h += pill('warn','Hiponatremia verdadera: persiste aun corrigiendo por la glucemia.');
+      set('rNa', h); }
+  } else set('rNa', empty('Na y glucemia'));
+
+  // Anión gap
+  let agUse = NaN;
+  if (ok(na, cl, hco3)){
+    const ag = na - (cl + hco3); agUse = ag;
+    const t = [tile('Anión gap', f(ag,1)+' mEq/L', 'sin K', !isFinite(alb))];
+    let msg = '';
+    if (isFinite(alb)){ const agc = ag + 2.5*(4-alb); agUse = agc;
+      t.push(tile('AG corregido', f(agc,1)+' mEq/L', `por albúmina ${f(alb,1)}`, true));
+      if (ag <= 16 && agc > 16) msg = pill('warn','El AG parecía normal, pero corregido por albúmina está <b>elevado</b>.'); }
+    if (!msg) msg = agUse > 16 ? pill('warn','AG elevado: pensar en acidosis láctica, insuficiencia renal, errores congénitos del metabolismo.')
+                 : agUse < 8 ? pill('info','AG bajo.') : pill('ok','AG dentro de la referencia habitual.');
+    set('rAG', tiles(...t) + msg);
+  } else set('rAG', empty('Na, Cl y HCO₃'));
+
+  // Osmolaridad
+  if (ok(na, glu, urea)){
+    const bunT = $('ureaT').value === 'bun';
+    const osm = 2*na + glu/18 + (bunT ? urea/2.8 : urea/6);
+    const t = [tile('Osm calculada', f(osm,0)+' mOsm/L', '', true)];
+    let msg = '';
+    if (isFinite(osmM)){ const gap = osmM - osm; t.push(tile('Gap osmolar', f(gap,0), `medida ${f(osmM,0)}`));
+      msg = gap > 10 ? pill('warn','Gap osmolar elevado (&gt; 10): osmoles no medidos (manitol, alcoholes, propilenglicol de algunas infusiones).') : pill('ok','Gap osmolar normal.'); }
+    set('rOsm', tiles(...t) + msg);
+  } else set('rOsm', empty('Na, glucemia y urea/BUN'));
+
+  // Winters
+  if (ok(hco3)){
+    const e = 1.5*hco3 + 8;
+    const kpa = ul('pco2') === 'kPa' ? ` = ${f((e-2)/7.5006,1)}–${f((e+2)/7.5006,1)} kPa` : '';
+    let h = tiles(tile('pCO₂ esperada', `${f(e-2,0)}–${f(e+2,0)} mmHg`, `HCO₃ ${f(hco3,1)}${kpa}`, true));
+    if (hco3 >= 22) h += pill('info','HCO₃ ≥ 22: no hay acidosis metabólica, Winters no aplica.');
+    else if (isFinite(pco2)){
+      h += pco2 > e+2 ? pill('warn',`pCO₂ medida ${f(pco2,0)} mmHg &gt; esperada: <b>acidosis respiratoria asociada</b> (compensación insuficiente).`)
+         : pco2 < e-2 ? pill('warn',`pCO₂ medida ${f(pco2,0)} mmHg &lt; esperada: <b>alcalosis respiratoria asociada</b>.`)
+         : pill('ok',`pCO₂ medida ${f(pco2,0)} mmHg: compensación respiratoria adecuada.`);
+    } else h += pill('info','Cargá la pCO₂ medida para compararla.');
+    set('rWin', h);
+  } else set('rWin', empty('HCO₃ (en Medio interno)'));
+
+  // Delta ratio
+  if (ok(agUse, hco3)){
+    if (agUse <= 12 || hco3 >= 24) set('rDelta', pill('info','El delta ratio se interpreta cuando hay AG elevado y HCO₃ bajo.'));
+    else { const dr = (agUse-12)/(24-hco3);
+      const i = dr < 0.4 ? 'Acidosis hiperclorémica (AG normal) predominante.'
+              : dr < 0.8 ? 'Acidosis mixta: AG alto + hiperclorémica.'
+              : dr <= 2 ? 'Acidosis con AG alto pura.'
+              : 'Acidosis con AG alto + <b>alcalosis metabólica</b> asociada (o acidosis respiratoria crónica compensada).';
+      set('rDelta', tiles(tile('Delta ratio', f(dr,2), `ΔAG ${f(agUse-12,1)} · ΔHCO₃ ${f(24-hco3,1)}`, true)) + pill('info', i)); }
+  } else set('rDelta', empty('Na, Cl y HCO₃'));
+
+  // Leucocitos corregidos
+  const gb=v('gb'), eb=v('eb');
+  let gbUse = gb;
+  if (ok(gb, eb)){ gbUse = gb*100/(100+eb);
+    set('rGB', tiles(tile('Leucocitos corregidos', f(gbUse,0)+' /mm³', `informados ${f(gb,0)} · ${f(eb,0)} eritroblastos/100`, true)));
+  } else set('rGB', empty('leucocitos y eritroblastos'));
+
+  // RAN e I/T
+  const seg=v('seg'), cay=v('cay'), meta=v('meta')||0, mie=v('mie')||0;
+  if (ok(gbUse, seg, cay)){
+    const inm = cay + meta + mie, ran = gbUse*(seg+inm)/100, it = (inm+seg) > 0 ? inm/(inm+seg) : NaN;
+    let h = tiles(tile('RAN', f(ran,0)+' /mm³', isFinite(eb)?'con leucocitos corregidos':'', true), tile('I/T', f(it,2), `inmaduros ${f(inm,0)} %`), tile('Inmaduros absolutos', f(gbUse*inm/100,0)+' /mm³'));
+    h += it > 0.2 ? pill('warn','I/T &gt; 0,2: sugestivo de infección (alta sensibilidad, baja especificidad).') : pill('ok','I/T ≤ 0,2.');
+    set('rRAN', h);
+  } else set('rRAN', empty('leucocitos, segmentados y cayados'));
+
+  // LCR
+  const lgb=v('lgb'), lgr=v('lgr'), sgb=v('sgb'), sgr=v('sgr');
+  if (ok(lgb, lgr)){
+    let h;
+    if (ok(sgb, sgr) && sgr > 0){ const esp = lgr*sgb/(sgr*1e6), corr = lgb - esp;
+      h = tiles(tile('Leucocitos LCR corregidos', f(Math.max(corr,0),0)+' /mm³', `esperados por sangre ${f(esp,1)}`, true),
+                tile('Observados / esperados', esp>0?f(lgb/esp,1):'–'));
+    } else { const corr = lgb - lgr/500;
+      h = tiles(tile('Leucocitos LCR corregidos', f(Math.max(corr,0),0)+' /mm³', 'regla 1 : 500 (aprox.)', true)) + pill('info','Cargá leucocitos y hematíes en sangre para usar la fórmula con el hemograma.'); }
+    set('rLCR', h);
+  } else set('rLCR', empty('leucocitos y hematíes en LCR'));
+
+  // Schwartz
+  const talla=v('talla'), cr=u('cr');
+  if (ok(talla, cr) && cr > 0){ const fg = +$('kS').value*talla/cr;
+    set('rFG', tiles(tile('FG estimado', f(fg,1), 'mL/min/1,73 m²', true)));
+  } else set('rFG', empty('talla y creatinina'));
+
+  // FENa
+  const una=v('una'), ucr=u('ucr');
+  if (ok(una, ucr, na, cr) && ucr > 0 && na > 0){ const fe = una*cr/(na*ucr)*100;
+    const i = fe < 2.5 ? 'Compatible con causa <b>prerrenal</b> (RN de término).' : fe <= 3 ? 'Zona intermedia.' : 'Sugiere daño renal intrínseco (RN de término).';
+    set('rFENa', tiles(tile('FENa', f(fe,2)+' %', '', true)) + pill('info', i) + pill('warn','En prematuros &lt; 32 semanas la FENa basal es alta (puede superar 5 %): interpretar con cautela.'));
+  } else set('rFENa', empty('Na urinario, creatinina urinaria, Na plasmático y creatinina plasmática'));
+
+  // IO y OSI
+  const map=v('map'), fio2=v('fio2'), pao2=u('pao2'), spo2=v('spo2');
+  const t = []; let msg = '';
+  if (isFinite(fio2) && fio2 > 0 && fio2 <= 1) msg += pill('warn','La FiO₂ va en % (ej. 60), no en fracción.');
+  if (ok(map, fio2, pao2) && pao2 > 0){ const io = map*fio2/pao2; t.push(tile('Índice de oxigenación', f(io,1), '', true));
+    msg += io < 15 ? pill('ok','IO &lt; 15: compromiso leve.')
+         : io < 25 ? pill('warn','IO 15–25: moderado.')
+         : io <= 40 ? pill('crit','IO 25–40: grave. Considerar óxido nítrico inhalado según protocolo.')
+         : pill('crit','IO &gt; 40: muy grave (criterio habitual de derivación a ECMO).'); }
+  if (ok(map, fio2, spo2) && spo2 > 0){ const osi = map*fio2/spo2; t.push(tile('OSI', f(osi,1), 'índice de saturación'));
+    if (spo2 > 97) msg += pill('info','SpO₂ &gt; 97 %: el OSI pierde precisión.'); }
+  set('rIO', t.length ? tiles(...t) + msg : empty('MAP, FiO₂ y PaO₂ o SpO₂'));
+}
+
+const EJ = {na:128,k:5.8,cl:100,hco3:12,glu:300,alb:2.4,ca:7.2,urea:40,ph:7.18,pco2:34,gb:22000,eb:15,seg:50,cay:12,meta:2,mie:0,lgb:40,lgr:8000,sgb:22000,sgr:4.5,talla:44,cr:1.1,una:40,ucr:25,map:14,fio2:70,pao2:45,spo2:88};
+$('ej').onclick = () => { $('ureaT').value = 'urea'; for (const [id,val] of Object.entries(EJ)) $(id).value = UNITS[id] ? fmtIn(val / fac(id)) : String(val).replace('.', ','); calc(); };
+$('clr').onclick = () => { document.querySelectorAll('input').forEach(i => { if (i.id !== 'kf') i.value = ''; }); calc(); };
+document.querySelectorAll('input,select').forEach(i => i.addEventListener('input', calc));
+calc();
+</script>
+<script src="paciente.js?v=v37"></script>
+</body>
+</html>

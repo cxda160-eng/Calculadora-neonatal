@@ -1,0 +1,2194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cardiología – UCIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: misma línea que Laboratorio — tarjetas por herramienta (VIS, QTc, interpretación, score de Schwartz, cómo medir); acento rojo coral para Cardiología */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#f6eeee; --line:#efdcdc; --fg:#2e3147; --muted:#6c7090; --accent:#b8323f; --accent-soft:#fde0e0; --mint:#dcf2ec; --mint-fg:#2b6a60; --peach:#fff4d6; --peach-fg:#86590a; --rose:#ffe3e8; --rose-fg:#a12d40; --sky:#e6f0fb; --sky-fg:#2f5f93;
+  --b-ok:#bfe8d6; --b-bord:#ffe2a6; --b-long:#ffc2c2; --b-high:#f08a8a; --b-short:#c9dcf7;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#ff9f9f; --accent-soft:#3e2228; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5;
+  --b-ok:#24584a; --b-bord:#6a5420; --b-long:#7a3236; --b-high:#a5434a; --b-short:#2c4a74; color-scheme:dark; }}
+:root[data-theme="dark"]{ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#ff9f9f; --accent-soft:#3e2228; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5;
+  --b-ok:#24584a; --b-bord:#6a5420; --b-long:#7a3236; --b-high:#a5434a; --b-short:#2c4a74; color-scheme:dark; }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+header h1{font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.btns{display:flex;gap:6px}
+.btn{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer}
+nav.jump{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+nav.jump a{flex:none;font-size:.8rem;text-decoration:none;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:999px;font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:10px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.card h3{margin:6px 0 0;font-size:.95rem;font-weight:700;padding-top:12px;border-top:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+label .u{font-family:var(--mono);font-size:.7rem;opacity:.8}
+input,select{font:inherit;font-family:var(--mono);font-size:1rem;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+select{font-family:var(--body);font-size:.9rem}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;background:var(--sunk);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:.84rem;padding:8px 6px;border-radius:8px;min-height:38px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.segrow{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:560px){.segrow{grid-template-columns:1fr 1fr}}
+.segrow .lbl{font-size:.8rem;color:var(--muted);margin-bottom:4px;display:block}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.res{display:flex;flex-direction:column;gap:8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:8px}
+.tile{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-family:var(--mono);font-size:1.25rem;font-weight:500;font-variant-numeric:tabular-nums}
+.tile .v small{font-size:.8rem;color:var(--muted);margin-left:3px}
+.tile .s{font-size:.75rem;color:var(--muted)}
+.tile.main{background:var(--accent-soft)}
+.tile.main .v{font-size:2.1rem;font-weight:700;color:var(--accent)}
+.pill{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;font-size:.86rem}
+.pill.warn{background:var(--peach);color:var(--peach-fg)}
+.pill.crit{background:var(--rose);color:var(--rose-fg)}
+.pill.ok{background:var(--mint);color:var(--mint-fg)}
+.pill.info{background:var(--sky);color:var(--sky-fg)}
+.empty{font-size:.82rem;color:var(--muted);font-style:italic}
+/* Escala de QTc */
+.gauge{position:relative;padding-top:26px}
+.gbar{display:flex;height:16px;border-radius:8px;overflow:hidden}
+.gbar span{display:block;height:100%}
+.gmark{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--fg)}
+.gmark::after{content:"";width:2px;height:26px;background:var(--fg);margin-top:2px}
+.gticks{position:relative;height:16px;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.gticks span{position:absolute;transform:translateX(-50%)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.74rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+/* Tabla de z-scores */
+table.zt{width:100%;border-collapse:collapse;font-size:.85rem}
+.zt th{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
+.zt th:first-child,.zt td:first-child{text-align:left}
+.zt td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.zt td:first-child{font-family:var(--body);white-space:normal}
+.zt tr.grp td{font-family:var(--body);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:600;padding-top:12px}
+.zt input{width:64px;padding:5px 6px;font-size:.9rem;text-align:right}
+.zt .zv{font-weight:700}
+.zt .zr{color:var(--muted);font-size:.72rem}
+.zt .zv.hi{color:var(--rose-fg);background:var(--rose);border-radius:6px}
+.zt .zv.lo{color:var(--sky-fg);background:var(--sky);border-radius:6px}
+/* Vistas y ECG */
+.seg.big button{font-size:.95rem;min-height:44px}
+.view{display:flex;flex-direction:column;gap:16px}
+.ejewrap{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+@media (min-width:600px){.ejewrap{grid-template-columns:260px 1fr}}
+#hexa svg{width:100%;max-width:300px;display:block;margin:0 auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:.8rem;font-weight:600;padding:6px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.atlas{display:flex;flex-direction:column;gap:10px}
+.agrp{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-top:6px}
+details.ac{border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+details.ac summary{cursor:pointer;padding:10px 12px;font-weight:700;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.ac summary::-webkit-details-marker{display:none}
+details.ac summary::after{content:"+";color:var(--accent);font-weight:700}
+details.ac[open] summary::after{content:"−"}
+.abody{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.strips{display:flex;gap:6px}
+.abody ul{margin:0;padding-left:18px;font-size:.88rem;display:flex;flex-direction:column;gap:3px}
+.abody .perla{font-size:.84rem;background:var(--sky);color:var(--sky-fg);padding:8px 10px;border-radius:10px}
+.nv.hi{color:var(--rose-fg);background:var(--rose);border-radius:6px;font-weight:700}
+.nv.lo{color:var(--sky-fg);background:var(--sky);border-radius:6px;font-weight:700}
+/* Score */
+.crit-list{display:flex;flex-direction:column;gap:2px}
+.crit-g{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:8px}
+.ck{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border-bottom:1px solid var(--line);font-size:.9rem;color:var(--fg);flex-direction:row;cursor:pointer}
+.ck input{width:20px;height:20px;flex:none;margin-top:1px;accent-color:var(--accent)}
+.ck .t{flex:1}
+.ck .p{font-family:var(--mono);font-weight:700;color:var(--accent);white-space:nowrap}
+.ck.off{opacity:.45}
+.ck .note{display:block;font-size:.75rem;color:var(--muted)}
+.score{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--accent-soft);border-radius:12px;padding:12px 14px}
+.score .v{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--accent)}
+ul.tips{margin:0;padding-left:18px;font-size:.88rem;display:flex;flex-direction:column;gap:4px}
+footer{font-size:.75rem;color:var(--muted)}
+footer a{color:var(--accent)}
+</style>
+<style id="tema-vivo">
+:root{--bg:#fdf3f3;--sunk:#fbe7e7;--line:#f3d3d3;--accent:#b52a39;--accent-soft:#ffd3d6;--mint:#c9efe2;--mint-fg:#0d6b5a;--peach:#ffecb8;--sky:#d6e6fb;--glow:#ffdede;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#3a2025;}}
+:root[data-theme="dark"]{--glow:#3a2025;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+</style>
+<style id="simulador">
+/* Simulador de arritmias: vista propia; monitor oscuro fijo en ambos temas */
+#viewSim{--impulse:#e2412f;--retro:#2563c9;--block:#c0262d;--node:#2e3147;--ink:#2e3147;--ra:#ffc7bd;--la:#ffdcb4;--rv:#eec2f2;--lv:#ffbccb}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #viewSim{--impulse:#ff6a55;--retro:#7aa8ff;--block:#ff5a61;--node:#eceefa;--ink:#eceefa;--ra:#7a4a44;--la:#7a5a3c;--rv:#674a6e;--lv:#7c4250}}
+:root[data-theme="dark"] #viewSim{--impulse:#ff6a55;--retro:#7aa8ff;--block:#ff5a61;--node:#eceefa;--ink:#eceefa;--ra:#7a4a44;--la:#7a5a3c;--rv:#674a6e;--lv:#7c4250}
+#sm-sel select{font-weight:700;font-size:1rem;border:2px solid var(--accent-soft);background:var(--surface)}
+.sm-mon{background:#151225;border-radius:16px;padding:10px 12px 12px;color:#d9d2f5}
+.sm-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--mono);font-size:.72rem}
+.sm-vit{display:flex;gap:14px;align-items:baseline}
+.sm-vit b{font-size:1.35rem;color:#7dffc0;font-weight:700;font-variant-numeric:tabular-nums}
+.sm-vit .a b{color:#ffd47a}
+.sm-ctrl{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.sm-ctrl button,.sm-ctrl select{font:inherit;font-family:var(--mono);font-size:.78rem;width:auto;background:#241f3a;color:#d9d2f5;border:1px solid #3a3360;border-radius:8px;padding:7px 10px;cursor:pointer}
+.sm-ctrl label{flex-direction:row;align-items:center;gap:6px;color:#b9b1da;font-size:.75rem}
+#sm-ecg{width:100%;height:170px;display:block;margin-top:4px}
+#viewSim .ihead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:space-between}
+#viewSim .ihead h2{font-size:1.05rem;text-transform:none;letter-spacing:0;color:var(--fg);font-weight:700}
+#viewSim .tag{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;color:var(--muted);background:var(--sunk);padding:3px 9px;border-radius:999px}
+#viewSim .dot{width:8px;height:8px;border-radius:50%}
+#viewSim .m-re{background:#e2412f}#viewSim .m-au{background:#e09a1f}#viewSim .m-tr{background:#8b4fd6}#viewSim .m-co{background:#2563c9}
+#viewSim .tip{margin:0;font-size:.9rem}
+#viewSim .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#viewSim .act{font:inherit;font-weight:600;font-size:.86rem;padding:11px 8px;border-radius:12px;border:0;background:var(--accent-soft);color:var(--accent);cursor:pointer;line-height:1.2}
+#viewSim .act.on,#viewSim .act:active{background:var(--accent);color:#fff}
+#viewSim .slider{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:.9rem}
+#viewSim .slider label{flex-direction:row;color:var(--fg);font-size:.9rem}
+#viewSim .slider input{flex:1;padding:0;background:none;border:0}
+#viewSim details{border-top:1px solid var(--line);padding-top:8px}
+#viewSim summary{font-weight:700;font-size:.9rem;cursor:pointer;color:var(--accent)}
+#viewSim details ul{margin:6px 0 0;padding-left:18px;font-size:.88rem;display:flex;flex-direction:column;gap:4px}
+#sm-heart{width:100%;max-width:380px;height:auto;display:block;margin:0 auto}
+#sm-hv{margin-bottom:8px}
+#sm-3d{position:relative}
+#sm-canvas{display:block;width:100%;height:min(108vw,440px);touch-action:none;cursor:grab;border-radius:14px;background:radial-gradient(ellipse at 50% 45%,#1d1f3a 0%,#0c0d1a 55%,#050509 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 8px 24px -12px rgba(0,0,0,.6)}
+#sm-canvas:active{cursor:grabbing}
+.sm3-hint{margin:4px 0 0;text-align:center;font-size:.74rem;color:var(--muted)}
+.sm-2d-off{position:absolute!important;visibility:hidden;pointer-events:none;width:380px;left:-9999px}
+.sm-leg{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.74rem;color:var(--muted)}
+.sm-leg i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+@media (min-width:700px){.sm-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}}
+.sm-grid{display:flex;flex-direction:column;gap:16px}
+@media (min-width:700px){.sm-grid{display:grid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Cardiología</h1>
+      <p>Calculadoras (VIS, z-scores, coronarias, Qp:Qs, anticoagulación, Doppler) y ECG (eje, normales por edad, bloqueos y arritmias, QTc, Schwartz). Simulador animado de arritmias.</p>
+    </div>
+    <div class="btns"><button type="button" class="btn" id="ej">Ejemplo</button><button type="button" class="btn" id="clr">Limpiar</button></div>
+  </header>
+
+  <div class="seg big" id="sView" role="tablist" aria-label="Sección">
+    <button data-v="tools" aria-pressed="true">Calculadoras</button><button data-v="ecg" aria-pressed="false">ECG</button><button data-v="sim" aria-pressed="false">Simulador</button>
+  </div>
+  <div id="viewTools" class="view">
+  <nav class="jump" aria-label="Ir a sección">
+    <a href="#s-vis">VIS</a><a href="#s-z">Z-scores</a><a href="#s-cor">Coronarias</a><a href="#s-qp">Qp:Qs</a><a href="#s-ac">Anticoagulación</a><a href="#s-dop">Doppler</a>
+  </nav>
+
+  <!-- VIS -->
+  <section class="card" id="s-vis">
+    <h2>Score vasoactivo-inotrópico (VIS)</h2>
+    <p class="hint">Cargá la dosis actual de cada infusión que esté corriendo. Dejá vacío lo que no recibe.</p>
+    <div class="grid">
+      <label for="vDopa">Dopamina <span class="u">mcg/kg/min</span><input id="vDopa" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vDobu">Dobutamina <span class="u">mcg/kg/min</span><input id="vDobu" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vAdre">Adrenalina <span class="u">mcg/kg/min</span><input id="vAdre" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vNora">Noradrenalina <span class="u">mcg/kg/min</span><input id="vNora" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vMil">Milrinona <span class="u">mcg/kg/min</span><input id="vMil" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vVaso">Vasopresina <span class="u">mU/kg/min</span><input id="vVaso" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="segrow">
+      <div><span class="lbl">Momento del posoperatorio</span>
+        <div class="seg" id="sVisT" role="group" aria-label="Momento del posoperatorio">
+          <button data-v="24" aria-pressed="true">Primeras 24 h</button><button data-v="48" aria-pressed="false">24–48 h</button>
+        </div></div>
+    </div>
+    <div class="res" id="rVIS"></div>
+    <p class="hint">VIS = dopamina + dobutamina + 100 × adrenalina + 100 × noradrenalina + 10 × milrinona + 10 000 × vasopresina (U/kg/min). Con vasopresina en mU/kg/min, el factor es 10. IS (score inotrópico de Wernovsky) = dopamina + dobutamina + 100 × adrenalina. El valor pronóstico es el VIS máximo del período: cargá la combinación de dosis más alta.</p>
+  </section>
+
+  <!-- SUPERFICIE CORPORAL Y Z-SCORES -->
+  <section class="card" id="s-z">
+    <h2>Superficie corporal y z-scores ecocardiográficos</h2>
+    <div class="grid">
+      <label for="zPeso">Peso <span class="u">g</span><input id="zPeso" inputmode="numeric" autocomplete="off" placeholder="3200"></label>
+      <label for="zTalla">Talla <span class="u">cm · opc.</span><input id="zTalla" inputmode="decimal" autocomplete="off" placeholder="50"></label>
+    </div>
+    <div class="res" id="rBSA"></div>
+    <h3>Z-scores</h3>
+    <div class="seg" id="sZm" role="group" aria-label="Modelo de z-score">
+      <button data-v="phn" aria-pressed="true">PHN (Lopez 2017)</button><button data-v="det" aria-pressed="false">Detroit (Pettersen 2008)</button>
+    </div>
+    <p class="hint" id="zModelTxt"></p>
+    <p class="hint">Medidas lineales en mm (la app convierte). Sin medida, cada fila muestra el valor esperado y el rango de z −2 a +2.</p>
+    <div class="tablewrap" style="overflow-x:auto"><table class="zt" id="zTable"></table></div>
+    <div class="res" id="rZ"></div>
+    <p class="hint">Ambos modelos se derivaron de niños sanos de 0 a 18 años. Pueden diferir hasta en 1 DE para la misma medida: en el seguimiento de un paciente usá siempre el mismo modelo. Las coronarias con PHN alimentan la clasificación AHA de abajo.</p>
+  </section>
+
+  <!-- CORONARIAS -->
+  <section class="card" id="s-cor">
+    <h2>Coronarias: clasificación AHA 2017 (Kawasaki)</h2>
+    <p class="hint">Si cargaste las coronarias arriba con el modelo PHN, la clasificación usa ese z. Si no, cargá el z-score de tu calculadora y, si lo tenés, el diámetro interno máximo.</p>
+    <div class="grid">
+      <label for="cZ">z-score máximo <span class="u">DA o CD</span><input id="cZ" inputmode="decimal" autocomplete="off" placeholder="2,7"></label>
+      <label for="cMm">Diámetro interno <span class="u">mm · opc.</span><input id="cMm" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rCor"></div>
+  </section>
+
+  <!-- QP:QS -->
+  <section class="card" id="s-qp">
+    <h2>Qp:Qs</h2>
+    <div class="seg" id="sQpM" role="group" aria-label="Método">
+      <button data-v="dop" aria-pressed="true">Por Doppler (eco)</button><button data-v="ox" aria-pressed="false">Por oximetría (Fick)</button>
+    </div>
+    <div id="qpDop" style="display:flex;flex-direction:column;gap:12px">
+      <div class="seg" id="sQpS" role="group" aria-label="Ubicación del cortocircuito">
+        <button data-v="cia" aria-pressed="true">CIA o CIV</button><button data-v="pda" aria-pressed="false">Ductus</button>
+      </div>
+      <div class="grid">
+        <label for="dpD">Anillo pulmonar <span class="u">mm</span><input id="dpD" inputmode="decimal" autocomplete="off" placeholder="8"></label>
+        <label for="dpV">VTI pulmonar <span class="u">cm</span><input id="dpV" inputmode="decimal" autocomplete="off" placeholder="14"></label>
+        <label for="daD">Anillo aórtico <span class="u">mm</span><input id="daD" inputmode="decimal" autocomplete="off" placeholder="7"></label>
+        <label for="daV">VTI aórtico <span class="u">cm</span><input id="daV" inputmode="decimal" autocomplete="off" placeholder="12"></label>
+        <label for="dFC">FC <span class="u">lpm · opc.</span><input id="dFC" inputmode="decimal" autocomplete="off" placeholder="140"></label>
+        <label for="dPeso">Peso <span class="u">g · opc.</span><input id="dPeso" inputmode="numeric" autocomplete="off" placeholder="3200"></label>
+      </div>
+      <div class="res" id="rQpD"></div>
+      <p class="hint">Volumen latido = 0,785 × diámetro² × VTI. Qp:Qs = VL pulmonar ÷ VL aórtico en CIA o CIV. En el ductus se invierte: el tracto aórtico mide el Qp (el VI recibe todo el retorno pulmonar) y el pulmonar mide el Qs. Medir el anillo en sístole, de bisagra a bisagra, y el VTI con la muestra en el mismo nivel. No es confiable con insuficiencia valvular significativa, obstrucción del tracto de salida o más de un cortocircuito.</p>
+    </div>
+    <div id="qpOx" hidden style="display:flex;flex-direction:column;gap:12px">
+    <div class="seg" id="sQp" role="group" aria-label="Fisiología">
+      <button data-v="bi" aria-pressed="true">Biventricular</button><button data-v="uni" aria-pressed="false">Univentricular / mezcla completa</button>
+    </div>
+    <div class="grid">
+      <label for="qAo">Sat. aórtica <span class="u">% · o SpO₂ de oxímetro</span><input id="qAo" inputmode="decimal" autocomplete="off" placeholder="95"></label>
+      <label for="qVm">Sat. venosa mixta <span class="u">% · catéter en VCS/AD</span><input id="qVm" inputmode="decimal" autocomplete="off" placeholder="70"></label>
+      <label for="qVp">Sat. venas pulmonares <span class="u">% · si falta, 98</span><input id="qVp" inputmode="decimal" autocomplete="off" placeholder="98"></label>
+      <label for="qAp" id="lAp">Sat. arteria pulmonar <span class="u">%</span><input id="qAp" inputmode="decimal" autocomplete="off" placeholder="85"></label>
+    </div>
+    <div class="res" id="rQp"></div>
+    <p class="hint">Qp:Qs = (SaO₂ − SvO₂) ÷ (SvpO₂ − SpaO₂). En mezcla completa (Norwood, shunt de BT, banding, fisiología univentricular) la saturación de la arteria pulmonar es igual a la aórtica. Venosa mixta: idealmente vena cava superior. La saturación de venas pulmonares se asume en 98% si no se midió; con enfermedad pulmonar el cálculo sobreestima el Qp. La venosa mixta no se puede estimar: sin catéter central, usá el método por Doppler.</p>
+    </div>
+  </section>
+
+  <!-- ANTICOAGULACIÓN -->
+  <section class="card" id="s-ac">
+    <h2>Anticoagulación: heparina y enoxaparina</h2>
+    <div class="grid">
+      <label for="aPeso">Peso <span class="u">g</span><input id="aPeso" inputmode="numeric" autocomplete="off" placeholder="3200"></label>
+    </div>
+    <div class="segrow">
+      <div><span class="lbl">Edad</span>
+        <div class="seg" id="sAcAge" role="group" aria-label="Edad">
+          <button data-v="neo" aria-pressed="true">&lt; 2 meses</button><button data-v="lact" aria-pressed="false">2–12 meses</button><button data-v="nino" aria-pressed="false">1–12 años</button><button data-v="ado" aria-pressed="false">≥ 12 años</button>
+        </div></div>
+    </div>
+
+    <h3>Heparina no fraccionada (infusión IV)</h3>
+    <div class="grid">
+      <label for="hConc">Concentración de la jeringa <span class="u">U/mL</span><input id="hConc" inputmode="decimal" autocomplete="off" value="100"></label>
+      <label for="hRate">Dosis actual <span class="u">U/kg/h · opc.</span><input id="hRate" inputmode="decimal" autocomplete="off" placeholder="inicial"></label>
+    </div>
+    <div class="res" id="rHep"></div>
+    <div class="segrow">
+      <div><span class="lbl">Ajuste por</span>
+        <div class="seg" id="sHepMon" role="group" aria-label="Control">
+          <button data-v="xa" aria-pressed="true">Anti-Xa (U/mL)</button><button data-v="aptt" aria-pressed="false">KPTT (s)</button>
+        </div></div>
+      <div><label for="hLab" id="lhLab">Resultado <span class="u" id="uhLab">U/mL</span><input id="hLab" inputmode="decimal" autocomplete="off" placeholder="—"></label></div>
+      <div id="xaRange"><span class="lbl">Rango anti-Xa objetivo</span>
+        <div class="seg" id="sXaR" role="group" aria-label="Rango anti-Xa">
+          <button data-v="0.3" aria-pressed="false">0,30–0,70</button><button data-v="0.35" aria-pressed="false">0,35–0,70</button>
+        </div></div>
+    </div>
+    <div class="res" id="rHepAdj"></div>
+
+    <h3>Enoxaparina (subcutánea, cada 12 h)</h3>
+    <div class="seg" id="sEnox" role="group" aria-label="Indicación">
+      <button data-v="tto" aria-pressed="true">Tratamiento</button><button data-v="pro" aria-pressed="false">Profilaxis</button>
+    </div>
+    <div class="grid">
+      <label for="eDose">Dosis actual <span class="u">mg/kg/dosis · opc.</span><input id="eDose" inputmode="decimal" autocomplete="off" placeholder="inicial"></label>
+      <label for="eConc">Concentración <span class="u">mg/mL</span><select id="eConc"><option value="100">100 mg/mL (jeringa comercial)</option><option value="20">20 mg/mL (dilución de farmacia)</option></select></label>
+      <label for="eXa">Anti-Xa 4 h posdosis <span class="u">U/mL · opc.</span><input id="eXa" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rEnox"></div>
+    <p class="hint">Heparina: carga 75 U/kg en 10 min (máx. 5000 U; 50 U/kg en menores de 35 semanas de edad posmenstrual; evitarla en prematuros enfermos o con riesgo de sangrado). Mantenimiento inicial: &lt; 1 año 28 U/kg/h, 1–12 años 20 U/kg/h, ≥ 12 años 18 U/kg/h. Objetivo: anti-Xa 0,3–0,7 U/mL (algunos protocolos 0,35–0,7) o KPTT 60–85 s (calibrar con el laboratorio local); control 4 h después de cada cambio. Enoxaparina: objetivo anti-Xa 0,5–1 U/mL a las 4 h (3–5 h) de la dosis, primer control tras la 3.ª o 4.ª dosis. Nomogramas adaptados de CHEST 2012 (Monagle y col.): verificá con el protocolo de tu servicio y hematología.</p>
+  </section>
+
+  <!-- DOPPLER -->
+  <section class="card" id="s-pda">
+    <h2>Cierre farmacológico del ductus</h2>
+    <div class="grid">
+      <label for="pdaPeso">Peso <span class="u">g</span><input id="pdaPeso" inputmode="numeric" autocomplete="off" placeholder="1200"></label>
+      <label for="pdaDias">Días de vida al iniciar <span class="u">días</span><input id="pdaDias" inputmode="numeric" autocomplete="off" placeholder="3"></label>
+    </div>
+    <div class="seg" id="sPda" role="group" aria-label="Fármaco">
+      <button data-v="ibu" aria-pressed="true">Ibuprofeno</button><button data-v="indo" aria-pressed="false">Indometacina</button><button data-v="para" aria-pressed="false">Paracetamol</button>
+    </div>
+    <div class="seg" id="sIbu" role="group" aria-label="Esquema de ibuprofeno">
+      <button data-v="std" aria-pressed="true">Estándar 10-5-5</button><button data-v="alta" aria-pressed="false">Dosis alta 20-10-10</button>
+    </div>
+    <div class="grid"><label for="pdaConc">Concentración <span class="u">mg/mL</span><input id="pdaConc" inputmode="decimal" autocomplete="off" value="5"></label></div>
+    <div class="res" id="rPda"></div>
+    <p class="hint">Ibuprofeno (IV u oral): 10 mg/kg y luego 5 mg/kg a las 24 y 48 h; esquema de dosis alta 20-10-10 en algunos protocolos. Indometacina IV cada 12–24 h según edad posnatal en la primera dosis: &lt; 48 h 0,2-0,1-0,1 mg/kg; 2–7 días 0,2-0,2-0,2; &gt; 7 días 0,2-0,25-0,25. Paracetamol (IV u oral): 15 mg/kg cada 6 h durante 3–7 días. Fuentes: NeoFax / Neofax-Micromedex, Lexicomp neonatal; verificar con el protocolo de la unidad.</p>
+  </section>
+
+  <section class="card" id="s-dop">
+    <h2>Doppler: gradientes y presión pulmonar</h2>
+    <div class="grid">
+      <label for="dTA">TA sistólica <span class="u">mmHg</span><input id="dTA" inputmode="decimal" autocomplete="off" placeholder="65"></label>
+      <label for="dPAD">Presión de AD <span class="u">mmHg</span><input id="dPAD" inputmode="decimal" autocomplete="off" value="5"></label>
+    </div>
+    <h3>Gradiente por Bernoulli</h3>
+    <div class="grid"><label for="dV">Velocidad pico <span class="u">m/s</span><input id="dV" inputmode="decimal" autocomplete="off" placeholder="3"></label></div>
+    <div class="res" id="rGrad"></div>
+    <h3>Presión sistólica del VD (y pulmonar, sin obstrucción del tracto de salida)</h3>
+    <div class="grid">
+      <label for="dIT">Por insuficiencia tricuspídea <span class="u">v pico m/s</span><input id="dIT" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="dCIV">Por CIV izq → der <span class="u">v pico m/s</span><input id="dCIV" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="dDA">Por ductus izq → der <span class="u">v pico sist. m/s</span><input id="dDA" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rPSAP"></div>
+    <h3>Presión pulmonar media y diastólica (insuficiencia pulmonar)</h3>
+    <div class="grid">
+      <label for="dIPp">IP protodiastólica <span class="u">v pico m/s</span><input id="dIPp" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="dIPf">IP telediastólica <span class="u">v final m/s</span><input id="dIPf" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rPAPm"></div>
+    <p class="hint">PAP media ≈ 4 × v² de la IP protodiastólica + presión de AD. PAP diastólica ≈ 4 × v² de la IP telediastólica + presión de AD. Si hay PSAP estimada por IT, también se muestra la PAP media por la fórmula de Chemla (0,61 × PSAP + 2). Normal: PAP media &lt; 20 mmHg (fuera del período neonatal inmediato).</p>
+    <h3>Área valvular por ecuación de continuidad</h3>
+    <div class="grid">
+      <label for="cLvot">Diámetro del tracto de salida <span class="u">mm</span><input id="cLvot" inputmode="decimal" autocomplete="off" placeholder="7"></label>
+      <label for="cVtiL">VTI del tracto de salida <span class="u">cm</span><input id="cVtiL" inputmode="decimal" autocomplete="off" placeholder="12"></label>
+      <label for="cVtiV">VTI transvalvular <span class="u">cm</span><input id="cVtiV" inputmode="decimal" autocomplete="off" placeholder="40"></label>
+      <label for="cBsa">Superficie corporal <span class="u">m² · opc.</span><input id="cBsa" inputmode="decimal" autocomplete="off" placeholder="auto"></label>
+    </div>
+    <div class="res" id="rCont"></div>
+    <p class="hint">Área = 0,785 × D² × (VTI del tracto ÷ VTI valvular). Se puede usar con velocidades pico en lugar de VTI (método simplificado). Si no cargás la SC, se toma la calculada en z-scores. En niños la gravedad se interpreta mejor indexada: estenosis aórtica grave con área indexada &lt; 0,6 cm²/m².</p>
+    <p class="hint">Gradiente = 4 × v². Por IT: PSVD = 4 × v² + presión de AD. Por CIV o ductus con flujo de izquierda a derecha: PSVD (o PSAP) = TA sistólica − 4 × v². El cociente con la TA sistólica clasifica la hipertensión pulmonar: &lt; 1/3 normal, 1/3–1/2 leve, 1/2–2/3 moderada, &gt; 2/3 grave, ≥ 1 suprasistémica.</p>
+  </section>
+
+  </div>
+  <div id="viewEcg" class="view" hidden>
+  <nav class="jump" aria-label="Ir a sección">
+    <a href="#s-eje">Eje</a><a href="#s-norm">Normales por edad</a><a href="#s-atlas">Bloqueos y arritmias</a><a href="#s-qtc">QTc</a><a href="#s-int">Interpretación</a><a href="#s-sch">Schwartz</a><a href="#s-med">Cómo medir</a>
+  </nav>
+
+  <!-- EJE -->
+  <section class="card" id="s-eje">
+    <h2>Eje eléctrico del QRS</h2>
+    <p class="hint">Cargá la amplitud neta del QRS (R menos la mayor de Q o S, en mm) en DI y aVF.</p>
+    <div class="grid">
+      <label for="eI">Neto en DI <span class="u">mm (±)</span><input id="eI" inputmode="decimal" autocomplete="off" placeholder="+6"></label>
+      <label for="eF">Neto en aVF <span class="u">mm (±)</span><input id="eF" inputmode="decimal" autocomplete="off" placeholder="+8"></label>
+      <label for="eAge">Edad<select id="eAge"></select></label>
+    </div>
+    <div class="ejewrap"><div id="hexa"></div><div class="res" id="rEje"></div></div>
+    <p class="hint">Eje = arctangente(aVF ÷ DI). Atajo: DI y aVF positivos → 0° a +90°; DI negativo y aVF positivo → +90° a 180° (derecho); DI positivo y aVF negativo → 0° a −90° (izquierdo o superior); ambos negativos → −90° a 180° (extremo, "tierra de nadie"). La derivación isodifásica es perpendicular al eje.</p>
+  </section>
+
+  <!-- NORMALES POR EDAD -->
+  <section class="card" id="s-norm">
+    <h2>ECG normal por edad (Davignon)</h2>
+    <div class="grid"><label for="nAge">Edad<select id="nAge"></select></label></div>
+    <p class="hint">Rango = percentiles 2 a 98 (media). Cargá los valores del paciente para marcarlos; dejá vacío lo que no midas.</p>
+    <div class="tablewrap" style="overflow-x:auto"><table class="zt" id="nTable"></table></div>
+    <h3>Signos cualitativos de hipertrofia</h3>
+    <label class="ck"><input type="checkbox" id="nTV1"><span class="t">T positiva en V1 (después del 3.er día y antes de la adolescencia)<span class="note">Signo de hipertrofia del VD aun con voltajes normales</span></span></label>
+    <label class="ck"><input type="checkbox" id="nQR"><span class="t">Patrón qR en V1</span></label>
+    <label class="ck"><input type="checkbox" id="nStrain"><span class="t">T invertida en V5–V6 (sobrecarga sistólica del VI)</span></label>
+    <label class="ck"><input type="checkbox" id="nQ6"><span class="t">Q profunda en V5–V6 (> 5 mm) con T alta (sobrecarga de volumen del VI)</span></label>
+    <div class="res" id="rNorm"></div>
+    <p class="hint">Hipertrofia del VD: R en V1 o S en V6 por encima del p98, R/S en V1 alto, T positiva en V1, qR en V1, eje derecho. Hipertrofia del VI: R en V6 o S en V1 por encima del p98, R/S en V1 bajo, Q profunda o T invertida en V5–V6. Biventricular: criterios de ambas, o R + S grandes en V2–V4 (Katz-Wachtel). Los voltajes no aplican si el QRS es ancho (bloqueo de rama, preexcitación).</p>
+  </section>
+
+  <!-- ATLAS -->
+  <section class="card" id="s-atlas">
+    <h2>Bloqueos y arritmias</h2>
+    <p class="hint">Trazados esquemáticos ilustrativos (25 mm/s, 10 mm/mV): muestran el patrón, no un ECG real. Tocá cada uno para ver criterios y perlas pediátricas.</p>
+    <button type="button" class="btn" id="goSim" style="align-self:flex-start">Ver animados en el Simulador →</button>
+    <div class="chips" id="aFilt"></div>
+    <div id="atlas" class="atlas"></div>
+  </section>
+
+  <!-- MEDICIÓN Y QTc -->
+  <section class="card" id="s-qtc">
+    <h2>Medición y QTc</h2>
+    <div class="segrow">
+      <div><span class="lbl">Edad</span>
+        <div class="seg" id="sAge" role="group" aria-label="Grupo de edad">
+          <button data-v="neo" aria-pressed="true">Neonato</button><button data-v="nino" aria-pressed="false">Niño prepuberal</button><button data-v="ado" aria-pressed="false">Pospuberal</button>
+        </div></div>
+      <div><span class="lbl">Sexo</span>
+        <div class="seg" id="sSex" role="group" aria-label="Sexo">
+          <button data-v="m" aria-pressed="true">Masculino</button><button data-v="f" aria-pressed="false">Femenino</button>
+        </div></div>
+      <div><span class="lbl">Cargo los intervalos en</span>
+        <div class="seg" id="sUnit" role="group" aria-label="Unidad de medida">
+          <button data-v="ms" aria-pressed="true">ms</button><button data-v="mm" aria-pressed="false">mm (cuadraditos)</button>
+        </div></div>
+      <div><span class="lbl">Frecuencia por</span>
+        <div class="seg" id="sHR" role="group" aria-label="Dato de frecuencia">
+          <button data-v="fc" aria-pressed="true">FC (lpm)</button><button data-v="rr" aria-pressed="false">Intervalo RR</button>
+        </div></div>
+    </div>
+    <div class="grid">
+      <label for="qt">QT <span class="u" id="uQT">ms</span><input id="qt" inputmode="decimal" autocomplete="off" placeholder="280"></label>
+      <label for="fc" id="lFC">FC <span class="u">lpm</span><input id="fc" inputmode="decimal" autocomplete="off" placeholder="140"></label>
+      <label for="rr" id="lRR" hidden>RR previo <span class="u" id="uRR">ms</span><input id="rr" inputmode="decimal" autocomplete="off" placeholder="430"></label>
+      <label for="qrs">QRS <span class="u" id="uQRS">ms · opc.</span><input id="qrs" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vel" id="lVel" hidden>Velocidad del papel<select id="vel"><option value="25">25 mm/s (1 mm = 40 ms)</option><option value="50">50 mm/s (1 mm = 20 ms)</option></select></label>
+    </div>
+    <div class="res" id="rQTc"></div>
+    <p class="hint">Bazett = QT ÷ √RR · Fridericia = QT ÷ ∛RR · Framingham = QT + 154 × (1 − RR) · Hodges = QT + 1,75 × (FC − 60). RR en segundos, QT en ms.</p>
+  </section>
+
+  <!-- INTERPRETACIÓN -->
+  <section class="card" id="s-int">
+    <h2>Interpretación (QTc de Bazett)</h2>
+    <div class="res" id="rInt"></div>
+  </section>
+
+  <!-- SCHWARTZ -->
+  <section class="card" id="s-sch">
+    <h2>Score de Schwartz · QT largo congénito</h2>
+    <div class="seg" id="sVer" role="group" aria-label="Versión del score">
+      <button data-v="esc" aria-pressed="true">ESC 2022 (modificado)</button><button data-v="sc" aria-pressed="false">Schwartz-Crotti 2011</button>
+    </div>
+    <div class="crit-list" id="crit"></div>
+    <div class="score"><div><b>Puntaje</b><div class="hint" id="schTxt"></div></div><div class="v" id="schV">0</div></div>
+    <div class="res" id="rSch"></div>
+    <p class="hint">Puntuar en ausencia de fármacos o trastornos que alteren el QT. El QTc del score es el de Bazett. Un mismo familiar no puede sumar en los dos criterios de antecedentes familiares.</p>
+  </section>
+
+  <!-- CÓMO MEDIR -->
+  <section class="card" id="s-med">
+    <h2>Cómo medir bien el QT</h2>
+    <ul class="tips">
+      <li>Medir en DII o V5 (la derivación con el QT más largo y T bien definida), desde el inicio del QRS hasta el final de la T.</li>
+      <li>Final de la T por el método de la tangente: cruce de la tangente a la pendiente descendente más empinada con la línea de base. No incluir la onda U si está separada.</li>
+      <li>Promediar 3 a 5 latidos. Con arritmia sinusal (frecuente en lactantes), usar el RR que precede al QT medido.</li>
+      <li>Registrar en reposo; en el neonato, con el bebé tranquilo. No confiar en la medición automática del equipo sin revisarla.</li>
+      <li>En neonatos, Bazett sigue siendo la fórmula de referencia. En niños mayores con FC muy alta o muy baja, comparar con Fridericia.</li>
+    </ul>
+    <h3>Causas adquiridas de QT largo a descartar en UCIN</h3>
+    <ul class="tips">
+      <li>Hipocalcemia, hipopotasemia, hipomagnesemia, hipotermia (incluida la terapéutica), hipotiroidismo, hipoglucemia.</li>
+      <li>Fármacos: amiodarona, sotalol, macrólidos, fluconazol, ondansetrón, metadona, domperidona, entre otros.</li>
+      <li>Hijo de madre con lupus o anticuerpos anti-Ro, hemorragia intracraneal, miocarditis.</li>
+    </ul>
+  </section>
+
+  </div>
+
+  <div id="viewSim" class="view" hidden>
+  <div class="pill warn"><span>Herramienta didáctica: tiempos y morfologías aproximados. No reemplaza el ECG real ni las guías.</span></div>
+  <div id="sm-sel"></div>
+  <section class="sm-mon" aria-label="Monitor ECG simulado">
+    <div class="sm-top">
+      <div class="sm-vit"><span>FCv <b id="sm-hrv">--</b></span><span class="a">FCa <b id="sm-hra">--</b></span></div>
+      <span id="sm-lead">DII</span>
+    </div>
+    <canvas id="sm-ecg" aria-label="ECG simulado"></canvas>
+    <div class="sm-ctrl">
+      <button id="sm-play" type="button">Pausa</button>
+      <label for="sm-speed">Velocidad <select id="sm-speed"><option value="0.25">0,25×</option><option value="0.5" selected>0,5×</option><option value="1">1×</option></select></label>
+      <button id="sm-reset" type="button">Reiniciar</button>
+    </div>
+  </section>
+  <div class="sm-grid">
+    <section class="card" id="sm-info" aria-live="polite"></section>
+    <section class="card" aria-label="Corazón esquemático">
+      <div class="seg" id="sm-hv" role="group" aria-label="Vista del corazón">
+        <button type="button" data-v="3d" aria-pressed="true">Corazón 3D</button><button type="button" data-v="2d" aria-pressed="false">Esquema 2D</button>
+      </div>
+      <div id="sm-3d" hidden>
+        <canvas id="sm-canvas" aria-label="Corazón en 3D con el sistema de conducción; arrastrá para girarlo"></canvas>
+        <p class="sm3-hint">Arrastrá para girar · doble toque para volver al frente</p>
+      </div>
+      <div id="sm-2d">
+      <svg id="sm-heart" viewBox="0 0 400 420" role="img" aria-label="Esquema del sistema de conducción">
+        <defs>
+          <filter id="sm-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <g id="sm-chambers">
+          <path id="sm-c-ra" d="M60 110 Q60 55 120 55 Q175 55 180 115 L182 195 Q130 215 75 190 Q55 160 60 110Z" fill="var(--ra)"/>
+          <path id="sm-c-la" d="M220 105 Q225 50 290 50 Q345 52 345 110 Q345 170 330 192 Q270 210 218 195Z" fill="var(--la)"/>
+          <path id="sm-c-rv" d="M72 205 Q130 228 186 210 L190 262 L188 395 Q120 400 85 340 Q60 290 72 205Z" fill="var(--rv)"/>
+          <path id="sm-c-lv" d="M214 210 Q275 225 335 205 Q350 280 330 345 Q300 405 205 398 L208 262Z" fill="var(--lv)"/>
+        </g>
+        <g font-family="Public Sans, system-ui, sans-serif" font-size="12" fill="var(--ink)" opacity=".75">
+          <text x="96" y="150">AD</text><text x="272" y="140">AI</text><text x="112" y="320">VD</text><text x="268" y="320">VI</text>
+        </g>
+        <g id="sm-paths" fill="none" stroke-linecap="round"></g>
+        <g id="sm-landmarks"></g>
+        <g id="sm-dots"></g>
+        <g id="sm-blocks"></g>
+      </svg>
+      </div>
+      <div class="sm-leg"><span><i style="background:var(--impulse)"></i>Anterógrado</span><span><i style="background:var(--retro)"></i>Retrógrado / vía accesoria</span><span><i style="background:var(--block)"></i>Bloqueo</span></div>
+    </section>
+  </div>
+  <p class="hint">Basado en EHRA/AEPC 2013, PACES/HRS 2012–2016, AHA 2024 (arritmias fetales y neonatales), ESC 2019 y 2022 y PALS 2025.</p>
+  </div>
+
+  <footer>
+    Referencias: Davignon y col., Pediatr Cardiol 1979/80 (ECG normal por edad) · Surawicz y col., recomendaciones AHA/ACCF/HRS 2009 (trastornos de conducción) · <a href="https://www.pediatricheartnetwork.org/forresearchers/echo-z-scores/">Pediatric Heart Network, z-scores (Lopez y col., Circ Cardiovasc Imaging 2017)</a> · Monagle y col., CHEST 2012 (anticoagulación en pediatría) · <a href="https://diagnosticcriteria.org/marfan/reprints/Petterson-2008-JAmSocEcho-21-p922-934.pdf">Pettersen y col., JASE 2008 (z-scores de Detroit)</a> · Clasificación coronaria de la AHA 2017 (McCrindle y col.) · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4159673">Gaies y col., VIS en lactantes posoperados (corte ≥ 20)</a> · <a href="https://academic.oup.com/eurheartj/article/43/40/3997/6675633">Guía ESC 2022 de arritmias ventriculares y prevención de muerte súbita (Zeppenfeld y col.)</a> · Schwartz PJ, Crotti L. Circulation 2011;124:2181-4 · <a href="https://esc365.escardio.org/journal/7212">Stramba-Badiale y col., Eur Heart J 2018 (Bazett en el ECG neonatal)</a> · Rautaharju y col., recomendaciones AHA/ACCF/HRS 2009 para el intervalo QT.
+    <br>Herramienta de apoyo. La interpretación final requiere la lectura del trazado completo y, ante un QTc prolongado, la evaluación por cardiología pediátrica.
+  </footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const v = id => { const s = String($(id).value).trim(); if (s === '') return NaN; const n = parseFloat(s.replace(',', '.')); return isFinite(n) ? n : NaN; };
+const vg = id => v(id) / 1000; // peso cargado en gramos → kg
+const f = (n, d=0) => isFinite(n) ? n.toLocaleString('es-AR', {maximumFractionDigits:d, minimumFractionDigits:0}) : '–';
+const tile = (k, val, s, main) => `<div class="tile${main?' main':''}"><span class="k">${k}</span><span class="v">${val}</span>${s?`<span class="s">${s}</span>`:''}</div>`;
+const pill = (cls, t) => `<div class="pill ${cls}"><span>${t}</span></div>`;
+const S = { age:'neo', sex:'m', unit:'ms', hr:'fc', ver:'esc' };
+const segs = {sAge:'age', sSex:'sex', sUnit:'unit', sHR:'hr', sVer:'ver'};
+for (const [id, key] of Object.entries(segs)) {
+  $(id).querySelectorAll('button').forEach(b => b.onclick = () => { S[key] = b.dataset.v; syncSeg(); calc(); });
+}
+function syncSeg(){
+  for (const [id, key] of Object.entries(segs)) $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === S[key]));
+  const mm = S.unit === 'mm';
+  $('uQT').textContent = mm ? 'mm' : 'ms'; $('uRR').textContent = mm ? 'mm' : 'ms'; $('uQRS').textContent = (mm ? 'mm' : 'ms') + ' · opc.';
+  $('lVel').hidden = !mm; $('lFC').hidden = S.hr !== 'fc'; $('lRR').hidden = S.hr !== 'rr';
+  $('qt').placeholder = mm ? '7' : '280'; $('rr').placeholder = mm ? '10,7' : '430'; $('qrs').placeholder = '—';
+}
+
+// Umbrales por grupo (ms, QTc de Bazett). bands: [hasta, clase, etiqueta]
+function bands(){
+  if (S.age === 'neo') return {short:340, rows:[[440,'ok','Normal'],[460,'bord','Limítrofe'],[470,'long','Prolongado leve'],[500,'long','Prolongado'],[Infinity,'high','Muy prolongado']]};
+  if (S.age === 'nino') return {short:340, rows:[[440,'ok','Normal'],[460,'bord','Limítrofe'],[500,'long','Prolongado'],[Infinity,'high','Muy prolongado']]};
+  const m = S.sex === 'm';
+  return {short:340, rows:[[m?430:440,'ok','Normal'],[m?450:460,'bord','Limítrofe'],[500,'long','Prolongado'],[Infinity,'high','Muy prolongado']]};
+}
+const toMs = x => S.unit === 'mm' ? x * 1000 / (+$('vel').value) : x;
+
+let QTcB = NaN;
+function calc(){
+  const qt = toMs(v('qt')), qrs = toMs(v('qrs'));
+  let rr, fc;
+  if (S.hr === 'fc') { fc = v('fc'); rr = 60 / fc; } else { rr = toMs(v('rr')) / 1000; fc = 60 / rr; }
+  const okIn = isFinite(qt) && isFinite(rr) && rr > 0;
+  QTcB = okIn ? qt / Math.sqrt(rr) : NaN;
+  if (!okIn) {
+    $('rQTc').innerHTML = `<div class="empty">Faltan datos: QT y ${S.hr === 'fc' ? 'FC' : 'RR'}.</div>`;
+    $('rInt').innerHTML = `<div class="empty">Cargá QT y ${S.hr === 'fc' ? 'FC' : 'RR'} para ver la interpretación.</div>`;
+    autoQTc(); score(); return;
+  }
+  const fri = qt / Math.cbrt(rr), fra = qt + 154 * (1 - rr), hod = qt + 1.75 * (fc - 60);
+  let h = `<div class="tiles">${tile('QTc Bazett', `${f(QTcB)}<small>ms</small>`, 'Referencia en pediatría y para el score', true)}</div>
+    <div class="tiles">${tile('Fridericia', `${f(fri)}<small>ms</small>`)}${tile('Framingham', `${f(fra)}<small>ms</small>`)}${tile('Hodges', `${f(hod)}<small>ms</small>`)}</div>
+    <div class="tiles">${tile('QT medido', `${f(qt)}<small>ms</small>`)}${tile('FC', `${f(fc)}<small>lpm</small>`)}${tile('RR', `${f(rr*1000)}<small>ms</small>`)}</div>`;
+  const A = [];
+  if (qt < 150 || qt > 700) A.push(pill('crit', 'Revisá el QT: el valor está fuera de lo esperable.'));
+  if (fc < 40 || fc > 300) A.push(pill('crit', 'Revisá la FC o el RR: el valor está fuera de lo esperable.'));
+  if (qt >= rr * 1000) A.push(pill('crit', 'El QT no puede ser igual o mayor que el RR. Revisá los datos.'));
+  if (S.age !== 'neo' && (fc > 120 || fc < 50)) A.push(pill('info', `Con FC de ${f(fc)} lpm, Bazett tiende a ${fc > 120 ? 'sobrecorregir (QTc más largo)' : 'subcorregir (QTc más corto)'}. Compará con Fridericia y repetí el ECG con otra FC si es posible.`));
+  if (isFinite(qrs) && qrs >= 120) A.push(pill('warn', `QRS de ${f(qrs)} ms: el QT incluye un QRS ancho y sobreestima la repolarización. Interpretar con cautela (considerar el intervalo JT).`));
+  h += A.join('');
+  $('rQTc').innerHTML = h;
+  interp(); autoQTc(); score();
+}
+
+function interp(){
+  const b = bands(), q = QTcB, lo = 300, hi = 560, pos = x => Math.min(100, Math.max(0, (x - lo) / (hi - lo) * 100));
+  const col = {ok:'var(--b-ok)', bord:'var(--b-bord)', long:'var(--b-long)', high:'var(--b-high)', short:'var(--b-short)'};
+  let prev = lo, segsHtml = `<span style="width:${pos(b.short)}%;background:${col.short}"></span>`; prev = b.short;
+  for (const [to, cls] of b.rows) { const t = Math.min(to, hi); segsHtml += `<span style="width:${pos(t) - pos(prev)}%;background:${col[cls]}"></span>`; prev = t; }
+  const ticks = [b.short, ...b.rows.map(r => r[0]).filter(x => x < hi)].filter((x, i, a) => i === 0 || x - a[i-1] >= 15).filter(x => x !== 470).map(x => `<span style="left:${pos(x)}%">${x}</span>`).join('');
+  let row = b.rows.find(r => q < r[0]);
+  let h = `<div class="gauge"><div class="gmark" style="left:${pos(q)}%">${f(q)}</div><div class="gbar">${segsHtml}</div><div class="gticks">${ticks}</div></div>
+    <div class="legend"><span><i style="background:${col.short}"></i>Corto</span><span><i style="background:${col.ok}"></i>Normal</span><span><i style="background:${col.bord}"></i>Limítrofe</span><span><i style="background:${col.long}"></i>Prolongado</span><span><i style="background:${col.high}"></i>≥ 500 ms</span></div>`;
+  const grp = S.age === 'neo' ? 'neonato' : S.age === 'nino' ? 'niño prepuberal' : `pospuberal ${S.sex === 'm' ? 'masculino' : 'femenino'}`;
+  if (q <= b.short) {
+    h += pill('info', `<b>QTc corto (${f(q)} ms) para ${grp}.</b> Valores ≤ 340 ms se consideran cortos en pediatría. La guía ESC 2022 diagnostica QT corto con QTc ≤ 360 ms más al menos un criterio: variante patogénica, antecedente familiar de QT corto o de muerte súbita antes de los 40 años, o haber sobrevivido a TV o FV. Descartar hipercalcemia, hiperpotasemia, acidosis, hipertermia y digoxina.`);
+  } else if (row[1] === 'ok') {
+    h += pill('ok', `<b>QTc normal para ${grp}.</b>`);
+  } else if (row[1] === 'bord') {
+    h += pill('warn', `<b>QTc limítrofe para ${grp}.</b> Repetir el ECG, medir a mano en varias derivaciones y descartar causas adquiridas (electrolitos, fármacos, hipotermia).`);
+  } else if (S.age === 'neo' && q < 470) {
+    h += pill('warn', `<b>QTc prolongado leve (460–469 ms).</b> En neonatos suele ser transitorio y normalizarse en los primeros meses. Repetir el ECG antes del alta y a las 3–4 semanas; descartar causas adquiridas.`);
+  } else if (q < 500) {
+    h += pill('crit', `<b>QTc prolongado para ${grp}.</b> Confirmar con ECG repetido y medición manual. Corregir Ca, K y Mg; suspender fármacos que prolongan el QT. Interconsulta con cardiología pediátrica, ECG de ambos padres y considerar estudio genético. Calcular el score de Schwartz.`);
+  } else {
+    h += pill('crit', `<b>QTc ≥ 500 ms: riesgo alto de arritmias ventriculares (torsades).</b> Monitoreo ECG continuo, corregir Ca, K y Mg, suspender fármacos que prolongan el QT y consultar de inmediato con cardiología pediátrica (evaluar betabloqueo). Buscar bloqueo AV 2:1 funcional en el neonato.`);
+  }
+  if (S.age === 'neo') h += `<p class="hint">Neonato: QTc medio cercano a 400 ms. En un estudio de 5000 neonatos, QTc de Bazett ≥ 460 ms identificó a todos los portadores de QT largo genético. Muchos QTc entre 450 y 470 ms se normalizan hacia los 6 meses.</p>`;
+  if (S.age === 'ado') h += `<p class="hint">Pospuberal: prolongado ≥ 450 ms en varones y ≥ 460 ms en mujeres (recomendaciones AHA/ACCF/HRS 2009).</p>`;
+  $('rInt').innerHTML = h;
+}
+
+// ---------- Score de Schwartz ----------
+const CRIT = [
+  {g:'ECG'},
+  {id:'qtc', t:'QTc (Bazett)', radio:[['qtc0','< 450 ms o no aplica',0],['qtc1','450–459 ms (solo varones)',1],['qtc2','460–479 ms',2],['qtc3','≥ 480 ms',3,3.5]]},
+  {id:'rec', t:'QTc ≥ 480 ms en el 4.º minuto de recuperación de una ergometría', p:1},
+  {id:'tdp', t:'Torsades de pointes', p:2, note:'Excluye el puntaje por síncope'},
+  {id:'alt', t:'Alternancia de la onda T', p:1},
+  {id:'notch', t:'Onda T con muesca en 3 derivaciones', p:1},
+  {id:'brad', t:'FC en reposo baja para la edad (< percentil 2)', p:0.5},
+  {g:'Antecedentes clínicos'},
+  {id:'sync', t:'Síncope', radio:[['sy0','No',0],['sy1','Sin estrés',1],['sy2','Con estrés (esfuerzo, emoción, ruido)',2]]},
+  {id:'deaf', t:'Sordera congénita', p:0.5, only:'sc'},
+  {g:'Antecedentes familiares'},
+  {id:'fam', t:'Familiar con diagnóstico definido de QT largo', p:1},
+  {id:'scd', t:'Muerte súbita inexplicada antes de los 30 años en familiar directo', p:0.5},
+  {g:'Genética', only:'esc'},
+  {id:'gen', t:'Variante patogénica en un gen de QT largo', p:3.5, only:'esc'}
+];
+let manualQTc = false;
+function buildCrit(){
+  const keep = [...document.querySelectorAll('#crit input:checked')].map(i => i.id);
+  const pts = c => S.ver === 'esc' && c[3] !== undefined ? c[3] : c[2];
+  $('crit').innerHTML = CRIT.filter(c => !c.only || c.only === S.ver).map(c => {
+    if (c.g) return `<div class="crit-g">${c.g}</div>`;
+    if (c.radio) return `<div class="crit-g" style="text-transform:none;letter-spacing:0;font-size:.82rem">${c.t}${c.id === 'qtc' ? ' <span id="qtcAuto" class="hint"></span>' : ''}</div>` +
+      c.radio.map(r => `<label class="ck" id="row_${r[0]}"><input type="radio" name="${c.id}" id="${r[0]}" value="${pts(r)}"${r[2] === 0 ? ' checked' : ''}><span class="t">${r[1]}</span><span class="p">${r[2] === 0 ? '0' : f(pts(r), 1)}</span></label>`).join('');
+    return `<label class="ck" id="row_${c.id}"><input type="checkbox" id="${c.id}" value="${c.p}"><span class="t">${c.t}${c.note ? `<span class="note">${c.note}</span>` : ''}</span><span class="p">${f(c.p, 1)}</span></label>`;
+  }).join('');
+  keep.forEach(id => { const el = $(id); if (el) el.checked = true; });
+  $('crit').querySelectorAll('input').forEach(i => i.addEventListener('change', () => { if (i.name === 'qtc') manualQTc = true; score(); }));
+  autoQTc();
+}
+function autoQTc(){
+  const lab = $('qtcAuto'); if (!lab) return;
+  if (manualQTc || !isFinite(QTcB)) { lab.textContent = isFinite(QTcB) && manualQTc ? '· elegido a mano' : ''; return; }
+  const q = QTcB, male = S.sex === 'm';
+  const id = q >= 480 ? 'qtc3' : q >= 460 ? 'qtc2' : (q >= 450 && male) ? 'qtc1' : 'qtc0';
+  $(id).checked = true; lab.textContent = `· marcado desde el QTc calculado (${f(q)} ms)`;
+}
+function score(){
+  const tdp = $('tdp') && $('tdp').checked;
+  ['sy1','sy2'].forEach(id => { const el = $(id); if (!el) return; el.disabled = tdp; $('row_' + id).classList.toggle('off', tdp); if (tdp && el.checked) $('sy0').checked = true; });
+  const q1 = $('qtc1'); if (q1) { const fem = S.sex === 'f'; q1.disabled = fem; $('row_qtc1').classList.toggle('off', fem); if (fem && q1.checked) $('qtc0').checked = true; }
+  let s = 0;
+  $('crit').querySelectorAll('input:checked').forEach(i => s += +i.value);
+  $('schV').textContent = f(s, 1);
+  const esc = S.ver === 'esc';
+  $('schTxt').textContent = esc ? '≤ 1 baja · 1,5–3 intermedia · > 3 diagnóstico' : '≤ 1 baja · 1,5–3 intermedia · ≥ 3,5 alta';
+  let h;
+  if (s <= 1) h = pill('ok', '<b>Probabilidad baja de QT largo congénito.</b>');
+  else if (s <= 3) h = pill('warn', '<b>Probabilidad intermedia.</b> Repetir ECG seriados, Holter y ergometría si la edad lo permite; ECG de familiares de primer grado; considerar estudio genético.');
+  else h = pill('crit', esc ? '<b>Puntaje > 3: diagnóstico clínico de QT largo</b> (en ausencia de causas secundarias). Derivación a cardiología pediátrica, estudio genético y evaluación familiar en cascada.' : '<b>Probabilidad alta de QT largo congénito.</b> Derivación a cardiología pediátrica, estudio genético y evaluación familiar.');
+  if (esc) h += pill('info', 'ESC 2022: también se diagnostica QT largo con QTc ≥ 480 ms en ECG repetidos o con una variante patogénica, aunque no se calcule el score.');
+  $('rSch').innerHTML = h;
+}
+
+// ---------- VIS ----------
+let visT = '24';
+$('sVisT').querySelectorAll('button').forEach(b => b.onclick = () => { visT = b.dataset.v; $('sVisT').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); vis(); });
+const VIS_IN = [['vDopa',1,'Dopamina'],['vDobu',1,'Dobutamina'],['vAdre',100,'Adrenalina'],['vNora',100,'Noradrenalina'],['vMil',10,'Milrinona'],['vVaso',10,'Vasopresina']];
+function vis(){
+  const vals = VIS_IN.map(([id,w,n]) => { const x = v(id); return {id, w, n, x: isFinite(x) ? x : 0, set: isFinite(x)}; });
+  if (!vals.some(o => o.set)) { $('rVIS').innerHTML = '<div class="empty">Cargá al menos una infusión.</div>'; return; }
+  const total = vals.reduce((a, o) => a + o.w * o.x, 0);
+  const is = vals[0].x + vals[1].x + 100 * vals[2].x;
+  const cuts = visT === '24' ? [10,15,20,25] : [5,10,15,20];
+  const grp = 1 + cuts.filter(c => total >= c).length;
+  const parts = vals.filter(o => o.set && o.x > 0).map(o => `${o.n} ${f(o.w * o.x, 1)}`).join(' · ');
+  let h = `<div class="tiles">${tile('VIS', `${f(total, 1)}`, parts, true)}</div>
+    <div class="tiles">${tile('IS', f(is, 1), 'Dopa + dobu + 100 × adre')}${tile('Grupo de Gaies', grp, visT === '24' ? 'Primeras 24 h' : '24–48 h')}</div>`;
+  const hi = visT === '24' ? total >= 20 : total >= 15;
+  if (total >= 25 || (visT === '48' && total >= 20)) h += pill('crit', `<b>Soporte muy alto (grupo 5).</b> En lactantes operados, un VIS máximo ≥ 20 en las primeras 24 h se asoció a un riesgo mucho mayor de evolución desfavorable (muerte, paro, ECMO, diálisis o lesión neurológica). Reevaluar precarga, ritmo, lesiones residuales por eco y la necesidad de soporte mecánico.`);
+  else if (hi) h += pill('crit', `<b>VIS alto (grupo ${grp}).</b> En lactantes operados, un VIS máximo ≥ 20 en las primeras 24 h se asoció a mayor morbimortalidad, más días de ventilación y de internación en la UCI. Buscar causas tratables de bajo gasto.`);
+  else if (grp >= 2) h += pill('warn', `<b>Soporte moderado (grupo ${grp}).</b> Seguir la tendencia: un VIS que no desciende en las 24–48 h es peor señal que un valor aislado.`);
+  else h += pill('ok', `<b>Soporte bajo (grupo 1).</b>`);
+  const vaso = v('vVaso'); if (isFinite(vaso) && vaso > 5) h += pill('warn', `Vasopresina de ${f(vaso, 2)} mU/kg/min: ¿la cargaste en U/kg/h? Este campo va en mU/kg/min (rango habitual 0,3–2).`);
+  h += `<p class="hint">Grupos de Gaies: primeras 24 h &lt; 10, 10–14, 15–19, 20–24, ≥ 25 · de 24 a 48 h &lt; 5, 5–9, 10–14, 15–19, ≥ 20. Se asigna el grupo más alto de los dos períodos.</p>`;
+  $('rVIS').innerHTML = h;
+}
+VIS_IN.forEach(([id]) => $(id).addEventListener('input', vis));
+
+// ---------- Superficie corporal y z-scores (Detroit, Pettersen 2008) ----------
+const DET = [
+  {g:'Ventrículos (modo M)'},
+  {id:'rvdd', n:'DdVD', b:[-0.317,1.850,-1.274,0.335,0.058]},
+  {id:'ivsd', n:'SIV diástole', b:[-1.242,1.272,-0.762,0.208,0.046]},
+  {id:'ivss', n:'SIV sístole', b:[-1.048,1.751,-1.177,0.318,0.034]},
+  {id:'lvidd', n:'DdVI', b:[0.105,2.859,-2.119,0.552,0.010]},
+  {id:'lvids', n:'DsVI', b:[-0.371,2.833,-2.081,0.538,0.016]},
+  {id:'lvpwd', n:'PPVI diástole', b:[-1.586,1.849,-1.188,0.313,0.037]},
+  {id:'lvpws', n:'PPVI sístole', b:[-0.947,1.907,-1.259,0.330,0.023]},
+  {g:'Válvulas'},
+  {id:'mva', n:'Anillo mitral', b:[-0.271,2.446,-1.700,0.425,0.022]},
+  {id:'tva', n:'Anillo tricuspídeo', b:[-0.164,2.341,-1.596,0.387,0.036]},
+  {id:'ava', n:'Anillo aórtico', b:[-0.874,2.708,-1.841,0.452,0.010]},
+  {id:'pva', n:'Anillo pulmonar', b:[-0.761,2.774,-1.808,0.436,0.023]},
+  {g:'Aorta'},
+  {id:'sov', n:'Senos de Valsalva', b:[-0.500,2.537,-1.707,0.420,0.012]},
+  {id:'stj', n:'Unión sinotubular', b:[-0.759,2.643,-1.797,0.442,0.018]},
+  {id:'tarch', n:'Arco transverso', b:[-0.790,3.020,-2.484,0.712,0.023]},
+  {id:'darch', n:'Arco distal', b:[-0.976,2.469,-1.746,0.445,0.026]},
+  {id:'isth', n:'Istmo aórtico', b:[-1.072,2.539,-1.627,0.368,0.027]},
+  {id:'aodia', n:'Aorta a nivel del diafragma', b:[-0.922,2.100,-1.411,0.371,0.018]},
+  {g:'Pulmonares y aurícula'},
+  {id:'mpa', n:'Tronco pulmonar', b:[-0.707,2.746,-1.807,0.424,0.024]},
+  {id:'rpa', n:'Rama pulmonar derecha', b:[-1.360,3.394,-2.508,0.660,0.027]},
+  {id:'lpa', n:'Rama pulmonar izquierda', b:[-1.348,2.884,-1.954,0.466,0.028]},
+  {id:'la', n:'Aurícula izquierda', b:[-0.208,2.164,-1.597,0.429,0.020]}
+];
+const bsaOf = (w, h) => ({
+  hay: 0.024265 * Math.pow(w, 0.5378) * Math.pow(h, 0.3964),
+  mos: Math.sqrt(w * h / 3600),
+  dub: 0.007184 * Math.pow(w, 0.425) * Math.pow(h, 0.725)
+});
+const detMean = (b, sc) => b[0] + b[1]*sc + b[2]*sc*sc + b[3]*sc*sc*sc;
+// PHN (Lopez 2017): índice = medida ÷ SC^α ; z = (índice − media) ÷ DE. Unidades PHN: cm (coronarias en mm), cm², mL, g. SC de Haycock.
+const PHN = [
+  {g:'Válvulas AV'},
+  {id:'p_mvap', n:'Anillo mitral AP (eje largo)', u:'mm', c:0.1, a:0.50, m:2.31, sd:0.24},
+  {id:'p_mvlat', n:'Anillo mitral lateral (4 cámaras)', u:'mm', c:0.1, a:0.50, m:2.23, sd:0.22},
+  {id:'p_mva', n:'Área del anillo mitral', u:'cm²', c:1, a:1.00, m:4.06, sd:0.68},
+  {id:'p_tvap', n:'Anillo tricuspídeo AP', u:'mm', c:0.1, a:0.50, m:2.36, sd:0.28},
+  {id:'p_tvlat', n:'Anillo tricuspídeo lateral (4 cámaras)', u:'mm', c:0.1, a:0.50, m:2.36, sd:0.29},
+  {id:'p_tva', n:'Área del anillo tricuspídeo', u:'cm²', c:1, a:1.00, m:4.39, sd:0.83},
+  {g:'Aorta'},
+  {id:'p_ann', n:'Anillo aórtico', u:'mm', c:0.1, a:0.50, m:1.48, sd:0.14},
+  {id:'p_root', n:'Raíz aórtica (senos)', u:'mm', c:0.1, a:0.50, m:2.06, sd:0.18},
+  {id:'p_stj', n:'Unión sinotubular', u:'mm', c:0.1, a:0.50, m:1.69, sd:0.16},
+  {id:'p_aao', n:'Aorta ascendente', u:'mm', c:0.1, a:0.50, m:1.79, sd:0.18},
+  {id:'p_archp', n:'Arco transverso proximal', u:'mm', c:0.1, a:0.50, m:1.53, sd:0.23},
+  {id:'p_archd', n:'Arco transverso distal', u:'mm', c:0.1, a:0.50, m:1.36, sd:0.19},
+  {id:'p_isth', n:'Istmo aórtico', u:'mm', c:0.1, a:0.50, m:1.25, sd:0.18},
+  {g:'Coronarias'},
+  {id:'p_lmca', n:'Tronco coronario izquierdo', u:'mm', c:1, a:0.45, m:2.95, sd:0.57, cor:true},
+  {id:'p_lad', n:'Descendente anterior proximal', u:'mm', c:1, a:0.45, m:1.90, sd:0.34, cor:true},
+  {id:'p_rca', n:'Coronaria derecha proximal', u:'mm', c:1, a:0.45, m:2.32, sd:0.55, cor:true},
+  {g:'Pulmonares'},
+  {id:'p_pvsax', n:'Anillo pulmonar (eje corto)', u:'mm', c:0.1, a:0.50, m:1.91, sd:0.24},
+  {id:'p_pvlax', n:'Anillo pulmonar (eje largo)', u:'mm', c:0.1, a:0.50, m:2.01, sd:0.28},
+  {id:'p_mpa', n:'Tronco pulmonar', u:'mm', c:0.1, a:0.50, m:1.82, sd:0.24},
+  {id:'p_rpa', n:'Rama pulmonar derecha', u:'mm', c:0.1, a:0.50, m:1.07, sd:0.18},
+  {id:'p_lpa', n:'Rama pulmonar izquierda', u:'mm', c:0.1, a:0.50, m:1.10, sd:0.18},
+  {g:'Ventrículo izquierdo (diástole)'},
+  {id:'p_lvedd', n:'DdVI (eje corto)', u:'mm', c:0.1, a:0.45, m:3.89, sd:0.33},
+  {id:'p_lvst', n:'SIV', u:'mm', c:0.1, a:0.40, m:0.58, sd:0.09},
+  {id:'p_lvpwt', n:'Pared posterior', u:'mm', c:0.1, a:0.40, m:0.57, sd:0.09},
+  {id:'p_lvedl', n:'Longitud del VI (endocardio)', u:'mm', c:0.1, a:0.45, m:6.31, sd:0.46},
+  {id:'p_lvedlepi', n:'Longitud del VI (epicardio)', u:'mm', c:0.1, a:0.45, m:6.87, sd:0.45},
+  {id:'p_lveda', n:'Área del VI eje corto (endocardio)', u:'cm²', c:1, a:0.90, m:11.91, sd:1.89},
+  {id:'p_lvedaepi', n:'Área del VI eje corto (epicardio)', u:'cm²', c:1, a:0.90, m:20.00, sd:2.59},
+  {id:'p_lvedv', n:'Volumen diastólico del VI (endocardio)', u:'mL', c:1, a:1.30, m:62.02, sd:11.94},
+  {id:'p_lvedvepi', n:'Volumen diastólico del VI (epicardio)', u:'mL', c:1, a:1.30, m:113.14, sd:17.85},
+  {id:'p_lvm', n:'Masa del VI', u:'g', c:1, a:1.25, m:53.02, sd:9.06},
+  {id:'p_lvmtv', n:'Relación masa / volumen', u:'', c:1, a:0, m:0.88, sd:0.16},
+  {id:'p_lvttd', n:'Relación espesor / diámetro', u:'', c:1, a:0, m:0.15, sd:0.03},
+  {id:'p_lvsi', n:'Índice de esfericidad', u:'', c:1, a:0, m:1.63, sd:0.17}
+];
+let zModel = 'phn';
+const zRows = () => zModel === 'phn' ? PHN : DET;
+const fmtU = (x, u) => f(x, u === 'mm' ? 1 : u === '' ? 2 : 1);
+function buildZ(){
+  const rows = zRows();
+  $('zTable').innerHTML = `<thead><tr><th>Estructura</th><th>Medida</th><th>z</th><th>Esperado<br>(z −2 a +2)</th></tr></thead><tbody>` +
+    rows.map(d => d.g ? `<tr class="grp"><td colspan="4">${d.g}</td></tr>` :
+      `<tr><td>${d.n}</td><td><input id="z_${d.id}" inputmode="decimal" autocomplete="off" aria-label="${d.n}${d.u !== undefined ? ' en ' + (d.u || 'valor') : ' en mm'}"><br><small class="zr">${d.u === undefined ? 'mm' : d.u}</small></td><td class="zv" id="zv_${d.id}">–</td><td><span id="ze_${d.id}">–</span><br><small class="zr" id="zr_${d.id}"></small></td></tr>`).join('') + '</tbody>';
+  rows.filter(d => !d.g).forEach(d => $('z_' + d.id).addEventListener('input', () => { zcalc(); cor(); }));
+  $('zModelTxt').innerHTML = zModel === 'phn'
+    ? 'Modelo del Pediatric Heart Network (Lopez y col., 2017): 3215 niños sanos de 19 centros. Superficie de Haycock (sin talla, Costeff). Índice = medida ÷ SC<sup>α</sup>; z = (índice − media) ÷ DE.'
+    : 'Modelo de Detroit (Pettersen y col., 2008): 782 niños. Superficie de DuBois (sin talla, Costeff). z = [ln(medida en cm) − (β0 + β1·SC + β2·SC² + β3·SC³)] ÷ √MSE.';
+}
+function zcalc(){
+  const w = vg('zPeso'), h = v('zTalla'), hasH = h > 0, rows = zRows().filter(d => !d.g);
+  if (!(w > 0)) {
+    $('rBSA').innerHTML = '<div class="empty">Falta el peso (la talla es opcional).</div>';
+    rows.forEach(d => { $('zv_' + d.id).textContent = '–'; $('zv_' + d.id).className = 'zv'; $('ze_' + d.id).textContent = '–'; $('zr_' + d.id).textContent = ''; });
+    $('rZ').innerHTML = ''; return;
+  }
+  const cos = (4 * w + 7) / (w + 90);
+  let sc, hb;
+  if (hasH) {
+    const B = bsaOf(w, h); sc = zModel === 'phn' ? B.hay : B.dub;
+    hb = `<div class="tiles">${tile('SC Haycock', `${f(B.hay, 3)}<small>m²</small>`, zModel === 'phn' ? 'Usada para PHN' : 'Recomendada en lactantes')}${tile('SC Mosteller', `${f(B.mos, 3)}<small>m²</small>`)}${tile('SC DuBois', `${f(B.dub, 3)}<small>m²</small>`, zModel === 'det' ? 'Usada para Detroit' : '')}</div>`;
+    hb += `<div class="tiles">${tile('SC Costeff', `${f(cos, 3)}<small>m²</small>`, 'Solo con el peso, como referencia')}</div>`;
+    if (w < 0.4 || w > 150 || h < 25 || h > 210) hb += pill('crit', 'Revisá peso y talla: están fuera de lo esperable.');
+  } else {
+    sc = cos;
+    hb = `<div class="tiles">${tile('SC Costeff', `${f(cos, 3)}<small>m²</small>`, '(4 × peso + 7) ÷ (peso + 90)', true)}</div>`;
+    hb += pill('info', 'Sin talla: la superficie se estima solo con el peso (Costeff) y los z-scores se calculan con ese valor. Es una aproximación; con la talla el cálculo es más preciso.');
+    if (w < 0.4 || w > 150) hb += pill('crit', 'Revisá el peso: está fuera de lo esperable.');
+  }
+  if (zModel === 'det' && (sc < 0.2 || sc > 2)) hb += pill('warn', `SC de ${f(sc, 2)} m²: fuera del rango con mejor respaldo del modelo de Detroit (0,2–2 m²). Interpretá los z-scores con cautela.`);
+  $('rBSA').innerHTML = hb;
+  const flag = [];
+  rows.forEach(d => {
+    const val = v('z_' + d.id), el = $('zv_' + d.id);
+    let z = NaN, exp, lo, hi, u = d.u === undefined ? 'mm' : d.u;
+    if (zModel === 'phn') {
+      const k = Math.pow(sc, d.a);
+      exp = d.m * k / d.c; lo = (d.m - 2 * d.sd) * k / d.c; hi = (d.m + 2 * d.sd) * k / d.c;
+      if (val > 0) z = (val * d.c / k - d.m) / d.sd;
+    } else {
+      const m = detMean(d.b, sc), sd = Math.sqrt(d.b[4]);
+      exp = 10 * Math.exp(m); lo = 10 * Math.exp(m - 2 * sd); hi = 10 * Math.exp(m + 2 * sd);
+      if (val > 0) z = (Math.log(val / 10) - m) / sd;
+    }
+    $('ze_' + d.id).textContent = fmtU(exp, u) + (u ? ' ' + u : '');
+    $('zr_' + d.id).textContent = `${fmtU(Math.max(lo, 0), u)}–${fmtU(hi, u)}`;
+    if (isFinite(z)) { el.textContent = (z > 0 ? '+' : '') + f(z, 2); el.className = 'zv' + (z >= 2 ? ' hi' : z <= -2 ? ' lo' : ''); if (Math.abs(z) >= 2 && !d.cor) flag.push([d.n, z]); }
+    else { el.textContent = '–'; el.className = 'zv'; }
+  });
+  $('rZ').innerHTML = flag.length ? flag.map(([n, z]) => pill(z > 0 ? 'crit' : 'info', `<b>${n}: z ${z > 0 ? '+' : ''}${f(z, 2)}</b> — ${z > 0 ? 'aumentado' : 'disminuido'}${Math.abs(z) >= 3 ? ' (|z| ≥ 3)' : ''}.`)).join('') : '';
+}
+// z de coronarias calculado con PHN (para la clasificación AHA)
+function phnCorZ(){
+  if (zModel !== 'phn') return null;
+  const w = vg('zPeso'), h = v('zTalla'); if (!(w > 0)) return null;
+  const sc = h > 0 ? bsaOf(w, h).hay : (4 * w + 7) / (w + 90);
+  const out = PHN.filter(d => d.cor).map(d => { const val = v('z_' + d.id); return val > 0 ? [d.n, (val / Math.pow(sc, d.a) - d.m) / d.sd, val] : null; }).filter(Boolean);
+  return out.length ? out : null;
+}
+['zPeso','zTalla'].forEach(id => $(id).addEventListener('input', () => { zcalc(); cor(); }));
+$('sZm').querySelectorAll('button').forEach(b => b.onclick = () => { zModel = b.dataset.v; $('sZm').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); buildZ(); zcalc(); cor(); });
+
+// ---------- Coronarias (AHA 2017) ----------
+function cor(){
+  const pc = phnCorZ();
+  let z = v('cZ'), mm = v('cMm'), src = '';
+  if (!isFinite(z) && pc) { const best = pc.reduce((a, b) => b[1] > a[1] ? b : a); z = best[1]; if (!isFinite(mm)) mm = Math.max(...pc.map(x => x[2])); src = `<div class="tiles">${pc.map(([n, zz]) => tile(n, (zz > 0 ? '+' : '') + f(zz, 2), 'z PHN')).join('')}</div>`; }
+  if (!isFinite(z) && !isFinite(mm)) { $('rCor').innerHTML = '<div class="empty">Cargá el z-score o el diámetro.</div>'; return; }
+  let cls, t;
+  if (mm >= 8 || z >= 10) { cls = 'crit'; t = '<b>Aneurisma grande o gigante</b> (z ≥ 10 o diámetro ≥ 8 mm).'; }
+  else if (z >= 5) { cls = 'crit'; t = '<b>Aneurisma mediano</b> (z 5 a < 10 y diámetro < 8 mm).'; }
+  else if (z >= 2.5) { cls = 'crit'; t = '<b>Aneurisma pequeño</b> (z 2,5 a < 5).'; }
+  else if (z >= 2) { cls = 'warn'; t = '<b>Solo dilatación</b> (z 2 a < 2,5).'; }
+  else if (isFinite(z)) { cls = 'ok'; t = '<b>Sin compromiso</b> (z < 2). Igual cuenta como dilatación una caída del z ≥ 1 en el seguimiento.'; }
+  else { cls = 'info'; t = 'Con diámetro < 8 mm hace falta el z-score para clasificar.'; }
+  $('rCor').innerHTML = src + pill(cls, t) + '<p class="hint">Clasificación de la AHA 2017 para la enfermedad de Kawasaki. Usá el mismo modelo de z-score en todo el seguimiento del paciente.</p>';
+}
+['cZ','cMm'].forEach(id => $(id).addEventListener('input', cor));
+
+// ---------- Qp:Qs ----------
+let qpMode = 'bi';
+$('sQp').querySelectorAll('button').forEach(b => b.onclick = () => { qpMode = b.dataset.v; $('sQp').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('lAp').hidden = qpMode === 'uni'; qp(); });
+function qp(){
+  const ao = v('qAo'), vm = v('qVm'), vpIn = v('qVp'), vp = isFinite(vpIn) ? vpIn : 98, pa = qpMode === 'uni' ? ao : v('qAp');
+  if (!(isFinite(ao) && isFinite(vm) && isFinite(pa))) { $('rQp').innerHTML = `<div class="empty">Faltan datos: saturación aórtica, venosa mixta${qpMode === 'bi' ? ' y de la arteria pulmonar' : ''}.</div>`; return; }
+  const den = vp - pa, ratio = (ao - vm) / den, avd = ao - vm;
+  const bad = [ao, vm, vp, pa].some(x => x < 10 || x > 100);
+  let h = '';
+  if (bad) h += pill('crit', 'Revisá las saturaciones: deben estar entre 10 y 100%.');
+  if (den <= 0) { $('rQp').innerHTML = h + pill('crit', 'La saturación de venas pulmonares debe ser mayor que la de la arteria pulmonar.'); return; }
+  if (vm >= ao) { $('rQp').innerHTML = h + pill('crit', 'La saturación venosa mixta debe ser menor que la aórtica.'); return; }
+  h += `<div class="tiles">${tile('Qp:Qs', f(ratio, 2) + '<small>: 1</small>', isFinite(vpIn) ? '' : 'Con SvpO₂ asumida en 98%', true)}${tile('Diferencia A-V', `${f(avd)}<small>%</small>`, 'SaO₂ − SvO₂')}</div>`;
+  if (qpMode === 'uni') {
+    if (ratio > 1.5) h += pill('warn', `<b>Circulación pulmonar excesiva (Qp:Qs ${f(ratio, 1)}).</b> Riesgo de bajo gasto sistémico con saturación alta. Revisar la resistencia vascular pulmonar (FiO₂, pCO₂) y la resistencia sistémica.`);
+    else if (ratio < 0.7) h += pill('crit', `<b>Flujo pulmonar insuficiente (Qp:Qs ${f(ratio, 1)}).</b> Hipoxemia: descartar obstrucción del shunt o del conducto, hipertensión pulmonar o enfermedad pulmonar.`);
+    else h += pill('ok', `<b>Circulación cercana al equilibrio</b> (objetivo habitual ≈ 1 en la fisiología univentricular en paralelo).`);
+  } else {
+    if (ratio >= 1.5) h += pill('warn', `<b>Cortocircuito izquierda-derecha significativo (Qp:Qs ≥ 1,5).</b>`);
+    else if (ratio < 1) h += pill('info', `<b>Qp:Qs menor de 1:</b> sugiere cortocircuito de derecha a izquierda predominante.`);
+    else h += pill('ok', `<b>Cortocircuito pequeño o ausente</b> (Qp:Qs < 1,5).`);
+  }
+  if (avd >= 30) h += pill('crit', `<b>Diferencia arteriovenosa de ${f(avd)}%:</b> mayor extracción de O₂, sugiere bajo gasto sistémico.`);
+  $('rQp').innerHTML = h;
+}
+['qAo','qVm','qVp','qAp'].forEach(id => $(id).addEventListener('input', qp));
+
+// ---------- Qp:Qs por Doppler ----------
+let qpM = 'dop', qpS = 'cia';
+$('sQpM').querySelectorAll('button').forEach(b => b.onclick = () => { qpM = b.dataset.v; $('sQpM').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('qpDop').hidden = qpM !== 'dop'; $('qpOx').hidden = qpM !== 'ox'; });
+$('sQpS').querySelectorAll('button').forEach(b => b.onclick = () => { qpS = b.dataset.v; $('sQpS').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); qpd(); });
+function qpd(){
+  const pd = v('dpD'), pv = v('dpV'), ad = v('daD'), av = v('daV'), fc = v('dFC'), w = vg('dPeso');
+  if (!(pd > 0 && pv > 0 && ad > 0 && av > 0)) { $('rQpD').innerHTML = '<div class="empty">Faltan datos: diámetro y VTI de los dos tractos de salida.</div>'; return; }
+  const svP = 0.785 * Math.pow(pd / 10, 2) * pv, svA = 0.785 * Math.pow(ad / 10, 2) * av;
+  const qpSv = qpS === 'cia' ? svP : svA, qsSv = qpS === 'cia' ? svA : svP, ratio = qpSv / qsSv;
+  const outTxt = sv => fc > 0 ? `${f(sv * fc, 0)} mL/min${w > 0 ? ` · ${f(sv * fc / w, 0)} mL/kg/min` : ''}` : 'Cargá la FC para el gasto';
+  let h = `<div class="tiles">${tile('Qp:Qs', f(ratio, 2) + '<small>: 1</small>', qpS === 'cia' ? 'Pulmonar ÷ aórtico' : 'Aórtico ÷ pulmonar (ductus)', true)}</div>
+    <div class="tiles">${tile('VL pulmonar', f(svP, 2) + '<small>mL</small>', outTxt(svP))}${tile('VL aórtico', f(svA, 2) + '<small>mL</small>', outTxt(svA))}</div>`;
+  if ([pd, ad].some(d => d > 40) || [pv, av].some(x => x > 60)) h += pill('crit', 'Revisá las unidades: diámetros en mm y VTI en cm.');
+  if (ratio >= 1.5) h += pill('warn', `<b>Cortocircuito izquierda-derecha significativo (Qp:Qs ≥ 1,5).</b>`);
+  else if (ratio < 1) h += pill('info', '<b>Qp:Qs menor de 1:</b> cortocircuito de derecha a izquierda predominante, o error de medición.');
+  else h += pill('ok', '<b>Cortocircuito pequeño o ausente</b> (Qp:Qs < 1,5).');
+  if (Math.min(pd, ad) < 10) h += pill('info', `Con anillos menores de 10 mm, 1 mm de error en el diámetro cambia el resultado en alrededor de ${f(100 * (Math.pow((Math.min(pd, ad) + 1) / Math.min(pd, ad), 2) - 1), 0)}%. Promediá 3 mediciones y tomá el resultado como orientativo.`);
+  if (w > 0 && fc > 0) { const lvo = svA * fc / w; if (lvo > 300 && qpS === 'pda') h += pill('warn', `Gasto del VI de ${f(lvo, 0)} mL/kg/min: alto (referencia neonatal ≈ 150–300), compatible con ductus con repercusión.`); }
+  $('rQpD').innerHTML = h;
+}
+['dpD','dpV','daD','daV','dFC','dPeso'].forEach(id => $(id).addEventListener('input', qpd));
+
+// ---------- Anticoagulación ----------
+const AC = { age:'neo', mon:'xa', enox:'tto' };
+[['sAcAge','age'],['sHepMon','mon'],['sEnox','enox']].forEach(([id,k]) => $(id).querySelectorAll('button').forEach(b => b.onclick = () => { AC[k] = b.dataset.v; $(id).querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); ac(); }));
+const pct = n => (n > 0 ? '+' : '') + n + '%';
+let xaLo = 0.35; try { const r = localStorage.getItem('xa_lo'); if (r === '0.3') xaLo = 0.3; } catch (err) {}
+function syncXa(){ $('sXaR').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.v === xaLo)); $('xaRange').hidden = AC.mon !== 'xa'; }
+$('sXaR').querySelectorAll('button').forEach(b => b.onclick = () => { xaLo = +b.dataset.v; try { localStorage.setItem('xa_lo', String(xaLo)); } catch (err) {} syncXa(); ac(); });
+function ac(){
+  const w = vg('aPeso'), conc = v('hConc');
+  $('uhLab').textContent = AC.mon === 'xa' ? 'U/mL' : 's'; syncXa();
+  if (!(w > 0)) { ['rHep','rHepAdj','rEnox'].forEach(id => $(id).innerHTML = '<div class="empty">Falta el peso.</div>'); return; }
+  const warnW = (w < 0.4 || w > 150) ? pill('crit', 'Revisá el peso.') : '';
+  // Heparina
+  const start = AC.age === 'neo' || AC.age === 'lact' ? 28 : AC.age === 'nino' ? 20 : 18;
+  const cur = isFinite(v('hRate')) ? v('hRate') : start;
+  const bolus = Math.min(75 * w, 5000);
+  const mlh = u => isFinite(conc) && conc > 0 ? f(u * w / conc, 2) + ' mL/h' : '—';
+  let h = warnW + `<div class="tiles">${tile('Carga', f(bolus, 0) + '<small>U</small>', `75 U/kg en 10 min${isFinite(conc) && conc > 0 ? ' · ' + f(bolus / conc, 2) + ' mL' : ''}`)}${tile(isFinite(v('hRate')) ? 'Infusión actual' : 'Infusión inicial', f(cur, 1) + '<small>U/kg/h</small>', `${f(cur * w, 0)} U/h · ${mlh(cur)}`, true)}</div>`;
+  if (AC.age === 'neo') h += pill('warn', 'En prematuros o con riesgo de sangrado, considerar omitir la carga (o 50 U/kg si < 35 semanas de edad posmenstrual).');
+  $('rHep').innerHTML = h;
+  // Ajuste heparina
+  const lab = v('hLab');
+  if (!isFinite(lab)) $('rHepAdj').innerHTML = `<div class="empty">Cargá el ${AC.mon === 'xa' ? 'anti-Xa' : 'KPTT'} para ver el ajuste.</div>`;
+  else {
+    const T = AC.mon === 'xa'
+      ? [[0.2,50,0,10,'4 h'],[xaLo,0,0,10,'4 h'],[0.71,0,0,0,'al día siguiente'],[0.81,0,0,-10,'4 h'],[1,0,30,-10,'4 h'],[Infinity,0,60,-15,'4 h']]
+      : [[50,50,0,10,'4 h'],[60,0,0,10,'4 h'],[86,0,0,0,'al día siguiente'],[96,0,0,-10,'4 h'],[121,0,30,-10,'4 h'],[Infinity,0,60,-15,'4 h']];
+    const [ , bo, hold, ch, nxt] = T.find(t => lab < t[0]);
+    const nu = cur * (1 + ch / 100);
+    const inR = ch === 0;
+    let t = inR ? `<b>En rango${AC.mon === 'xa' ? ` (anti-Xa ${xaLo.toFixed(2).replace('.', ',')}–0,70)` : ' (KPTT 60–85 s)'}.</b> Mantener ${f(cur, 1)} U/kg/h.` : `<b>${ch > 0 ? 'Subir' : 'Bajar'} la infusión ${pct(ch)}:</b> de ${f(cur, 1)} a <b>${f(nu, 1)} U/kg/h</b> (${f(nu * w, 0)} U/h · ${mlh(nu)}).`;
+    if (bo) t += ` Considerar bolo de 50 U/kg (${f(Math.min(50 * w, 5000), 0)} U).`;
+    if (hold) t += ` <b>Suspender ${hold} min</b> antes de reiniciar.`;
+    t += ` Próximo control: ${nxt}.`;
+    $('rHepAdj').innerHTML = pill(inR ? 'ok' : (hold ? 'crit' : 'warn'), t);
+  }
+  // Enoxaparina
+  const young = AC.age === 'neo';
+  const base = AC.enox === 'tto' ? (young ? 1.5 : 1) : (young ? 0.75 : 0.5);
+  const eCur = isFinite(v('eDose')) ? v('eDose') : base, ec = +$('eConc').value;
+  let e = `<div class="tiles">${tile(isFinite(v('eDose')) ? 'Dosis actual' : 'Dosis inicial', f(eCur * w, 2) + '<small>mg</small>', `${f(eCur, 2)} mg/kg cada 12 h · ${f(eCur * w / ec, 3)} mL a ${ec} mg/mL`, true)}</div>`;
+  if (eCur * w / ec < 0.1) e += pill('warn', `Volumen de ${f(eCur * w / ec, 3)} mL: pedí a farmacia la dilución de 20 mg/mL para medir con precisión.`);
+  if (young && AC.enox === 'tto') e += pill('info', 'Neonatos: suelen necesitar más de 1,5 mg/kg para llegar al rango (≈ 1,7 mg/kg en término y 2 mg/kg en prematuros, según algunas guías). Ajustar por anti-Xa.');
+  const xa = v('eXa');
+  if (isFinite(xa)) {
+    const E = [[0.35,25,''],[0.5,10,''],[1.01,0,''],[1.51,-20,''],[2.01,-30,'Suspender la dosis hasta anti-Xa < 1 (o 3 h) y luego'],[Infinity,-40,'Suspender hasta anti-Xa < 0,5 (control cada 12 h) y luego']];
+    const [ , ch, pre] = E.find(t => xa < t[0]);
+    const nu = eCur * (1 + ch / 100);
+    e += ch === 0 ? pill('ok', `<b>Anti-Xa en rango (0,5–1).</b> Mantener ${f(eCur * w, 2)} mg cada 12 h; control semanal o ante cambios clínicos.`)
+      : pill(ch > 0 ? 'warn' : 'crit', `${pre ? pre + ' ' : ''}<b>${pre ? (ch > 0 ? 'subir' : 'bajar') : (ch > 0 ? 'Subir' : 'Bajar')} la dosis ${pct(ch)}:</b> ${f(nu, 2)} mg/kg = <b>${f(nu * w, 2)} mg</b> cada 12 h (${f(nu * w / ec, 3)} mL). Nuevo anti-Xa 4 h después de la dosis ajustada.`);
+  }
+  $('rEnox').innerHTML = e;
+}
+['aPeso','hConc','hRate','hLab','eDose','eXa'].forEach(id => $(id).addEventListener('input', ac));
+$('eConc').addEventListener('change', ac);
+
+// ---------- Doppler ----------
+function dop(){
+  const vv = v('dV');
+  $('rGrad').innerHTML = isFinite(vv) && vv > 0 ? `<div class="tiles">${tile('Gradiente pico', f(4 * vv * vv, 0) + '<small>mmHg</small>', `v ${f(vv, 2)} m/s`, true)}</div>` + (vv > 7 ? pill('crit', 'Revisá la velocidad: está en m/s, no en cm/s.') : '') : '<div class="empty">Cargá la velocidad pico.</div>';
+  const ta = v('dTA'), pad = isFinite(v('dPAD')) ? v('dPAD') : 5, it = v('dIT'), civ = v('dCIV'), da = v('dDA');
+  const est = [];
+  if (it > 0) est.push(['Por IT', 4 * it * it + pad, `4 × ${f(it, 2)}² + ${f(pad, 0)}`]);
+  if (civ > 0 && isFinite(ta)) est.push(['Por CIV', ta - 4 * civ * civ, `${f(ta, 0)} − 4 × ${f(civ, 2)}²`]);
+  if (da > 0 && isFinite(ta)) est.push(['Por ductus', ta - 4 * da * da, `${f(ta, 0)} − 4 × ${f(da, 2)}²`]);
+  if (!est.length) { $('rPSAP').innerHTML = `<div class="empty">Cargá la velocidad de IT${isFinite(ta) ? ', CIV o ductus' : ' (o la TA sistólica y la velocidad de CIV o ductus)'}.</div>`; return; }
+  let h = `<div class="tiles">${est.map(([k, p, s]) => tile(k, f(p, 0) + '<small>mmHg</small>', s)).join('')}</div>`;
+  if (est.some(([, p]) => p < 0)) h += pill('crit', 'Un valor negativo indica un error de carga: revisá la TA sistólica y la velocidad.');
+  if (isFinite(ta) && ta > 0) {
+    const p = Math.max(...est.map(e => e[1])), q = p / ta;
+    const [cls, t] = q >= 1 ? ['crit', 'suprasistémica'] : q > 2/3 ? ['crit', 'grave'] : q > 0.5 ? ['warn', 'moderada'] : q >= 1/3 ? ['warn', 'leve'] : ['ok', 'sin hipertensión pulmonar'];
+    h += pill(cls, `<b>PSVD / TA sistólica = ${f(q * 100, 0)}%: ${t}.</b>${q > 2/3 ? ' Evaluar además la dirección del flujo ductal y por el foramen, y la función del VD.' : ''}`);
+  } else h += '<p class="hint">Cargá la TA sistólica para clasificar la hipertensión pulmonar.</p>';
+  $('rPSAP').innerHTML = h;
+}
+['dV','dTA','dPAD','dIT','dCIV','dDA'].forEach(id => $(id).addEventListener('input', dop));
+function papm(){
+  const pad = isFinite(v('dPAD')) ? v('dPAD') : 5, ip = v('dIPp'), ipf = v('dIPf'), it = v('dIT');
+  const t = [];
+  if (ip > 0) t.push(tile('PAP media (IP)', f(4 * ip * ip + pad, 0) + '<small>mmHg</small>', `4 × ${f(ip, 2)}² + ${f(pad, 0)}`, true));
+  if (ipf > 0) t.push(tile('PAP diastólica (IP)', f(4 * ipf * ipf + pad, 0) + '<small>mmHg</small>', `4 × ${f(ipf, 2)}² + ${f(pad, 0)}`));
+  if (it > 0) { const ps = 4 * it * it + pad; t.push(tile('PAP media (Chemla)', f(0.61 * ps + 2, 0) + '<small>mmHg</small>', `0,61 × PSAP ${f(ps, 0)} + 2`)); }
+  if (!t.length) { $('rPAPm').innerHTML = '<div class="empty">Cargá la velocidad de la insuficiencia pulmonar (o la de IT para Chemla).</div>'; return; }
+  let h = `<div class="tiles">${t.join('')}</div>`;
+  const m = ip > 0 ? 4 * ip * ip + pad : (it > 0 ? 0.61 * (4 * it * it + pad) + 2 : NaN);
+  if ([ip, ipf, it].some(x => x > 6)) h += pill('crit', 'Revisá las velocidades: van en m/s.');
+  else if (isFinite(m)) h += m >= 25 ? pill('crit', `<b>PAP media ≈ ${f(m, 0)} mmHg: elevada.</b> Correlacionar con la PSVD, el flujo ductal y por el foramen y la función del VD.`)
+    : m > 20 ? pill('warn', `<b>PAP media ≈ ${f(m, 0)} mmHg: límite (> 20).</b> En los primeros días la presión pulmonar es fisiológicamente más alta.`)
+    : pill('ok', `<b>PAP media ≈ ${f(m, 0)} mmHg.</b>`);
+  $('rPAPm').innerHTML = h;
+}
+['dIPp','dIPf','dIT','dPAD'].forEach(id => $(id).addEventListener('input', papm));
+function cont(){
+  const d = v('cLvot'), vl = v('cVtiL'), vv = v('cVtiV');
+  if (!(d > 0 && vl > 0 && vv > 0)) { $('rCont').innerHTML = '<div class="empty">Faltan datos: diámetro y VTI del tracto de salida y VTI transvalvular.</div>'; return; }
+  const area = 0.785 * Math.pow(d / 10, 2) * vl / vv, ratio = vl / vv;
+  let bsa = v('cBsa');
+  if (!(bsa > 0)) { const w = vg('zPeso'), hh = v('zTalla'); if (w > 0) bsa = hh > 0 ? 0.024265 * Math.pow(w, 0.5378) * Math.pow(hh, 0.3964) : (4 * w + 7) / (w + 90); }
+  const t = [tile('Área valvular', f(area, 2) + '<small>cm²</small>', '', true), tile('Índice adimensional', f(ratio, 2), 'VTI tracto ÷ VTI válvula')];
+  if (bsa > 0) t.push(tile('Área indexada', f(area / bsa, 2) + '<small>cm²/m²</small>', `SC ${f(bsa, 2)} m²`));
+  let h = `<div class="tiles">${t.join('')}</div>`;
+  if (vl >= vv) h += pill('crit', 'El VTI transvalvular debe ser mayor que el del tracto de salida. Revisá los datos.');
+  else if (ratio < 0.25) h += pill('crit', '<b>Índice adimensional &lt; 0,25:</b> estenosis grave.');
+  else if (ratio <= 0.5) h += pill('warn', '<b>Índice adimensional 0,25–0,50:</b> estenosis moderada.');
+  else h += pill('ok', '<b>Índice adimensional &gt; 0,50:</b> estenosis leve o ausente.');
+  if (bsa > 0 && vl < vv) { const ai = area / bsa; if (ai < 0.6) h += pill('crit', `<b>Área indexada ${f(ai, 2)} cm²/m² (&lt; 0,6):</b> estenosis grave.`); }
+  $('rCont').innerHTML = h;
+}
+['cLvot','cVtiL','cVtiV','cBsa','zPeso','zTalla'].forEach(id => $(id).addEventListener('input', cont));
+
+// ---------- Ductus ----------
+let pdaD = 'ibu', ibuS = 'std';
+const PDA_CONC = {ibu:5, indo:0.5, para:10};
+$('sPda').querySelectorAll('button').forEach(b => b.onclick = () => { pdaD = b.dataset.v; $('sPda').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('pdaConc').value = String(PDA_CONC[pdaD]).replace('.', ','); pda(); });
+$('sIbu').querySelectorAll('button').forEach(b => b.onclick = () => { ibuS = b.dataset.v; $('sIbu').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); pda(); });
+function pda(){
+  $('sIbu').hidden = pdaD !== 'ibu';
+  const w = vg('pdaPeso'), d = v('pdaDias'), c = v('pdaConc');
+  if (!(w > 0)) { $('rPda').innerHTML = '<div class="empty">Falta el peso.</div>'; return; }
+  let doses, intv, extra = '';
+  if (pdaD === 'ibu') { doses = ibuS === 'std' ? [10, 5, 5] : [20, 10, 10]; intv = 'cada 24 h'; }
+  else if (pdaD === 'indo') {
+    if (!isFinite(d)) { $('rPda').innerHTML = '<div class="empty">Cargá los días de vida al iniciar: la dosis de indometacina depende de la edad posnatal.</div>'; return; }
+    doses = d < 2 ? [0.2, 0.1, 0.1] : d <= 7 ? [0.2, 0.2, 0.2] : [0.2, 0.25, 0.25]; intv = 'cada 12–24 h';
+    extra = `Edad posnatal ${d < 2 ? '< 48 h' : d <= 7 ? '2–7 días' : '> 7 días'}.`;
+  } else { doses = [15]; intv = 'cada 6 h durante 3–7 días'; }
+  const rows = doses.map((mgk, i) => `<tr><td>${pdaD === 'para' ? 'Cada dosis' : (i + 1) + '.ª dosis'}</td><td>${f(mgk, 2)} mg/kg</td><td><b>${f(mgk * w, 2)} mg</b></td><td>${c > 0 ? f(mgk * w / c, 2) + ' mL' : '—'}</td></tr>`).join('');
+  let h = `<div class="tablewrap"><table class="pdat"><thead><tr><th></th><th>Dosis</th><th>Total</th><th>Volumen</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  h += pill('info', `<b>${pdaD === 'ibu' ? 'Ibuprofeno' : pdaD === 'indo' ? 'Indometacina' : 'Paracetamol'}:</b> ${intv}. ${extra}${pdaD === 'para' ? ` Dosis diaria ${f(60 * w, 1)} mg.` : ''}`);
+  if (pdaD !== 'para') h += pill('warn', '<b>Antes de cada dosis:</b> diuresis &gt; 1 mL/kg/h, creatinina y plaquetas (evitar con &lt; 50.000–60.000/mm³ o sangrado activo), descartar ECN o perforación intestinal. No usar en cardiopatías ductus-dependientes. No combinar con corticoides sistémicos.');
+  else h += pill('warn', '<b>Controlar transaminasas</b> durante el tratamiento. Alternativa cuando los AINE están contraindicados (plaquetopenia, sangrado, insuficiencia renal).');
+  if (w < 0.4 || w > 5) h += pill('crit', 'Revisá el peso.');
+  $('rPda').innerHTML = h;
+}
+['pdaPeso','pdaDias','pdaConc'].forEach(id => $(id).addEventListener('input', pda));
+
+// ---------- Generador de trazados ECG esquemáticos (SVG) ----------
+// Escala: 25 mm/s y 10 mm/mV. 1 mm = 8 px → 0,2 px/ms y 80 px/mV.
+const ECG = (() => {
+  const PXMS = 0.2, PXMV = 80;
+  const g = (t, c, w, a) => a * Math.exp(-0.5 * Math.pow((t - c) / w, 2));
+  // Plantillas de QRS (gaussianas relativas al inicio del QRS, ms y mV) y su T por defecto
+  const QRS = {
+    n:     { c: [[10,4,-0.08],[32,8,1.25],[52,6,-0.35]], t: [250,42,0.32] },
+    nS:    { c: [[12,5,0.35],[38,9,-1.0]], t: [250,42,0.25] },
+    wide:  { c: [[45,22,1.45],[105,20,-0.45]], t: [300,50,-0.5] },
+    wide2: { c: [[45,22,-1.3],[105,20,0.4]], t: [300,50,0.45] },
+    rbbbV1:{ c: [[18,7,0.35],[42,8,-0.55],[88,14,0.95]], t: [290,45,-0.3] },
+    rbbbV6:{ c: [[10,4,-0.1],[32,8,1.1],[92,18,-0.45]], t: [280,45,0.3] },
+    lbbbV1:{ c: [[12,6,0.12],[75,30,-1.35]], t: [300,50,0.4] },
+    lbbbV6:{ c: [[40,18,1.0],[95,18,1.1]], t: [310,50,-0.4] },
+    delta: { c: [[22,20,0.45],[62,10,1.2],[86,6,-0.25]], t: [280,45,0.25] },
+    esc:   { c: [[12,5,-0.1],[36,10,1.1],[60,8,-0.3]], t: [260,45,0.3] }
+  };
+  function render(spec){
+    const dur = spec.dur || 3000, W = dur * PXMS;
+    const comps = []; const marks = [];
+    const P = (t, o = {}) => comps.push(tt => g(tt, t + 40, o.w || 18, (o.inv ? -1 : 1) * (o.a || 0.15)));
+    const beat = (t, k = 'n', o = {}) => {
+      const q = QRS[k];
+      q.c.forEach(([c, w, a]) => comps.push(tt => g(tt, t + c, w, a * (o.amp || 1))));
+      const T = o.t || q.t; if (T && !o.noT) comps.push(tt => g(tt, t + (o.tc || T[0]), T[1], (o.tinv ? -1 : 1) * T[2] * (o.amp || 1)));
+      if (o.label) marks.push([t, o.label]);
+    };
+    spec.build({ P, beat, add: f => comps.push(f), mark: (t, l) => marks.push([t, l]) });
+    const ys = []; for (let t = 0; t <= dur; t += 4) { let y = 0; for (const c of comps) y += c(t); ys.push(y); }
+    const mx = Math.max(0.6, ...ys), mn = Math.min(-0.5, ...ys);
+    const y0 = 22 + mx * PXMV, H = Math.max(120, Math.ceil((y0 + (-mn) * PXMV + 14) / 8) * 8);
+    let d = ''; ys.forEach((y, i) => { d += (i ? 'L' : 'M') + (i * 4 * PXMS).toFixed(1) + ' ' + (y0 - y * PXMV).toFixed(1); });
+    const lab = marks.map(([t, l]) => `<text x="${(t * PXMS).toFixed(1)}" y="14" font-size="11" fill="#8a4a52" text-anchor="middle" font-family="Public Sans,system-ui,sans-serif">${l}</text>`).join('');
+    const id = 'gr' + Math.random().toString(36).slice(2, 8);
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${spec.aria || 'Trazado esquemático'}" style="display:block;border-radius:8px;background:#fff7f7">
+      <defs><pattern id="${id}s" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#f6c9cc" stroke-width="0.5"/></pattern>
+      <pattern id="${id}" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="url(#${id}s)"/><path d="M40 0H0V40" fill="none" stroke="#eea2a8" stroke-width="0.9"/></pattern></defs>
+      <rect width="${W}" height="${H}" fill="url(#${id})"/>${lab}
+      <path d="${d}" fill="none" stroke="#1f2333" stroke-width="1.6" stroke-linejoin="round"/>
+      ${spec.lead ? `<text x="${W - 6}" y="${H - 8}" font-size="12" font-weight="700" fill="#8a4a52" text-anchor="end" font-family="Public Sans,system-ui,sans-serif">${spec.lead}</text>` : ''}</svg>`;
+  }
+  // pseudoaleatorio determinístico (los trazados se ven igual siempre)
+  const rnd = s => () => (s = (s * 16807) % 2147483647) / 2147483647;
+  return { render, g, rnd };
+})();
+
+// Biblioteca: cada entrada tiene trazado(s), criterios y perlas pediátricas
+const ATLAS = [
+  {g:'Bloqueos AV'},
+  {id:'bav1', n:'Bloqueo AV de 1.er grado', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=300;t<3000;t+=650){ P(t-260); beat(t);} }}],
+   crit:['PR prolongado para la edad (> percentil 98: ≈ 150 ms en lactantes, 180 ms en niños, 200 ms en adolescentes).','Toda onda P conduce: relación P:QRS 1:1.'],
+   notas:'Causas: vagotonía, fármacos (digoxina, betabloqueantes, amiodarona), miocarditis, fiebre reumática, CIA, canal AV, Ebstein, posoperatorio. Suele ser benigno; vigilar progresión.'},
+  {id:'mob1', n:'2.º grado Mobitz I (Wenckebach)', strips:[{lead:'DII', dur:4200, build:({P,beat,mark})=>{ const prs=[140,220,270,null,140,220,270]; let t=250; for(const pr of prs){ if(pr===null){ P(t-140); mark(t-100,'P bloqueada'); t+=560; continue;} P(t-pr); beat(t); t+=560+(pr-140)*0.5; } }}],
+   crit:['Alargamiento progresivo del PR hasta que una P no conduce.','El PR después de la pausa es el más corto; la pausa dura menos que dos ciclos.'],
+   notas:'Bloqueo habitualmente suprahisiano (nodo AV). Frecuente durante el sueño y en deportistas; benigno si es nocturno y asintomático.'},
+  {id:'mob2', n:'2.º grado Mobitz II', strips:[{lead:'DII', dur:3600, build:({P,beat,mark})=>{ let t=250; for(let i=0;i<6;i++){ P(t-160); if(i===3){ mark(t-120,'P bloqueada'); } else beat(t); t+=560; } }}],
+   crit:['PR constante en los latidos conducidos.','Una P súbitamente no conduce, sin alargamiento previo del PR.'],
+   notas:'Bloqueo infrahisiano: riesgo de progresar a BAV completo. Suele asociarse a QRS ancho. Indicación habitual de evaluación para marcapasos (posoperatorio, miocarditis).'},
+  {id:'bav21', n:'Bloqueo AV 2:1', strips:[{lead:'DII', dur:3600, build:({P,beat})=>{ for(let t=250,i=0;t<3500;t+=380,i++){ P(t-160); if(i%2===0) beat(t); } }}],
+   crit:['Una de cada dos P no conduce.','No se puede distinguir Mobitz I de II con un solo trazado: QRS estrecho y respuesta a atropina o al ejercicio sugieren nivel nodal.'],
+   notas:'En el neonato con QT largo grave puede verse un BAV 2:1 funcional (la P cae en el período refractario): es un signo de alto riesgo.'},
+  {id:'bav3', n:'Bloqueo AV completo (3.er grado)', strips:[{lead:'DII', dur:4000, build:({P,beat})=>{ for(let t=100;t<4000;t+=430) P(t); for(let t=400;t<4000;t+=1150) beat(t,'esc'); }}],
+   crit:['Disociación AV completa: P regulares y QRS regulares sin relación entre sí.','Frecuencia auricular mayor que la ventricular.','Escape de la unión (QRS estrecho, más rápido) o ventricular (QRS ancho, más lento).'],
+   notas:'Congénito: anticuerpos maternos anti-Ro/La, L-TGA, isomerismo izquierdo. Adquirido: posoperatorio (CIV, canal AV, Fallot), miocarditis, Lyme. Riesgo si FC media < 55 lpm en el neonato, < 70 lpm con cardiopatía, QRS ancho, QT largo o disfunción ventricular.'},
+  {g:'Bloqueos de rama y preexcitación'},
+  {id:'brd', n:'Bloqueo de rama derecha', strips:[{lead:'V1', dur:1600, build:({beat})=>{ beat(300,'rbbbV1'); beat(1000,'rbbbV1'); }},{lead:'V6', dur:1600, build:({beat})=>{ beat(300,'rbbbV6'); beat(1000,'rbbbV6'); }}],
+   crit:['QRS ancho para la edad (completo: > 90 ms en < 4 años, > 100 ms de 4 a 16 años, ≥ 120 ms después).','rSR\' (M) en V1; S ancha y empastada en DI y V6.','Eje desviado a la derecha para la edad; T opuesta a la R\' en V1.'],
+   notas:'Casi constante tras la reparación de Fallot o el cierre de CIV por ventriculotomía. Un rSR\' con QRS normal en V1 es frecuente y normal en niños; en la CIA sugiere sobrecarga de volumen del VD.'},
+  {id:'bri', n:'Bloqueo de rama izquierda', strips:[{lead:'V1', dur:1600, build:({beat})=>{ beat(300,'lbbbV1'); beat(1000,'lbbbV1'); }},{lead:'V6', dur:1600, build:({beat})=>{ beat(300,'lbbbV6'); beat(1000,'lbbbV6'); }}],
+   crit:['QRS ancho para la edad (> 90 ms en < 4 años, > 100 ms de 4 a 16 años, ≥ 120 ms después).','QS o rS profundo y ancho en V1; R ancha con muesca y sin q en DI, aVL y V6.','T opuesta al QRS en V6.'],
+   notas:'Raro en pediatría: posoperatorio de estenosis subaórtica o cierre de CIV perimembranosa, miocardiopatía, enfermedad del sistema de conducción. Puede inducir disincronía y disfunción del VI.'},
+  {id:'hbai', n:'Hemibloqueo anterior izquierdo', strips:[],
+   crit:['Eje entre −30° y −90° (desviado a la izquierda).','qR en DI y aVL; rS en DII, DIII y aVF.','QRS normal o apenas prolongado.'],
+   notas:'En pediatría, el eje superior obliga a pensar en canal AV (el nodo AV desplazado genera el patrón) y atresia tricuspídea. También tras el cierre de CIV. Usá la calculadora de eje.'},
+  {id:'hbpi', n:'Hemibloqueo posterior izquierdo', strips:[],
+   crit:['Eje desviado a la derecha para la edad, sin hipertrofia del VD que lo explique.','rS en DI y aVL; qR en DIII y aVF.'],
+   notas:'Diagnóstico de exclusión: en niños el eje derecho suele deberse a sobrecarga del VD. Asociado a BRD orienta a enfermedad bifascicular.'},
+  {id:'wpw', n:'Preexcitación (Wolff-Parkinson-White)', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=300;t<3000;t+=650){ P(t-80); beat(t,'delta'); } }}],
+   crit:['PR corto para la edad (límite inferior ≈ 75 ms antes del año, 80 ms de 1 a 3 años, 85 ms de 3 a 5, 90 ms de 5 a 12 y 95 ms de 12 a 16).','Onda delta: empastamiento inicial del QRS.','QRS ancho para la edad y alteraciones secundarias del ST-T.'],
+   notas:'Asociado a Ebstein y L-TGA. Riesgo de muerte súbita por FA preexcitada; estratificar (Holter, ergometría, estudio electrofisiológico). Evitar digoxina y verapamilo; la adenosina, con desfibrilador disponible.'},
+  {g:'Taquicardias de QRS estrecho'},
+  {id:'tsv', n:'TSV por reentrada (AVRT ortodrómica)', strips:[{lead:'DII', build:({beat,P})=>{ for(let t=200;t<3000;t+=220){ beat(t,'n',{t:[170,26,0.22]}); P(t+60,{inv:true,a:0.1,w:12}); } }}],
+   crit:['Taquicardia regular de QRS estrecho, típicamente 220–300 lpm en lactantes y 180–250 lpm en niños.','Frecuencia fija, sin variación latido a latido; comienzo y fin bruscos.','P retrógrada en el ST (RP corto, > 70 ms en la AVRT); en la AVNRT suele no verse o aparecer al final del QRS.'],
+   notas:'Mecanismo más frecuente en el lactante (vía accesoria). Responde a maniobras vagales (hielo en la cara) y adenosina. Ver Infusiones → Adenosina.'},
+  {id:'flutter', n:'Flutter auricular', strips:[{lead:'DII', build:({add,beat})=>{ add(t=>{ const ph=(t%200)/200; return ph<0.75? 0.12-0.4*(ph/0.75) : -0.28+0.4*((ph-0.75)/0.25); }); for(let t=300;t<3000;t+=400) beat(t,'n',{amp:0.9}); }}],
+   crit:['Ondas F en serrucho sin línea isoeléctrica (mejor vistas en DII, DIII, aVF y V1).','Frecuencia auricular 300–500 lpm en el neonato, ~300 lpm en niños mayores.','Conducción AV variable (2:1, 3:1…); la adenosina desenmascara las ondas F.'],
+   notas:'Neonatal en corazón sano: suele tratarse con cardioversión sincrónica y no recurre. En operados (Mustard, Senning, Fontan) es una macrorreentrada por cicatriz.'},
+  {id:'fa', n:'Fibrilación auricular', strips:[{lead:'DII', build:({add,beat})=>{ const r=ECG.rnd(7); const ph=[...Array(6)].map(()=>[r()*6, 0.018+r()*0.022, 0.035+r()*0.03]); add(t=>ph.reduce((s,[p,a,f])=>s+a*Math.sin(f*t+p),0)); const rr=[430,610,380,700,450,520]; let t=200; for(const x of rr){ beat(t); t+=x; } }}],
+   crit:['Ausencia de ondas P; línea de base irregular (ondas f).','RR irregularmente irregular.'],
+   notas:'Rara en niños sin cardiopatía: buscar WPW (con preexcitación es una emergencia), miocardiopatía, Ebstein, posoperatorio o hipertiroidismo.'},
+  {id:'tae', n:'Taquicardia auricular ectópica', strips:[{lead:'DII', build:({P,beat})=>{ const rr=[480,440,400,370,360,360,360,360]; let t=300; for(const x of rr){ P(t-120,{inv:true,a:0.12}); beat(t); t+=x; } }}],
+   crit:['P de morfología o eje distinto del sinusal antes de cada QRS (RP largo).','Inicio y fin progresivos (calentamiento y enfriamiento).','La adenosina produce bloqueo AV transitorio sin terminarla.'],
+   notas:'Suele ser incesante: causa frecuente de miocardiopatía por taquicardia. Tratamiento: betabloqueantes, flecainida, amiodarona; ablación.'},
+  {id:'jet', n:'Taquicardia ectópica de la unión (JET)', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=200;t<3000;t+=300) beat(t); for(let t=80;t<3000;t+=470) P(t); }}],
+   crit:['QRS estrecho, igual al sinusal, con frecuencia mayor que la auricular.','Disociación AV (P más lentas e independientes) o conducción retrógrada 1:1.','Inicio gradual; no responde a la adenosina.'],
+   notas:'Típica en las primeras 24–48 h tras cirugía cardíaca (cierre de CIV, Fallot, canal AV). Medidas: bajar catecolaminas, normotermia o hipotermia leve (34–35 °C), corregir Mg y K, sedación, amiodarona, estimulación auricular sincronizada.'},
+  {g:'Extrasístoles'},
+  {id:'esv', n:'Extrasístole supraventricular', strips:[{lead:'DII', dur:3400, build:({P,beat,mark})=>{ const ts=[300,950,1420,2240,2890]; ts.forEach((t,i)=>{ if(i===2){ P(t-150,{a:0.1,w:14}); beat(t,'n',{label:'ESV'}); } else { P(t-140); beat(t);} }); }}],
+   crit:['Latido prematuro con P de morfología distinta y QRS estrecho.','Pausa generalmente no compensadora.','Puede conducir con aberrancia (QRS ancho) o no conducir (P bloqueada).'],
+   notas:'Muy frecuentes y benignas en neonatos y lactantes. Las P prematuras bloqueadas en bigeminismo pueden simular bradicardia sinusal.'},
+  {id:'ev', n:'Extrasístole ventricular', strips:[{lead:'DII', dur:3400, build:({P,beat})=>{ P(160); beat(300); P(810); beat(950); beat(1400,'wide',{label:'EV'}); P(2110); beat(2250); P(2760); beat(2900); }}],
+   crit:['QRS prematuro y ancho, sin P precedente.','T opuesta al QRS; pausa compensadora completa.','Monomorfas, polimorfas, bigeminismo, duplas, salvas (≥ 3 = TV no sostenida).'],
+   notas:'Aisladas y monomorfas, con corazón sano, que desaparecen con el ejercicio: suelen ser benignas. Estudiar si son polimorfas, en duplas o salvas, aumentan con el esfuerzo, o si hay QT largo, miocarditis o cardiopatía.'},
+  {g:'Arritmias ventriculares'},
+  {id:'tv', n:'Taquicardia ventricular', strips:[{lead:'DII', build:({beat,P})=>{ for(let t=200;t<3000;t+=330) beat(t,'wide',{t:[230,45,-0.45],amp:0.75}); for(let t=120;t<3000;t+=560) P(t,{a:0.12}); }}],
+   crit:['Taquicardia de QRS ancho para la edad (≥ 3 latidos).','Disociación AV, latidos de captura o de fusión: confirman origen ventricular.','Ante la duda, todo QRS ancho rápido es TV hasta demostrar lo contrario.'],
+   notas:'En lactantes la TV puede tener QRS apenas ancho (≈ 80–100 ms). Causas: miocarditis, miocardiopatías, cicatriz posoperatoria (Fallot), canalopatías, trastornos electrolíticos, tumores (rabdomioma).'},
+  {id:'tdp', n:'Torsades de pointes', strips:[{lead:'DII', build:({add})=>{ add(t=> t<250? 0 : Math.sin(2*Math.PI*(t-250)/230)*(0.15+0.75*Math.abs(Math.sin(2*Math.PI*(t-250)/1900)))); }}],
+   crit:['TV polimorfa con QRS que rotan alrededor de la línea de base (amplitud creciente y decreciente).','Desencadenada por QT largo; a menudo tras una secuencia pausa larga – latido corto.'],
+   notas:'Tratamiento: sulfato de magnesio, corregir K y Ca, suspender fármacos que prolongan el QT, estimulación o isoproterenol si es dependiente de pausas, desfibrilación si es sostenida. Ver la calculadora de QTc.'},
+  {id:'fv', n:'Fibrilación ventricular', strips:[{lead:'DII', build:({add})=>{ const r=ECG.rnd(11); const ph=[...Array(5)].map(()=>[r()*6, 0.12+r()*0.2, 0.025+r()*0.02]); add(t=>ph.reduce((s,[p,a,f])=>s+a*Math.sin(f*t+p),0)); }}],
+   crit:['Actividad eléctrica caótica, sin QRS identificables.','Sin pulso: paro cardíaco.'],
+   notas:'Desfibrilación 2 J/kg, luego 4 J/kg (hasta 10 J/kg); RCP de alta calidad; adrenalina; amiodarona 5 mg/kg o lidocaína en la FV refractaria (PALS).'}
+];
+
+// Davignon y col. (1979): percentiles 2–98 (media)
+const DAV = [
+  {k:'d0', n:'< 1 día', hr:[93,155,122], ax:[59,192,135], qrs:[21,76], pr:[79,160,107], rv1:[5,27,14], sv1:[0.5,23,9], rsv1:[0.2,9.8,2.3], rv6:[0,12,5], sv6:[0.2,10,4], rsv6:[0.5,9,2.5]},
+  {k:'d1', n:'1–3 días', hr:[91,158,124], ax:[64,197,134], qrs:[22,67], pr:[81,139,108], rv1:[5,27,15], sv1:[0.5,21,10], rsv1:[0.2,6,2], rv6:[0.1,12,5], sv6:[0.2,10,3], rsv6:[0.5,11,3]},
+  {k:'d3', n:'3–7 días', hr:[90,166,128], ax:[77,187,132], qrs:[21,68], pr:[75,137,104], rv1:[3,25,13], sv1:[0.5,17,7], rsv1:[0.2,9.8,2.8], rv6:[0.5,12,5], sv6:[0.4,10,4], rsv6:[0.5,10,2.5]},
+  {k:'d7', n:'7–30 días', hr:[106,182,148], ax:[65,159,110], qrs:[22,79], pr:[73,138,101], rv1:[3,22,11], sv1:[0.5,12,4], rsv1:[1,7,2.9], rv6:[3,17,8], sv6:[0.2,10,3], rsv6:[0.5,12,4]},
+  {k:'m1', n:'1–3 meses', hr:[120,179,149], ax:[31,115,75], qrs:[23,75], pr:[73,130,98], rv1:[3,19,10], sv1:[0.5,13,5], rsv1:[0.3,7.5,2.3], rv6:[5,22,12], sv6:[0.3,7,3], rsv6:[0.5,12,4.5]},
+  {k:'m3', n:'3–6 meses', hr:[105,185,142], ax:[7,105,60], qrs:[22,79], pr:[74,145,106], rv1:[3,20,10], sv1:[0.5,17,6], rsv1:[0.2,6,2.4], rv6:[6,23,14], sv6:[0.2,10,3], rsv6:[0.5,18,6.5]},
+  {k:'m6', n:'6–12 meses', hr:[107,168,132], ax:[7,98,54], qrs:[23,76], pr:[73,156,110], rv1:[2,20,9], sv1:[0.5,18,7], rsv1:[0.1,3.9,1.8], rv6:[6,23,13], sv6:[0.2,8,2], rsv6:[0.5,22,8]},
+  {k:'a1', n:'1–3 años', hr:[90,151,119], ax:[8,100,55], qrs:[27,75], pr:[82,148,114], rv1:[3,18,9], sv1:[1,21,9], rsv1:[0.1,4.2,1.4], rv6:[6,23,14], sv6:[0.1,7,2], rsv6:[0.5,28,9.5]},
+  {k:'a3', n:'3–5 años', hr:[73,137,108], ax:[7,104,55], qrs:[30,72], pr:[85,161,118], rv1:[2,18,8], sv1:[2,22,10], rsv1:[0,2.8,0.9], rv6:[9,25,15], sv6:[0.1,6,2], rsv6:[0.8,30,11]},
+  {k:'a5', n:'5–8 años', hr:[65,133,100], ax:[10,140,66], qrs:[32,79], pr:[90,164,124], rv1:[1,13,7], sv1:[3,24,12], rsv1:[0,2,0.8], rv6:[9,27,17], sv6:[0.1,4,1], rsv6:[1,30,12]},
+  {k:'a8', n:'8–12 años', hr:[63,129,92], ax:[9,115,61], qrs:[32,85], pr:[87,171,128], rv1:[0.5,10,6], sv1:[3,26,12], rsv1:[0,1.9,0.6], rv6:[10,26,17], sv6:[0,4,1], rsv6:[2,33,14]},
+  {k:'a12', n:'12–16 años', hr:[66,120,86], ax:[11,133,58], qrs:[34,88], pr:[92,175,135], rv1:[0.5,10,5], sv1:[3,22,11], rsv1:[0,1.8,0.5], rv6:[7,23,15], sv6:[0,4,1], rsv6:[2,39,15]}
+];
+const NROWS = [['hr','FC','lpm'],['pr','PR','ms'],['qrs','QRS','ms'],['ax','Eje','°'],['rv1','R en V1','mm'],['sv1','S en V1','mm'],['rsv1','R/S en V1',''],['rv6','R en V6','mm'],['sv6','S en V6','mm'],['rsv6','R/S en V6','']];
+['eAge','nAge'].forEach(id => { DAV.forEach((a, i) => $(id).add(new Option(a.n, i))); $(id).value = 3; });
+const fr = (a, d = 1) => a ? `${f(a[0], d)}–${f(a[1], d)}${a[2] !== undefined ? ` (${f(a[2], d)})` : ''}` : '–';
+function norm(){
+  const A = DAV[+$('nAge').value];
+  $('nTable').innerHTML = `<thead><tr><th>Parámetro</th><th>Normal</th><th>Paciente</th></tr></thead><tbody>` + NROWS.map(([k, n, u]) =>
+    `<tr><td>${n}${u ? ` <small class="zr">${u}</small>` : ''}</td><td>${fr(A[k], u === 'mm' || u === '' ? 1 : 0)}</td><td><input id="n_${k}" inputmode="decimal" autocomplete="off" aria-label="${n} del paciente" value="${$('n_' + k) ? $('n_' + k).value : ''}"><span class="nv" id="nv_${k}"></span></td></tr>`).join('') + '</tbody>';
+  NROWS.forEach(([k]) => $('n_' + k).addEventListener('input', normEval));
+  normEval();
+}
+function normEval(){
+  const A = DAV[+$('nAge').value], hi = {}, lo = {};
+  NROWS.forEach(([k]) => {
+    const x = v('n_' + k), el = $('nv_' + k); el.textContent = ''; el.className = 'nv';
+    if (!isFinite(x)) return;
+    if (x > A[k][1]) { hi[k] = 1; el.textContent = ' ↑'; el.className = 'nv hi'; }
+    else if (x < A[k][0]) { lo[k] = 1; el.textContent = ' ↓'; el.className = 'nv lo'; }
+  });
+  const rvh = [], lvh = [], other = [];
+  if (hi.rv1) rvh.push('R en V1 > p98'); if (hi.sv6) rvh.push('S en V6 > p98'); if (hi.rsv1) rvh.push('R/S en V1 > p98');
+  if ($('nTV1').checked) rvh.push('T positiva en V1'); if ($('nQR').checked) rvh.push('qR en V1'); if (hi.ax) rvh.push('eje derecho para la edad');
+  if (hi.rv6) lvh.push('R en V6 > p98'); if (hi.sv1) lvh.push('S en V1 > p98'); if (lo.rsv1) lvh.push('R/S en V1 < p2');
+  if ($('nStrain').checked) lvh.push('T invertida en V5–V6'); if ($('nQ6').checked) lvh.push('Q profunda en V5–V6'); if (lo.ax) lvh.push('eje izquierdo para la edad');
+  if (hi.hr) other.push('Taquicardia para la edad'); if (lo.hr) other.push('Bradicardia para la edad');
+  if (hi.pr) other.push('PR largo: bloqueo AV de 1.er grado'); if (lo.pr) other.push('PR corto: descartar preexcitación (onda delta) o ritmo auricular bajo');
+  if (hi.qrs) other.push('QRS ancho para la edad: bloqueo de rama, preexcitación o ritmo ventricular; los criterios de voltaje no son válidos');
+  let h = '';
+  if (rvh.length) h += pill(rvh.length >= 2 ? 'crit' : 'warn', `<b>${rvh.length >= 2 ? 'Hipertrofia del VD probable' : 'Signo aislado de hipertrofia del VD'}:</b> ${rvh.join(', ')}.`);
+  if (lvh.length) h += pill(lvh.length >= 2 ? 'crit' : 'warn', `<b>${lvh.length >= 2 ? 'Hipertrofia del VI probable' : 'Signo aislado de hipertrofia del VI'}:</b> ${lvh.join(', ')}.`);
+  if (rvh.length >= 2 && lvh.length >= 2) h += pill('crit', '<b>Criterios de ambos ventrículos: considerar hipertrofia biventricular.</b>');
+  other.forEach(t => h += pill('warn', t + '.'));
+  if (!h) h = NROWS.some(([k]) => isFinite(v('n_' + k))) ? pill('ok', '<b>Valores cargados dentro de lo normal para la edad.</b>') : '<div class="empty">Cargá valores del paciente para evaluarlos.</div>';
+  $('rNorm').innerHTML = h;
+}
+$('nAge').addEventListener('change', norm);
+['nTV1','nQR','nStrain','nQ6'].forEach(id => $(id).addEventListener('change', normEval));
+
+// Eje con sistema hexaxial
+function hexa(axis, lo, hi){
+  const cx = 150, cy = 150, R = 112, P = a => [cx + R * Math.cos(a * Math.PI / 180), cy + R * Math.sin(a * Math.PI / 180)];
+  const leads = [['DI',0],['DII',60],['DIII',120],['aVF',90],['aVL',-30],['aVR',-150]];
+  const arc = (a1, a2) => { const [x1, y1] = P(a1), [x2, y2] = P(a2); const large = (a2 - a1) > 180 ? 1 : 0; return `M${cx} ${cy}L${x1.toFixed(1)} ${y1.toFixed(1)}A${R} ${R} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}Z`; };
+  let svg = `<svg viewBox="0 0 300 300" role="img" aria-label="Sistema hexaxial con el eje calculado">`;
+  svg += `<path d="${arc(lo, hi)}" fill="var(--mint)" stroke="none"/>`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--line)" stroke-width="1.5"/>`;
+  leads.forEach(([n, a]) => { const [x1, y1] = P(a), [x2, y2] = P(a + 180), [lx, ly] = [cx + (R + 22) * Math.cos(a * Math.PI / 180), cy + (R + 22) * Math.sin(a * Math.PI / 180)];
+    svg += `<line x1="${x2.toFixed(1)}" y1="${y2.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="${n.startsWith('aV') ? '4 3' : '0'}"/>`;
+    svg += `<text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">${n}</text>`;
+    svg += `<text x="${(cx + (R - 14) * Math.cos(a * Math.PI / 180)).toFixed(1)}" y="${(cy + (R - 14) * Math.sin(a * Math.PI / 180) + 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--muted)">${a > 0 ? '+' : ''}${a}°</text>`; });
+  [[180,'±180°'],[-90,'−90°'],[150,'+150°'],[-120,'−120°'],[-60,'−60°'],[30,'+30°']].forEach(([a, t]) => svg += `<text x="${(cx + (R - 14) * Math.cos(a * Math.PI / 180)).toFixed(1)}" y="${(cy + (R - 14) * Math.sin(a * Math.PI / 180) + 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--muted)">${t}</text>`);
+  if (isFinite(axis)) { const [x, y] = [cx + (R - 4) * Math.cos(axis * Math.PI / 180), cy + (R - 4) * Math.sin(axis * Math.PI / 180)];
+    svg += `<defs><marker id="axh" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>`;
+    svg += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--accent)" stroke-width="3.5" marker-end="url(#axh)"/>`; }
+  svg += `<circle cx="${cx}" cy="${cy}" r="3" fill="var(--fg)"/></svg>`;
+  return svg;
+}
+function eje(){
+  const I = v('eI'), F = v('eF'), A = DAV[+$('eAge').value], [lo, hi] = A.ax;
+  let axis = NaN;
+  if (isFinite(I) && isFinite(F) && (I !== 0 || F !== 0)) axis = Math.atan2(F, I) * 180 / Math.PI;
+  // En la primera semana el eje normal supera +180° (Davignon): expresarlo en la escala 0–360°
+  if (isFinite(axis) && hi > 180 && axis < -90) axis += 360;
+  $('hexa').innerHTML = hexa(axis, lo, hi);
+  if (!isFinite(axis)) { $('rEje').innerHTML = `<div class="empty">Cargá DI y aVF. Zona verde: normal para ${A.n} (${lo}° a ${hi}°).</div>`; return; }
+  const ax = Math.round(axis);
+  let h = `<div class="tiles">${tile('Eje del QRS', (ax > 0 ? '+' : '') + ax + '<small>°</small>', `Normal para ${A.n}: ${lo}° a ${hi}°`, true)}</div>`;
+  if (axis >= lo && axis <= hi) h += pill('ok', '<b>Eje normal para la edad.</b>');
+  else if (axis < -90 || (hi > 180 && axis > 270)) h += pill('crit', '<b>Eje extremo (−90° a ±180°, "tierra de nadie").</b> Pensar en ritmo ventricular, hiperpotasemia, cardiopatía compleja o error de electrodos.');
+  else if (axis < lo) h += pill('warn', `<b>Desviación izquierda para la edad.</b>${axis <= -30 ? ' Eje superior (−30° a −90°): canal AV, atresia tricuspídea, hemibloqueo anterior izquierdo, preexcitación, ventrículo único con VI dominante.' : ' Sobrecarga del VI o variante.'}`);
+  else h += pill('warn', '<b>Desviación derecha para la edad.</b> Sobrecarga del VD (estenosis pulmonar, Fallot, hipertensión pulmonar, CIA), dextrocardia o hemibloqueo posterior izquierdo.');
+  if (hi > 180 && axis > 180) h += `<p class="hint">En la primera semana el eje normal puede superar +180° (equivale a ${Math.round(axis - 360)}° en la escala de −180° a +180°).</p>`;
+  if (I < 0 && F < 0 && !(hi > 180 && axis >= lo && axis <= hi)) h += pill('info', 'DI y aVF negativos: con DI negativo y aVR positivo, descartar inversión de electrodos o dextrocardia.');
+  $('rEje').innerHTML = h;
+}
+['eI','eF'].forEach(id => $(id).addEventListener('input', eje)); $('eAge').addEventListener('change', eje);
+
+// Atlas
+let aGroup = 'Todos';
+function buildAtlas(){
+  const groups = ['Todos', ...ATLAS.filter(a => a.g).map(a => a.g)];
+  $('aFilt').innerHTML = groups.map(gname => `<button class="chip" aria-pressed="${gname === aGroup}">${gname}</button>`).join('');
+  $('aFilt').querySelectorAll('button').forEach(b => b.onclick = () => { aGroup = b.textContent; buildAtlas(); });
+  let cur = '', html = '';
+  ATLAS.forEach(a => {
+    if (a.g) { cur = a.g; if (aGroup === 'Todos' || aGroup === cur) html += `<div class="agrp">${cur}</div>`; return; }
+    if (aGroup !== 'Todos' && aGroup !== cur) return;
+    html += `<details class="ac" data-id="${a.id}"><summary>${a.n}</summary><div class="abody"><div class="strips" id="st_${a.id}"></div><ul>${a.crit.map(c => `<li>${c}</li>`).join('')}</ul><div class="perla">${a.notas}</div></div></details>`;
+  });
+  $('atlas').innerHTML = html;
+  $('atlas').querySelectorAll('details.ac').forEach(d => d.addEventListener('toggle', () => {
+    const a = ATLAS.find(x => x.id === d.dataset.id), box = $('st_' + a.id);
+    if (d.open && !box.dataset.done) { box.innerHTML = a.strips.map(sp => `<div style="flex:${(sp.dur || 3000) / 3000};min-width:0">${ECG.render(sp)}</div>`).join('') || '<div class="hint">Sin trazado: se reconoce por el eje y la morfología en las derivaciones de miembros (ver Eje).</div>'; box.dataset.done = 1; }
+  }));
+}
+
+// Vistas
+$('sView').querySelectorAll('button').forEach(b => b.onclick = () => { const v = b.dataset.v; $('sView').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('viewEcg').hidden = v !== 'ecg'; $('viewTools').hidden = v !== 'tools'; $('viewSim').hidden = v !== 'sim'; try { localStorage.setItem('cardio_view', v); } catch (err) {} });
+
+// ---------- Ejemplo y limpiar ----------
+$('ej').onclick = () => { $('zPeso').value = '3200'; $('zTalla').value = '50'; if ($('z_p_ann')) { $('z_p_ann').value = '5'; $('z_p_lad').value = '1,4'; } zcalc(); cor(); $('vDopa').value = '5'; $('vAdre').value = '0,05'; $('vMil').value = '0,5'; vis(); S.age = 'neo'; S.sex = 'm'; S.unit = 'ms'; S.hr = 'fc'; syncSeg(); $('qt').value = '300'; $('fc').value = '150'; $('rr').value = ''; $('qrs').value = '60'; manualQTc = false; calc(); };
+$('clr').onclick = () => { VIS_IN.forEach(([id]) => $(id).value = ''); vis(); ['eI','eF','zPeso','zTalla','cZ','cMm','qAo','qVm','qVp','qAp','aPeso','hRate','hLab','eDose','eXa','dV','dTA','dIT','dCIV','dDA','dIPp','dIPf','cLvot','cVtiL','cVtiV','cBsa','pdaPeso','pdaDias','dpD','dpV','daD','daV','dFC','dPeso'].forEach(id => $(id).value = ''); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); eje(); NROWS.forEach(([k]) => $('n_' + k).value = ''); ['nTV1','nQR','nStrain','nQ6'].forEach(id => $(id).checked = false); normEval(); zRows().filter(d => !d.g).forEach(d => $('z_' + d.id).value = ''); zcalc(); cor(); ['qt','fc','rr','qrs'].forEach(id => $(id).value = ''); manualQTc = false; $('crit').innerHTML = ''; buildCrit(); calc(); };
+['qt','fc','rr','qrs','vel'].forEach(id => $(id).addEventListener('input', () => { manualQTc = false; calc(); }));
+$('sVer').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { manualQTc = false; buildCrit(); calc(); }));
+$('sSex').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { manualQTc = false; autoQTc(); score(); }));
+
+$('goSim').onclick = () => { $('sView').querySelectorAll('button')[2].click(); window.scrollTo(0,0); };
+syncSeg(); buildCrit(); calc(); vis(); buildZ(); zcalc(); cor(); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); norm(); eje(); buildAtlas();
+try { const cv0 = localStorage.getItem('cardio_view'); if (location.hash === '#simulador' || cv0 === 'sim') $('sView').querySelectorAll('button')[2].click(); else if (cv0 === 'ecg' || location.hash === '#ecg') $('sView').querySelectorAll('button')[1].click(); } catch (err) {}
+</script>
+<script>
+
+(function(){
+"use strict";
+const $ = id => document.getElementById("sm-"+id);
+const svgNS = "http://www.w3.org/2000/svg";
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- Geometría: vías de conducción ---------- */
+const PATHS = {
+  "sa-ra":   "M98 72 Q118 130 172 192",
+  "sa-la":   "M98 72 Q190 40 300 95",
+  "av":      "M178 196 L198 228",
+  "his-r":   "M198 228 L190 262 Q150 310 120 372",
+  "his-l":   "M198 228 L210 262 Q255 310 290 372",
+  "ap-ante": "M336 180 L348 212 L336 252",
+  "ap-retro":"M336 252 L348 212 L336 180",
+  "la-av":   "M336 180 Q262 168 178 196",
+  "la-ra":   "M300 110 Q200 80 110 120",
+  "av-slow": "M150 186 Q156 222 198 228",
+  "av-fast": "M198 228 Q182 200 176 190",
+  "fast-atria":"M176 190 Q130 150 98 100",
+  "ps-retro":"M206 256 Q170 252 166 214",
+  "ps-atria":"M166 214 Q120 160 92 98",
+  "ps-la":   "M166 214 Q240 170 320 120",
+  "focus-av":"M310 82 Q250 140 178 196",
+  "focus-ra":"M310 82 Q200 64 104 118",
+  "flutter": "M128 128 A40 40 0 1 0 129 128",
+  "fl-av":   "M160 162 L178 196",
+  "jet-ret": "M198 228 Q170 180 110 118",
+  "rvot-r":  "M168 236 Q140 300 118 372",
+  "rvot-l":  "M168 236 Q240 268 290 372",
+  "fasc-l":  "M262 336 Q282 352 292 372",
+  "fasc-r":  "M262 336 Q190 300 118 372",
+  "lv-r":    "M300 300 Q200 280 118 372",
+  "lv-l":    "M300 300 Q300 340 292 372",
+  "rv-l":    "M110 300 Q200 280 292 372",
+  "rv-r":    "M110 300 Q112 340 118 372",
+  "lb-ant":  "M204 250 Q250 246 312 236",
+  "lb-post": "M204 250 Q232 318 272 372",
+  "l-to-r":  "M262 330 Q190 300 118 372",
+  "r-to-l":  "M150 330 Q220 300 292 372",
+  "post-ant":"M272 372 Q336 320 312 236",
+  "ant-post":"M312 236 Q330 320 272 372"
+};
+const LANDMARKS = {
+  sa:{x:98,y:72,r:7,label:"NS"}, av:{x:186,y:210,r:7,label:"NAV"},
+  his:{x:198,y:232,r:5,label:"His"}, focusLA:{x:310,y:82,r:6,label:"Foco"},
+  rvot:{x:168,y:236,r:6,label:"TSVD"}, fasc:{x:262,y:336,r:6,label:"FPI"},
+  ap:{x:348,y:212,r:6,label:"Vía acc."}, ps:{x:190,y:252,r:6,label:"Vía PS"},
+  lvf:{x:300,y:300,r:5,label:""}, rvf:{x:110,y:300,r:5,label:""}
+};
+const pathG = $("paths"), lmG = $("landmarks"), dotG = $("dots"), blockG = $("blocks");
+const pathEls = {};
+for(const id in PATHS){
+  const p = document.createElementNS(svgNS,"path");
+  p.setAttribute("d",PATHS[id]); p.setAttribute("stroke","var(--node)");
+  p.setAttribute("stroke-width","2"); p.setAttribute("opacity","0");
+  p.setAttribute("stroke-dasharray","4 4");
+  pathG.appendChild(p); pathEls[id]=p; p._len = p.getTotalLength();
+}
+const lmEls = {};
+for(const id in LANDMARKS){
+  const L = LANDMARKS[id], g = document.createElementNS(svgNS,"g");
+  const c = document.createElementNS(svgNS,"circle");
+  c.setAttribute("cx",L.x); c.setAttribute("cy",L.y); c.setAttribute("r",L.r);
+  c.setAttribute("fill","var(--surface)"); c.setAttribute("stroke","var(--node)"); c.setAttribute("stroke-width","2");
+  const t = document.createElementNS(svgNS,"text");
+  if(L.x>320){ t.setAttribute("x",L.x-10); t.setAttribute("text-anchor","end"); } else t.setAttribute("x",L.x+10);
+  t.setAttribute("y",L.y-8); t.setAttribute("font-size","11");
+  t.setAttribute("font-family","IBM Plex Mono, monospace"); t.setAttribute("fill","var(--ink)"); t.textContent=L.label;
+  g.appendChild(c); g.appendChild(t); g.style.display="none"; lmG.appendChild(g); lmEls[id]={g,c};
+}
+const chamberEls = {ra:$("c-ra"),la:$("c-la"),rv:$("c-rv"),lv:$("c-lv")};
+
+/* ---------- Simulación ---------- */
+const WINDOW = 3000;            // ms de ECG visibles
+let sim, scen, running = !reduceMotion, speed = 0.5;
+
+function newSim(){
+  return {t:0, ecg:[], anims:[], flashes:[], marks:[], blocks:[], qrs:[], p:[], st:{}, next:0};
+}
+function gauss(d,s){return Math.exp(-(d*d)/(2*s*s));}
+/* Cada onda es un vector (x: izquierda, y: inferior, z: anterior) que se proyecta en cada derivación */
+const LEADV = {DI:[1,0,0], DII:[.5,.866,0], DIII:[-.5,.866,0], aVR:[-.866,-.5,0], aVL:[.866,-.5,0], aVF:[0,1,0],
+  V1:[-.42,.1,.9], V2:[-.12,.1,1], V5:[.85,.12,.25], V6:[.97,.12,-.1]};
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+function addWave(t,comps,v){ // comps escalares [offset, amp, sigma]; v = vector (null = igual en todas)
+  let lo=1e9,hi=-1e9;
+  for(const c of comps){lo=Math.min(lo,c[0]-4*c[2]);hi=Math.max(hi,c[0]+4*c[2]);}
+  sim.ecg.push({t0:t+lo,t1:t+hi,v:v||null,f:x=>{let r=0;for(const c of comps)r+=c[1]*gauss(x-t-c[0],c[2]);return r;}});
+}
+function addVec(t,comps,k=1){ // comps vectoriales [offset, sigma, x, y, z]
+  for(const c of comps) addWave(t,[[c[0],k,c[1]]],[c[2],c[3],c[4]]);
+}
+function addBase(t0,t1,f,v){sim.ecg.push({t0,t1,f,v:v||null});}
+const QRS_SHAPES = {
+  narrow:[[-16,5,-.25,0,.35],[0,8,.6,.78,-.35],[17,6,-.18,-.22,-.25]],
+  delta:[[-38,16,-.3,.28,.35],[0,11,.5,.72,-.05],[24,9,-.12,-.18,-.15]],
+  wide:[[0,24,-.35,.85,.65],[55,14,.12,-.22,-.2]],
+  wideNeg:[[-34,10,-.1,.15,.3],[4,22,.25,-.95,.05],[42,14,-.35,0,.55]],
+  pvc:[[0,22,.25,1.05,-.6],[50,14,-.1,-.25,.2]],
+  pvcNeg:[[0,22,-.35,-.95,.55],[50,14,.1,.25,-.2]],
+  normal:[[-16,5,-.25,0,.35],[0,8,.6,.78,-.35],[17,6,-.18,-.22,-.25]],
+  brd:[[-16,5,-.25,0,.35],[0,8,.55,.72,-.4],[40,14,-.55,-.12,.8]],
+  brdInc:[[-16,5,-.25,0,.35],[0,8,.58,.75,-.4],[26,8,-.35,-.05,.45]],
+  bri:[[-10,16,.5,.32,-.62],[34,17,.6,.42,-.5]],
+  hbai:[[-14,6,.2,.42,.2],[8,10,.42,-.88,-.3],[24,7,-.1,-.05,-.1]],
+  hbpi:[[-16,5,.3,-.35,.1],[4,9,-.55,.92,-.2],[20,7,.05,-.1,-.1]],
+  bif:[[-14,6,.2,.42,.2],[8,10,.42,-.88,-.3],[42,14,-.55,-.12,.8]]
+};
+const PV=[.45,.85,.25], TV=[.55,.62,-.42];
+const TBY = {normal:TV, brd:[.5,.45,-.55], brdInc:[.52,.55,-.45], bri:[-.5,-.3,.65], hbai:TV, hbpi:TV, bif:[.5,.4,-.55]};
+function P(t,o={}){addWave(t,[[0,o.amp??.15,o.w??17]],o.v||PV); sim.p.push(t);
+  if(o.mark) mark(t,o.mark,o.color);}
+function QRS(t,type="narrow",o={}){
+  addVec(t, QRS_SHAPES[type], o.k??1); sim.qrs.push(t);
+  if(o.mark) mark(t,o.mark,o.color);
+}
+function T(t,o={}){addWave(t,[[0,o.amp??.3,o.w??38]],o.v||TV);}
+function spike(t){addWave(t,[[0,1.3,1.6]]); mark(t,"E","#ffd27a");}
+function mark(t,text,color){sim.marks.push({t,text,color:color||"#cfe9dc"});}
+function anim(path,t,dur,kind="ante"){sim.anims.push({path,t0:t,dur,kind});}
+function flash(ch,t){sim.flashes.push({ch,t0:t});}
+function block(x,y,t,dur=600){sim.blocks.push({x,y,t0:t,dur});}
+function event(t,label){mark(t,label,"#ffd27a");}
+
+/* Latido sinusal genérico */
+function sinus(t,o={}){
+  const PR=o.PR??120;
+  anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); flash("la",t+55);
+  P(t+45,{amp:o.pAmp??.15, mark:o.pmark});
+  if(o.noAV){ if(o.showBlock) block(186,210,t+90); return null; }
+  anim("av",t+70,PR-70);
+  let q = t+PR;
+  if(o.preex){
+    anim("ap-ante",t+70,45,"retro"); flash("lv",t+110);
+    q = t+PR-25; QRS(q,"delta",{mark:o.qmark});
+  } else QRS(q,o.qrs??"narrow",{mark:o.qmark});
+  anim("his-r",q-12,55); anim("his-l",q-12,55); flash("rv",q+10); flash("lv",q+10);
+  T(q+(o.qt??240),{amp:o.tAmp??.3,w:o.tw??38});
+  return q;
+}
+
+/* ---------- Escenarios ---------- */
+const S = [];
+function def(o){S.push(o);}
+
+def({id:"sinusal",group:"Referencia",name:"Ritmo sinusal",mech:null,
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["P positiva en DII antes de cada QRS, PR constante (~120 ms en un lactante).","QRS estrecho: activación por el His-Purkinje."],
+ fisio:["El nódulo sinusal tiene la fase 4 más rápida y por eso marca el ritmo.","El nodo AV retrasa el impulso (PR) para que la aurícula termine de llenar el ventrículo.","Usalo como referencia para comparar cada arritmia."],
+ tip:"Mirá cómo el impulso se detiene un instante en el nodo AV: ese retraso es el PR.",
+ actions:[], init(){sim.next=200;},
+ step(){ if(sim.t>=sim.next){sinus(sim.next);sim.next+=500;} }});
+
+/* TRAV ortodrómica */
+function travCycle(t){
+  const st=sim.st;
+  if(st.adenoUntil && t<st.adenoUntil){ block(186,210,t,700); event(t,"bloqueo NAV"); st.mode="sinus"; sim.next=t+650; return; }
+  anim("av",t,60); anim("his-r",t+60,55); anim("his-l",t+60,55);
+  QRS(t+75,"narrow"); flash("rv",t+85); flash("lv",t+85); T(t+215,{amp:.2,w:30});
+  anim("ap-retro",t+95,45,"retro"); anim("la-av",t+140,60,"retro"); anim("la-ra",t+140,70,"retro");
+  flash("la",t+145); flash("ra",t+175);
+  P(t+170,{amp:-.13,mark:"P′"});
+  sim.next=t+240;
+}
+def({id:"trav",group:"Supraventriculares",name:"TRAV ortodrómica",mech:"re",
+ show:["av","his-r","his-l","ap-retro","la-av","la-ra","sa-ra","sa-la"],lm:["sa","av","his","ap"],
+ ecg:["QRS estrecho regular a ~250 lpm, sin variabilidad.","P′ retrógrada negativa poco después del QRS: RP corto (>70 ms)."],
+ fisio:["Circuito macro: baja por el nodo AV y sube por una vía accesoria (aquí lateral izquierda, oculta).","La vía es un remanente muscular del anillo AV; en el lactante suele perder conducción al madurar el anillo, de ahí la resolución en el primer año.","El nodo AV es un brazo obligado del circuito: bloquearlo un instante termina la taquicardia."],
+ tip:"Tocá «Adenosina»: el circuito se corta en el nodo AV. Después reiniciala con una extrasístole auricular.",
+ actions:[
+  {label:"Adenosina", run(){sim.st.adenoUntil=sim.t+900; event(sim.t,"Adenosina");}},
+  {label:"Extrasístole auricular", run(){ if(sim.st.mode==="tachy")return; sim.st.mode="pac"; sim.next=sim.t+60; }}
+ ],
+ init(){sim.st.mode="tachy"; sim.next=200;},
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return;
+  if(st.mode==="tachy") travCycle(sim.next);
+  else if(st.mode==="pac"){ const t=sim.next; anim("focus-av",t,80); flash("la",t+10); P(t+30,{amp:.1,mark:"EA"}); st.mode="tachy"; sim.next=t+110; }
+  else { sinus(sim.next); sim.next+=520; }
+ }});
+
+/* TRNAV */
+function trnavCycle(t){
+  const st=sim.st;
+  if(st.adenoUntil && t<st.adenoUntil){ block(186,210,t,700); event(t,"bloqueo NAV"); st.mode="sinus"; sim.next=t+650; return; }
+  anim("av-slow",t,110); anim("his-r",t+110,55); anim("his-l",t+110,55);
+  QRS(t+125,"narrow"); flash("rv",t+135); flash("lv",t+135); T(t+255,{amp:.18,w:28});
+  anim("av-fast",t+110,30,"retro"); anim("fast-atria",t+140,50,"retro"); flash("ra",t+150); flash("la",t+170);
+  P(t+150,{amp:-.09,mark:"r′"});
+  sim.next=t+265;
+}
+def({id:"trnav",group:"Supraventriculares",name:"TRNAV",mech:"re",
+ show:["av-slow","av-fast","fast-atria","his-r","his-l","sa-ra","sa-la","av"],lm:["sa","av","his"],
+ ecg:["QRS estrecho regular ~225 lpm.","La P retrógrada cae dentro o justo al final del QRS (pseudo-r′ en V1, pseudo-S en DII)."],
+ fisio:["Doble fisiología nodal: una vía lenta (período refractario corto) y una rápida (refractario largo).","Forma típica: baja por la lenta y sube por la rápida, por eso aurícula y ventrículo se activan casi a la vez.","Requiere maduración de la fisiología nodal: es rara en lactantes y aumenta en la edad escolar."],
+ tip:"Fijate en las dos vías dentro del nodo AV: el circuito entero es intranodal.",
+ actions:[
+  {label:"Adenosina", run(){sim.st.adenoUntil=sim.t+900; event(sim.t,"Adenosina");}},
+  {label:"Extrasístole auricular", run(){ if(sim.st.mode==="tachy")return; sim.st.mode="pac"; sim.next=sim.t+60; }}
+ ],
+ init(){sim.st.mode="tachy"; sim.next=200;},
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return;
+  if(st.mode==="tachy") trnavCycle(sim.next);
+  else if(st.mode==="pac"){ const t=sim.next; anim("focus-av",t,80); flash("la",t+10); P(t+30,{amp:.1,mark:"EA"}); block(178,200,t+70,500); st.mode="tachy"; sim.next=t+110; }
+  else { sinus(sim.next); sim.next+=520; }
+ }});
+
+/* WPW */
+def({id:"wpw",group:"Supraventriculares",name:"WPW y FA preexcitada",mech:"re",
+ show:["sa-ra","sa-la","av","his-r","his-l","ap-ante"],lm:["sa","av","his","ap"],
+ ecg:["En sinusal: PR corto, onda delta y QRS ancho por fusión.","En FA preexcitada: QRS anchos, irregulares y muy rápidos; el RR preexcitado más corto es el SPERRI."],
+ fisio:["El impulso llega al ventrículo por la vía accesoria sin el retraso nodal (PR corto) y activa el miocardio célula a célula (delta).","La vía no tiene conducción decremental: en FA puede conducir casi cada impulso y degenerar en FV.","Una vía con período refractario corto (SPERRI ≤250 ms) es de alto riesgo."],
+ tip:"Desencadená la FA con cada tipo de vía y compará el SPERRI que mide el monitor.",
+ actions:[
+  {label:"FA con vía de alto riesgo", run(){startAF(200);}},
+  {label:"FA con vía de bajo riesgo", run(){startAF(340);}}
+ ],
+ init(){sim.st.mode="sinus"; sim.next=200;},
+ step(){
+  const st=sim.st;
+  if(st.mode==="af"){
+    if(sim.t>=st.afEnd){ st.mode="sinus"; sim.next=sim.t+400; mark(sim.t,"SPERRI "+st.minRR+" ms","#ffd27a"); return; }
+    if(sim.t>=sim.next){
+      const t=sim.next; anim("ap-ante",t,35,"retro"); anim("lv-r",t+30,60,"retro"); anim("lv-l",t+30,40,"retro");
+      flash("lv",t+30); flash("rv",t+60); QRS(t+40,"wide",{k:.9}); T(t+230,{amp:-.25,w:40});
+      if(st.lastQ){ st.minRR=Math.min(st.minRR, t+40-st.lastQ); } st.lastQ=t+40;
+      sim.next = t + st.refr + Math.random()*st.refr*0.9;
+    }
+    if(!st.afAnimNext || sim.t>st.afAnimNext){ anim("la-ra",sim.t,90); anim("sa-la",sim.t,90); flash("ra",sim.t); flash("la",sim.t); st.afAnimNext=sim.t+90; }
+    return;
+  }
+  if(sim.t>=sim.next){ sinus(sim.next,{preex:true,PR:110,qt:250,tAmp:-.15}); sim.next+=560; }
+ }});
+function startAF(refr){
+  const st=sim.st; if(st.mode==="af")return;
+  st.mode="af"; st.refr=refr; st.afEnd=sim.t+4200; st.minRR=9999; st.lastQ=null; sim.next=sim.t+150;
+  event(sim.t,"FA");
+  const t0=sim.t, ph=[Math.random()*6,Math.random()*6,Math.random()*6];
+  addBase(t0,t0+4200,x=>.05*Math.sin(x/23+ph[0])+.035*Math.sin(x/37+ph[1])+.03*Math.sin(x/17+ph[2]),[.2,.6,.9]);
+}
+
+/* PJRT */
+function pjrtCycle(t){
+  const st=sim.st;
+  if(st.adenoUntil && t<st.adenoUntil){ block(186,210,t,700); event(t,"bloqueo NAV"); st.mode="sinus"; st.sinusLeft=2; sim.next=t+700; return; }
+  anim("av",t,80); anim("his-r",t+80,55); anim("his-l",t+80,55);
+  QRS(t+95,"narrow"); flash("rv",t+105); flash("lv",t+105); T(t+250,{amp:.25,w:34});
+  anim("ps-retro",t+115,150,"retro"); anim("ps-atria",t+265,60,"retro"); anim("ps-la",t+265,70,"retro");
+  flash("ra",t+270); flash("la",t+290);
+  P(t+300,{amp:-.17,mark:"P′"});
+  sim.next=t+380;
+}
+def({id:"pjrt",group:"Supraventriculares",name:"PJRT (Coumel)",mech:"re",
+ show:["av","his-r","his-l","ps-retro","ps-atria","ps-la","sa-ra","sa-la"],lm:["sa","av","his","ps"],
+ ecg:["Taquicardia de QRS estrecho ~160 lpm, incesante.","RP largo: P′ negativa en DII, DIII y aVF, lejos del QRS precedente."],
+ fisio:["Reentrada ortodrómica por una vía accesoria oculta posteroseptal con conducción retrógrada lenta y decremental.","La conducción lenta deja el RP largo y permite que el circuito se reinicie con casi cualquier latido: por eso es incesante.","Su persistencia lleva a taquicardiomiopatía, reversible al controlarla."],
+ tip:"Cortala con adenosina y mirá: a los pocos latidos sinusales vuelve sola.",
+ actions:[{label:"Adenosina", run(){sim.st.adenoUntil=sim.t+900; event(sim.t,"Adenosina");}}],
+ init(){sim.st.mode="tachy"; sim.next=200;},
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return;
+  if(st.mode==="tachy") pjrtCycle(sim.next);
+  else { sinus(sim.next); st.sinusLeft--; sim.next+=520; if(st.sinusLeft<=0){ st.mode="tachy"; mark(sim.next-150,"reinicio","#ffd27a"); sim.next-=120; } }
+ }});
+
+/* TA focal */
+def({id:"taf",group:"Supraventriculares",name:"Taquicardia auricular focal",mech:"au",
+ show:["focus-av","focus-ra","av","his-r","his-l"],lm:["focusLA","av","his"],
+ ecg:["P de morfología distinta a la sinusal, RP largo.","Calentamiento al inicio; con adenosina aparece bloqueo AV pero las P siguen."],
+ fisio:["Automatismo anormal de un foco auricular (orejuela, crista terminalis, venas pulmonares).","No depende del nodo AV: la adenosina solo bloquea la conducción a los ventrículos.","La cardioversión no la revierte o reaparece enseguida, típico del automatismo."],
+ tip:"Probá adenosina y cardioversión: ninguna apaga el foco, a diferencia de la TRAV.",
+ actions:[
+  {label:"Adenosina", run(){sim.st.adenoUntil=sim.t+1600; event(sim.t,"Adenosina");}},
+  {label:"Cardioversión", run(){ spike(sim.t); event(sim.t,"CVE"); sim.st.cl=520; sim.next=sim.t+500; }}
+ ],
+ init(){sim.st.cl=520; sim.next=200;},
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  anim("focus-av",t,90); anim("focus-ra",t,100); flash("la",t+5); flash("ra",t+60);
+  P(t+40,{amp:.13,w:22,v:[-.6,.65,-.35]});
+  if(st.adenoUntil && t<st.adenoUntil){ block(186,210,t+90,500); }
+  else { anim("av",t+90,70); anim("his-r",t+160,55); anim("his-l",t+160,55); QRS(t+175); flash("rv",t+185); flash("lv",t+185); T(t+175+Math.min(220,st.cl*.6),{amp:.22,w:32}); }
+  st.cl=Math.max(300, st.cl-35); sim.next=t+st.cl;
+ }});
+
+/* Aleteo */
+def({id:"aleteo",group:"Supraventriculares",name:"Aleteo auricular neonatal",mech:"re",
+ show:["flutter","fl-av","av","his-r","his-l"],lm:["av","his"],
+ ecg:["Ondas F en dientes de sierra a ~375/min, sin línea isoeléctrica.","Conducción 2:1 (FC ventricular ~187); con adenosina el bloqueo aumenta y se ven mejor las F."],
+ fisio:["Macrorreentrada que gira dentro de la aurícula derecha alrededor del anillo tricuspídeo.","El nodo AV filtra los impulsos (2:1) por su período refractario.","En el neonato sin cardiopatía no queda sustrato permanente: tras revertirlo casi no recurre."],
+ tip:"La adenosina no lo termina pero desenmascara las ondas F. La cardioversión sí lo corta.",
+ actions:[
+  {label:"Adenosina", run(){sim.st.adenoUntil=sim.t+1600; event(sim.t,"Adenosina");}},
+  {label:"Cardioversión sincronizada", run(){ const st=sim.st; if(st.mode!=="fl")return; spike(sim.t); event(sim.t,"CVE"); st.mode="sinus"; st.flEnd=sim.t; sim.next=sim.t+600; }},
+  {label:"Volver a aleteo", run(){ startFlutter(); }}
+ ],
+ init(){ startFlutter(); },
+ step(){
+  const st=sim.st;
+  if(st.mode==="fl"){
+    if(sim.t>=sim.next){ const t=sim.next; anim("flutter",t,160); flash("ra",t+80); flash("la",t+110);
+      st.k=(st.k+1)%((st.adenoUntil&&t<st.adenoUntil)?4:2);
+      if(st.k===0){ anim("fl-av",t+60,30); anim("av",t+90,60); anim("his-r",t+150,55); anim("his-l",t+150,55); QRS(t+165); flash("rv",t+175); flash("lv",t+175); T(t+300,{amp:.15,w:28}); }
+      else if(st.adenoUntil&&t<st.adenoUntil) block(186,210,t+90,300);
+      sim.p.push(t+80); sim.next=t+160; }
+  } else if(sim.t>=sim.next){ sinus(sim.next); sim.next+=480; }
+ }});
+function startFlutter(){
+  const st=sim.st; if(st.mode==="fl")return;
+  st.mode="fl"; st.k=0; st.flStart=sim.t; st.flEnd=Infinity; sim.next=sim.t+100;
+  const t0=sim.t;
+  addBase(t0,1e12,x=>{ if(x>st.flEnd||x<t0) return 0; const fr=((x-t0)%160)/160; return fr<.72? .07-.27*(fr/.72) : -.2+.27*((fr-.72)/.28); },[0,1,-.55]);
+}
+
+/* JET */
+def({id:"jet",group:"Unión AV",name:"JET posoperatoria",mech:"au",
+ show:["sa-ra","sa-la","his-r","his-l","av"],lm:["sa","av","his"],
+ ecg:["QRS estrecho rápido (~220 lpm) con P disociadas que «marchan» a través de los QRS.","Pérdida de la contracción auricular sincrónica."],
+ fisio:["Automatismo aumentado de la unión AV/His, irritada por suturas, edema e inflamación (cierre de CIV, Fallot, canal AV).","Catecolaminas, fiebre e hipomagnesemia aceleran la fase 4.","Sin sincronía AV cae el gasto, se suben inotrópicos y el foco se acelera más: espiral."],
+ tip:"Enfriá y frená el foco; después estimulá la aurícula por encima de la JET para recuperar la sincronía AV.",
+ actions:[
+  {label:"Enfriar a 34–35 °C", run(){ sim.st.jcl=Math.max(sim.st.jcl,340); event(sim.t,"Enfriamiento"); }},
+  {label:"Amiodarona / ivabradina", run(){ sim.st.jcl=440; event(sim.t,"Fármaco"); }},
+  {label:"Estimulación auricular", run(){ sim.st.pace=!sim.st.pace; event(sim.t,sim.st.pace?"Marcapaso AAI":"Marcapaso off"); }},
+  {label:"Inotrópicos ↑", run(){ sim.st.jcl=250; event(sim.t,"Adrenalina"); }}
+ ],
+ init(){ const st=sim.st; st.jcl=270; st.pace=false; st.nj=200; st.ns=350; },
+ step(){
+  const st=sim.st;
+  if(st.pace){
+    const pcl=Math.max(250,st.jcl-30);
+    if(sim.t>=st.ns){ const t=st.ns; spike(t); anim("sa-ra",t,60); anim("sa-la",t,80); flash("ra",t+20); flash("la",t+40); P(t+35,{amp:.14});
+      anim("av",t+60,60); anim("his-r",t+120,55); anim("his-l",t+120,55); QRS(t+135); flash("rv",t+145); flash("lv",t+145); T(t+135+170,{amp:.2,w:28});
+      st.ns=t+pcl; st.nj=t+pcl+40; }
+    return;
+  }
+  if(sim.t>=st.nj){ const t=st.nj; mark(t-5,"","#000"); anim("his-r",t,55); anim("his-l",t,55); QRS(t+15); flash("rv",t+25); flash("lv",t+25); T(t+15+Math.min(200,st.jcl*.62),{amp:.2,w:28}); st.nj=t+st.jcl; }
+  if(sim.t>=st.ns){ const t=st.ns; anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); flash("la",t+55); P(t+45,{amp:.14}); st.ns=t+430; }
+ }});
+
+/* TV TSVD */
+def({id:"tsvd",group:"Ventriculares",name:"TV del tracto de salida (TSVD)",mech:"tr",
+ show:["sa-ra","sa-la","av","his-r","his-l","rvot-r","rvot-l"],lm:["sa","av","his","rvot"],
+ ecg:["Salvas de QRS ancho con imagen de BRI y eje inferior (positivo en DII).","Entre salvas, ritmo sinusal normal."],
+ fisio:["Actividad desencadenada: posdespolarizaciones tardías dependientes de AMPc y Ca en el tracto de salida del VD.","Por eso aumenta con catecolaminas y responde a betabloqueantes.","Es el 60–80% de las TV pediátricas con corazón normal y suele tener buen pronóstico."],
+ tip:"Subí el tono adrenérgico y después probá el betabloqueante.",
+ actions:[
+  {label:"Estímulo adrenérgico", run(){ sim.st.adr=true; sim.st.bb=false; event(sim.t,"Catecolaminas"); }},
+  {label:"Betabloqueante", run(){ sim.st.bb=true; sim.st.adr=false; event(sim.t,"Betabloqueante"); }}
+ ],
+ init(){ const st=sim.st; st.n=0; st.run=0; st.adr=false; st.bb=false; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.run>0){ anim("rvot-r",t,70); anim("rvot-l",t,90); flash("rv",t); flash("lv",t+40); QRS(t+30,"pvc"); T(t+230,{amp:-.35,w:40}); st.run--; sim.next=t+(st.adr?270:300); return; }
+  st.n++;
+  const every = st.bb?7:(st.adr?2:4);
+  if(st.n%every===0){ st.run = st.bb?1:(st.adr?7:4); sim.next=t+330; }
+  else { sinus(t); sim.next=t+(st.adr?420:520); }
+ }});
+
+/* TV fascicular */
+def({id:"fasc",group:"Ventriculares",name:"TV fascicular (Belhassen)",mech:"re",
+ show:["fasc-l","fasc-r","sa-ra","sa-la"],lm:["fasc","sa"],
+ ecg:["QRS relativamente estrecho (BRD) con eje superior: negativo en DII.","Regular ~210 lpm; fácil de confundir con TSV."],
+ fisio:["Reentrada en el fascículo posterior izquierdo, con tejido de conducción lenta dependiente de calcio.","Sale por el fascículo posterior: BRD con eje superior.","Sensible a verapamilo (no usar en lactantes pequeños); la adenosina no la termina."],
+ tip:"Probá adenosina (no hace nada) y después verapamilo.",
+ actions:[
+  {label:"Adenosina", run(){ event(sim.t,"Adenosina: sin efecto"); }},
+  {label:"Verapamilo", run(){ if(sim.st.mode!=="vt")return; sim.st.mode="sinus"; event(sim.t,"Verapamilo"); sim.next=sim.t+700; }},
+  {label:"Reiniciar TV", run(){ sim.st.mode="vt"; sim.next=sim.t+100; }}
+ ],
+ init(){ sim.st.mode="vt"; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.mode==="vt"){ anim("fasc-l",t,40); anim("fasc-r",t,90); flash("lv",t); flash("rv",t+50); QRS(t+30,"wideNeg",{k:.9}); T(t+210,{amp:.25,w:32});
+    if(!st.sn||t>st.sn){ anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); P(t+45,{amp:.12}); st.sn=t+460; }
+    sim.next=t+285; }
+  else { sinus(t); sim.next=t+520; }
+ }});
+
+/* QT largo */
+def({id:"lqts",group:"Canalopatías",name:"QT largo y torsades",mech:"tr",
+ show:["sa-ra","sa-la","av","his-r","his-l","lv-r","lv-l"],lm:["sa","av","his","lvf"],
+ ecg:["QT prolongado con T ancha o de inscripción tardía.","Tras el desencadenante: EV sobre la T y torsades de pointes (QRS que giran alrededor de la línea de base)."],
+ fisio:["Pérdida de corrientes repolarizantes de K (IKs en LQT1, IKr en LQT2) o Na tardío persistente (LQT3).","La repolarización larga y heterogénea genera posdespolarizaciones tempranas que disparan la torsades.","Betabloqueante no selectivo (nadolol, propranolol); en LQT3 la mexiletina bloquea el Na tardío."],
+ tip:"Elegí el genotipo, aplicá su desencadenante y después repetilo con betabloqueante.",
+ actions:[
+  {label:"LQT1: natación/ejercicio", run(){ trigger("Ejercicio"); }},
+  {label:"LQT2: sobresalto auditivo", run(){ trigger("Alarma"); }},
+  {label:"LQT3: pausa en el sueño", run(){ trigger("Sueño"); }},
+  {label:"Betabloqueante", run(){ sim.st.bb=!sim.st.bb; event(sim.t,sim.st.bb?"Nadolol":"sin BB"); }}
+ ],
+ init(){ const st=sim.st; st.bb=false; st.tdpEnd=0; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.pending){ st.pending=false;
+    anim("lv-r",t,70); anim("lv-l",t,40); flash("lv",t); QRS(t,"pvc",{mark:"R/T"});
+    if(st.bb){ T(t+260,{amp:-.3,w:40}); sim.next=t+700; return; }
+    const t0=t+220; st.tdpEnd=t0+3000;
+    addBase(t0,t0+3000,x=>.95*Math.sin(2*Math.PI*(x-t0)/235)*(.25+.75*Math.abs(Math.sin(Math.PI*(x-t0)/1100))),[.45,.8,.45]);
+    event(t0,"Torsades"); sim.next=t0+3300; st.inTdp=true; return; }
+  if(st.inTdp && t>=st.tdpEnd){ st.inTdp=false; }
+  sinus(t,{qt:st.bb?360:420,tAmp:.28,tw:60}); sim.next=t+(st.bb?620:540);
+ }});
+function trigger(name){ const st=sim.st; if(st.inTdp)return; event(sim.t,name); st.pending=true; sim.next=Math.max(sim.next, sim.t+50); }
+
+/* TVPC */
+def({id:"tvpc",group:"Canalopatías",name:"TVPC",mech:"tr",
+ show:["sa-ra","sa-la","av","his-r","his-l","rv-l","rv-r","lv-r","lv-l"],lm:["sa","av","his","rvf","lvf"],
+ ecg:["ECG basal normal.","Con el esfuerzo: EV, bigeminia, TV bidireccional (QRS que alternan de eje latido a latido) y luego polimorfa."],
+ fisio:["Mutación de RYR2 (dominante) o CASQ2 (recesiva): fuga diastólica de calcio del retículo sarcoplásmico con estímulo adrenérgico.","El Ca libre activa el intercambiador Na/Ca: posdespolarizaciones tardías.","Dos focos alternantes (VD y VI) explican la TV bidireccional. Nadolol, flecainida, denervación simpática izquierda."],
+ tip:"Subí el esfuerzo de a poco. Después activá nadolol y flecainida y repetí.",
+ slider:{label:"Esfuerzo", min:0, max:100, value:10},
+ actions:[
+  {label:"Nadolol", toggle:"bb", run(){ sim.st.bb=!sim.st.bb; event(sim.t,sim.st.bb?"Nadolol":"sin nadolol"); }},
+  {label:"Flecainida", toggle:"fl", run(){ sim.st.fl=!sim.st.fl; event(sim.t,sim.st.fl?"Flecainida":"sin flecainida"); }}
+ ],
+ init(){ const st=sim.st; st.ex=10; st.bb=false; st.fl=false; st.k=0; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  let ex=st.ex*(st.bb?.55:1)*(st.fl?.75:1);
+  const sinusCl = 60000/(100+ex*0.9*(st.bb?.6:1)+ (st.bb?0:ex*0.0));
+  st.k++;
+  const vent = (v)=>{ if(v>0){anim("rv-l",t,80);anim("rv-r",t,40);flash("rv",t);flash("lv",t+40);QRS(t,"pvc",{k:.9});T(t+230,{amp:-.3,w:36});}
+                       else {anim("lv-r",t,80);anim("lv-l",t,40);flash("lv",t);flash("rv",t+40);QRS(t,"pvcNeg",{k:.9});T(t+230,{amp:.3,w:36});} };
+  if(ex>88){ vent(st.k%2?1:-1); if(st.k%5===0){ addWave(t+150,[[0,.6,30]],[.3,.6,.5]);} sim.next=t+230; return; }
+  if(ex>72){ vent(st.k%2?1:-1); sim.next=t+300; return; }
+  if(ex>55 && st.k%2===0){ vent(1); sim.next=t+sinusCl*.75; return; }
+  if(ex>38 && st.k%5===0){ vent(1); sim.next=t+sinusCl*.8; return; }
+  sinus(t,{qt:Math.max(180,sinusCl*.45)}); sim.next=t+sinusCl;
+ }});
+
+/* Brugada */
+def({id:"brugada",group:"Canalopatías",name:"Síndrome de Brugada",mech:"tr",
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["En V1–V2: elevación del ST convexa (tipo 1) que desciende a una T negativa; DII sin cambios.","La fiebre puede desenmascarar el patrón o desencadenar arritmias."],
+ fisio:["Pérdida de función del canal de Na (SCN5A en una minoría).","En el epicardio del TSVD predomina la corriente Ito: se pierde la cúpula del potencial de acción y aparece el gradiente que eleva el ST.","Esa heterogeneidad permite reentrada en fase 2 y FV. Raro en niños; tratar la fiebre con rapidez."],
+ tip:"Subí la temperatura y mirá cómo se acentúa el patrón tipo 1.",
+ actions:[
+  {label:"Fiebre 39,5 °C", run(){ sim.st.fever=true; event(sim.t,"Fiebre"); }},
+  {label:"Antitérmico", run(){ sim.st.fever=false; event(sim.t,"Antitérmico"); }}
+ ],
+ init(){ sim.st.fever=false; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  const q=sinus(t,{qrs:"brdInc",tAmp:.25,pAmp:.12});
+  const e = st.fever?.55:.25;
+  addWave(q,[[40,e,22],[90,e*.85,30],[150,e*.55,32],[210,-.3,34]],[-.05,0,1.05]);
+  sim.next=t+(st.fever?400:520);
+ }});
+
+/* ---------- Bloqueos ---------- */
+function ventBB(q,kind){
+  const a=(p,dt,d)=>anim(p,q+dt,d);
+  if(kind==="brd"||kind==="brdInc"){ a("lb-ant",-12,45); a("lb-post",-12,50); block(170,292,q-6,450); a("l-to-r",12,kind==="brd"?75:45); flash("lv",q+8); flash("rv",q+(kind==="brd"?55:35)); return; }
+  if(kind==="bri"){ a("his-r",-12,55); block(214,262,q-6,450); a("r-to-l",12,85); flash("rv",q+8); flash("lv",q+60); return; }
+  if(kind==="hbai"){ a("his-r",-12,55); a("lb-post",-12,50); block(246,246,q-6,450); a("post-ant",30,50); flash("rv",q+8); flash("lv",q+20); return; }
+  if(kind==="hbpi"){ a("his-r",-12,55); a("lb-ant",-12,45); block(226,300,q-6,450); a("ant-post",28,50); flash("rv",q+8); flash("lv",q+20); return; }
+  if(kind==="bif"){ a("lb-post",-12,50); block(170,292,q-6,450); block(246,246,q-6,450); a("post-ant",30,50); a("l-to-r",20,75); flash("lv",q+15); flash("rv",q+60); return; }
+  a("his-r",-12,55); a("lb-ant",-12,45); a("lb-post",-12,50); flash("rv",q+10); flash("lv",q+10);
+}
+function bk(t,o={}){
+  const lead=sim.st.lead||"DII", PR=o.PR||120;
+  anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); flash("la",t+55);
+  P(t+45,{amp:.15, mark:o.pmark});
+  if(o.block==="av"){ anim("av",t+70,60); block(186,210,t+125,500); mark(t+45,"P bloq.","#ff8a8a"); return null; }
+  if(o.block==="his"){ anim("av",t+70,Math.max(40,PR-70)); block(198,238,t+PR,500); mark(t+45,"P bloq.","#ff8a8a"); return null; }
+  anim("av",t+70,PR-70);
+  const q=t+PR, kind=o.kind||"normal";
+  QRS(q,kind); T(q+(o.qt||240),{amp:kind==="bri"?.45:.32,w:o.tw||38,v:TBY[kind]});
+  ventBB(q,kind);
+  if(o.prmark) mark(t+PR/2+20,"PR "+PR,"#9fd8ff");
+  return q;
+}
+function setLead(){}
+const BKSHOW=["sa-ra","sa-la","av","his-r","lb-ant","lb-post"];
+const AVG="Bloqueos sinusal y AV", BRG="Bloqueos de rama";
+
+def({id:"bsa",group:AVG,name:"Bloqueo sinoauricular 2.º grado",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["Falta una onda P con su QRS de forma súbita.","La pausa dura exactamente el doble del PP de base (en el tipo II); no hay P bloqueada visible."],
+ fisio:["El nódulo sinusal descarga, pero el impulso no logra salir al tejido auricular: bloqueo de salida sinoatrial.","Causas en pediatría: tono vagal alto, posoperatorio auricular (Senning, Mustard, Fontan, cierre de CIA seno venoso), miocarditis, fármacos (digoxina, betabloqueantes).","Diferencia con la pausa sinusal: en la pausa el nódulo no descarga y la pausa no es múltiplo del PP."],
+ tip:"Medí la pausa: tiene que ser el doble del PP. Probá atropina.",
+ actions:[{label:"Atropina", run(){ sim.st.atr=!sim.st.atr; event(sim.t,sim.st.atr?"Atropina":"sin atropina"); }}],
+ init(){ setLead("DII"); sim.st.i=0; sim.st.atr=false; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next; st.i++;
+  if(st.i%(st.atr?9:4)===0){ block(98,72,t,500); mark(t+45,"pausa = 2 PP","#ffd27a"); }
+  else bk(t,{});
+  sim.next=t+(st.atr?440:520); }});
+
+def({id:"bav1",group:AVG,name:"BAV de 1.er grado",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["Todas las P conducen, con PR prolongado y constante.","Límites de PR por edad: ~150 ms en lactantes, ~160 ms en escolares, ~180 ms en adolescentes."],
+ fisio:["Retraso de la conducción casi siempre en el nodo AV.","Causas: tono vagal, digoxina y betabloqueantes, fiebre reumática, enfermedad de Lyme, miocarditis, canal AV, Ebstein, TGA corregida.","En el feto expuesto a anti-Ro, el PR mecánico largo puede ser el primer signo de daño inmune."],
+ tip:"Mirá cómo el impulso «se demora» en el nodo AV. Subí el tono vagal y después probá atropina.",
+ actions:[{label:"Tono vagal ↑ (sueño)", run(){ sim.st.pr=280; event(sim.t,"Vagal"); }},{label:"Atropina", run(){ sim.st.pr=150; event(sim.t,"Atropina"); }}],
+ init(){ setLead("DII"); sim.st.pr=230; sim.next=200; },
+ step(){ if(sim.t<sim.next)return; const t=sim.next; bk(t,{PR:sim.st.pr,prmark:true}); sim.next=t+(sim.st.pr<200?460:560); }});
+
+def({id:"mob1",group:AVG,name:"BAV 2.º grado Mobitz I (Wenckebach)",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["El PR se alarga latido a latido hasta que una P no conduce.","El PR que sigue a la pausa es el más corto; los RR se acortan antes de la P bloqueada (aquí 4:3)."],
+ fisio:["Conducción decremental del nodo AV: cada impulso llega cuando el nodo está menos recuperado.","Casi siempre suprahisiano, de buen pronóstico. Es frecuente durante el sueño y en adolescentes deportistas.","Mejora con atropina o ejercicio, que reducen el tono vagal."],
+ tip:"Seguí el PR (lo marca el monitor) hasta la P bloqueada. Después probá atropina o ejercicio.",
+ actions:[{label:"Atropina / ejercicio", run(){ sim.st.ok=true; event(sim.t,"Atropina"); }},{label:"Sueño (vagal)", run(){ sim.st.ok=false; event(sim.t,"Sueño"); }}],
+ init(){ setLead("DII"); sim.st.i=0; sim.st.ok=false; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.ok){ bk(t,{PR:160,prmark:true}); sim.next=t+430; return; }
+  const seq=[130,190,225,null], pr=seq[st.i%4]; st.i++;
+  if(pr===null) bk(t,{block:"av"}); else bk(t,{PR:pr,prmark:true});
+  sim.next=t+520; }});
+
+def({id:"mob2",group:AVG,name:"BAV 2.º grado Mobitz II",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["PR constante (normal o largo) y, de golpe, una P sin QRS.","Suele acompañarse de QRS ancho (bloqueo de rama): enfermedad del sistema His-Purkinje."],
+ fisio:["Bloqueo infrahisiano de tipo todo o nada: el tejido no decrementa, falla de golpe.","Riesgo de progresión súbita a BAV completo con escape lento e inestable.","La atropina acelera el sinusal pero no mejora el His: puede aumentar el bloqueo. Indicación de marcapasos."],
+ tip:"Compará con Wenckebach: acá el PR no cambia. Probá atropina y mirá cómo empeora.",
+ actions:[{label:"Atropina", run(){ sim.st.atr=!sim.st.atr; event(sim.t,sim.st.atr?"Atropina":"sin atropina"); }}],
+ init(){ setLead("DII"); sim.st.i=0; sim.st.atr=false; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next; st.i++;
+  const every=st.atr?2:4;
+  if(st.i%every===0) bk(t,{block:"his",PR:140}); else bk(t,{PR:140,kind:"brd",prmark:true});
+  sim.next=t+(st.atr?430:520); }});
+
+def({id:"b21",group:AVG,name:"BAV 2:1",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["Una P conducida y una bloqueada, alternando.","No se puede llamar Mobitz I ni II: falta ver dos PR seguidos. El nivel lo sugieren el ancho del QRS y la respuesta a atropina."],
+ fisio:["Nodal: QRS estrecho, mejora con atropina (pasa a 1:1 o a Wenckebach).","Infrahisiano: QRS ancho, empeora con atropina; riesgo alto, marcapasos.","Funcional por QT largo (neonatos y fetos): la refractariedad ventricular supera el ciclo auricular y cada segunda P cae en el período refractario. Marcador de SQTL grave."],
+ tip:"Elegí el nivel y aplicá atropina para ver cómo se comporta cada uno.",
+ actions:[
+  {label:"Nivel: nodal", run(){ sim.st.lv="nodal"; sim.st.atr=false; event(sim.t,"Nodal"); }},
+  {label:"Nivel: infrahisiano", run(){ sim.st.lv="his"; sim.st.atr=false; event(sim.t,"Infrahisiano"); }},
+  {label:"Causa: QT largo", run(){ sim.st.lv="qt"; sim.st.atr=false; event(sim.t,"QT largo"); }},
+  {label:"Atropina", run(){ sim.st.atr=true; event(sim.t,"Atropina"); }}
+ ],
+ init(){ setLead("DII"); const st=sim.st; st.lv="nodal"; st.atr=false; st.i=0; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next; st.i++;
+  if(st.lv==="nodal"){ if(st.atr){ bk(t,{PR:170,prmark:true}); sim.next=t+420; return; }
+    if(st.i%2===0) bk(t,{block:"av"}); else bk(t,{PR:160}); sim.next=t+440; return; }
+  if(st.lv==="his"){ const cond = st.atr ? (st.i%3===0) : (st.i%2===1); if(cond) bk(t,{PR:130,kind:"brd"}); else bk(t,{block:"his",PR:130}); sim.next=t+(st.atr?380:440); return; }
+  if(st.i%2===0){ anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); P(t+45,{amp:.15}); anim("av",t+70,60); anim("his-r",t+130,30); block(150,300,t+150,450); mark(t+45,"P en refractario","#ff8a8a"); }
+  else bk(t,{PR:120,qt:440,tw:62});
+  sim.next=t+(st.atr?400:440); }});
+
+def({id:"bavav",group:AVG,name:"BAV avanzado (alto grado)",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["Dos o más P consecutivas sin QRS (3:1, 4:1), pero las que conducen lo hacen con PR fijo.","Todavía hay relación AV, a diferencia del BAV completo."],
+ fisio:["Enfermedad extensa del sistema de conducción, habitualmente infrahisiana.","Mismo riesgo que el BAV completo: puede caer en asistolia o en un escape lento.","Indicación de marcapasos si es persistente o sintomático, o si es posquirúrgico y no se recupera en 7–10 días."],
+ tip:"Contá las P por cada QRS y fijate que el PR de las conducidas no cambia.",
+ actions:[{label:"Progresar a BAV completo", run(){ sim.st.cb=true; event(sim.t,"BAV completo"); sim.st.nv=sim.t+400; }}],
+ init(){ setLead("DII"); sim.st.i=0; sim.st.cb=false; sim.next=200; },
+ step(){ const st=sim.st;
+  if(st.cb){ if(sim.t>=sim.next){ const t=sim.next; anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); P(t+45,{amp:.15}); anim("av",t+70,50); block(198,238,t+120,400); sim.next=t+430; }
+    if(sim.t>=st.nv){ const t=st.nv; anim("rv-l",t,110); anim("rv-r",t,50); flash("rv",t); flash("lv",t+60); QRS(t,"pvc"); T(t+330,{amp:-.35,w:48}); st.nv=t+1500; } return; }
+  if(sim.t<sim.next)return; const t=sim.next; st.i++;
+  if(st.i%3===1) bk(t,{PR:140,kind:"brd",prmark:true}); else bk(t,{block:"his",PR:140});
+  sim.next=t+430; }});
+
+def({id:"brd",group:BRG,name:"Bloqueo de rama derecha",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["V1: rsR′ con R′ ancha y T negativa; DII y V6: S ancha y empastada.","QRS por encima del límite para la edad (completo); el incompleto tiene rsr′ con QRS casi normal."],
+ fisio:["La rama derecha no conduce: el VI se activa normal y el VD tarde, por conducción miocárdica lenta a través del septo.","Es el bloqueo más frecuente en pediatría: tras cierre de CIV o reparación de Fallot (ventriculotomía o lesión de la rama).","El patrón incompleto en la CIA refleja sobrecarga de volumen del VD más que un bloqueo verdadero."],
+ tip:"Compará V1 (rsR′) con V6 y DI (S ancha). Después cambiá al patrón incompleto de la CIA.",
+ actions:[{label:"Completo / incompleto (CIA)", run(){ sim.st.inc=!sim.st.inc; event(sim.t,sim.st.inc?"Incompleto":"Completo"); }}],
+ init(){ setLead("V1"); sim.st.inc=false; sim.next=200; },
+ step(){ if(sim.t<sim.next)return; const t=sim.next; bk(t,{kind:sim.st.inc?"brdInc":"brd",qt:260}); sim.next=t+520; }});
+
+def({id:"bri",group:BRG,name:"Bloqueo de rama izquierda",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["V1: QS o rS ancho y profundo; DI y V6: R ancha, mellada, sin q septal.","T opuesta al QRS (secundaria)."],
+ fisio:["La rama izquierda no conduce: el septo se activa de derecha a izquierda y el VI llega último.","Raro en niños: tras resección de membrana subaórtica, cirugía de tracto de salida del VI (Konno), miocarditis o miocardiopatía dilatada.","La activación tardía del VI genera disincronía y puede deprimir la función: indicación de resincronización en casos seleccionados."],
+ tip:"Mirá el orden de activación: primero el VD, después el VI.",
+ actions:[],
+ init(){ setLead("V1"); sim.next=200; },
+ step(){ if(sim.t<sim.next)return; const t=sim.next; bk(t,{kind:"bri",qt:270}); sim.next=t+540; }});
+
+def({id:"hbai",group:BRG,name:"Hemibloqueo anterior izquierdo",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["Eje superior izquierdo (−30° a −90°): rS en DII, DIII y aVF; qR en DI y aVL.","QRS normal o apenas prolongado."],
+ fisio:["Falla el fascículo anterior: el VI se activa desde el posterior y la pared anterolateral se despolariza tarde y hacia arriba.","En el canal AV y la atresia tricuspídea el eje superior es característico desde el nacimiento: el nodo AV y el His están desplazados hacia posterior e inferior.","Adquirido: tras cirugía cardíaca, a menudo junto al BRD."],
+ tip:"Mirá cómo el impulso baja por el fascículo posterior y sube tarde a la pared anterolateral.",
+ actions:[],
+ init(){ setLead("DII"); sim.next=200; },
+ step(){ if(sim.t<sim.next)return; const t=sim.next; bk(t,{kind:"hbai"}); sim.next=t+500; }});
+
+def({id:"hbpi",group:BRG,name:"Hemibloqueo posterior izquierdo",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["Eje derecho (+90° a +180°): qR en DII, DIII y aVF; rS en DI.","QRS normal o apenas prolongado."],
+ fisio:["Falla el fascículo posterior, más grueso y mejor irrigado: es el hemibloqueo más raro.","Perla pediátrica: el eje derecho es normal en el neonato y el lactante, y la hipertrofia del VD también lo desvía. Solo se diagnostica tras descartar ambos.","Si aparece junto a BRD, sugiere enfermedad extensa del sistema de conducción."],
+ tip:"Compará con el anterior: el impulso entra por el fascículo anterior y baja tarde a la pared posteroinferior.",
+ actions:[],
+ init(){ setLead("DII"); sim.next=200; },
+ step(){ if(sim.t<sim.next)return; const t=sim.next; bk(t,{kind:"hbpi"}); sim.next=t+500; }});
+
+def({id:"bif",group:BRG,name:"Bloqueo bifascicular (BRD + HBAI)",mech:"co",
+ show:BKSHOW,lm:["sa","av","his"],
+ ecg:["BRD en V1 (rsR′) más eje superior en DII (rS).","Si además el PR es largo se habló de «trifascicular»: hoy se prefiere describir cada hallazgo."],
+ fisio:["Solo queda el fascículo posterior izquierdo para conducir a los ventrículos.","Típico tras reparación de Fallot o de CIV, por lesión del His y sus ramas en el borde de la comunicación.","Si hubo BAV completo transitorio en el posoperatorio y queda un bifascicular residual, aumenta el riesgo de BAV tardío: el síncope inexplicado justifica considerar marcapasos (PACES 2021)."],
+ tip:"Mirá V1 (BRD) junto a DII y aVF (eje superior). Después simulá la progresión: falla el último fascículo.",
+ actions:[{label:"Progresión a BAV completo", run(){ sim.st.cb=!sim.st.cb; sim.st.nv=sim.t+500; event(sim.t,sim.st.cb?"BAV completo":"Bifascicular"); }}],
+ init(){ setLead("V1"); sim.st.cb=false; sim.next=200; },
+ step(){ const st=sim.st;
+  if(st.cb){ if(sim.t>=sim.next){ const t=sim.next; anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); P(t+45,{amp:.12}); anim("av",t+70,60); anim("lb-post",t+130,30); block(236,290,t+160,400); sim.next=t+430; }
+    if(sim.t>=st.nv){ const t=st.nv; anim("rv-l",t,110); anim("rv-r",t,50); flash("rv",t); flash("lv",t+60); QRS(t,"pvc"); T(t+330,{amp:-.35,w:48}); st.nv=t+1550; } return; }
+  if(sim.t<sim.next)return; const t=sim.next; bk(t,{kind:"bif",qt:260}); sim.next=t+520; }});
+
+/* BAV completo */
+def({id:"bav",group:AVG,name:"BAV completo congénito",mech:"co",
+ show:["sa-ra","sa-la","av","his-r","his-l","rv-l","rv-r"],lm:["sa","av","his","rvf"],
+ ecg:["P regulares (~140/min) sin relación con los QRS.","Escape de QRS estrecho (~60 lpm, suprahisiano) o ancho y más lento (infrahisiano, inestable)."],
+ fisio:["Anti-Ro/La maternos cruzan la placenta e inhiben canales de Ca tipo L y T de los nodos (fase aguda, reversible).","Después: apoptosis, inflamación, fibrosis y calcificación del nodo AV: bloqueo completo irreversible.","El gasto del lactante depende de la frecuencia: un escape ancho o <50 lpm indica marcapasos."],
+ tip:"Cambiá el nivel del escape y compará la frecuencia ventricular.",
+ actions:[
+  {label:"Escape ancho (infrahisiano)", run(){ sim.st.wide=!sim.st.wide; event(sim.t,sim.st.wide?"Escape ventricular":"Escape de la unión"); }},
+  {label:"Salbutamol / isoproterenol", run(){ sim.st.beta=!sim.st.beta; event(sim.t,sim.st.beta?"β-agonista":"sin β-agonista"); }}
+ ],
+ init(){ const st=sim.st; st.wide=false; st.beta=false; st.ns=200; st.nv=600; },
+ step(){
+  const st=sim.st;
+  if(sim.t>=st.ns){ const t=st.ns; sinus(t,{noAV:true,showBlock:true}); st.ns=t+430; }
+  if(sim.t>=st.nv){ const t=st.nv;
+    if(st.wide){ anim("rv-l",t,110); anim("rv-r",t,50); flash("rv",t); flash("lv",t+60); QRS(t,"pvc"); T(t+330,{amp:-.35,w:48}); st.nv=t+(st.beta?1300:1550); }
+    else { anim("his-r",t,55); anim("his-l",t,55); flash("rv",t+15); flash("lv",t+15); QRS(t+10); T(t+330,{amp:.3,w:40}); st.nv=t+(st.beta?850:1000); } }
+ }});
+
+/* Bigeminia bloqueada */
+def({id:"bigem",group:"Fetal",name:"Bigeminia auricular bloqueada",mech:"co",
+ show:["sa-ra","sa-la","av","his-r","his-l","focus-av","focus-ra"],lm:["sa","av","his","focusLA"],
+ ecg:["Cada P sinusal va seguida de una extrasístole auricular precoz (P′) sin QRS.","La frecuencia ventricular cae a la mitad (~70 lpm): simula bradicardia o BAV 2:1."],
+ fisio:["La extrasístole llega al nodo AV en su período refractario y no conduce.","No hay bloqueo verdadero: los intervalos entre P varían (>20 ms), a diferencia del BAV de 2.º grado.","Benigna, pero se asocia a riesgo de TSV en el feto: vigilar."],
+ tip:"Suprimí las extrasístoles y mirá cómo se duplica la frecuencia ventricular.",
+ actions:[{label:"Suprimir extrasístoles", run(){ sim.st.off=!sim.st.off; event(sim.t,sim.st.off?"Sin EA":"Con EA"); }}],
+ init(){ sim.st.off=false; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  sinus(t,{qt:260});
+  if(!st.off){ const e=t+250; anim("focus-av",e,80); anim("focus-ra",e,90); flash("la",e+5); P(e+30,{amp:.11,mark:"P′"}); block(186,210,e+85,450); sim.next=t+860; }
+  else sim.next=t+430;
+ }});
+
+/* ---------- Aberrancia ---------- */
+const ABG="Aberrancia";
+def({id:"ashman",group:ABG,name:"Fenómeno de Ashman",mech:"co",
+ show:["sa-la","la-ra","av","his-r","lb-ant","lb-post"],lm:["av","his"],
+ ecg:["FA: línea de base fibrilatoria y RR irregular con QRS estrecho.","Tras un RR largo, el latido que llega temprano sale ancho con imagen de BRD (rsR′ en V1): es aberrancia, no una extrasístole ventricular."],
+ fisio:["El período refractario del His-Purkinje se ajusta al ciclo previo: tras un RR largo se alarga.","Si el latido siguiente llega pronto, encuentra la rama derecha (la de refractario más largo) todavía refractaria y conduce por la izquierda.","Claves para no confundirlo con una EV: secuencia largo-corto, BRD trifásico típico, sin pausa compensadora y con el mismo vector inicial que los latidos normales."],
+ tip:"Buscá el patrón ciclo largo → ciclo corto → QRS ancho. Después controlá la frecuencia y mirá cómo desaparece.",
+ actions:[{label:"Control de frecuencia", run(){ sim.st.slow=!sim.st.slow; event(sim.t,sim.st.slow?"Control FC":"sin control"); }}],
+ init(){ const st=sim.st; st.lastQ=null; st.prevRR=500; st.afAnim=0; st.slow=false; sim.next=300;
+   const ph=[Math.random()*6,Math.random()*6,Math.random()*6];
+   addBase(-9000,1e12,x=>.05*Math.sin(x/23+ph[0])+.035*Math.sin(x/37+ph[1])+.03*Math.sin(x/17+ph[2]),[.2,.6,.9]); },
+ step(){ const st=sim.st;
+  if(sim.t>st.afAnim){ anim("la-ra",sim.t,90); anim("sa-la",sim.t,90); flash("ra",sim.t); flash("la",sim.t); st.afAnim=sim.t+90; }
+  if(sim.t<sim.next) return; const t=sim.next;
+  const rr = st.lastQ? t-st.lastQ : 500, ab = st.prevRR>560 && rr<370;
+  anim("av",t-60,60);
+  if(ab){ QRS(t,"brd",{mark:"Ashman"}); T(t+220,{amp:.32,w:38,v:TBY.brd}); ventBB(t,"brd"); }
+  else { QRS(t,"narrow"); T(t+200,{amp:.25,w:30}); ventBB(t,"normal"); }
+  st.prevRR=rr; st.lastQ=t;
+  let nx;
+  if(st.slow) nx=500+Math.random()*320;
+  else if(rr>560) nx=290+Math.random()*60;
+  else nx = Math.random()<.35 ? 600+Math.random()*180 : 360+Math.random()*200;
+  sim.next=t+nx; }});
+
+function tcqaCase(){
+  const st=sim.st; st.dx=Math.random()<.5?"tsv":"tv"; st.mode="tachy"; st.adenoUntil=0; st.k=0; st.ns=sim.t+150; st.revealed=false;
+  sim.next=sim.t+120;
+}
+def({id:"tcqa",group:ABG,name:"QRS ancho: ¿TSV aberrante o TV?",mech:null,
+ show:["av","his-r","lb-ant","lb-post","l-to-r","ap-retro","la-av","la-ra","sa-ra","sa-la","lv-r","lv-l"],lm:["sa","av","his","ap","lvf"],
+ ecg:["Taquicardia regular de QRS ancho, sin ECG basal para comparar.","Pistas de TV: disociación AV (P que marchan a su ritmo), latidos de captura (QRS estrecho intercalado) y de fusión (QRS intermedio).","Pistas de TSV aberrante: P′ retrógrada 1:1 detrás de cada QRS, BRD trifásico típico y respuesta a adenosina."],
+ fisio:["La aberrancia es un bloqueo de rama funcional: el impulso supraventricular encuentra una rama todavía refractaria.","En la TV el impulso nace en el ventrículo; las aurículas siguen con el sinusal, salvo que haya conducción retrógrada.","En niños la TSV aberrante es más frecuente que en adultos, pero si el paciente está inestable se trata como TV: cardioversión sincronizada. Si está estable, regular y monomorfa, la adenosina diagnostica y trata (PALS)."],
+ tip:"Cada caso es al azar. Buscá las P, probá adenosina y recién después revelá el diagnóstico.",
+ actions:[
+  {label:"Mostrar las P", run(){ sim.st.showP=!sim.st.showP; event(sim.t,sim.st.showP?"P marcadas":"P sin marcar"); }},
+  {label:"Adenosina", run(){ const st=sim.st; event(sim.t,"Adenosina"); if(st.dx==="tsv"&&st.mode==="tachy") st.adenoUntil=sim.t+900; else mark(sim.t+300,"sin cambios en la TV","#ff8a8a"); }},
+  {label:"Revelar diagnóstico", run(){ const st=sim.st; st.revealed=true; event(sim.t, st.dx==="tsv"?"TSV ortodrómica con aberrancia (BRD)":"Taquicardia ventricular"); }},
+  {label:"Nuevo caso", run(){ tcqaCase(); event(sim.t,"Nuevo caso"); }}
+ ],
+ init(){ sim.st.showP=false; tcqaCase(); },
+ step(){ const st=sim.st;
+  if(st.dx==="tsv"){
+    if(sim.t<sim.next) return; const t=sim.next;
+    if(st.mode==="sinus"){ sinus(t,{pmark:st.showP?"P":null}); sim.next=t+520; return; }
+    if(st.adenoUntil && t<st.adenoUntil){ block(186,210,t,700); event(t,"bloqueo NAV: termina"); st.mode="sinus"; sim.next=t+650; return; }
+    anim("av",t,60); const q=t+75; QRS(q,"brd"); ventBB(q,"brd"); T(q+190,{amp:.25,w:30,v:TBY.brd});
+    anim("ap-retro",q+20,45,"retro"); anim("la-av",q+65,60,"retro"); anim("la-ra",q+65,70,"retro"); flash("la",q+70); flash("ra",q+95);
+    P(q+95,{amp:-.13,mark:st.showP?"P′":null});
+    sim.next=t+260; return;
+  }
+  // TV con sinusal disociado, capturas y fusiones
+  if(sim.t>=st.ns){ const t=st.ns; anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); flash("la",t+55); P(t+45,{amp:.15,mark:st.showP?"P":null}); st.lastP=t; st.ns=t+470; }
+  if(sim.t<sim.next) return; const t=sim.next; st.k++;
+  const sinceP = st.lastP!=null ? t-st.lastP : 999;
+  if(st.k%8===0){ anim("av",t-80,70); QRS(t,"narrow",{mark:st.showP?"captura":null}); ventBB(t,"normal"); T(t+200,{amp:.25,w:30}); sim.next=t+300; return; }
+  if(st.k%8===4){ anim("av",t-70,60); anim("lv-r",t,60,"ante"); QRS(t,"wide",{k:.5,mark:st.showP?"fusión":null}); QRS(t,"narrow",{k:.5}); sim.qrs.pop(); T(t+220,{amp:-.15,w:36}); flash("lv",t); flash("rv",t+20); sim.next=t+285; return; }
+  anim("lv-r",t,80); anim("lv-l",t,45); flash("lv",t); flash("rv",t+50); QRS(t,"wide"); T(t+230,{amp:-.28,w:40});
+  sim.next=t+285; }});
+
+function coumelStart(ab){ const st=sim.st; st.ab=ab; st.n=0; st.abN=7; st.mode="tachy"; sim.next=sim.t+150; event(sim.t, ab==="bri"?"Inicio con BRI":"Inicio con BRD"); }
+def({id:"coumel",group:ABG,name:"TRAV con aberrancia (ley de Coumel)",mech:"re",
+ show:["av","his-r","lb-ant","lb-post","r-to-l","l-to-r","ap-retro","la-av","la-ra"],lm:["av","his","ap"],
+ ecg:["La TRAV arranca con QRS ancho (aberrancia) y a los pocos latidos se normaliza.","Si el bloqueo de rama es del mismo lado que la vía accesoria, el RR del período aberrante es más largo (aquí 300 ms contra 240 ms): el monitor marca cada RR."],
+ fisio:["La extrasístole que inicia la taquicardia llega con una rama todavía refractaria: aberrancia de fase 3.","Con BRI y una vía izquierda, el impulso baja por la rama derecha y cruza el septo antes de alcanzar la vía: el circuito se alarga y también el intervalo VA.","Con BRD (lado opuesto) el circuito no cambia. Ese alargamiento localiza la vía del lado del bloqueo (ley de Coumel)."],
+ tip:"Compará los RR marcados durante la aberrancia y después de que se normaliza. Repetí con BRD.",
+ actions:[{label:"Inicio con BRI (mismo lado)", run(){ coumelStart("bri"); }},{label:"Inicio con BRD (lado opuesto)", run(){ coumelStart("brd"); }}],
+ init(){ coumelStart("bri"); },
+ step(){ const st=sim.st; if(sim.t<sim.next) return; const t=sim.next;
+  const ab = st.n<st.abN ? st.ab : null; st.n++;
+  const d = ab==="bri" ? 60 : 0, q=t+75;
+  anim("av",t,60);
+  if(ab){ QRS(q,ab); ventBB(q,ab); T(q+190,{amp:.25,w:30,v:TBY[ab]}); } else { QRS(q,"narrow"); ventBB(q,"normal"); T(q+170,{amp:.2,w:28}); }
+  anim("ap-retro",q+20+d,45,"retro"); anim("la-av",q+65+d,60,"retro"); anim("la-ra",q+65+d,70,"retro"); flash("la",q+70+d); flash("ra",q+95+d);
+  P(q+95+d,{amp:-.13});
+  mark(q+120,"RR "+(240+d),"#9fd8ff");
+  sim.next=t+240+d; }});
+
+/* ---------- Derivaciones por escenario ---------- */
+const LEADS = {
+  sinusal:["DI","DII","aVF","V1","V6"], trav:["DII","V1"], trnav:["DII","V1"], wpw:["DI","DII","aVL","V1"],
+  pjrt:["DII","DIII","aVF"], taf:["DII","V1"], aleteo:["DII","DIII","aVF","V1"], jet:["DII","V1"],
+  tsvd:["DI","DII","DIII","aVF","V1"], fasc:["DI","DII","aVF","V1"], lqts:["DII","V5"], tvpc:["DII","V1"],
+  brugada:["V1","V2","DII"], bav:["DII","V1"], bigem:["DII"],
+  bsa:["DII"], bav1:["DII","V1"], mob1:["DII"], mob2:["DII","V1"], b21:["DII","V1"], bavav:["DII","V1"],
+  brd:["V1","V6","DI"], bri:["V1","V6","DI"], hbai:["DI","DII","DIII","aVF","aVL"], hbpi:["DI","DII","DIII","aVF"],
+  bif:["V1","DI","DII","aVF"], ashman:["DII","V1"], tcqa:["DII","V1","V6"], coumel:["DII","V1","V6"]
+};
+S.forEach(sc=>{ sc.leads = LEADS[sc.id] || ["DII"]; });
+
+/* ---------- UI ---------- */
+const MECH = {re:["Reentrada","m-re"],au:["Automatismo","m-au"],tr:["Actividad desencadenada","m-tr"],co:["Trastorno de conducción","m-co"]};
+const selEl=$("sel"), infoEl=$("info");
+const groups=[...new Set(S.map(s=>s.group))];
+const selBox=document.createElement("select"); selBox.id="sm-arrsel"; selBox.setAttribute("aria-label","Arritmia");
+groups.forEach(g=>{ const og=document.createElement("optgroup"); og.label=g;
+  S.filter(s=>s.group===g).forEach(s=>{ const o=document.createElement("option"); o.value=s.id; o.textContent=s.name; og.appendChild(o); });
+  selBox.appendChild(og); });
+selBox.addEventListener("change",e=>{ load(e.target.value); try{localStorage.setItem("sim_arr",e.target.value);}catch(err){} });
+selEl.appendChild(selBox);
+function renderInfo(){
+  const s=scen; const m=s.mech?MECH[s.mech]:null;
+  let h=`<div class="ihead"><h2>${s.name}</h2>`;
+  if(m) h+=`<span class="tag"><span class="dot ${m[1]}"></span>${m[0]}</span>`;
+  h+=`</div><p class="tip">${s.tip}</p><div class="actions" id="sm-acts"></div>`;
+  h+=`<details open><summary>En el ECG</summary><ul>${s.ecg.map(x=>`<li>${x}</li>`).join("")}</ul></details>`;
+  h+=`<details><summary>Fisiopatología</summary><ul>${s.fisio.map(x=>`<li>${x}</li>`).join("")}</ul></details>`;
+  infoEl.innerHTML=h;
+  const acts=$("acts");
+  if(s.slider){
+    const w=document.createElement("div"); w.className="slider";
+    w.innerHTML=`<label for="sm-sl">${s.slider.label}</label><input id="sm-sl" type="range" min="${s.slider.min}" max="${s.slider.max}" value="${s.slider.value}"><span id="sm-slv">${s.slider.value}%</span>`;
+    acts.appendChild(w);
+    $("sl").addEventListener("input",e=>{ sim.st.ex=+e.target.value; $("slv").textContent=e.target.value+"%"; });
+  }
+  s.actions.forEach(a=>{
+    const b=document.createElement("button"); b.type="button"; b.className="act"; b.textContent=a.label;
+    b.addEventListener("click",()=>{ a.run(); if(a.toggle) b.classList.toggle("on", !!sim.st[a.toggle]); if(!running){ running=true; $("play").textContent="Pausa"; } });
+    acts.appendChild(b);
+  });
+}
+
+function load(id){
+  scen = S.find(s=>s.id===id) || S[1];
+  $("arrsel").value=scen.id;
+  $("lead").textContent="DII · 25 mm/s";
+  for(const p in pathEls) pathEls[p].setAttribute("opacity", scen.show.includes(p)?".28":"0");
+  for(const l in lmEls) lmEls[l].g.style.display = scen.lm.includes(l)?"":"none";
+  sim=newSim(); scen.init(); renderInfo();
+  $("lead").textContent = scen.leads.join(" · ");
+  sizeECG();
+  // precalentar unos segundos para que el monitor arranque lleno
+  for(let i=0;i<180;i++){ sim.t+=16; scen.step(); }
+  dotG.innerHTML=""; blockG.innerHTML="";
+}
+
+/* ---------- Render ---------- */
+const cv=$("ecg"), ctx=cv.getContext("2d");
+function fit(){ const r=cv.getBoundingClientRect(); const d=window.devicePixelRatio||1; cv.width=Math.round(r.width*d); cv.height=Math.round(r.height*d); ctx.setTransform(d,0,0,d,0,0); }
+window.addEventListener("resize",()=>{ if(scen) sizeECG(); else fit(); });
+
+function signal(x,L){ let r=0; for(const e of sim.ecg){ if(x>=e.t0&&x<=e.t1){ const f=e.f(x); r+= e.v? f*dot(e.v,L) : f; } } return r; }
+function stripH(){ return window.innerWidth<600? 82 : 96; }
+function sizeECG(){ cv.style.height=(scen.leads.length*stripH()+18)+"px"; fit(); }
+
+function drawECG(){
+  const W=cv.clientWidth, H=cv.clientHeight; ctx.clearRect(0,0,W,H);
+  const pxms=W/WINDOW, t1=sim.t, t0=t1-WINDOW, top=18, sh=(H-top)/scen.leads.length;
+  ctx.lineWidth=1;
+  const off=(t0%40+40)%40;
+  for(let tm=-off; tm<=WINDOW; tm+=40){ const x=tm*pxms; const big=Math.round((t0+tm)/40)%5===0; ctx.strokeStyle=big?"#22483b":"#152b23"; ctx.beginPath(); ctx.moveTo(x,top); ctx.lineTo(x,H); ctx.stroke(); }
+  const mv=sh/2.4, step=Math.max(2, WINDOW/W*1.3);
+  scen.leads.forEach((ld,i)=>{
+    const y0=top+i*sh, base=y0+sh*0.6, L=LEADV[ld];
+    for(let k=-5;k<=4;k++){ const y=base-k*mv*0.5; if(y<y0||y>y0+sh) continue; ctx.strokeStyle=(k%2===0)?"#22483b":"#152b23"; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    if(i>0){ ctx.strokeStyle="#2f5c4c"; ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(W,y0); ctx.stroke(); }
+    ctx.save(); ctx.beginPath(); ctx.rect(0,y0,W,sh); ctx.clip();
+    ctx.strokeStyle="#5ff0a8"; ctx.lineWidth=1.8; ctx.lineJoin="round"; ctx.beginPath();
+    for(let tm=t0; tm<=t1; tm+=step){ const x=(tm-t0)*pxms, y=base-signal(tm,L)*mv; if(tm===t0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+    ctx.stroke(); ctx.restore();
+    ctx.font="600 12px IBM Plex Mono, monospace"; ctx.textAlign="left";
+    ctx.fillStyle="rgba(12,21,18,.75)"; ctx.fillRect(4,y0+4,40,17);
+    ctx.fillStyle="#cfe9dc"; ctx.fillText(ld,8,y0+17);
+  });
+  ctx.font="11px IBM Plex Mono, monospace"; ctx.textAlign="center";
+  for(const m of sim.marks){ if(m.t<t0||m.t>t1||!m.text) continue; const x=(m.t-t0)*pxms; ctx.fillStyle=m.color; ctx.fillText(m.text,x,13); }
+  ctx.fillStyle="rgba(95,240,168,.9)"; ctx.fillRect(W-2,top,2,H-top);
+}
+
+function rates(){
+  const now=sim.t;
+  const q=sim.qrs.filter(x=>x<=now).slice(-4), p=sim.p.filter(x=>x<=now).slice(-5);
+  const hr=a=>a.length>1? Math.round(60000/((a[a.length-1]-a[0])/(a.length-1))) : null;
+  const v=hr(q), a=hr(p);
+  $("hrv").textContent = (v && now-q[q.length-1]<2500)? v : "--";
+  $("hra").textContent = (a && now-p[p.length-1]<2500)? a : (scen.id==="tvpc"||scen.id==="fasc"?"--":"--");
+}
+
+function drawHeart(){
+  const now=sim.t;
+  // cámaras
+  for(const ch in chamberEls){
+    let v=0; for(const f of sim.flashes){ if(f.ch===ch && now>=f.t0){ v=Math.max(v, Math.exp(-(now-f.t0)/160)); } }
+    chamberEls[ch].setAttribute("fill-opacity", (0.35+0.65*v).toFixed(3));
+  }
+  // impulsos
+  dotG.innerHTML="";
+  for(const a of sim.anims){
+    if(now<a.t0 || now>a.t0+a.dur+60) continue;
+    const el=pathEls[a.path]; if(!el) continue;
+    const fr=Math.min(1,(now-a.t0)/a.dur), len=el._len;
+    const col = a.kind==="retro"?"var(--retro)":"var(--impulse)";
+    const fade = now>a.t0+a.dur ? 1-(now-a.t0-a.dur)/60 : 1;
+    // estela
+    const tr=document.createElementNS(svgNS,"path"); tr.setAttribute("d",PATHS[a.path]);
+    tr.setAttribute("stroke",col); tr.setAttribute("stroke-width","4"); tr.setAttribute("fill","none");
+    tr.setAttribute("stroke-dasharray",`${fr*len} ${len}`); tr.setAttribute("opacity",(.55*fade).toFixed(2)); tr.setAttribute("stroke-linecap","round");
+    dotG.appendChild(tr);
+    const pt=el.getPointAtLength(fr*len);
+    const c=document.createElementNS(svgNS,"circle"); c.setAttribute("cx",pt.x); c.setAttribute("cy",pt.y); c.setAttribute("r","6");
+    c.setAttribute("fill",col); c.setAttribute("opacity",fade.toFixed(2)); if(!reduceMotion) c.setAttribute("filter","url(#sm-glow)");
+    dotG.appendChild(c);
+  }
+  // bloqueos
+  blockG.innerHTML="";
+  for(const b of sim.blocks){
+    if(now<b.t0||now>b.t0+b.dur) continue;
+    const g=document.createElementNS(svgNS,"g"); g.setAttribute("stroke","var(--block)"); g.setAttribute("stroke-width","4"); g.setAttribute("stroke-linecap","round");
+    g.innerHTML=`<line x1="${b.x-9}" y1="${b.y-9}" x2="${b.x+9}" y2="${b.y+9}"/><line x1="${b.x+9}" y1="${b.y-9}" x2="${b.x-9}" y2="${b.y+9}"/>`;
+    blockG.appendChild(g);
+  }
+}
+
+function prune(){
+  const lim=sim.t-WINDOW-500;
+  if(sim.ecg.length>400) sim.ecg=sim.ecg.filter(e=>e.t1>lim);
+  if(sim.anims.length>200) sim.anims=sim.anims.filter(a=>a.t0+a.dur+100>sim.t);
+  if(sim.flashes.length>200) sim.flashes=sim.flashes.filter(f=>sim.t-f.t0<800);
+  if(sim.marks.length>100) sim.marks=sim.marks.filter(m=>m.t>lim);
+  if(sim.blocks.length>50) sim.blocks=sim.blocks.filter(b=>b.t0+b.dur>sim.t);
+  if(sim.qrs.length>40) sim.qrs=sim.qrs.slice(-20);
+  if(sim.p.length>40) sim.p=sim.p.slice(-20);
+}
+
+let last=performance.now();
+let lastW=0;
+function frame(now){
+  const dt=Math.min(50, now-last); last=now;
+  if(cv.offsetParent===null){ requestAnimationFrame(frame); return; }
+  if(cv.clientWidth!==lastW){ lastW=cv.clientWidth; sizeECG(); }
+  if(running){
+    let adv=dt*speed;
+    while(adv>0){ const s=Math.min(8,adv); sim.t+=s; scen.step(); adv-=s; }
+    prune();
+  }
+  drawECG(); drawHeart(); rates();
+  requestAnimationFrame(frame);
+}
+
+$("play").addEventListener("click",()=>{ running=!running; $("play").textContent=running?"Pausa":"Reanudar"; });
+$("speed").addEventListener("change",e=>{ speed=+e.target.value; });
+$("reset").addEventListener("click",()=>load(scen.id));
+if(!running) $("play").textContent="Reanudar";
+
+let first="trav"; try{ const v=localStorage.getItem("sim_arr"); if(v && S.some(s=>s.id===v)) first=v; }catch(err){}
+fit(); load(first);
+requestAnimationFrame(frame);
+// Estado expuesto para el corazón 3D (sim3d.js)
+window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, LANDMARKS, pathEls, lmEls };
+})();
+
+</script>
+<script src="paciente.js?v=v37"></script>
+<script type="module" src="sim3d.js"></script>
+</body>
+</html>

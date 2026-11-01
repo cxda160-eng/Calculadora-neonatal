@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Infusión de insulina – UCIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: misma línea que la Calculadora Neonatal — tarjetas de paciente, preparación, goteo, purgado, flujo de glucosa y osmolaridad; acento rosa para Insulina */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#eef3fb; --line:#e2e4f1; --fg:#2e3147; --muted:#6c7090; --accent:#b8336a; --accent-soft:#fde0ec; --mint:#dcf2ec; --mint-fg:#2b6a60; --peach:#fff4d6; --peach-fg:#86590a; --rose:#ffe3e8; --rose-fg:#a12d40; --sky:#e6f0fb; --sky-fg:#2f5f93;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#f6a3c4; --accent-soft:#3e2232; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }}
+:root[data-theme="dark"]{ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#f6a3c4; --accent-soft:#3e2232; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header h1{font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>*{flex:1 1 140px;min-width:0}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+input{font:inherit;font-family:var(--mono);font-size:1rem;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;font:inherit;font-size:.85rem;color:var(--muted);padding:7px 8px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:500}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-family:var(--mono);font-size:1.45rem;font-weight:500;font-variant-numeric:tabular-nums}
+.tile .s{font-size:.75rem;color:var(--muted)}
+.tile.main{background:var(--accent-soft)} .tile.main .v{font-size:1.9rem}
+.tile.mint{background:var(--mint)} .tile.peach{background:var(--peach)} .tile.sky{background:var(--sky)}
+.prep{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:baseline}
+.prep b{font-family:var(--mono);font-weight:700;font-size:1.1rem;text-align:right;font-variant-numeric:tabular-nums}
+.prep .s{color:var(--muted);font-size:.85rem}
+.prep .tot{border-top:1px dashed var(--line);padding-top:8px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+td{font-family:var(--mono)}
+table.txt td{font-family:var(--body);white-space:normal}
+table.txt td:first-child{font-family:var(--mono);white-space:nowrap}
+table.txt td:last-child{text-align:left}
+tr.sel td{background:var(--accent-soft);font-weight:700}
+.pill{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;font-size:.85rem}
+.pill.warn{background:var(--peach);color:var(--peach-fg)}
+.pill.crit{background:var(--rose);color:var(--rose-fg)}
+.pill.ok{background:var(--mint);color:var(--mint-fg)}
+.pill:empty{display:none}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+ol.steps li:last-child{border:0}
+ol.steps li::before{content:counter(s);flex:0 0 26px;height:26px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+ol.steps li span{flex:1}
+ol.steps input{width:22px;height:22px;flex:0 0 22px;accent-color:var(--accent)}
+footer{font-size:.75rem;color:var(--muted);text-align:center}
+</style>
+<style id="tema-vivo">
+:root{--bg:#fff2f7;--sunk:#fde3ee;--line:#f4d3e1;--accent:#c22d6b;--accent-soft:#ffd1e3;--mint:#c9efe2;--mint-fg:#0d6b5a;--peach:#ffecb8;--sky:#d6e6fb;--glow:#ffd9e8;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#3a2030;}}
+:root[data-theme="dark"]{--glow:#3a2030;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Infusión de insulina</h1>
+    <p>Hiperglucemia neonatal · dilución estándar: 0,1 mL/h = 0,01 U/kg/h</p>
+  </header>
+
+  <section class="card">
+    <h2>Paciente</h2>
+    <label for="peso">Peso (g)
+      <input id="peso" type="text" inputmode="numeric" autocomplete="off" value="1000">
+    </label>
+    <div class="pill warn" id="pesoMsg"></div>
+  </section>
+
+  <section class="card">
+    <h2>Preparación de la solución</h2>
+    <div class="prep">
+      <span>Insulina corriente 100 U/mL</span><b id="pInsMl">–</b>
+      <span class="s">(equivale a)</span><b class="s" id="pInsU" style="font-size:.9rem;font-weight:500">–</b>
+      <span>Solución fisiológica</span><b>240 mL</b>
+      <span class="tot">Concentración final</span><b class="tot" id="pConc">–</b>
+    </div>
+    <p class="hint">Dosis 0,01 U/kg/h × peso × 24 h × 100 (amplificación) en 240 mL de SF. Insulina humana cristalina (rápida): 100 U = 1 mL.</p>
+  </section>
+
+  <section class="card">
+    <h2>Goteo</h2>
+    <div class="seg" id="modo">
+      <button type="button" data-v="dosis" aria-pressed="true">Dosis → mL/h</button>
+      <button type="button" data-v="vel" aria-pressed="false">mL/h → Dosis</button>
+    </div>
+    <label for="dosis" id="boxDosis">Dosis (U/kg/h) · rango 0,01–0,2
+      <input id="dosis" type="text" inputmode="decimal" autocomplete="off" value="0,01">
+    </label>
+    <label for="vel" id="boxVel" hidden>Velocidad (mL/h)
+      <input id="vel" type="text" inputmode="decimal" autocomplete="off" value="0,1">
+    </label>
+    <div class="tiles">
+      <div class="tile main"><span class="k" id="rMainK">Velocidad de infusión</span><span class="v" id="rMain">–</span></div>
+      <div class="tile sky"><span class="k">Insulina por hora</span><span class="v" id="rUh">–</span></div>
+      <div class="tile peach"><span class="k">Volumen en 24 h</span><span class="v" id="r24">–</span></div>
+    </div>
+    <div class="pill" id="dosisMsg"></div>
+    <div class="tablewrap"><table id="tablaDosis">
+      <thead><tr><th>U/kg/h</th><th>mL/h</th><th>U/h</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="hint">Con esta dilución la velocidad no depende del peso: mL/h = dosis (U/kg/h) × 10.</p>
+  </section>
+
+  <section class="card">
+    <h2>Purgado de la guía</h2>
+    <ol class="steps">
+      <li><span>Purgar la guía de suero con una solución de insulina <b>1 U = 1 mL</b> durante <b>30 min</b>.</span><input type="checkbox" aria-label="Paso 1 hecho"></li>
+      <li><span><b>Descartar</b> esa solución.</span><input type="checkbox" aria-label="Paso 2 hecho"></li>
+      <li><span>Preparar la solución definitiva (0,1 mL/h = 0,01 U/kg/h) y cargarla en el <b>mismo Baxter ya purgado</b>.</span><input type="checkbox" aria-label="Paso 3 hecho"></li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Flujo de glucosa (FG)</h2>
+    <div class="row">
+      <label for="dx">Dextrosa (%)<input id="dx" type="text" inputmode="decimal" autocomplete="off" value="10"></label>
+      <label for="dxVel">Velocidad (mL/h)<input id="dxVel" type="text" inputmode="decimal" autocomplete="off" value="4"></label>
+    </div>
+    <div class="tiles"><div class="tile sky"><span class="k">FG actual</span><span class="v" id="rFG">–</span></div></div>
+    <label for="gluc">Glucemia actual (mg/dL)
+      <input id="gluc" type="text" inputmode="decimal" autocomplete="off" placeholder="ej. 180">
+    </label>
+    <div class="pill" id="accion"></div>
+    <div class="tablewrap"><table class="txt" id="tablaGl">
+      <thead><tr><th>Glucemia</th><th style="text-align:left">Acción</th></tr></thead>
+      <tbody>
+        <tr data-r="1"><td>50–80</td><td>Aumentar 1,5 mg/kg/min</td></tr>
+        <tr data-r="2"><td>80–120</td><td>Aumentar 1 mg/kg/min</td></tr>
+        <tr data-r="3"><td>120–150</td><td>Mantener igual aporte</td></tr>
+        <tr data-r="4"><td>&gt;150</td><td>y/o glucosuria &gt; trazas: disminuir el aporte hasta 7 mg/kg/min</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">FG (mg/kg/min) = % dextrosa × mL/h ÷ (6 × peso). Considera solo esta solución; sumá otras fuentes de glucosa si las hay.</p>
+  </section>
+
+  <section class="card">
+    <h2>Vía de acceso según osmolaridad</h2>
+    <div class="tiles"><div class="tile main"><span class="k">Osmolaridad aprox. de la dextrosa sola</span><span class="v" id="rOsm" style="font-size:1.45rem">–</span></div></div>
+    <div class="pill" id="osmMsg"></div>
+    <p class="hint">Periférica: Osm &lt; 800–900 · Central: Osm &lt; 1800 mOsm/L. Estimación ≈ % dextrosa × 50,5; los electrolitos y aminoácidos agregados la aumentan.</p>
+  </section>
+
+  <footer>Herramienta de apoyo basada en el protocolo de la institución. Verificar siempre los cálculos antes de preparar y administrar.</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const num = v => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : NaN; };
+const f = (n, d=2) => isFinite(n) ? n.toLocaleString('es-AR', {maximumFractionDigits:d, minimumFractionDigits:0}) : '–';
+const pill = (id, cls, html) => { const el = $(id); el.className = 'pill ' + (cls || ''); el.innerHTML = html ? '<span>' + html + '</span>' : ''; };
+let modo = 'dosis';
+
+function calc(){
+  const w = num($('peso').value) / 1000;
+  const okW = w > 0;
+  $('pesoMsg').innerHTML = okW && (w < 0.4 || w > 6) ? '⚠️ Peso fuera del rango habitual neonatal (0,4–6 kg). Revisá el dato.' : '';
+
+  // Preparación
+  const insU = w * 24, insMl = insU / 100, conc = insU / 240;
+  $('pInsMl').textContent = okW ? f(insMl,3) + ' mL' : '–';
+  $('pInsU').textContent  = okW ? f(insU,1) + ' U' : '–';
+  $('pConc').textContent  = okW ? f(conc,3) + ' U/mL' : '–';
+
+  // Goteo
+  let dosis, vel;
+  if (modo === 'dosis'){ dosis = num($('dosis').value); vel = dosis * 10;
+    $('rMainK').textContent = 'Velocidad de infusión'; $('rMain').textContent = isFinite(vel) ? f(vel,2) + ' mL/h' : '–'; }
+  else { vel = num($('vel').value); dosis = vel / 10;
+    $('rMainK').textContent = 'Dosis administrada'; $('rMain').textContent = isFinite(dosis) ? f(dosis,3) + ' U/kg/h' : '–'; }
+  $('rUh').textContent = okW && isFinite(dosis) ? f(dosis*w,3) + ' U/h' : '–';
+  $('r24').textContent = isFinite(vel) ? f(vel*24,1) + ' mL' : '–';
+
+  if (isFinite(dosis) && dosis > 0.2) pill('dosisMsg','crit','⛔ Dosis por encima del máximo del protocolo (0,2 U/kg/h).');
+  else if (isFinite(dosis) && dosis > 0 && dosis < 0.01) pill('dosisMsg','warn','⚠️ Dosis por debajo del mínimo del protocolo (0,01 U/kg/h).');
+  else pill('dosisMsg');
+
+  const pasos = [0.01,0.02,0.03,0.05,0.07,0.1,0.15,0.2];
+  $('tablaDosis').querySelector('tbody').innerHTML = pasos.map(p =>
+    `<tr class="${Math.abs(p-dosis)<1e-9?'sel':''}"><td>${f(p,2)}</td><td>${f(p*10,1)}</td><td>${okW?f(p*w,3):'–'}</td></tr>`).join('');
+
+  // FG
+  const dx = num($('dx').value), dv = num($('dxVel').value);
+  const fg = okW ? dx * dv / (6 * w) : NaN;
+  $('rFG').textContent = isFinite(fg) ? f(fg,1) + ' mg/kg/min' : '–';
+
+  const g = num($('gluc').value);
+  const velPara = t => okW && dx > 0 ? t * 6 * w / dx : NaN;
+  let r = 0;
+  if (isFinite(g) && g > 0){
+    if (g < 50) pill('accion','crit','⛔ Glucemia &lt; 50 mg/dL: fuera de la tabla. Manejar como hipoglucemia según protocolo.');
+    else if (g < 80){ r=1; const t=fg+1.5; pill('accion','ok',`Aumentar 1,5 mg/kg/min → nuevo FG <b>${f(t,1)}</b> mg/kg/min ≈ <b>${f(velPara(t),1)} mL/h</b> de dextrosa ${f(dx,1)}%`); }
+    else if (g < 120){ r=2; const t=fg+1; pill('accion','ok',`Aumentar 1 mg/kg/min → nuevo FG <b>${f(t,1)}</b> mg/kg/min ≈ <b>${f(velPara(t),1)} mL/h</b> de dextrosa ${f(dx,1)}%`); }
+    else if (g <= 150){ r=3; pill('accion','ok','Mantener igual aporte de glucosa.'); }
+    else { r=4; (isFinite(fg) && fg <= 7)
+      ? pill('accion','warn',`Disminuir el aporte hasta 7 mg/kg/min: el FG actual (${f(fg,1)}) ya está en ese límite o por debajo, no reducir más.`)
+      : pill('accion','warn',`Disminuir el aporte, hasta 7 mg/kg/min (≈ <b>${f(velPara(7),1)} mL/h</b> de dextrosa ${f(dx,1)}%).`); }
+  } else pill('accion');
+  document.querySelectorAll('#tablaGl tr[data-r]').forEach(tr => tr.classList.toggle('sel', +tr.dataset.r === r));
+
+  // Osmolaridad
+  const osm = dx * 50.5;
+  $('rOsm').textContent = isFinite(osm) ? f(osm,0) + ' mOsm/L' : '–';
+  if (!isFinite(osm)) pill('osmMsg');
+  else if (osm >= 1800) pill('osmMsg','crit','⛔ Supera 1800 mOsm/L: no apta ni por vía central.');
+  else if (osm >= 900) pill('osmMsg','warn','Requiere vía central.');
+  else if (osm >= 800) pill('osmMsg','warn','Zona límite (800–900): preferir vía central.');
+  else pill('osmMsg','ok','Apta para vía periférica (sin contar otros componentes).');
+}
+
+$('modo').querySelectorAll('button').forEach(b => b.onclick = () => {
+  modo = b.dataset.v;
+  $('modo').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  $('boxDosis').hidden = modo !== 'dosis'; $('boxVel').hidden = modo !== 'vel';
+  calc();
+});
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', calc));
+calc();
+</script>
+<script src="paciente.js?v=v37"></script>
+</body>
+</html>

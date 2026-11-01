@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Electrolitos Neonatales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+
+/* Layout: misma línea que la Calculadora Neonatal — paciente arriba, selector de trastorno, lectura principal tipo bomba, datos + preparación (dos columnas en tablet) */
+:root{
+  --bg:#f7f6fc; --surface:#ffffff; --surface-2:#eef3fb; --fg:#2e3147; --muted:#6c7090; --line:#e2e4f1;
+  --accent:#5a8fd0; --accent-ink:#ffffff;
+  --pump-bg:#dcf2ec; --pump-fg:#2c4a4f; --pump-num:#2b7a72;
+  --na:#7fb6e3; --k:#ec8e9a; --ca:#e8b86a; --mg:#ad94e4; --hco3:#6cc3b0; --glu:#f0a37c;
+  --warn-bg:#fff4d6; --warn-fg:#86590a; --bad-bg:#ffe3e8; --bad-fg:#a12d40; --info-bg:#e6f0fb; --info-fg:#2f5f93;
+  --hl-bg:#ffe1d2; --hl-fg:#8a3a1c; --hl-line:#f6b394;
+  --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-num:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
+  --accent:#9cc3ef; --accent-ink:#152131;
+  --pump-bg:#1e3a3b; --pump-fg:#dcf2ec; --pump-num:#a6ecdc;
+  --na:#a7d1f2; --k:#f5a7b2; --ca:#f0cd8e; --mg:#c8b6f4; --hco3:#92dccb; --glu:#f6bb9c;
+  --warn-bg:#3b3014; --warn-fg:#ffdc8f; --bad-bg:#43202a; --bad-fg:#ffb9c4; --info-bg:#1f2f45; --info-fg:#b5d3f5;
+  --hl-bg:#4a2c22; --hl-fg:#ffd2bd; --hl-line:#a8604a;
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
+  --accent:#9cc3ef; --accent-ink:#152131;
+  --pump-bg:#1e3a3b; --pump-fg:#dcf2ec; --pump-num:#a6ecdc;
+  --na:#a7d1f2; --k:#f5a7b2; --ca:#f0cd8e; --mg:#c8b6f4; --hco3:#92dccb; --glu:#f6bb9c;
+  --warn-bg:#3b3014; --warn-fg:#ffdc8f; --bad-bg:#43202a; --bad-fg:#ffb9c4; --info-bg:#1f2f45; --info-fg:#b5d3f5;
+  --hl-bg:#4a2c22; --hl-fg:#ffd2bd; --hl-line:#a8604a;
+  color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 calc(84px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:980px;margin:0 auto}
+header.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-block:18px 10px;flex-wrap:wrap}
+h1{font-size:1.25rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1rem;margin:0}
+.sub{color:var(--muted);font-size:.82rem}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.num{font-family:var(--font-num);font-variant-numeric:tabular-nums}
+section.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid{display:grid;gap:12px}
+@media (min-width:760px){.grid.two{grid-template-columns:1fr 1fr}}
+.patient{display:grid;grid-template-columns:1.3fr 1fr;gap:10px}
+@media (max-width:420px){.patient{grid-template-columns:1fr}}
+.weight{display:flex;align-items:center;gap:8px}
+.weight input{flex:1;min-width:0;font-family:var(--font-num);font-size:1.5rem;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);text-align:center}
+.weight .u{font-weight:600;color:var(--muted)}
+button{font:inherit;cursor:pointer}
+.step{width:46px;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font-size:1.4rem;font-weight:600}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.selwrap{position:relative;display:flex;align-items:center}
+.selwrap i{position:absolute;left:14px;width:11px;height:11px;border-radius:50%;background:var(--c);pointer-events:none}
+.selwrap::after{content:"";position:absolute;right:16px;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-3px) rotate(45deg);pointer-events:none}
+.selwrap select{appearance:none;-webkit-appearance:none;width:100%;font:inherit;font-size:1.1rem;font-weight:600;padding:13px 40px 13px 34px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);min-height:52px}
+.selwrap.plain select{padding-left:12px;font-size:1rem;font-weight:500;min-height:46px}
+.pump{background:var(--pump-bg);color:var(--pump-fg);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:end}
+.pump .drug{font-weight:700;font-size:1rem;display:flex;gap:8px;align-items:center}
+.pump .drug i{width:10px;height:10px;border-radius:2px;background:var(--c)}
+.pump .rate{font-family:var(--font-num);font-size:2.8rem;line-height:1;color:var(--pump-num);font-weight:700;text-align:right}
+.pump .rate.txt{font-family:var(--font-body);font-size:1.8rem}
+.pump .rate small{font-size:1rem;color:var(--pump-fg);font-weight:500;margin-left:4px}
+.pump .meta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.82rem;opacity:.85;border-top:1px solid color-mix(in srgb,var(--pump-fg) 18%,transparent);padding-top:8px;margin-top:6px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:.82rem;color:var(--muted);font-weight:500}
+.inrow{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);overflow:hidden}
+.inrow input{flex:1;min-width:0;border:0;background:transparent;color:var(--fg);font-family:var(--font-num);font-size:1.15rem;padding:10px}
+.inrow span{padding:0 10px;color:var(--muted);font-size:.8rem;white-space:nowrap}
+.recipe{background:var(--surface-2);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.recipe .line{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.recipe .line b{font-family:var(--font-num);font-variant-numeric:tabular-nums;text-align:right}
+.recipe .conc{background:var(--hl-bg);color:var(--hl-fg);border:1.5px solid var(--hl-line);border-radius:10px;padding:10px 12px;margin-bottom:2px;font-weight:600}
+.recipe .conc b{font-size:1.3rem;font-weight:700}
+.recipe .steps{margin:4px 0 0;padding-left:18px;font-size:.9rem;display:grid;gap:4px}
+.alerts{display:flex;flex-direction:column;gap:6px}
+.alert{padding:9px 11px;border-radius:9px;font-size:.86rem;background:var(--warn-bg);color:var(--warn-fg)}
+.alert.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.alert.info{background:var(--info-bg);color:var(--info-fg)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+td.n{font-family:var(--font-num);font-variant-numeric:tabular-nums;white-space:nowrap}
+.src{font-size:.76rem;color:var(--muted)}
+.disc{font-size:.78rem;color:var(--muted);max-width:68ch;padding-block:6px}
+details.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:var(--r)}
+details.card summary{list-style:none;cursor:pointer;padding:13px 14px;font-weight:700;display:flex;justify-content:space-between;gap:8px}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary span.sub{font-weight:400}
+.mbody{padding:0 14px 14px;display:grid;gap:8px}
+.mbody p{margin:0;max-width:68ch}
+.f{font-family:var(--font-num);font-size:.85rem;background:var(--surface-2);border-radius:8px;padding:8px 10px;overflow-x:auto;white-space:pre-wrap}
+.tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:var(--hl-bg);color:var(--hl-fg)}
+.comp{display:grid;gap:8px;padding-top:8px}
+.cmpbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.cmpbox>summary{cursor:pointer;font-weight:700;font-size:.92rem}
+.cn{font-weight:700;font-size:.88rem;margin-top:4px;border-top:1px solid var(--line);padding-top:8px}
+.cg{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.cg b{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;width:100%}
+.pill{font-size:.8rem;padding:3px 9px;border-radius:999px;border:1px solid transparent}
+.pill.I{background:var(--bad-bg);color:var(--bad-fg);border-color:color-mix(in srgb,var(--bad-fg) 30%,transparent);font-weight:600}
+.pill.V{background:var(--warn-bg);color:var(--warn-fg)}
+.pill.C{background:var(--pump-bg);color:var(--pump-fg)}
+.cg.I b{color:var(--bad-fg)}.cg.V b{color:var(--warn-fg)}.cg.C b{color:var(--muted)}
+details.more summary{cursor:pointer;font-size:.85rem;color:var(--accent);font-weight:600;padding:2px 0}
+.csrc{font-size:.74rem;color:var(--muted)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;
+  padding:8px max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));gap:8px;z-index:20}
+nav.tabs button{flex:1;max-width:240px;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:10px;font-weight:600;font-size:.95rem;min-height:48px}
+nav.tabs button[aria-selected="true"]{background:var(--surface-2);color:var(--fg)}
+</style>
+<style id="tema-vivo">
+/* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
+:root{--bg:#eef4fd;--surface-2:#e2ecfb;--line:#cfdcf2;--accent:#3a7bd5;--pump-bg:#cde3fb;--pump-fg:#1f3b5c;--pump-num:#1f63b3;--na:#5aa8e6;--k:#f07c8e;--ca:#eca93e;--mg:#9b7ae8;--hco3:#3fbf9f;--glu:#f28a5a;--hl-bg:#ffd6c2;--hl-line:#f59a72;--glow:#d3e5fc;--pump-grad:linear-gradient(135deg,#cde3fb 0%,#ddd3fb 100%);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#1b2f4d;--pump-grad:linear-gradient(135deg,#1f3a5c 0%,#2c2a52 100%);--pump-bg:#1f3a5c;--pump-fg:#e2eefb;--pump-num:#a9cff5;}}
+:root[data-theme="dark"]{--glow:#1b2f4d;--pump-grad:linear-gradient(135deg,#1f3a5c 0%,#2c2a52 100%);--pump-bg:#1f3a5c;--pump-fg:#e2eefb;--pump-num:#a9cff5;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+.pump{background:var(--pump-grad);box-shadow:0 6px 18px -10px var(--pump-num)}
+.pump .rate{color:var(--pump-num)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Electrolitos Neonatales</h1>
+    <span class="sub">Corrección de trastornos hidroelectrolíticos · UCIN</span>
+  </header>
+
+  <main id="view-calc">
+    <div class="grid">
+      <section class="panel">
+        <div class="patient">
+          <div class="field">
+            <span class="lbl">Peso</span>
+            <div class="weight">
+              <button class="step" id="wMinus" aria-label="Restar 100 g">−</button>
+              <input id="peso" inputmode="numeric" autocomplete="off" value="3000" aria-label="Peso en gramos">
+              <span class="u">g</span>
+              <button class="step" id="wPlus" aria-label="Sumar 100 g">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl" for="cat">Paciente</label>
+            <div class="selwrap plain"><select id="cat">
+              <option value="rnpt">Recién nacido prematuro</option>
+              <option value="rnt" selected>Recién nacido de término</option>
+              <option value="lac">Lactante</option>
+            </select></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="act">Agua corporal total (fracción del peso)</label>
+          <div class="inrow"><input id="act" inputmode="decimal" autocomplete="off"><span id="actTxt">L/kg</span></div>
+        </div>
+        <label class="lbl" for="modSel">Trastorno a corregir</label>
+        <div class="selwrap"><i></i><select id="modSel"></select></div>
+      </section>
+
+      <div class="pump" id="pump" aria-live="polite"></div>
+
+      <div class="grid two">
+        <section class="panel">
+          <div class="lbl">Datos</div>
+          <div class="fields" id="fields"></div>
+        </section>
+        <section class="panel">
+          <div class="lbl">Preparación e indicaciones</div>
+          <div class="recipe" id="recipe"></div>
+          <div class="alerts" id="alerts"></div>
+          <div class="tablewrap" id="tbl"></div>
+          <div id="cmp"></div>
+          <div class="src" id="src"></div>
+        </section>
+      </div>
+      <p class="disc">Herramienta de apoyo para personal de salud. Fórmulas tomadas de la guía de Medicina Interna Pediátrica (Hospital de Niños R. Gutiérrez, 2016), con ajustes neonatales señalados. Verificá con el protocolo de tu unidad y hacé doble chequeo antes de indicar.</p>
+    </div>
+  </main>
+
+  <main id="view-ref" hidden>
+    <div class="grid" id="refs"></div>
+    <p class="disc">Resumen de fórmulas. No reemplaza la guía original ni el protocolo institucional.</p>
+  </main>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" id="tCalc" aria-selected="true">Corregir</button>
+  <button role="tab" id="tRef" aria-selected="false">Fórmulas</button>
+</nav>
+
+<script>
+const $=id=>document.getElementById(id);
+const parse=v=>{const n=parseFloat(String(v).replace(",","."));return isFinite(n)?n:NaN};
+const fmt=(n,d=1)=>isFinite(n)?n.toLocaleString("es-AR",{maximumFractionDigits:d,minimumFractionDigits:0}):"—";
+const f2=n=>fmt(n,n<10?2:1);
+const ACT={rnpt:0.9,rnt:0.75,lac:0.6};
+const G={w:3,cat:"rnt",act:0.75};
+const SRC={guia:"Fuente: Medicina Interna Pediátrica. Guía Práctica, HNRG 2016.",neo:"Ajuste neonatal: referencia habitual en neonatología (no figura en la guía)."};
+const sel=(id,label,opts,def,show)=>({id,label,type:"sel",opts,def,show});
+const num=(id,label,unit,def,show,full)=>({id,label,unit,def,show,full});
+
+const MODS=[
+/* ---------------- HIPONATREMIA ---------------- */
+{id:"hipona",name:"Hiponatremia",group:"Sodio",c:"var(--na)",
+ fields:[num("na","Na⁺ plasmático","mEq/L",120),num("glu","Glucemia (opcional)","mg/dL",""),
+  sel("modo","Situación clínica",[["asin","Asintomática · corrección por déficit"],["sint","Sintomática / convulsiones · bolo"]],"asin",null),
+  num("obj","Na⁺ objetivo","mEq/L",125,v=>v.modo==="asin"),num("ritmo","Ritmo de ascenso","mEq/L/h",1,v=>v.modo==="asin"),
+  num("mlkg","Dosis de ClNa 3%","mL/kg",3,v=>v.modo==="sint")],
+ calc(v){
+  const A=[],R=[],S=[];let main;
+  if(isFinite(v.glu)&&v.glu>100){const nc=v.na+1.6*(v.glu-100)/100;
+    R.push(["Na⁺ corregido por glucemia",fmt(nc,1)+" mEq/L"]);
+    if(nc>=130)A.push(["bad","Con la glucemia corregida el Na⁺ es normal: hiponatremia translocacional. Tratar la hiperglucemia, no administrar sodio."]);}
+  if(v.na>=130)A.push(["info","Na⁺ ≥ 130 mEq/L: no cumple criterio de hiponatremia."]);
+  if(v.modo==="asin"){
+    if(v.na>=120&&v.na<130)A.push(["","La guía indica corrección con Na⁺ < 120 mEq/L, o < 125 mEq/L con síntomas."]);
+    const d=v.obj-v.na;
+    if(!(d>0)){main={v:"—",u:"",l:"Sin déficit hasta el objetivo"};return{main,R,S,A};}
+    const def=G.act*G.w*d, vol=def/0.51, h=d/v.ritmo, rate=vol/h;
+    main={v:f2(rate),u:"mL/h",l:"ClNa 3%",meta:[`${fmt(vol,1)} mL en ${fmt(h,1)} h`,`Déficit ${fmt(def,1)} mEq`]};
+    R.unshift(["Concentración ClNa 3%","0,51 mEq/mL",1],["Déficit de Na⁺",fmt(def,1)+" mEq"],["Volumen de ClNa 3%",fmt(vol,1)+" mL"],["Tiempo de infusión",fmt(h,1)+" h"]);
+    S.push(`Preparar ClNa 3%: <b>${fmt(vol*0.15,1)} mL</b> de ClNa 20% + <b>${fmt(vol*0.85,1)} mL</b> de agua destilada (proporción 15/85).`,
+      `Infundir a <b>${f2(rate)} mL/h</b> (ascenso ${fmt(v.ritmo,1)} mEq/L/h).`,"Controlar Na⁺ al finalizar y según evolución.");
+    if(v.obj>125)A.push(["bad","El Na⁺ objetivo no debe superar 125 mEq/L en la fase de corrección."]);
+    if(d>8)A.push(["bad",`Delta de ${fmt(d,1)} mEq/L: no superar 6–8 mEq/L en 24 h (riesgo de desmielinización osmótica).`]);
+    if(v.ritmo>1)A.push(["","En la hiponatremia severa asintomática la guía sugiere 1 mEq/L/h."]);
+  }else{
+    const vol=v.mlkg*G.w, meq=vol*0.51;
+    main={v:f2(vol*3),u:"mL/h",l:"ClNa 3% en bolo",meta:[`${fmt(vol,1)} mL en 20 min`,`${fmt(meq,1)} mEq Na⁺`]};
+    R.push(["Concentración ClNa 3%","0,51 mEq/mL",1],["Volumen del bolo",fmt(vol,1)+" mL"],["Sodio aportado",fmt(meq,1)+" mEq ("+fmt(meq/G.w,2)+" mEq/kg)"]);
+    S.push(`Preparar ClNa 3%: <b>${fmt(vol*0.15,1)} mL</b> de ClNa 20% + <b>${fmt(vol*0.85,1)} mL</b> de agua destilada.`,
+      `Pasar <b>${fmt(vol,1)} mL en 20 minutos</b> hasta que cedan los síntomas. Puede repetirse si persisten.`,
+      "Luego continuar con corrección lenta: no superar 6–8 mEq/L en 24 h o Na⁺ 125 mEq/L.");
+    if(v.mlkg<3||v.mlkg>5)A.push(["","La dosis de la guía es 3–5 mL/kg (1,5–2,5 mEq/kg)."]);
+  }
+  return{main,R,S,A,src:SRC.guia};
+ }},
+/* ---------------- HIPERNATREMIA / AGUA LIBRE ---------------- */
+{id:"hiperna",name:"Hipernatremia · déficit de agua libre",group:"Sodio",c:"var(--na)",
+ fields:[num("na","Na⁺ plasmático","mEq/L",165),
+  sel("form","Fórmula",[["f1","ACT normal − ACT real"],["f2","ACT × (Na⁺ − 145) / 145"],["f3","4 mL/kg × (Na⁺ − 145)"]],"f2"),
+  sel("tiempo","Tiempo de corrección",[["auto","Según natremia (tabla de la guía)"],["24","24 h"],["48","48 h"],["72","72 h"],["84","84 h"]],"auto"),
+  sel("sint","Síntomas neurológicos",[["no","Sin convulsiones ni coma"],["si","Convulsiones o coma"]],"no")],
+ calc(v){
+  const A=[],R=[],S=[];const d=v.na-145;
+  if(!(d>0)){return{main:{v:"—",u:"",l:"Na⁺ ≤ 145 mEq/L: sin déficit de agua libre"},R,S,A,src:SRC.guia};}
+  const act=G.act*G.w;let def;
+  if(v.form==="f1")def=(act-act*145/v.na)*1000;else if(v.form==="f2")def=act*d/145*1000;else def=4*G.w*d;
+  const h=v.tiempo==="auto"?(v.na<=157?24:v.na<=170?48:v.na<=183?72:84):+v.tiempo;
+  const vol=def*2, rate=vol/h, bajada=d/h;
+  const main={v:f2(rate),u:"mL/h",l:"SS 0,45%",meta:[`${fmt(vol,0)} mL en ${h} h`,`Agua libre ${fmt(def,0)} mL`,`Descenso ≈ ${fmt(bajada,2)} mEq/L/h`]};
+  R.push(["Déficit de agua libre",fmt(def,0)+" mL",1],["Equivalente en SS 0,45%",fmt(vol,0)+" mL"],["Tiempo de corrección",h+" h"],["Agua libre por hora",fmt(def/h,1)+" mL/h"]);
+  S.push(`El SS 0,45% aporta 50% de agua libre: por eso el volumen es el doble del déficit.`,
+    `Preparar SS 0,45%: por cada 100 mL, <b>2,25 mL</b> de ClNa 20% + <b>97,75 mL</b> de agua destilada o Dx 5% (para ${fmt(vol,0)} mL: ${fmt(vol*0.0225,1)} mL de ClNa 20%).`,
+    `Infundir a <b>${f2(rate)} mL/h</b> durante ${h} h, sumando aparte las necesidades de mantenimiento.`,"Controles de natremia frecuentes y ajuste según evolución.");
+  if(bajada>0.5)A.push(["bad",`Descenso estimado de ${fmt(bajada,2)} mEq/L/h: no superar 0,5 mEq/L/h ni 10–12 mEq/L por día. Prolongá el tiempo de corrección.`]);
+  if(v.sint==="si"){const b=4*G.w;R.push(["Bolo de Dx 2,5% (agua libre)",fmt(b,1)+" mL"]);
+    A.push(["bad",`Convulsiones o coma: bolos EV rápidos de Dx 2,5% sin sodio a 4 mL/kg (${fmt(b,1)} mL), cada uno baja ≈ 1 mEq/L, hasta que cese la convulsión. Es la única indicación de agua libre sin sodio.`]);}
+  if(v.form==="f3"&&Math.abs(G.act-0.6)>0.01)A.push(["",`La fórmula de 4 mL/kg supone ACT 0,6. Con ACT ${fmt(G.act,2)}, 1 mEq/L equivale a ≈ ${fmt(1000*G.act/145,1)} mL/kg: preferí las otras fórmulas.`]);
+  A.push(["info","En la deshidratación hipernatrémica la guía sugiere hoy aportar mantenimiento + déficit con solución isotónica (Na⁺ 140 mEq/L en Dx 5% + ClK 20 mEq/L) en el tiempo de la tabla. El cálculo de agua libre se usa sobre todo en diabetes insípida."]);
+  return{main,R,S,A,src:SRC.guia};
+ }},
+/* ---------------- HIPOKALEMIA ---------------- */
+{id:"hipok",name:"Hipokalemia",group:"Potasio",c:"var(--k)",
+ fields:[num("k","K⁺ plasmático","mEq/L",2.4),num("dosis","Dosis","mEq/kg",1),num("h","Tiempo de infusión","h",3),
+  sel("via","Acceso venoso",[["per","Periférico (máx. 40–60 mEq/L)"],["cen","Central (máx. 120–150 mEq/L)"]],"per"),
+  num("conc","Concentración final","mEq/L",40),
+  num("phpv","Plan EV en curso (opcional)","mL/kg/día",""),num("phpk","K⁺ del plan","mEq/L","")],
+ calc(v){
+  const A=[],R=[],S=[];
+  const meq=v.dosis*G.w, mlk=meq/3, tot=meq/v.conc*1000, dil=tot-mlk, rate=tot/v.h, flujo=meq/G.w/v.h;
+  const main={v:f2(rate),u:"mL/h",l:"ClK diluido en SF",meta:[`${fmt(tot,1)} mL en ${fmt(v.h,1)} h`,`${fmt(meq,2)} mEq K⁺`,`Flujo ${fmt(flujo,2)} mEq/kg/h`]};
+  R.push(["Concentración final",fmt(v.conc,0)+" mEq/L",1],["Potasio a infundir",fmt(meq,2)+" mEq"],["ClK 3 M (1 mL = 3 mEq)",fmt(mlk,2)+" mL"],["Flujo de K⁺",fmt(flujo,2)+" mEq/kg/h"]);
+  S.push(`Cargar <b>${fmt(mlk,2)} mL</b> de ClK 3 M.`,`Completar con <b>SF 0,9%</b> hasta <b>${fmt(tot,1)} mL</b> (≈ ${fmt(dil,1)} mL de SF). Evitar soluciones glucosadas: la insulina baja más el K⁺.`,
+    `Infundir a <b>${f2(rate)} mL/h</b> durante ${fmt(v.h,1)} h, con monitor cardíaco.`);
+  if(flujo>0.5)A.push(["bad","El flujo supera 0,5 mEq/kg/h. Aumentá el tiempo de infusión."]);
+  if(v.via==="per"&&v.conc>60)A.push(["bad","Por vía periférica la concentración no debe superar 40–60 mEq/L (dolor, flebitis)."]);
+  else if(v.via==="per"&&v.conc>40)A.push(["","Concentración en el límite superior para vía periférica."]);
+  if(v.via==="cen"&&v.conc>150)A.push(["bad","Por vía central no superar 120–150 mEq/L."]);
+  if(meq>40)A.push(["bad","Supera la dosis máxima de 40 mEq por dosis."]);
+  if(v.dosis>1)A.push(["","La dosis EV de la guía es 1 mEq/kg/dosis."]);
+  if(isFinite(v.phpv)&&isFinite(v.phpk)){const fp=v.phpv*v.phpk/1000/24;R.push(["Flujo de K⁺ del plan en curso",fmt(fp,2)+" mEq/kg/h"]);
+    if(fp+flujo>0.5)A.push(["bad",`Sumando todas las vías el flujo es ${fmt(fp+flujo,2)} mEq/kg/h: supera 0,5 mEq/kg/h.`]);}
+  if(v.k>=3.5)A.push(["info","K⁺ ≥ 3,5 mEq/L: no hay hipokalemia."]);
+  else if(v.k>=2.5)A.push(["info","Hipokalemia leve a moderada: si está asintomático y tolera la vía enteral, la guía prefiere la vía oral (2–5 mEq/kg/día en 2–4 tomas)."]);
+  else A.push(["","Hipokalemia severa: monitor cardíaco y ECG. Corregir también la hipomagnesemia, si la hay."]);
+  return{main,R,S,A,src:SRC.guia};
+ }},
+/* ---------------- HIPERKALEMIA ---------------- */
+{id:"hiperk",name:"Hiperkalemia",group:"Potasio",c:"var(--k)",
+ fields:[num("k","K⁺ plasmático","mEq/L",7),sel("ecg","ECG y clínica",[["no","Sin cambios en el ECG"],["si","Con cambios ECG o síntomas"]],"no")],
+ calc(v){
+  const A=[],R=[],S=[],w=G.w;
+  const sev=v.k<=6?"Sin hiperkalemia":v.k<=6.5?"Leve":v.k<8?"Moderada":"Severa";
+  const main={v:sev,u:"",l:"Hiperkalemia",txt:1,meta:[`K⁺ ${fmt(v.k,1)} mEq/L`,"En < 1 año: hiperkalemia si K⁺ > 6 mEq/L"]};
+  R.push(["Gluconato de calcio 10%",`${fmt(0.5*w,1)}–${fmt(w,1)} mL`,1]);
+  S.push("Suspender todo aporte de K⁺ y drogas que lo eleven.","Con K⁺ > 6–6,5 mEq/L, ECG y monitor cardíaco.",
+    "1) Estabilizar la membrana (calcio) · 2) Desplazar K⁺ a la célula (bicarbonato, insulina-glucosa) · 3) Eliminar K⁺ (furosemida, resinas, diálisis).");
+  const T=[["Gluconato de calcio 10%","0,5–1 mL/kg",`${fmt(0.5*w,1)}–${fmt(w,1)} mL`,"EV lento en 5–10 min con monitor. Máx. 10–20 mL. Si la FC baja > 20–25%, frenar o suspender. Puede repetirse a los 5–10 min."],
+   ["Bicarbonato de sodio 1 M","1–2 mEq/kg",`${fmt(w,1)}–${fmt(2*w,1)} mL`,"EV en 5–10 min, solo si hay acidosis metabólica. En RN diluir (ver módulo de bicarbonato). No por la misma vía que el calcio."],
+   ["Insulina corriente + Dx 10%","0,1 U/kg + 5–10 mL/kg",`${fmt(0.1*w,2)} U + ${fmt(5*w,0)}–${fmt(10*w,0)} mL`,"EV en 30–60 min. Control estricto de glucemia."],
+   ["Furosemida","1–2 mg/kg/dosis",`${fmt(w,1)}–${fmt(2*w,1)} mg`,"EV cada 6–12 h."],
+   ["Resinas de intercambio","0,5–1 g/kg (rectal)",`${fmt(0.5*w,1)}–${fmt(w,1)} g`,"Enema en Dx 10% (3–4 mL por gramo), retener 30–60 min. Usar con precaución en prematuros."]];
+  if(v.k>6&&v.ecg==="si")A.push(["bad","Hiperkalemia con cambios ECG: gluconato de calcio inmediato y medidas de desplazamiento."]);
+  if(v.k>=8)A.push(["bad","Hiperkalemia severa: evaluar diálisis si hay insuficiencia renal o anuria."]);
+  A.push(["info","Descartá pseudohiperkalemia: hemólisis de la muestra (frecuente en punción de talón), trombocitosis o leucocitosis marcadas."]);
+  return{main,R,S,A,T:{h:["Fármaco","Dosis","Para "+fmt(w,2)+" kg","Administración"],rows:T},src:SRC.guia};
+ }},
+/* ---------------- HIPOCALCEMIA ---------------- */
+{id:"hipoca",name:"Hipocalcemia",group:"Calcio",c:"var(--ca)",
+ fields:[num("cat","Calcio total","mg/dL",6.8),num("alb","Albúmina (opcional)","g/dL",""),num("cai","Calcio iónico (opcional)","mg/dL",""),
+  sel("modo","Tratamiento",[["bolo","Bolo · hipocalcemia sintomática"],["inf","Infusión continua"]],"bolo"),
+  num("dosis","Gluconato de Ca 10%","mL/kg",1,v=>v.modo==="bolo"),num("min","Tiempo del bolo","min",10,v=>v.modo==="bolo"),
+  num("dia","Gluconato de Ca 10%","mL/kg/día",4,v=>v.modo==="inf")],
+ calc(v){
+  const A=[],R=[],S=[];let main;
+  const lim={rnpt:[7,2.4],rnt:[8,3.2],lac:[8.4,3]}[G.cat];
+  if(isFinite(v.alb)){const c=v.cat+0.8*(4-v.alb);R.push(["Calcio corregido por albúmina",fmt(c,2)+" mg/dL"]);}
+  const ref=isFinite(v.alb)?v.cat+0.8*(4-v.alb):v.cat;
+  if(isFinite(v.cai)&&v.cai>=lim[1])A.push(["info",`Calcio iónico ≥ ${fmt(lim[1],1)} mg/dL: no cumple criterio de hipocalcemia para este paciente.`]);
+  else if(!isFinite(v.cai)&&ref>=lim[0])A.push(["info",`Calcio total ≥ ${fmt(lim[0],1)} mg/dL: no cumple criterio de hipocalcemia para este paciente. Preferí el calcio iónico.`]);
+  if(v.modo==="bolo"){
+    const ml=v.dosis*G.w, tot=ml*2, rate=tot/(v.min/60);
+    main={v:f2(rate),u:"mL/h",l:"Gluconato de Ca 10% diluido 1:1",meta:[`${fmt(tot,1)} mL en ${fmt(v.min,0)} min`,`${fmt(ml*9,1)} mg de Ca elemental`]};
+    R.unshift(["Gluconato de calcio 10%",fmt(ml,2)+" mL",1],["Calcio elemental (1 mL = 9 mg)",fmt(ml*9,1)+" mg"],["Volumen final",fmt(tot,1)+" mL"]);
+    S.push(`Cargar <b>${fmt(ml,2)} mL</b> de gluconato de calcio 10% y diluir con <b>${fmt(ml,2)} mL</b> de SF (concentración máxima 0,5 mL de gluconato por mL).`,
+      `Pasar en <b>${fmt(v.min,0)} min</b> (${f2(rate)} mL/h) con monitor de FC. Puede repetirse hasta que ceda la clínica.`,"Luego continuar con infusión continua.");
+    if(ml/v.min>1)A.push(["bad","Supera la velocidad máxima de 1 mL/min de gluconato."]);
+    if(ml>20)A.push(["bad","Supera la dosis máxima de 10–20 mL."]);
+    if(v.dosis<1||v.dosis>2)A.push(["","La dosis de la guía es 1–2 mL/kg/dosis."]);
+  }else{
+    const md=v.dia*G.w, mh=md/24, rate=mh*2;
+    main={v:f2(rate),u:"mL/h",l:"Gluconato de Ca 10% diluido 1:1",meta:[`${fmt(md,1)} mL/día de gluconato`,`${fmt(md*9,0)} mg/día de Ca elemental`]};
+    R.unshift(["Gluconato de calcio 10%",fmt(md,1)+" mL/día",1],["Gluconato por hora",fmt(mh,2)+" mL/h"],["Calcio elemental",fmt(md*9/G.w,0)+" mg/kg/día"]);
+    S.push(`Para 24 h: <b>${fmt(md,1)} mL</b> de gluconato 10% + <b>${fmt(md,1)} mL</b> de SF (o más diluido).`,`Infundir a <b>${f2(rate)} mL/h</b>.`);
+    if(md>40)A.push(["bad","Supera la dosis máxima diaria de 40 mL."]);
+  }
+  A.push(["","No mezclar con bicarbonato ni fosfato. La extravasación produce necrosis: vía segura y controlada. Bradicardia con infusión rápida."]);
+  A.push(["info","Tratar la hipocalcemia antes de corregir una acidosis y descartar hipomagnesemia si es refractaria."]);
+  return{main,R,S,A,src:SRC.guia+" Valores de corte neonatales de la misma guía."};
+ }},
+/* ---------------- HIPOMAGNESEMIA ---------------- */
+{id:"hipomg",name:"Hipomagnesemia",group:"Magnesio",c:"var(--mg)",
+ fields:[num("mg","Magnesio plasmático","mg/dL",1.2),num("dosis","Sulfato de Mg","mg/kg",25),num("h","Tiempo de infusión","h",2),num("conc","Concentración final","mg/mL",100)],
+ calc(v){
+  const A=[],R=[],S=[];
+  const mgs=v.dosis*G.w, meq=mgs/125, ml25=mgs/250, tot=mgs/v.conc, rate=tot/v.h, flujo=meq/G.w/v.h;
+  const main={v:f2(rate),u:"mL/h",l:"Sulfato de magnesio diluido",meta:[`${fmt(tot,2)} mL en ${fmt(v.h,1)} h`,`${fmt(mgs,0)} mg · ${fmt(meq,2)} mEq`]};
+  R.push(["Concentración final",fmt(v.conc,0)+" mg/mL",1],["Sulfato de Mg 25% (1 mL = 250 mg = 2 mEq)",fmt(ml25,2)+" mL"],["Magnesio",fmt(meq,2)+" mEq ("+fmt(meq/G.w,2)+" mEq/kg)"]);
+  S.push(`Cargar <b>${fmt(ml25,2)} mL</b> de sulfato de magnesio 25%.`,`Diluir con SF o Dx 5% hasta <b>${fmt(tot,2)} mL</b> (≈ ${fmt(tot-ml25,2)} mL de diluyente).`,`Infundir a <b>${f2(rate)} mL/h</b> en ${fmt(v.h,1)} h. Puede repetirse cada 8–12 h según control.`);
+  if(v.dosis>50)A.push(["bad","Supera la dosis neonatal habitual de 25–50 mg/kg/dosis. La guía cita 100–200 mg/kg, pero es la dosis pediátrica."]);
+  if(v.conc>200)A.push(["bad","La concentración no debe superar 200 mg/mL."]);
+  if(flujo>1)A.push(["bad","Supera la velocidad máxima de 1 mEq/kg/h."]);
+  if(v.mg>=1.5)A.push(["info","Mg ≥ 1,5 mg/dL: dentro del rango normal (1,5–2,3 mg/dL)."]);
+  A.push(["","Monitorear FC, TA y reflejos. Tener gluconato de calcio disponible como antídoto. Precaución con insuficiencia renal o digoxina."]);
+  return{main,R,S,A,src:"Dosis: referencia neonatal habitual (25–50 mg/kg). Presentación, velocidad máxima y valores normales: guía HNRG 2016."};
+ }},
+/* ---------------- BICARBONATO ---------------- */
+{id:"hco3",name:"Acidosis metabólica · bicarbonato",group:"Ácido-base",c:"var(--hco3)",
+ fields:[num("hco3","HCO₃⁻ plasmático","mEq/L",9),num("ph","pH","",7.08),
+  sel("tipo","Tipo de acidosis",[["gap","Anión GAP aumentado · objetivo 12"],["hcl","Hiperclorémica / pérdidas · objetivo 15"]],"hcl"),
+  sel("vel","Corrección",[["rap","Rápida (0,3 × peso × Δ)"],["len","Lenta (0,6 × peso × Δ)"]],"rap"),
+  num("h","Tiempo de infusión","h",1),
+  sel("dil","Dilución",[["6","1/6 M (0,166 mEq/mL) · guía"],["2","0,5 mEq/mL (1:1) · neonatal"]],"6")],
+ calc(v){
+  const A=[],R=[],S=[];const obj=v.tipo==="gap"?12:15, d=obj-v.hco3, fac=v.vel==="rap"?0.3:0.6;
+  if(!(d>0))return{main:{v:"—",u:"",l:`HCO₃⁻ ≥ ${obj} mEq/L: sin corrección`},R,S,A,src:SRC.guia};
+  const meq=fac*G.w*d, dil=v.dil==="6"?5*meq:meq, tot=meq+dil, rate=tot/v.h, c=v.dil==="6"?0.166:0.5;
+  const main={v:f2(rate),u:"mL/h",l:"Bicarbonato de sodio diluido",meta:[`${fmt(tot,1)} mL en ${fmt(v.h,1)} h`,`${fmt(meq,1)} mEq HCO₃⁻`]};
+  R.push(["Concentración final",fmt(c,3)+" mEq/mL",1],["HCO₃⁻ a infundir",fmt(meq,1)+" mEq"],["Bicarbonato de Na 1 M (1 mL = 1 mEq)",fmt(meq,1)+" mL"],["HCO₃⁻ objetivo",obj+" mEq/L"]);
+  S.push(`Cargar <b>${fmt(meq,1)} mL</b> de bicarbonato de sodio 1 M.`,`Diluir con <b>${fmt(dil,1)} mL</b> de agua destilada o Dx 5% (total ${fmt(tot,1)} mL).`,`Infundir a <b>${f2(rate)} mL/h</b> en ${fmt(v.h,1)} h.`,
+    `Alternativa de la guía: 1–2 mL/kg de solución 1/6 M (${fmt(G.w,1)}–${fmt(2*G.w,1)} mL) en 30–60 min, que sube el HCO₃⁻ ≈ 5 mEq/L.`);
+  if(v.vel==="rap"&&(v.h<1||v.h>2))A.push(["","La corrección rápida se pasa en 1–2 h."]);
+  if(v.vel==="len"&&v.h<12)A.push(["","La corrección lenta se pasa en 12–24 h."]);
+  if(isFinite(v.ph)&&v.ph>=7.1&&v.hco3>=10)A.push(["info","La guía indica corrección con pH < 7,10 y/o HCO₃⁻ < 10 mEq/L. Entre 7,10 y 7,20, según causa y clínica."]);
+  A.push(["","En prematuros evitar infusiones rápidas e hipertónicas (riesgo de hemorragia intraventricular). Asegurar ventilación adecuada y corregir antes la hipocalcemia."]);
+  return{main,R,S,A,src:SRC.guia+" Dilución 0,5 mEq/mL: práctica neonatal habitual."};
+ }},
+/* ---------------- GLUCOSA ---------------- */
+{id:"glu",name:"Glucosa · flujo e hipoglucemia",group:"Glucosa",c:"var(--glu)",
+ fields:[sel("modo","Cálculo",[["gir","Flujo de glucosa de una solución"],["prep","Preparar solución para un flujo deseado"],["bolo","Bolo por hipoglucemia"]],"gir"),
+  num("vol","Volumen","mL/kg/día",80,v=>v.modo!=="bolo"),num("pct","Concentración de dextrosa","%",10,v=>v.modo==="gir"),
+  num("gir","Flujo deseado","mg/kg/min",6,v=>v.modo==="prep"),num("base","Dextrosa de base","%",10,v=>v.modo==="prep"),num("alta","Dextrosa concentrada","%",50,v=>v.modo==="prep"),
+  num("glu","Glucemia","mg/dL",35,v=>v.modo==="bolo"),num("bml","Dx 10%","mL/kg",2,v=>v.modo==="bolo")],
+ calc(v){
+  const A=[],R=[],S=[];let main;
+  if(v.modo==="gir"){
+    const gir=v.pct*v.vol/144, rate=v.vol*G.w/24;
+    main={v:fmt(gir,1),u:"mg/kg/min",l:`Flujo de glucosa · Dx ${fmt(v.pct,1)}%`,meta:[`${f2(rate)} mL/h`,`${fmt(v.vol*G.w,0)} mL/día`]};
+    R.push(["Flujo de glucosa",fmt(gir,2)+" mg/kg/min",1],["Velocidad",f2(rate)+" mL/h"],["Glucosa aportada",fmt(v.pct*v.vol/100,1)+" g/kg/día"]);
+    S.push("Flujo (mg/kg/min) = % dextrosa × mL/kg/día ÷ 144.");
+    if(v.pct>12.5)A.push(["bad","Dextrosa > 12,5%: requiere acceso venoso central."]);
+    if(gir>12)A.push(["","Flujo > 12 mg/kg/min: evaluar causas de hiperinsulinismo y riesgo de hiperglucemia."]);
+  }else if(v.modo==="prep"){
+    const need=v.gir*144/v.vol, tot=v.vol*G.w, rate=tot/24;
+    main={v:fmt(need,1),u:"%",l:"Dextrosa necesaria",meta:[`${f2(rate)} mL/h`,`${fmt(tot,0)} mL/día`,`Flujo ${fmt(v.gir,1)} mg/kg/min`]};
+    R.push(["Concentración final",fmt(need,2)+" % de dextrosa",1],["Volumen para 24 h",fmt(tot,0)+" mL"]);
+    if(need<v.base)A.push(["",`La concentración necesaria es menor que la dextrosa de base (${fmt(v.base,0)}%). Usá una base más diluida.`]);
+    else if(need>v.alta)A.push(["bad","No se puede lograr con estas soluciones: aumentá el volumen o usá una dextrosa más concentrada."]);
+    else{const x=tot*(need-v.base)/(v.alta-v.base), y=tot-x;
+      R.push([`Dx ${fmt(v.alta,0)}%`,fmt(x,1)+" mL"],[`Dx ${fmt(v.base,0)}%`,fmt(y,1)+" mL"]);
+      S.push(`Mezclar <b>${fmt(y,1)} mL</b> de Dx ${fmt(v.base,0)}% + <b>${fmt(x,1)} mL</b> de Dx ${fmt(v.alta,0)}%.`,`Infundir a <b>${f2(rate)} mL/h</b> durante 24 h.`,"Sumar los electrolitos de mantenimiento según indicación.");}
+    if(need>12.5)A.push(["bad","Dextrosa > 12,5%: requiere acceso venoso central."]);
+  }else{
+    const ml=v.bml*G.w;
+    main={v:fmt(ml,1),u:"mL",l:"Dx 10% en bolo",meta:[`${fmt(ml*100,0)} mg de glucosa`,`${fmt(v.bml*100,0)} mg/kg`]};
+    R.push(["Dx 10% (100 mg/mL)",fmt(ml,1)+" mL",1],["Glucosa",fmt(v.bml*100,0)+" mg/kg"]);
+    S.push(`Administrar <b>${fmt(ml,1)} mL</b> de Dx 10% EV lento.`,"Continuar con infusión a 6–8 mg/kg/min (módulo «Preparar solución»).","Control de glucemia a los 30 minutos y según protocolo.");
+    if(v.bml>2)A.push(["","El bolo habitual es 2 mL/kg de Dx 10% (200 mg/kg). Evitar bolos hipertónicos: hiperglucemia de rebote."]);
+    A.push(["info","Los umbrales de intervención dependen de la edad y del protocolo de tu unidad."]);
+  }
+  return{main,R,S,A,src:SRC.neo};
+ }}
+];
+
+const ECOMP={"gluca": {"I": ["Anfotericina B", "Bicarbonato de sodio", "Cefalotina", "Dexametasona", "Diazepan", "Difenilhidantoína", "Fosfatos", "Metilprednisolona", "TMP-SMX"], "V": ["Ampicilina", "Ampicilina-sulbactam", "Fluconazol", "Hidrocortisona", "Imipenem", "Sulfato de magnesio", "Meropenem"], "C": ["Aciclovir", "Adrenalina", "Amikacina", "Aminofilina", "Amiodarona", "Cloruro de calcio", "Caspofungin", "Cefotaxima", "Ceftazidima", "Ciprofloxacina", "Clindamicina", "Dexmedetomidina", "Dobutamina", "Dopamina", "Esmolol", "Fenobarbital", "Fentanilo", "Furosemida", "Ganciclovir", "Gentamicina", "Heparina", "Insulina regular", "Lidocaína", "Linezolide", "Lorazepam", "Metoclopramida", "Midazolam", "Milrinona", "Morfina", "Nitroprusiato de sodio", "Noradrenalina", "Octreotide", "Piperacilina-tazobactam", "Cloruro de potasio", "Ranitidina", "Vancomicina", "Vasopresina", "Vecuronio", "Voriconazol"]}, "mgso4": {"I": ["Aminofilina", "Anfotericina B", "Cloruro de calcio", "Ciprofloxacina", "Dexametasona", "Diazepan", "Difenilhidantoína", "Metilprednisolona", "Tiopental"], "V": ["Amiodarona", "Ampicilina", "Ampicilina-sulbactam", "Gluconato de calcio", "Furosemida", "Ganciclovir", "Hidrocortisona", "TMP-SMX"], "C": ["Aciclovir", "Adrenalina", "Amikacina", "Bicarbonato de sodio", "Caspofungin", "Cefalotina", "Cefotaxima", "Ceftazidima", "Clindamicina", "Clonidina", "Dexmedetomidina", "Dobutamina", "Dopamina", "Esmolol", "Fenobarbital", "Fentanilo", "Fluconazol", "Gentamicina", "Heparina", "Imipenem", "Insulina regular", "Lidocaína", "Linezolide", "Lorazepam", "Metoclopramida", "Metronidazol", "Midazolam", "Milrinona", "Morfina", "Nitroprusiato de sodio", "Noradrenalina", "Piperacilina-tazobactam", "Cloruro de potasio", "Ranitidina", "Vancomicina", "Vasopresina", "Vecuronio", "Voriconazol"]}, "kcl": {"I": ["Anfotericina B", "Diazepan", "Difenilhidantoína", "TMP-SMX"], "V": ["Ampicilina", "Ampicilina-sulbactam", "Metilprednisolona"], "C": ["Aciclovir", "Adrenalina", "Alprostadil", "Amikacina", "Aminofilina", "Amiodarona", "Bicarbonato de sodio", "Cloruro de calcio", "Gluconato de calcio", "Caspofungin", "Cefalotina", "Cefotaxima", "Ceftazidima", "Ciprofloxacina", "Claritromicina", "Clindamicina", "Clonidina", "Dexametasona", "Dexmedetomidina", "Dobutamina", "Dopamina", "Esmolol", "Fenobarbital", "Fentanilo", "Fluconazol", "Furosemida", "Ganciclovir", "Gentamicina", "Heparina", "Hidrocortisona", "Imipenem", "Insulina regular", "Lidocaína", "Linezolide", "Lorazepam", "Sulfato de magnesio", "Meropenem", "Metoclopramida", "Midazolam", "Milrinona", "Morfina", "Nitroprusiato de sodio", "Noradrenalina", "Octreotide", "Piperacilina-tazobactam", "Ranitidina", "Vancomicina", "Vasopresina", "Vecuronio", "Voriconazol"]}, "bic": {"I": ["Adrenalina", "Amiodarona", "Ampicilina", "Anfotericina B", "Cloruro de calcio", "Gluconato de calcio", "Caspofungin", "Cefotaxima", "Diazepan", "Difenilhidantoína", "Dobutamina", "Ganciclovir", "Imipenem", "Midazolam", "Noradrenalina", "Tiopental", "TMP-SMX"], "V": ["Ampicilina-sulbactam", "Ciprofloxacina", "Dopamina"], "C": ["Aciclovir", "Amikacina", "Aminofilina", "Cefalotina", "Ceftazidima", "Clindamicina", "Dexametasona", "Dexmedetomidina", "Esmolol", "Fenobarbital", "Fentanilo", "Fluconazol", "Furosemida", "Gentamicina", "Heparina", "Hidrocortisona", "Insulina regular", "Lidocaína", "Linezolide", "Lorazepam", "Sulfato de magnesio", "Metilprednisolona", "Metoclopramida", "Milrinona", "Morfina", "Nitroprusiato de sodio", "Piperacilina-tazobactam", "Cloruro de potasio", "Ranitidina", "Vancomicina", "Vasopresina", "Vecuronio", "Voriconazol"]}, "ins": {"I": ["Diazepan", "Difenilhidantoína", "Piperacilina-tazobactam", "Tiopental", "TMP-SMX"], "V": ["Adrenalina", "Amikacina", "Ampicilina", "Ampicilina-sulbactam", "Dobutamina", "Dopamina", "Gentamicina", "Midazolam", "Morfina", "Noradrenalina", "Ranitidina", "Vasopresina"], "C": ["Aciclovir", "Aminofilina", "Amiodarona", "Bicarbonato de sodio", "Cloruro de calcio", "Gluconato de calcio", "Caspofungin", "Cefalotina", "Cefotaxima", "Ceftazidima", "Ciprofloxacina", "Claritromicina", "Clindamicina", "Dexametasona", "Dexmedetomidina", "Esmolol", "Fenobarbital", "Fentanilo", "Fluconazol", "Furosemida", "Ganciclovir", "Heparina", "Hidrocortisona", "Imipenem", "Lidocaína", "Linezolide", "Lorazepam", "Sulfato de magnesio", "Meropenem", "Metilprednisolona", "Metoclopramida", "Milrinona", "Nitroprusiato de sodio", "Cloruro de potasio", "Vancomicina", "Vecuronio", "Voriconazol"]}, "furo": {"I": ["Caspofungin", "Ciprofloxacina", "Claritromicina", "Diazepan", "Difenilhidantoína", "Esmolol", "Midazolam", "Milrinona", "TMP-SMX", "Vancomicina", "Vecuronio"], "V": ["Amiodarona", "Ampicilina", "Ampicilina-sulbactam", "Dobutamina", "Dopamina", "Fluconazol", "Gentamicina", "Sulfato de magnesio", "Metoclopramida", "Morfina", "Noradrenalina", "Vasopresina"], "C": ["Aciclovir", "Adrenalina", "Alprostadil", "Amikacina", "Aminofilina", "Bicarbonato de sodio", "Cloruro de calcio", "Gluconato de calcio", "Cefalotina", "Cefotaxima", "Ceftazidima", "Clindamicina", "Dexametasona", "Dexmedetomidina", "Fenobarbital", "Fentanilo", "Foscarnet", "Ganciclovir", "Heparina", "Hidrocortisona", "Imipenem", "Insulina regular", "Lidocaína", "Linezolide", "Lorazepam", "Meropenem", "Metilprednisolona", "Nitroprusiato de sodio", "Octreotide", "Piperacilina-tazobactam", "Cloruro de potasio", "Ranitidina", "Tiopental", "Voriconazol"]}};
+const MODCOMP={hipok:[["kcl","Cloruro de potasio"]],hiperk:[["gluca","Gluconato de calcio"],["bic","Bicarbonato de sodio"],["ins","Insulina regular"],["furo","Furosemida"]],hipoca:[["gluca","Gluconato de calcio"]],hipomg:[["mgso4","Sulfato de magnesio"]],hco3:[["bic","Bicarbonato de sodio"]]};
+function compBlock(id){const L=MODCOMP[id];if(!L)return"";
+  const pills=(a,k)=>a.map(x=>`<span class="pill ${k}">${x}</span>`).join("");
+  const grp=(k,t,a)=>a.length?`<div class="cg ${k}"><b>${t} (${a.length})</b>${pills(a,k)}</div>`:"";
+  return `<details class="cmpbox"${L.length===1?" open":""}><summary>Compatibilidad en Y</summary><div class="comp">`+L.map(([k,n])=>{const c=ECOMP[k];
+    return `${L.length>1?`<div class="cn">${n}</div>`:""}${grp("I","Incompatibles",c.I)}${grp("V","Compatibilidad variable",c.V)}<details class="more"><summary>Ver compatibles (${c.C.length})</summary><div class="cg C" style="margin-top:6px">${pills(c.C,"C")}</div></details>`}).join("")+
+    `<div class="csrc">Tabla de compatibilidad en Y · Farmacia, Hospital J. P. Garrahan. Se expresa según el solvente de elección. Los fármacos que no figuran no tienen datos: consultá al farmacéutico.</div></div></details>`}
+const VAL={};MODS.forEach(m=>{VAL[m.id]={};m.fields.forEach(f=>VAL[m.id][f.id]=f.type==="sel"?f.def:(f.def===""?NaN:f.def))});
+let cur=MODS[0];
+
+function buildSelect(){
+  const s=$("modSel");const groups=[...new Set(MODS.map(m=>m.group))];
+  groups.forEach(g=>{const og=document.createElement("optgroup");og.label=g;MODS.filter(m=>m.group===g).forEach(m=>{const o=document.createElement("option");o.value=m.id;o.textContent=m.name;og.appendChild(o)});s.appendChild(og)});
+  s.onchange=()=>{cur=MODS.find(m=>m.id===s.value);renderFields();update()};
+}
+function renderFields(){
+  const box=$("fields"),v=VAL[cur.id];box.innerHTML="";
+  $("modSel").parentElement.style.setProperty("--c",cur.c);
+  cur.fields.forEach(f=>{
+    if(f.show&&!f.show(v))return;
+    const d=document.createElement("div");d.className="field"+(f.type==="sel"||f.full?" full":"");
+    const id="f_"+cur.id+"_"+f.id;
+    if(f.type==="sel"){
+      d.innerHTML=`<label for="${id}">${f.label}</label><div class="selwrap plain"><select id="${id}">${f.opts.map(o=>`<option value="${o[0]}"${o[0]===v[f.id]?" selected":""}>${o[1]}</option>`).join("")}</select></div>`;
+      d.querySelector("select").onchange=e=>{v[f.id]=e.target.value;renderFields();update()};
+    }else{
+      d.innerHTML=`<label for="${id}">${f.label}</label><div class="inrow"><input id="${id}" inputmode="decimal" autocomplete="off" value="${isFinite(v[f.id])?fmt(v[f.id],3):""}"><span>${f.unit||""}</span></div>`;
+      d.querySelector("input").oninput=e=>{v[f.id]=parse(e.target.value);update()};
+    }
+    box.appendChild(d);
+  });
+}
+function update(){
+  const r=cur.calc(VAL[cur.id]),m=r.main;
+  const p=$("pump");p.style.setProperty("--c",cur.c);
+  p.innerHTML=`<div><div class="drug"><i></i>${cur.name}</div><div class="sub" style="color:inherit;opacity:.8">${m.l} · ${fmt(G.w,2)} kg</div></div>
+    <div class="rate${m.txt?" txt":""}">${m.v}${m.u?`<small>${m.u}</small>`:""}</div>
+    ${m.meta?`<div class="meta">${m.meta.map(x=>`<span>${x}</span>`).join("")}</div>`:""}`;
+  $("recipe").innerHTML=(r.R.length?r.R.map(([k,val,hl])=>`<div class="line${hl?" conc":""}"><span>${k}</span><b>${val}</b></div>`).join(""):`<div class="sub">Sin corrección para los datos ingresados.</div>`)+
+    (r.S.length?`<ol class="steps">${r.S.map(s=>`<li>${s}</li>`).join("")}</ol>`:"");
+  const A=[...r.A];if(!(G.w>=0.3&&G.w<=15))A.unshift(["bad","Revisá el peso: está fuera del rango esperable."]);
+  $("alerts").innerHTML=A.map(([t,x])=>`<div class="alert ${t}">${x}</div>`).join("");
+  $("tbl").innerHTML=r.T?`<table><thead><tr>${r.T.h.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${r.T.rows.map(row=>`<tr><td><b>${row[0]}</b></td><td>${row[1]}</td><td class="n">${row[2]}</td><td>${row[3]}</td></tr>`).join("")}</tbody></table>`:"";
+  $("src").textContent=r.src||"";
+  $("cmp").innerHTML=compBlock(cur.id);
+}
+
+// paciente
+function setW(w){G.w=w;update()}
+$("peso").oninput=e=>setW(parse(e.target.value)/1000);
+$("wMinus").onclick=()=>{G.w=Math.max(0.1,+((G.w||0)-0.1).toFixed(2));$("peso").value=fmt(G.w*1000,0);update()};
+$("wPlus").onclick=()=>{G.w=+((G.w||0)+0.1).toFixed(2);$("peso").value=fmt(G.w*1000,0);update()};
+$("cat").onchange=e=>{G.cat=e.target.value;G.act=ACT[G.cat];$("act").value=fmt(G.act,2);update()};
+$("act").oninput=e=>{G.act=parse(e.target.value);update()};
+$("act").value=fmt(G.act,2);
+
+// fórmulas
+const REFS=[
+ ["Hiponatremia","var(--na)","guia",`Déficit de Na⁺ (mEq) = ACT × peso × (Na⁺ objetivo − Na⁺ real)
+Na⁺ objetivo ≤ 125 · delta ≤ 6–8 mEq/L en 24 h
+ClNa 3% = 0,51 mEq/mL → mL = mEq ÷ 0,51
+Horas = delta ÷ ritmo (1 mEq/L/h asintomática; 2–6 sintomática aguda)
+Sintomática: 3–5 mL/kg de ClNa 3% en 20 min
+ClNa 3% = 15 mL ClNa 20% + 85 mL agua destilada
+Na⁺ corregido = Na⁺ + 1,6 × (glucemia − 100) / 100`],
+ ["Hipernatremia · agua libre","var(--na)","guia",`1) Déficit = 0,6 × peso − 0,6 × peso × 145 / Na⁺ real
+2) Déficit = ACT × (Na⁺ − 145) / 145
+3) Déficit = 4 mL/kg × (Na⁺ − 145)
+Administrar como SS 0,45% → volumen × 2
+Tiempo: Na⁺ 145–157: 24 h · 158–170: 48 h · 171–183: 72 h · 184–196: 84 h
+Descenso ≤ 0,5 mEq/L/h o 10–12 mEq/L/día
+Convulsiones/coma: Dx 2,5% 4 mL/kg en bolo (baja ≈ 1 mEq/L)`],
+ ["Hipokalemia","var(--k)","guia",`EV: 1 mEq/kg/dosis (máx. 40 mEq) en 3 h · flujo ≤ 0,5 mEq/kg/h
+ClK 3 M: 1 mL = 3 mEq · diluir en SF 0,9%
+Concentración: periférica ≤ 40–60 mEq/L · central ≤ 120–150 mEq/L
+Flujo de un plan = mL/kg/día × [K⁺] mEq/L ÷ 1000 ÷ 24`],
+ ["Hiperkalemia","var(--k)","guia",`Gluconato de Ca 10%: 0,5–1 mL/kg en 5–10 min
+Bicarbonato 1 M: 1–2 mEq/kg en 5–10 min (si acidosis)
+Insulina 0,1 U/kg + Dx 10% 5–10 mL/kg en 30–60 min
+Furosemida 1–2 mg/kg/dosis c/6–12 h
+Resinas: 0,5–1 g/kg rectal`],
+ ["Hipocalcemia","var(--ca)","guia",`Ca corregido = Ca total + 0,8 × (4 − albúmina)
+Hipocalcemia RNT: CaT < 8 · Cai < 3,2 mg/dL (< 0,8 mmol/L)
+Hipocalcemia RNPT: CaT < 7 · Cai < 2,4 mg/dL (< 0,6 mmol/L)
+Gluconato de Ca 10%: 1 mL = 9 mg Ca elemental
+Bolo: 1–2 mL/kg, máx. 1 mL/min · Infusión: 4 mL/kg/día (máx. 40 mL/día)
+Concentración máxima: 0,5 mL de gluconato por mL`],
+ ["Hipomagnesemia","var(--mg)","neo",`Neonatal: sulfato de Mg 25–50 mg/kg/dosis EV en 2–4 h, c/8–12 h
+Guía (pediátrica): 0,8–1,6 mEq/kg (100–200 mg/kg de sulfato)
+Sulfato de Mg 25%: 1 mL = 250 mg = 25 mg Mg elemental = 2 mEq
+Velocidad máxima: 1 mEq/kg/h · normal 1,5–2,3 mg/dL`],
+ ["Bicarbonato","var(--hco3)","guia",`Rápida: 0,3 × peso × (HCO₃⁻ objetivo − real) = mL de HCO₃Na 1 M en 1–2 h
+Lenta: 0,6 × peso × (objetivo − real) en 12–24 h
+Objetivo: 12 (GAP aumentado) · 15 (hiperclorémica)
+Indicación: pH < 7,10 y/o HCO₃⁻ < 10
+1/6 M: 1 parte de HCO₃Na 1 M + 5 partes de agua o Dx 5%
+Alternativa: 1–2 mL/kg de 1/6 M en 30–60 min (≈ +5 mEq/L)`],
+ ["Glucosa","var(--glu)","neo",`Flujo (mg/kg/min) = % dextrosa × mL/kg/día ÷ 144
+% necesario = flujo × 144 ÷ mL/kg/día
+Bolo: Dx 10% 2 mL/kg (200 mg/kg) y luego 6–8 mg/kg/min
+Periférica: dextrosa ≤ 12,5%`]
+];
+$("refs").innerHTML=REFS.map(([n,c,s,f])=>`<details class="card" style="--c:${c}"><summary>${n}<span class="sub">${s==="neo"?'<span class="tag">Ajuste neonatal</span>':"Guía HNRG"}</span></summary><div class="mbody"><div class="f">${f}</div></div></details>`).join("")+
+ `<details class="card" style="--c:var(--accent)"><summary>Agua corporal total<span class="sub">Ajuste neonatal</span></summary><div class="mbody"><p>La guía usa ACT 0,6 (niños). En neonatos el agua corporal es mayor: por defecto la calculadora usa 0,9 en prematuros y 0,75 en recién nacidos de término. Podés modificarlo en el campo «Agua corporal total».</p></div></details>`;
+
+function show(v){const c=v!=="ref";$("view-calc").hidden=!c;$("view-ref").hidden=c;$("tCalc").setAttribute("aria-selected",c);$("tRef").setAttribute("aria-selected",!c);window.scrollTo(0,0)}
+$("tCalc").onclick=()=>show("calc");$("tRef").onclick=()=>show("ref");
+
+buildSelect();renderFields();update();
+if(location.hash==="#formulas")show("ref");
+</script>
+
+<script src="paciente.js?v=v37"></script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Antimicrobianos neonatales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: misma línea que las otras pestañas — tarjeta del paciente arriba, buscador y lista de antimicrobianos con la dosis ya calculada; acento ámbar */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#fbf2e4; --line:#f0e1c8; --fg:#2e3147; --muted:#6c7090; --accent:#a35a00; --accent-soft:#ffe6c2; --mint:#dcf2ec; --mint-fg:#2b6a60; --peach:#fff4d6; --peach-fg:#86590a; --rose:#ffe3e8; --rose-fg:#a12d40; --sky:#e6f0fb; --sky-fg:#2f5f93;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#ffc277; --accent-soft:#3d2e19; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }}
+:root[data-theme="dark"]{ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#ffc277; --accent-soft:#3d2e19; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header h1{font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+label .u{font-family:var(--mono);font-size:.7rem;opacity:.8}
+input,select{font:inherit;font-family:var(--mono);font-size:1rem;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+input:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.tile{background:var(--sunk);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-family:var(--mono);font-size:1.15rem;font-weight:600}
+.tile.main{background:var(--accent-soft)}
+.cols{display:flex;flex-wrap:wrap;gap:6px}
+.cols button{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:.78rem;font-weight:600;padding:6px 10px;border-radius:999px;cursor:pointer}
+.cols button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.pill{padding:8px 10px;border-radius:10px;font-size:.85rem}
+.pill.warn{background:var(--peach);color:var(--peach-fg)}
+.pill.crit{background:var(--rose);color:var(--rose-fg)}
+.pill.info{background:var(--sky);color:var(--sky-fg)}
+.pill.ok{background:var(--mint);color:var(--mint-fg)}
+.search{font-family:var(--body)}
+.list{display:flex;flex-direction:column;gap:8px}
+details.d{border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+details.d summary{cursor:pointer;list-style:none;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}
+details.d summary::-webkit-details-marker{display:none}
+details.d summary .nm{font-weight:700}
+details.d summary .vi{font-size:.75rem;color:var(--muted)}
+details.d summary .ds{grid-row:1/3;grid-column:2;text-align:right;font-family:var(--mono);font-size:.85rem;font-weight:600;color:var(--accent)}
+details.d summary .ds small{display:block;font-size:.72rem;color:var(--muted);font-weight:500}
+details.d summary .ds.na{color:var(--muted)}
+.db{padding:0 12px 12px;display:flex;flex-direction:column;gap:10px}
+.var{border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:6px}
+.var .vn{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
+table.row{width:100%;border-collapse:collapse;font-size:.76rem}
+table.row td,table.row th{border:1px solid var(--line);padding:4px 5px;text-align:center;font-family:var(--mono)}
+table.row th{font-family:var(--body);font-size:.66rem;color:var(--muted);font-weight:600}
+table.row td.cur{background:var(--accent-soft);font-weight:700}
+ul.obs{margin:0;padding-left:18px;font-size:.86rem;display:flex;flex-direction:column;gap:3px}
+.prof{display:flex;flex-direction:column;gap:8px}
+.prof .it{border-top:1px solid var(--line);padding-top:8px;font-size:.88rem}
+.prof .it b{display:block;font-size:.8rem;color:var(--accent);margin-bottom:2px}
+.prof .calc{font-family:var(--mono);font-weight:600}
+footer{font-size:.75rem;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:4px}
+.seg button{border:0;background:transparent;color:var(--fg);font:inherit;font-size:.82rem;font-weight:600;padding:8px 6px;border-radius:9px;cursor:pointer;line-height:1.2}
+.seg button small{display:block;font-size:.66rem;font-weight:500;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.12);color:var(--accent)}
+.seg button[data-src="tk"][aria-pressed="true"],.seg button[data-src="cmp"][aria-pressed="true"]{color:var(--or-fg)}
+:root{--or:#ffe4cc;--or-fg:#9a3c00;--or-line:#f6b27a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--or:#46280f;--or-fg:#ffc28f;--or-line:#8a4a1c}}
+:root[data-theme="dark"]{--or:#46280f;--or-fg:#ffc28f;--or-line:#8a4a1c}
+.tkban{background:var(--or);color:var(--or-fg);border:1.5px solid var(--or-line);border-radius:12px;padding:10px 12px;font-size:.84rem;display:flex;gap:10px;align-items:flex-start}
+.tkban b{display:block;font-size:.9rem;margin-bottom:2px}
+.tkban .ic{font-size:1.2rem;line-height:1}
+.card.tk h2{color:var(--or-fg)}
+.tkgrp{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:8px 2px 0}
+details.d.tkd{border-left:4px solid var(--or-line)}
+details.d.tkd summary .ds{color:var(--or-fg)}
+.badge{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;vertical-align:middle;margin-left:6px}
+.badge.dif{background:var(--or);color:var(--or-fg);border:1px solid var(--or-line)}
+.badge.eq{background:var(--mint);color:var(--mint-fg)}
+.badge.man{background:var(--sunk);color:var(--muted);border:1px solid var(--line)}
+.badge.src{background:var(--or);color:var(--or-fg)}
+.pill.or{background:var(--or);color:var(--or-fg)}
+.bands{display:flex;flex-direction:column;gap:3px;font-size:.8rem;font-family:var(--mono)}
+.bands div{padding:3px 8px;border-radius:7px;background:var(--sunk)}
+.bands div.cur{background:var(--or);color:var(--or-fg);font-weight:700}
+.cmp{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.cmp.isdif{border-color:var(--or-line);box-shadow:inset 4px 0 0 var(--or-line)}
+.cmp .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cmp .hd .nm{font-weight:700}
+.cmprow{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:6px}
+.cmprow .vn{font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.two>div{border-radius:10px;padding:7px 9px;font-size:.84rem;background:var(--sunk)}
+.two>div.g{background:var(--sky);color:var(--sky-fg)}
+.two>div.t{background:var(--or);color:var(--or-fg)}
+.two>div.t.same{background:var(--sunk);color:var(--fg)}
+.two .lb{display:block;font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;opacity:.8;margin-bottom:2px}
+.two .v{font-family:var(--mono);font-weight:700}
+.two small{display:block;font-size:.72rem;opacity:.85}
+.chk{display:flex;flex-direction:row;align-items:center;gap:8px;font-size:.84rem;color:var(--fg)}
+.chk input{width:auto}
+.tkmeta{font-size:.74rem;color:var(--muted)}
+
+</style>
+<style id="tema-vivo">
+:root{--bg:#fdf7ee;--sunk:#fbeedb;--line:#f1dcba;--accent:#a35400;--accent-soft:#ffdcae;--glow:#ffe9c9;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#3a2c18;}}
+:root[data-theme="dark"]{--glow:#3a2c18;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Antimicrobianos neonatales</h1>
+    <p>Dosis por peso y edad según la tabla de neonatología del Hospital Garrahan, versión 2024. Consulta comparativa opcional con el Taketomo 18.ª ed. (2011).</p>
+  </header>
+
+  <section class="card" id="s-pac">
+    <h2>Paciente</h2>
+    <div class="grid">
+      <label for="pPeso">Peso actual <span class="u">gramos</span><input id="pPeso" inputmode="numeric" autocomplete="off" placeholder="1850"></label>
+      <label for="pDias">Edad postnatal <span class="u">días de vida</span><input id="pDias" inputmode="numeric" autocomplete="off" placeholder="5"></label>
+      <label for="pEG">EG al nacer <span class="u">semanas</span><input id="pEG" inputmode="decimal" autocomplete="off" placeholder="33"></label>
+    </div>
+    <div id="rPac"></div>
+    <div>
+      <div class="hint" style="margin-bottom:6px">Columna de la tabla (elegida sola; tocá otra para cambiarla):</div>
+      <div class="cols" id="cols"></div>
+    </div>
+  </section>
+
+  <section class="card" id="s-src">
+    <h2>Fuente</h2>
+    <div class="seg" role="group" aria-label="Fuente de dosis">
+      <button data-src="gar" aria-pressed="true">Garrahan 2024<small>principal</small></button>
+      <button data-src="tk" aria-pressed="false">Taketomo 2011<small>consulta</small></button>
+      <button data-src="cmp" aria-pressed="false">Comparar<small>lado a lado</small></button>
+    </div>
+  </section>
+
+  <section class="card" id="s-gar">
+    <h2>Antimicrobianos · Garrahan 2024</h2>
+    <input class="search" id="q" type="search" placeholder="Buscar antimicrobiano…" aria-label="Buscar antimicrobiano">
+    <div class="list" id="list"></div>
+  </section>
+
+  <section class="card tk" id="s-tk" hidden>
+    <h2>Antimicrobianos · Taketomo 2011</h2>
+    <div class="tkban" id="tkBanner"><span class="ic">⚠</span><div><b>Taketomo 18.ª ed. (2011) – referencia histórica, puede estar desactualizada</b>Manual de prescripción pediátrica y neonatal, edición en español con contenido cerrado hacia enero de 2011. La fuente principal de la app sigue siendo Garrahan 2024. Dosis resumidas y transcriptas desde el libro: verificá en la página indicada.</div></div>
+    <input class="search" id="tq" type="search" placeholder="Buscar en el Taketomo (nombre o grupo)…" aria-label="Buscar en el Taketomo">
+    <div class="list" id="tklist"></div>
+  </section>
+
+  <section class="card tk" id="s-cmp" hidden>
+    <h2>Comparación Garrahan 2024 vs Taketomo 2011</h2>
+    <div class="tkban" id="cmpBanner"><span class="ic">⚠</span><div><b>Taketomo 18.ª ed. (2011) – referencia histórica, puede estar desactualizada</b>Manual de prescripción pediátrica y neonatal, edición en español con contenido cerrado hacia enero de 2011. La fuente principal de la app sigue siendo Garrahan 2024. Dosis resumidas y transcriptas desde el libro: verificá en la página indicada.</div></div>
+    <div class="hint">Se compara la dosis por toma y el intervalo para el paciente cargado. <span class="badge eq">Coinciden</span> rangos superpuestos · <span class="badge dif">Difiere</span> dosis o intervalo distinto · <span class="badge man">A mano</span> sin dato comparable.</div>
+    <label class="chk"><input type="checkbox" id="onlyDif"> Mostrar solo los que difieren</label>
+    <input class="search" id="cq" type="search" placeholder="Buscar…" aria-label="Buscar en la comparación">
+    <div class="list" id="cmplist"></div>
+  </section>
+
+  <section class="card" id="s-prof">
+    <h2>Profilaxis y descolonización</h2>
+    <div class="prof" id="prof"></div>
+  </section>
+
+  <footer>
+    Fuente: Tabla de dosis de antimicrobianos en neonatología, versión 2024. Travaglianti M, Berberian G, Castro G. Terapia Intensiva Neonatal, Farmacia y Epidemiología e Infectología, Hospital de Pediatría J. P. Garrahan, Buenos Aires.
+    Abreviaturas: FQP fibrosis quística del páncreas; IRA insuficiencia renal aguda; ITU infección urinaria; OMR microorganismos multirresistentes; RNPT/RNT recién nacido pretérmino/de término; EG edad gestacional.
+    <br>Consulta comparativa: Taketomo CK, Hodding JH, Kraus DM. Manual de prescripción pediátrica y neonatal, 18.ª ed. en español (contenido ~2011). Referencia histórica; no reemplaza a la fuente principal.
+    <br>Herramienta de apoyo: verificá la dosis con la tabla original, la función renal y hepática y el criterio de Infectología.
+  </footer>
+</div>
+
+<script src="taketomo.js?v=v37"></script>
+<script>
+// Tabla de dosis de antimicrobianos en neonatología – Versión 2024 (Hospital de Pediatría J. P. Garrahan).
+// Columnas: c0 <1200 g 0–4 sem · c1 1200–2000 g 0–7 d · c2 1200–2000 g >7 d · c3 >2000 g 0–7 d · c4 >2000 g >7 d · c5 RNPT >45 sem EG o RNT >1 mes
+// Celdas en mg/kg/dosis "dosis c/intervalo (h)"; '-' = sin dato. "all" = misma indicación para todas las columnas.
+const COLS = [
+  {k:0, n:'< 1200 g · 0–4 semanas'},
+  {k:1, n:'1200–2000 g · 0–7 días'},
+  {k:2, n:'1200–2000 g · > 7 días'},
+  {k:3, n:'> 2000 g · 0–7 días'},
+  {k:4, n:'> 2000 g · > 7 días'},
+  {k:5, n:'RNPT > 45 sem EG corregida o RNT > 1 mes'}
+];
+const ATB = [
+  {id:'aciclovir', n:'Aciclovir', via:'IV', rows:[
+    {v:'Herpes simplex', c:['-','20 c/12','20 c/8','20 c/12','20 c/8','20 c/8']},
+    {v:'Varicela', c:['-','10 c/12','10 c/8','10 c/12','10 c/8','10 c/8']}],
+   obs:['VO: no recomendado como tratamiento inicial.','Varicela VO > 1 mes: 20 c/6.','Profilaxis secundaria de HSV: ver Profilaxis.']},
+  {id:'amikacina', n:'Amikacina', via:'IV-IM', rows:[{c:['7,5 c/24','7,5 c/24','10 c/12','10 c/12','10 c/12','15 c/24']}],
+   obs:['FQP: 10 c/8.'], dosar:'Dosar en la 3.ª dosis. Dosis c/12 h: valle (previo a la dosis) 1–8 µg/mL; pico (30 min posinfusión) 15–40 µg/mL. Dosis c/24 h: valle < 1 µg/mL; pico 35–60 µg/mL.'},
+  {id:'amoxicilina', n:'Amoxicilina', via:'VO', rows:[{c:['-','-','40 c/12','50 c/12','30 c/8','50 c/12 ó 30 c/8']}], obs:['No usar como tratamiento empírico inicial.']},
+  {id:'amoxclav', n:'Amoxicilina-clavulánico', via:'VO', rows:[{c:['-','-','-','15 c/12','15 c/12','15-45 c/12']}], obs:['No usar como tratamiento empírico inicial.']},
+  {id:'ampicilina', n:'Ampicilina', via:'EV-IM', rows:[
+    {v:'Sepsis', c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/6','50 c/6']},
+    {v:'Meningitis', c:['100 c/12','100 c/12','100 c/8','100 c/8','75 c/6','75-100 c/6']}], obs:[]},
+  {id:'ampisulb', n:'Ampicilina-sulbactam', via:'EV', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/6','50 c/8']}], obs:['Alternativa para completar VO: amoxicilina-clavulánico.']},
+  {id:'anfob', n:'Anfotericina B', via:'EV', rows:[{all:'0,5 y luego 1 c/24'}], obs:['Tiempo de infusión: 6 h.']},
+  {id:'anfolip', n:'Anfotericina complejo lipídico', via:'EV (infusión 2,5 mg/kg/h)', rows:[{c:['Inicio 1, luego 3 a 5 c/24','Inicio 1, luego 3 a 5 c/24','Inicio 3, luego 5 c/24','Inicio 3, luego 5 c/24','Inicio 3, luego 5 c/24','Inicio 3, luego 5 c/24']}],
+   obs:['Requiere autorización de Infectología.','Indicación: RN < 1500 g, IRA y/o hipokalemia refractaria.']},
+  {id:'anidula', n:'Anidulafungina', via:'EV', rows:[{all:'Inicio 3, luego 1,5 c/24'}], obs:['Requiere autorización de Infectología.']},
+  {id:'azitro', n:'Azitromicina', via:'VO', rows:[{v:'Bordetella pertussis', all:'10 c/24', dur:'× 5 días'},{v:'Chlamydia trachomatis, Ureaplasma urealyticum', all:'20 c/24', dur:'× 3 días'}], obs:[]},
+  {id:'caspo', n:'Caspofungina', via:'EV', rows:[{all:'2 mg/kg (o 25 mg/m²)'}], obs:['Requiere autorización de Infectología.','Candidiasis invasiva con falla de tratamiento.']},
+  {id:'aztreonam', n:'Aztreonam', via:'EV', rows:[{c:['30 c/24','-','30 c/8','-','30 c/6','30 c/6']}], obs:['Requiere autorización de Infectología.']},
+  {id:'cefalexina', n:'Cefalexina', via:'VO', rows:[{c:['-','-','25 c/8','25 c/12','25 c/8','12,5-25 c/6']}], obs:['Rango de dosis según la gravedad de la enfermedad.']},
+  {id:'cefalotina', n:'Cefalotina', via:'EV', rows:[{c:['20 c/12','20 c/12','20 c/8','20 c/8','20 c/6','25 c/6']}], obs:['Endocarditis: 50 c/6.']},
+  {id:'cefotaxima', n:'Cefotaxima', via:'EV-IM', rows:[
+    {v:'Sepsis', c:['50 c/12','50 c/12','50 c/8','50 c/12','50 c/8','50 c/6']},
+    {v:'Meningitis', c:['100 c/12','100 c/12','100 c/8','100 c/12','75 c/6','75 c/6']}],
+   obs:['Dosis de meningitis en tratamiento empírico inicial: asociar ampicilina.','Oftalmía neonatal gonocócica: homologar dosis de sepsis.']},
+  {id:'ceftazidima', n:'Ceftazidima', via:'EV-IM', rows:[
+    {v:'Sepsis', c:['50 c/12','50 c/12','50 c/8','50 c/12','50 c/8','50 c/8']},
+    {v:'Meningitis', c:['50 c/12','50 c/12','50 c/8','50 c/12','75 c/8','50 c/6']}], obs:['FQP: 50 c/6.']},
+  {id:'ceftazavi', n:'Ceftazidima-avibactam', via:'EV', rows:[{all:'50 c/8'}], obs:['50 mg/kg = 40 de ceftazidima + 10 de avibactam.','Requiere autorización de Infectología.']},
+  {id:'ceftriaxona', n:'Ceftriaxona', via:'EV-IM', rows:[{c:['50 c/24','50 c/24','50 c/24','50 c/24','75 c/24','50-80 c/24']}],
+   obs:['En RN, limitar su uso.','Meningitis: 100 c/24.','No usar como tratamiento empírico inicial. Individualizar.']},
+  {id:'cefuroxima', n:'Cefuroxima', via:'EV-IM', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/8','50 c/8']}], obs:['No se recomienda en meningitis.']},
+  {id:'cipro', n:'Ciprofloxacina', via:'EV-VO', rows:[{c:['10 c/24','7,5 c/12','7,5 c/12','12,5 c/24','12,5 c/12','10-15 c/12']}], obs:['No usar como tratamiento empírico inicial.','FQP: 20 c/12.']},
+  {id:'claritro', n:'Claritromicina', via:'EV-VO', rows:[{c:['-','-','-','-','-','7,5 c/12']}], obs:['< 1 mes: consultar con Infectología.']},
+  {id:'clinda', n:'Clindamicina', via:'EV-VO', rows:[{c:['5 c/12','5 c/8','5 c/8','7,5 c/8','7,5 c/6','7,5 c/6 ó 10 c/8'], c0b:'5 c/8', c0d:14}], obs:['< 1200 g con > 14 días: 5 c/8.','Precaución en disfunción hepática.']},
+  {id:'colistin', n:'Colistín', via:'EV', rows:[{all:'1,7 c/8'}], obs:['No usar como tratamiento empírico inicial. Solo para OMR.']},
+  {id:'dapto', n:'Daptomicina', via:'', rows:[{all:'6 c/12'}], obs:['Requiere autorización de Infectología.']},
+  {id:'estrepto', n:'Estreptomicina', via:'EV-IM', rows:[{all:'10-15 c/12'}], obs:['Según sensibilidad del germen.']},
+  {id:'fluco', n:'Fluconazol', via:'EV-VO', rows:[{c:['fluco0','6-12 c/24','12 c/24','12 c/24','12 c/24','12 c/24']}],
+   obs:['No usar como tratamiento empírico inicial.','Sin anfotericina previa: iniciar con dosis de carga de 25 mg/kg.']},
+  {id:'ganci', n:'Ganciclovir', via:'EV', rows:[{all:'6 c/12'}], obs:['Contraindicado con < 25 000 plaquetas o < 500 neutrófilos.']},
+  {id:'genta', n:'Gentamicina', via:'EV', rows:[{c:['2,5 c/24','2,5 c/24','2,5 c/12','4 c/24','4 c/24','5 c/24']}],
+   obs:['FQP: 2,5–3,3 c/8.','Endocarditis: 1 c/8.'], dosar:'Dosar en la 3.ª dosis (en RNPT, IRA, FQP, endocarditis). Dosis c/12 h: valle < 2 µg/mL; pico (30 min posinfusión) 4–12 µg/mL. Dosis c/24 h: valle < 1 µg/mL; pico 4–12 µg/mL (RN y hasta 24 meses).'},
+  {id:'imipenem', n:'Imipenem', via:'EV-IM', rows:[{c:['20 c/24','25 c/12','25 c/12','25 c/12','25 c/8','25 c/6']}], obs:['Priorizar meropenem.']},
+  {id:'linezolid', n:'Linezolid', via:'EV-VO', rows:[{c:['10 c/12','10 c/12','10 c/8','10 c/12','10 c/8','10 c/8']}], obs:['Requiere autorización de Infectología.']},
+  {id:'meropenem', n:'Meropenem', via:'EV', rows:[
+    {v:'Sepsis', c:['20 c/24','20 c/12','20 c/8','20 c/12','20 c/8','20 c/8']},
+    {v:'Meningitis', c:['40 c/12','40 c/12','40 c/8','40 c/12','40 c/8','40 c/8']}], obs:['FQP: 40 c/8.','OMR y ECMO: infusión en 3 h.']},
+  {id:'metro', n:'Metronidazol', via:'EV-VO', load:15, rows:[{c:['7,5 c/48','7,5 c/12','7,5 c/12','7,5 c/8','10 c/8','10 c/8'], c0b:'7,5 c/24', c0d:28}],
+   obs:['Dosis de carga: 15 mg/kg.','< 1200 g con > 28 días: 7,5 c/24.','Mantenimiento: en < 1200 g se inicia 24 h después de la carga; en el resto, al intervalo de la dosis de mantenimiento.']},
+  {id:'peni', n:'Penicilina G sódica', via:'EV', u:'U', rows:[
+    {v:'Sepsis', c:['50000 c/12','50000 c/12','50000 c/8','50000 c/12','50000 c/8','50000 c/6']},
+    {v:'Meningitis', c:['150000 c/12','150000 c/8','125000 c/6','150000 c/8','125000 c/6','100000 c/4-6']}],
+   obs:['Sífilis congénita: < 7 días de vida 50 000 U c/12; 7–28 días 50 000 U c/8; > 28 días 50 000 U c/6.','Estreptococo del grupo B: homologar dosis de meningitis.','Endocarditis: 100 000 U c/6.']},
+  {id:'pipetazo', n:'Piperacilina-tazobactam', via:'IV', rows:[{c:['100 c/12','100 c/12','100 c/8','100 c/12','100 c/8','100 c/8'], c0b:'100 c/8', c0d:14}], obs:['< 1200 g con > 14 días: 100 c/8.','FQP: 100 c/6.']},
+  {id:'rifampicina', n:'Rifampicina', via:'EV-VO', rows:[
+    {v:'Sepsis', c:['-','10 c/24','10 c/24','10 c/24','10 c/24','10 c/12']},
+    {v:'Meningitis', c:['-','10 c/24','10 c/12','10 c/24','10 c/12','10 c/12']}], obs:['Precaución en disfunción hepática.']},
+  {id:'tms', n:'Trimetoprima-sulfametoxazol (TMS)', via:'IV-VO', rows:[
+    {v:'ITU', c:['-','-','-','-','-','5 c/12']},
+    {v:'Sepsis', c:['-','-','-','-','-','5 c/12']},
+    {v:'Meningitis', c:['-','-','-','-','-','10 c/12 ó 5 c/6']}],
+   obs:['VO: 3–6 c/12. Profilaxis: ver Profilaxis.','Dosis de sepsis homologada a osteomielitis, mediastinitis, endocarditis y FQP.','Pneumocystis jirovecii: 5 c/6.','La tabla no lo aclara: habitualmente la dosis se expresa como trimetoprima.']},
+  {id:'vanco', n:'Vancomicina', via:'IV', rows:[
+    {v:'Sepsis', c:['15 c/24','10 c/12','10 c/8','15 c/12','10 c/8','10 c/6']},
+    {v:'Meningitis', c:['15 c/12','15 c/12','15 c/8','15 c/8','15 c/6','15 c/6']}],
+   obs:['FQP: 20–30 c/12.'], dosar:'Dosar en la 3.ª dosis. Valle (previo a la dosis) 5–15 µg/mL; pico (60 min posinfusión) 25–40 µg/mL.'}
+];
+const PROF = [
+  {t:'Descolonización de SAMR', d:'Mupirocina 2% en fosas nasales cada 12 h, 5 días.'},
+  {t:'Descolonización intestinal selectiva', d:'Rifaximina 15 mg/kg c/12 h × 5 días.', mgkg:15, int:'c/12 h', extra:'Síndrome de pseudoobstrucción intestinal crónica: iniciar la profilaxis al comenzar la nutrición enteral trófica y continuar mensual.'},
+  {t:'Profilaxis neonatal de infección materna gonocócica no tratada', d:'Ceftriaxona 50 mg/kg EV-IM, dosis única diaria. Alternativa: cefotaxima 100 mg/kg EV-IM, dosis única diaria.', mgkg:50, int:'dosis única (ceftriaxona)', alt:[100,'cefotaxima']},
+  {t:'Profilaxis de ITU < 1 mes', d:'Cefalexina 25 mg/kg/día, dosis única diaria.', mgkg:25, int:'una vez al día'},
+  {t:'Profilaxis de ITU > 1 mes', d:'TMS 2 mg/kg/día, dosis única diaria.', mgkg:2, int:'una vez al día'},
+  {t:'Profilaxis de Pneumocystis jirovecii (> 1 mes)', d:'TMS VO 5 mg/kg/día en días alternos (lunes, miércoles y viernes).', mgkg:5, int:'lun, mié y vie'},
+  {t:'Profilaxis secundaria de HSV', d:'Aciclovir VO 20 mg/kg c/8 h durante 6 meses.', mgkg:20, int:'c/8 h'},
+  {t:'Profilaxis en asplenia', d:'Ampicilina EV 10 mg/kg/dosis c/12 h. Alternativa: amoxicilina VO 10 mg/kg/dosis c/12 h.', mgkg:10, int:'c/12 h'},
+  {t:'Profilaxis de candidiasis en prematuros < 1000 g', d:'Fluconazol 3 mg/kg dos veces por semana × 45 días. Usar solo con prevalencia > 5% en la UCIN.', mgkg:3, int:'2 veces por semana'},
+  {t:'Candidiasis en ECMO prolongado', d:'Fluconazol: día 1, 12 mg/kg/día; luego 6 mg/kg/día hasta la salida.', mgkg:12, int:'día 1; luego 6 mg/kg/día', alt:[6,'desde el día 2']}
+];
+
+const $ = id => document.getElementById(id);
+const num = id => { const s = String($(id).value).trim().replace(',', '.'); if (!s) return NaN; const n = parseFloat(s); return isFinite(n) ? n : NaN; };
+const f = (n, d = 2) => isFinite(n) ? n.toLocaleString('es-AR', {maximumFractionDigits: d}) : '–';
+let manualCol = null;
+
+function patient(){
+  const w = num('pPeso'), d = num('pDias'), eg = num('pEG');
+  const pma = isFinite(eg) && isFinite(d) ? eg + d / 7 : NaN;
+  let col = null, why = '';
+  if (isFinite(w) && isFinite(d)) {
+    const term = isFinite(eg) ? eg >= 37 : w > 2500;
+    if ((isFinite(pma) && !term && pma > 45) || (term && d > 30)) { col = 5; why = term ? 'RN de término con más de 1 mes' : 'RN pretérmino con más de 45 semanas de EG corregida'; }
+    else if (w < 1200) col = 0;
+    else if (w <= 2000) col = d <= 7 ? 1 : 2;
+    else col = d <= 7 ? 3 : 4;
+  }
+  return { w, d, eg, pma, col: manualCol !== null ? manualCol : col, auto: col, why };
+}
+
+// Parseo de celdas "50 c/12", "75-100 c/6", "50 c/12 ó 30 c/8"
+function parse(cell){
+  const m = String(cell).trim().match(/^(\d+(?:[.,]\d+)?)(?:\s*[-–]\s*(\d+(?:[.,]\d+)?))?\s*c\/\s*(\d+)(?:\s*-\s*(\d+))?$/);
+  if (!m) return null;
+  const n = x => x ? parseFloat(x.replace(',', '.')) : null;
+  return { lo: n(m[1]), hi: n(m[2]) || n(m[1]), int: n(m[3]), int2: n(m[4]) };
+}
+const unitOf = a => a.u === 'U' ? 'U' : 'mg';
+function doseText(cell, a, P){
+  if (!cell || cell === '-') return { short: 'Sin dato', long: 'Sin dato en la tabla para esta columna.', na: true };
+  const alts = String(cell).split(/\s+ó\s+/);
+  const out = alts.map(c => {
+    const p = parse(c), u = unitOf(a);
+    if (!p) return { short: c, long: `${c}${u === 'mg' && /\d/.test(c) ? '' : ''}` };
+    const rng = (x, y, d) => x === y ? f(x, d) : `${f(x, d)}–${f(y, d)}`;
+    const iv = p.int2 ? `${p.int}–${p.int2}` : p.int;
+    const kg = P.w / 1000;
+    const perDose = isFinite(kg) ? rng(p.lo * kg, p.hi * kg, u === 'U' ? 0 : 2) + ' ' + u : '';
+    const perDay = isFinite(kg) ? rng(p.lo * kg * 24 / (p.int2 || p.int), p.hi * kg * 24 / p.int, u === 'U' ? 0 : 1) + ' ' + u + '/día' : '';
+    return { short: `${rng(p.lo, p.hi, 1)} ${u}/kg c/${iv} h`, sub: perDose ? `${perDose} por dosis` : '',
+      long: `<b>${rng(p.lo, p.hi, 1)} ${u}/kg/dosis cada ${iv} h</b>${perDose ? ` → <b>${perDose}</b> por dosis (${perDay})` : ''}` };
+  });
+  return { short: out.map(o => o.short).join(' ó '), sub: out.map(o => o.sub).filter(Boolean).join(' ó '), long: out.map(o => o.long).join('<br>ó '), na: false };
+}
+function cellFor(row, a, P){
+  if (row.all) return row.all;
+  if (P.col === null) return null;
+  let c = row.c[P.col];
+  if (c === 'fluco0') c = !isFinite(P.d) ? '6-12 c/72' : P.d < 14 ? '6-12 c/72' : P.d <= 28 ? '6-12 c/48' : '12 c/24';
+  if (P.col === 0 && row.c0b && isFinite(P.d) && P.d > row.c0d) c = row.c0b;
+  return c;
+}
+function rowTable(row, P){
+  if (row.all) return '';
+  const cells = row.c.map((c, i) => `<td class="${i === P.col ? 'cur' : ''}">${c === 'fluco0' ? '6-12 c/72 (< 14 d) · 6-12 c/48 (≥ 14 d) · 12 c/24 (> 28 d)' : c}</td>`).join('');
+  return `<div style="overflow-x:auto"><table class="row"><tr><th>&lt;1200 g<br>0–4 sem</th><th>1200–2000<br>0–7 d</th><th>1200–2000<br>&gt;7 d</th><th>&gt;2000 g<br>0–7 d</th><th>&gt;2000 g<br>&gt;7 d</th><th>RNPT &gt;45 sem<br>RNT &gt;1 mes</th></tr><tr>${cells}</tr></table></div>`;
+}
+
+function render(){
+  const P = patient(), q = $('q').value.trim().toLowerCase();
+  // paciente
+  let h = '';
+  if (isFinite(P.w) && isFinite(P.d)) {
+    h += `<div class="tiles"><div class="tile"><span class="k">Peso</span><span class="v">${f(P.w / 1000, 3)} kg</span></div>${isFinite(P.pma) ? `<div class="tile"><span class="k">EG corregida</span><span class="v">${f(P.pma, 1)} sem</span></div>` : ''}<div class="tile main"><span class="k">Columna</span><span class="v" style="font-size:.9rem">${COLS[P.col].n}</span></div></div>`;
+    if (P.why && manualCol === null) h += `<div class="pill info">${P.why}: se usa la última columna.</div>`;
+    if (manualCol !== null && manualCol !== P.auto) h += `<div class="pill warn">Columna elegida a mano (la automática sería: ${COLS[P.auto].n}).</div>`;
+    if (P.col === 0 && P.d > 28) h += `<div class="pill warn">La columna de &lt; 1200 g cubre de 0 a 4 semanas: con ${f(P.d, 0)} días el paciente queda fuera de lo que define la tabla. Consultar con Infectología.</div>`;
+    if (!isFinite(P.eg)) h += `<div class="pill info">Sin EG al nacer no se puede calcular la EG corregida (criterio RNPT &gt; 45 semanas).</div>`;
+    if (P.w < 300 || P.w > 8000) h += `<div class="pill crit">Revisá el peso: va en gramos.</div>`;
+  } else h = `<div class="hint">Cargá peso y edad postnatal (y la EG al nacer) para calcular las dosis.</div>`;
+  $('rPac').innerHTML = h;
+  $('cols').innerHTML = COLS.map(c => `<button data-k="${c.k}" aria-pressed="${c.k === P.col}">${c.n}</button>`).join('') + (manualCol !== null ? '<button data-k="auto" aria-pressed="false">Automática</button>' : '');
+  $('cols').querySelectorAll('button').forEach(b => b.onclick = () => { manualCol = b.dataset.k === 'auto' ? null : +b.dataset.k; render(); });
+  // lista
+  const open = new Set([...document.querySelectorAll('details.d[open]')].map(d => d.dataset.id));
+  const items = ATB.filter(a => !q || a.n.toLowerCase().includes(q)).map(a => {
+    const main = doseText(cellFor(a.rows[0], a, P), a, P);
+    const sumTxt = P.col === null && !a.rows[0].all ? '<span class="ds na">Cargá el paciente</span>' : `<span class="ds${main.na ? ' na' : ''}">${a.rows.length > 1 ? `<small>${a.rows[0].v}</small>` : ''}${main.short}${main.sub ? `<small>${main.sub}</small>` : ''}</span>`;
+    const vars = a.rows.map(r => { const t = doseText(cellFor(r, a, P), a, P); return `<div class="var">${r.v ? `<div class="vn">${r.v}</div>` : ''}<div>${P.col === null && !r.all ? 'Cargá el paciente.' : t.long}${r.dur ? ' ' + r.dur : ''}</div>${rowTable(r, P)}</div>`; }).join('');
+    const load = a.load && isFinite(P.w) ? `<div class="pill info">Dosis de carga: ${a.load} mg/kg = <b>${f(a.load * P.w / 1000, 2)} mg</b>.</div>` : '';
+    const flu = a.id === 'fluco' && isFinite(P.w) ? `<div class="pill info">Carga si no recibió anfotericina: 25 mg/kg = <b>${f(25 * P.w / 1000, 2)} mg</b>.</div>` : '';
+    return `<details class="d" data-id="${a.id}"${open.has(a.id) ? ' open' : ''}><summary><span class="nm">${a.n}</span>${sumTxt}<span class="vi">${a.via || 'Vía no especificada'}</span></summary><div class="db">${vars}${load}${flu}${a.dosar ? `<div class="pill warn">${a.dosar}</div>` : ''}${a.obs.length ? `<ul class="obs">${a.obs.map(o => `<li>${o}</li>`).join('')}</ul>` : ''}</div></details>`;
+  });
+  items.push(...special(P, q));
+  $('list').innerHTML = items.join('') || '<div class="hint">Sin resultados.</div>';
+  // profilaxis
+  renderSrc(P);
+  $('prof').innerHTML = PROF.map(p => `<div class="it"><b>${p.t}</b>${p.d}${p.mgkg && isFinite(P.w) ? `<div class="calc">→ ${f(p.mgkg * P.w / 1000, 2)} mg ${p.int}${p.alt ? ` · ${f(p.alt[0] * P.w / 1000, 2)} mg ${p.alt[1]}` : ''}</div>` : ''}${p.extra ? `<div class="hint" style="margin-top:4px">${p.extra}</div>` : ''}</div>`).join('');
+}
+
+// Zidovudina (por EG y días de vida) y oseltamivir (por EG)
+function special(P, q){
+  const out = [], kg = P.w / 1000;
+  if (!q || 'zidovudina'.includes(q)) {
+    let ev = null, vo = null, grp = '';
+    if (isFinite(P.eg) && isFinite(P.d)) {
+      if (P.eg < 30) { grp = '< 30 sem EG, ' + (P.d < 30 ? '< 30 días' : '≥ 30 días'); [ev, vo] = P.d < 30 ? [1.5, 2] : [2, 3]; }
+      else if (P.eg < 35) { grp = '30 a < 35 sem EG, ' + (P.d < 14 ? '< 14 días' : '≥ 14 días'); [ev, vo] = P.d < 14 ? [1.5, 2] : [2, 3]; }
+      else { grp = '≥ 35 sem EG, hasta 30 días'; [ev, vo] = [3, 4]; }
+    }
+    const d = x => `<b>${f(x, 1)} mg/kg c/12 h</b>${isFinite(kg) ? ` → <b>${f(x * kg, 2)} mg</b>` : ''}`;
+    out.push(`<details class="d" data-id="azt"><summary><span class="nm">Zidovudina</span><span class="ds${ev ? '' : ' na'}">${ev ? `EV ${f(ev, 1)} · VO ${f(vo, 1)} mg/kg c/12 h` : 'Requiere EG y días de vida'}</span><span class="vi">EV-VO · según EG y días de vida</span></summary><div class="db">${ev ? `<div>${grp}</div><div>EV: ${d(ev)}</div><div>VO: ${d(vo)}</div>` : ''}${P.eg >= 35 && P.d > 30 ? '<div class="pill warn">La tabla define ≥ 35 semanas hasta 30 días de vida.</div>' : ''}<ul class="obs"><li>&lt; 30 sem: &lt; 30 días EV 1,5 / VO 2; ≥ 30 días EV 2 / VO 3 (mg/kg c/12 h).</li><li>30 a &lt; 35 sem: &lt; 14 días EV 1,5 / VO 2; ≥ 14 días EV 2 / VO 3.</li><li>≥ 35 sem (hasta 30 días): EV 3 / VO 4.</li><li>RN de mediano y alto riesgo: terapia combinada. Consultar con Infectología y ver las recomendaciones de HIV perinatal.</li></ul></div></details>`);
+  }
+  if (!q || 'oseltamivir'.includes(q)) {
+    let x = null; if (isFinite(P.pma)) x = P.pma < 38 ? 1 : P.pma <= 40 ? 1.5 : 3;
+    out.push(`<details class="d" data-id="osel"><summary><span class="nm">Oseltamivir</span><span class="ds${x ? '' : ' na'}">${x ? `${f(x, 1)} mg/kg c/12 h${isFinite(kg) ? `<small>${f(x * kg, 2)} mg por dosis</small>` : ''}` : 'Requiere EG'}</span><span class="vi">Según EG (se usa la EG corregida)</span></summary><div class="db"><ul class="obs"><li>&lt; 38 sem: 1 mg/kg c/12 h · 38–40 sem: 1,5 mg/kg c/12 h · &gt; 40 sem: 3 mg/kg c/12 h.</li><li>No se recomienda como profilaxis.</li><li>La tabla dice "semanas" sin aclarar: la app usa la EG corregida (EG al nacer + días de vida).</li></ul></div></details>`);
+  }
+  return out;
+}
+// ───────── Consulta Taketomo 18.ª ed. (2011) y comparación con Garrahan 2024
+let SRC = 'gar';
+try { const v = localStorage.getItem('atbFuente'); if (['gar','tk','cmp'].includes(v)) SRC = v; } catch (e) {}
+const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const nf = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+function bandLabel(s, b){
+  const [lo, hi, plo, phi] = b, w = s.by === 'EPM' ? 'EPM' : 'EG';
+  let a = s.by === 'EPN' ? '' : (lo <= 0 ? `${w} < ${hi} sem` : hi >= 99 ? `${w} ≥ ${lo} sem` : `${w} ${lo}–${hi - 1} sem`);
+  let d = plo === 0 && phi >= 999 ? '' : phi >= 999 ? `≥ ${plo} días` : `${plo}–${phi} días`;
+  return [a, d].filter(Boolean).join(' · ');
+}
+// Celda Taketomo para el paciente actual en un esquema
+function tkCell(t, s, P){
+  if (s.c) return P.col === null ? { cell: null, why: 'Cargá peso y días de vida' } : { cell: s.c[P.col] };
+  if (P.col === 5 && t.lac) return { cell: t.lac, why: 'lactante > 1 mes (dosis usual)' };
+  if (!isFinite(P.d)) return { cell: null, why: 'Requiere días de vida' };
+  let x = 50;
+  if (s.by === 'EG') { if (!isFinite(P.eg)) return { cell: null, why: 'Requiere EG al nacer' }; x = P.eg; }
+  if (s.by === 'EPM') { if (!isFinite(P.pma)) return { cell: null, why: 'Requiere EG y días de vida' }; x = P.pma; }
+  const b = s.b.find(b => x >= b[0] && x < b[1] && P.d >= b[2] && P.d <= b[3]);
+  return b ? { cell: b[4], band: b } : { cell: null, why: 'La fuente no define este grupo' };
+}
+function tkCard(t, P, open){
+  const a = { u: t.u };
+  let main = null;
+  const vars = (t.s || []).map(s => {
+    const r = tkCell(t, s, P), d = r.cell ? doseText(r.cell, a, P) : null;
+    if (!main && d && !d.na) main = { d, t: s.t };
+    let tbl = '';
+    if (s.c) tbl = rowTable({ c: s.c }, P);
+    else tbl = `<div class="bands">${s.b.map(b => `<div class="${r.band === b ? 'cur' : ''}">${bandLabel(s, b)}: ${b[4]}</div>`).join('')}${t.lac ? `<div class="${r.cell === t.lac && P.col === 5 ? 'cur' : ''}">Lactante &gt; 1 mes: ${t.lac}</div>` : ''}</div>`;
+    return `<div class="var"><div class="vn">${s.t}</div><div>${d ? d.long : `<span class="hint">${r.why || 'Sin dato'}</span>`}${r.why && d ? ` <span class="tkmeta">(${r.why})</span>` : ''}</div>${tbl}</div>`;
+  }).join('');
+  const sum = main ? `<span class="ds">${(t.s || []).length > 1 ? `<small>${main.t}</small>` : ''}${main.d.short}${main.d.sub ? `<small>${main.d.sub}</small>` : ''}</span>` : `<span class="ds na">${t.s ? 'Cargá el paciente' : 'Ver texto'}</span>`;
+  const load = t.load && isFinite(P.w) ? `<div class="pill info">Dosis de carga: ${t.load} mg/kg = <b>${f(t.load * P.w / 1000, 2)} mg</b>.</div>` : '';
+  return `<details class="d tkd" data-id="tk-${t.id}"${open ? ' open' : ''}><summary><span class="nm">${t.n}</span>${sum}<span class="vi">${t.via} · ${t.g}</span></summary><div class="db">${vars}${load}
+    <ul class="obs"><li><b>Neonatos:</b> ${t.neo}</li><li><b>Lactantes y niños:</b> ${t.ped}</li></ul>
+    ${t.dif ? `<div class="pill or"><b>Diferencia con Garrahan:</b> ${t.dif}</div>` : ''}
+    <div class="tkmeta">${t.pag ? `Taketomo 18.ª ed., pág. ${t.pag}` : 'Sin monografía en esta edición'} · referencia histórica (2011).</div></div></details>`;
+}
+function renderTK(P){
+  const q = nf($('tq').value.trim());
+  const open = new Set([...document.querySelectorAll('#tklist details[open]')].map(d => d.dataset.id));
+  const list = TK.filter(t => !t.nomono && (!q || nf(t.n + ' ' + t.g).includes(q)));
+  let html = '', g = '';
+  list.forEach(t => { if (t.g !== g) { g = t.g; html += `<div class="tkgrp">${g}</div>`; } html += tkCard(t, P, open.has('tk-' + t.id)); });
+  $('tklist').innerHTML = html || '<div class="hint">Sin resultados.</div>';
+}
+// ¿Se superponen dos celdas (dosis por toma e intervalo)?
+function overlap(c1, c2){
+  const A = String(c1).split(/\s+ó\s+/).map(parse), B = String(c2).split(/\s+ó\s+/).map(parse);
+  if (A.some(x => !x) || B.some(x => !x)) return null;
+  return A.some(a => B.some(b => a.lo <= b.hi + 1e-9 && b.lo <= a.hi + 1e-9 && a.int <= (b.int2 || b.int) && b.int <= (a.int2 || a.int)));
+}
+// Valores Garrahan para el paciente (incluye zidovudina y oseltamivir, que van por EG)
+function garRows(id, P){
+  if (id === 'azt') {
+    if (!(isFinite(P.eg) && isFinite(P.d))) return [{ v: 'VO', cell: null, why: 'Requiere EG y días de vida' }];
+    const vo = P.eg < 30 ? (P.d < 30 ? 2 : 3) : P.eg < 35 ? (P.d < 14 ? 2 : 3) : 4;
+    return [{ v: 'Prevención perinatal VO', k: 'sep', cell: `${String(vo)} c/12` }];
+  }
+  if (id === 'osel') {
+    if (!isFinite(P.pma)) return [{ v: '', cell: null, why: 'Requiere EG' }];
+    const x = P.pma < 38 ? 1 : P.pma <= 40 ? 1.5 : 3;
+    return [{ v: 'Tratamiento', k: 'sep', cell: `${String(x).replace('.', ',')} c/12` }];
+  }
+  const a = ATB.find(x => x.id === id); if (!a) return [];
+  return a.rows.map(r => ({ v: r.v || '', k: /mening/i.test(r.v || '') ? 'men' : 'sep', cell: cellFor(r, a, P), why: P.col === null && !r.all ? 'Cargá peso y días' : '', a }));
+}
+function cmpItem(t, P){
+  const G = garRows(t.gar, P), a = ATB.find(x => x.id === t.gar) || { u: t.u };
+  let status = 'man';
+  const rows = G.map(gr => {
+    const cand = (t.s || []).filter(s => s.k === gr.k).map(s => ({ s, r: tkCell(t, s, P) })).filter(x => x.r.cell && x.r.cell !== '-');
+    let st = 'man';
+    if (gr.cell && gr.cell !== '-' && cand.length) {
+      const res = cand.map(x => overlap(gr.cell, x.r.cell));
+      st = res.some(v => v === true) ? 'eq' : res.every(v => v === false) ? 'dif' : 'man';
+    }
+    if (st === 'dif') status = 'dif'; else if (st === 'eq' && status !== 'dif') status = 'eq';
+    const gd = gr.cell ? doseText(gr.cell, a, P) : null;
+    const tTxt = cand.length ? cand.map(x => { const d = doseText(x.r.cell, { u: t.u }, P); return `${cand.length > 1 || (t.s || []).length > 1 ? `<small>${x.s.t}</small>` : ''}<span class="v">${d.short}</span>${d.sub ? `<small>${d.sub}</small>` : ''}`; }).join('') :
+      `<span class="hint">${gr.k === 'men' && (t.s || []).length ? 'Sin fila específica de meningitis' : (t.s && t.s[0] ? (tkCell(t, t.s[0], P).why || 'Sin dato estructurado') : 'Solo texto: ver detalle')}</span>`;
+    const badge = st === 'dif' ? '<span class="badge dif">Difiere</span>' : st === 'eq' ? '<span class="badge eq">Coinciden</span>' : '<span class="badge man">A mano</span>';
+    return `<div class="cmprow">${gr.v || G.length > 1 ? `<div class="vn">${gr.v || 'General'} ${badge}</div>` : `<div class="vn">Dosis para el paciente ${badge}</div>`}
+      <div class="two"><div class="g"><span class="lb">Garrahan 2024</span>${gd ? `<span class="v">${gd.short}</span>${gd.sub ? `<small>${gd.sub}</small>` : ''}` : `<span class="hint">${gr.why || 'Sin dato'}</span>`}</div>
+      <div class="t${st === 'eq' ? ' same' : ''}"><span class="lb">Taketomo 2011</span>${tTxt}</div></div></div>`;
+  }).join('');
+  const head = status === 'dif' ? '<span class="badge dif">Difiere</span>' : status === 'eq' ? '<span class="badge eq">Coinciden</span>' : '<span class="badge man">A mano</span>';
+  const html = `<div class="cmp${status === 'dif' ? ' isdif' : ''}"><div class="hd"><span class="nm">${t.n}</span>${head}</div>${rows}
+    ${t.dif ? `<div class="pill or">${t.dif}</div>` : ''}
+    <details><summary class="tkmeta" style="cursor:pointer">Texto Taketomo (neonatos)${t.pag ? ` · pág. ${t.pag}` : ''}</summary><div style="font-size:.84rem;margin-top:4px">${t.neo}</div></details></div>`;
+  return { html, status };
+}
+function renderCmp(P){
+  const q = nf($('cq').value.trim()), only = $('onlyDif').checked;
+  const items = TK.filter(t => t.gar && (!q || nf(t.n).includes(q))).map(t => cmpItem(t, P)).filter(x => !only || x.status === 'dif');
+  const nd = items.filter(x => x.status === 'dif').length;
+  const tkIds = new Set(TK.map(t => t.gar).filter(Boolean));
+  const solo = ATB.filter(a => !tkIds.has(a.id)).map(a => a.n);
+  $('cmplist').innerHTML = (P.col === null ? '<div class="pill info">Cargá peso y días de vida (y EG) para comparar las dosis del paciente.</div>' : `<div class="hint">${nd} con diferencias para este paciente.</div>`) +
+    (items.map(x => x.html).join('') || '<div class="hint">Sin resultados.</div>') +
+    (!only && !q && solo.length ? `<div class="hint">Solo en Garrahan (sin monografía en el Taketomo 2011): ${solo.join(', ')}.</div>` : '');
+}
+function renderSrc(P){
+  document.querySelectorAll('#s-src button').forEach(b => b.setAttribute('aria-pressed', b.dataset.src === SRC));
+  $('s-gar').hidden = SRC !== 'gar'; $('s-prof').hidden = SRC !== 'gar';
+  $('s-tk').hidden = SRC !== 'tk'; $('s-cmp').hidden = SRC !== 'cmp';
+  if (SRC === 'tk') renderTK(P);
+  if (SRC === 'cmp') renderCmp(P);
+}
+document.querySelectorAll('#s-src button').forEach(b => b.onclick = () => { SRC = b.dataset.src; try { localStorage.setItem('atbFuente', SRC); } catch (e) {} render(); });
+['tq','cq'].forEach(id => $(id).addEventListener('input', render));
+$('onlyDif').addEventListener('change', render);
+['pPeso','pDias','pEG'].forEach(id => $(id).addEventListener('input', () => { manualCol = null; render(); }));
+$('q').addEventListener('input', render);
+render();
+</script>
+<script src="paciente.js?v=v37"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Calculadora Neonatal</title>
+<meta name="description" content="Calculadoras de infusiones, electrolitos, sedoanalgesia, nutrición, insulina, laboratorio, cardiología, antimicrobianos, vademécum neonatal, reanimación, bilirrubina y transfusiones para UCIN">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202436" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Calc Neonatal">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: barra superior fija con el nombre de la app y un selector de dos calculadoras; cada calculadora ocupa el resto de la pantalla */
+:root{
+  --bg:#f7f6fc; --surface:#ffffff; --surface-2:#eef3fb; --fg:#2e3147; --muted:#6c7090; --line:#e2e4f1;
+  --inf:#2b7a72; --inf-soft:#dcf2ec; --ele:#5a8fd0; --ele-soft:#e3eefb; --sed:#ad94e4; --sed-soft:#ece6fb; --nut:#f0a37c; --nut-soft:#fde9dc; --ins:#e0679a; --ins-soft:#fde0ec; --lab:#6aa84f; --lab-soft:#dcf1cf; --ecg:#c0392b; --ecg-soft:#fde0e0; --atb:#b26a00; --atb-soft:#ffe6c2; --neo:#0e7490; --neo-soft:#cff1f8; --cre:#4f46e5; --cre-soft:#e0e1ff; --vad:#8d5b3e; --vad-soft:#f3e3d6;
+  --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
+  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
+  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; color-scheme:dark;}
+html,body{height:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);display:flex;flex-direction:column;overflow:hidden}
+.bar{background:var(--surface);border-bottom:1px solid var(--line);padding-top:calc(10px + env(safe-area-inset-top,0px))!important;
+  padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.bar .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1rem}
+.brand svg{width:30px;height:30px;flex:none}
+.seg{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:3px;flex:1;max-width:1120px;min-width:280px}
+.seg .s{display:none}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:.92rem;padding:9px 8px;border-radius:9px;min-height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.seg button i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.seg button[aria-selected="true"]{background:var(--soft);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg button:focus-visible{outline:3px solid var(--ele);outline-offset:2px}
+.pac{background:var(--surface);border-bottom:1px solid var(--line);padding:7px max(12px,env(safe-area-inset-left,0px))}
+.pac .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pac b{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.pac label{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted)}
+.pac input{font:600 .95rem/1 "Public Sans",system-ui,sans-serif;width:70px;padding:7px 8px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);text-align:center}
+.pac input:focus{outline:2px solid var(--ele);outline-offset:1px}
+.pac input.empty{border-color:#e0743c;background:#fff4ec}
+.pac input.kgwarn{border-color:#c0392b;background:#ffe3e8;color:#a12d40}
+.pac .u{display:flex;align-items:center;margin-left:-2px}
+.pac .u .gfix{font:600 .8rem/1 "Public Sans",system-ui,sans-serif;color:var(--muted)}
+.pac .u button{font:600 .8rem/1 "Public Sans",system-ui,sans-serif;border:0;background:transparent;color:var(--muted);padding:7px 8px;min-height:34px;min-width:30px;cursor:pointer}
+.pac .u button[aria-pressed="true"]{background:var(--fg);color:var(--surface)}
+.pac .clr .x{display:none}
+.pac .clr{font:600 .76rem/1 "Public Sans",system-ui,sans-serif;border:1.5px solid var(--line);background:transparent;color:var(--muted);border-radius:9px;padding:8px 9px;cursor:pointer;margin-left:auto}
+@media (max-width:640px){.pac b{display:none}.pac input{width:58px;padding:7px 4px}.pac .in{gap:6px}.pac label{gap:3px;font-size:.74rem}}
+@media (max-width:420px){.pac input{width:52px}.pac .clr{padding:8px 9px}.pac .clr .t{display:none}.pac .clr .x{display:inline}.pac .in{gap:5px;flex-wrap:nowrap}.pac .u button{padding:7px 4px;min-width:24px}.pac label{gap:2px}.pac input{width:50px}}
+.views{flex:1;position:relative;min-height:0}
+.views iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
+@media (max-width:600px){.brand span{display:none}.seg{min-width:0;max-width:none}.seg button{font-size:.82rem;padding:8px 4px;gap:5px}}
+@media (max-width:900px){.brand span{display:none}}
+.bar .seg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;max-width:980px}
+@media (max-width:640px){.brand{display:none}.seg .l{display:none}.seg .s{display:inline}
+  .seg{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
+  .seg button{font-size:.78rem;padding:7px 1px;gap:4px;min-height:38px;letter-spacing:-.02em}
+  .seg button i{display:inline-block;width:7px;height:7px}}
+</style>
+<style id="tema-vivo">
+/* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
+:root{--bg:#f5f2fd;--inf:#0f9a83;--inf-soft:#bfeadb;--ele:#3a7bd5;--ele-soft:#cde3fb;--sed:#7d5fd6;--sed-soft:#ddd0fb;--nut:#e0743c;--nut-soft:#ffd6c0;--ins:#c22d6b;--ins-soft:#ffd1e3;--lab:#367a14;--lab-soft:#cdeeb6;--ecg:#b52a39;--ecg-soft:#ffd3d6;--atb:#a35400;--atb-soft:#ffdcae;--neo:#0b6c86;--neo-soft:#c4ecf6;--cre:#4338ca;--cre-soft:#dcdcff;--glow:transparent;--bar:linear-gradient(90deg,#d8f3ea 0%,#d6e6fb 30%,#e6dcfb 55%,#ffe1cf 70%,#ffd9e8 85%,#ddf3cc 100%);--surface-2:rgba(255,255,255,.65);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:transparent;--bar:linear-gradient(90deg,#173a36 0%,#1b2f4d 38%,#2a2350 68%,#3a2620 70%,#3a2030 85%,#22331c 100%);--surface-2:rgba(0,0,0,.25);}}
+:root[data-theme="dark"]{--glow:transparent;--bar:linear-gradient(90deg,#173a36 0%,#1b2f4d 38%,#2a2350 68%,#3a2620 70%,#3a2030 85%,#22331c 100%);--surface-2:rgba(0,0,0,.25);}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+.bar{background:var(--bar);border-bottom-color:transparent}
+.seg button[aria-selected="true"]{box-shadow:0 2px 8px -3px var(--c)}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="in">
+    <div class="brand">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#dcf2ec"/><path d="M32 10 L20 33 A13.5 13.5 0 1 0 44 33 Z" fill="#7fb6e3"/><rect x="29.5" y="31" width="5" height="16" rx="2" fill="#fff"/><rect x="24" y="36.5" width="16" height="5" rx="2" fill="#fff"/><circle cx="48" cy="16" r="4" fill="#ec8e9a"/></svg>
+      <span>Calculadora Neonatal</span>
+    </div>
+    <div class="seg" role="tablist" aria-label="Calculadoras">
+      <button role="tab" id="bInf" aria-selected="true" style="--c:var(--inf);--soft:var(--inf-soft)"><i></i><span class="l">Infusiones</span><span class="s">Infus.</span></button>
+      <button role="tab" id="bSed" aria-selected="false" style="--c:var(--sed);--soft:var(--sed-soft)"><i></i><span class="l">Sedoanalgesia</span><span class="s">Sedo.</span></button>
+      <button role="tab" id="bAtb" aria-selected="false" style="--c:var(--atb);--soft:var(--atb-soft)"><i></i><span class="l">Antimicrobianos</span><span class="s">ATB</span></button>
+      <button role="tab" id="bIns" aria-selected="false" style="--c:var(--ins);--soft:var(--ins-soft)"><i></i><span class="l">Insulina</span><span class="s">Insul.</span></button>
+      <button role="tab" id="bEle" aria-selected="false" style="--c:var(--ele);--soft:var(--ele-soft)"><i></i><span class="l">Electrolitos</span><span class="s">Electr.</span></button>
+      <button role="tab" id="bNut" aria-selected="false" style="--c:var(--nut);--soft:var(--nut-soft)"><i></i><span class="l">Nutrición</span><span class="s">Nutric.</span></button>
+      <button role="tab" id="bLab" aria-selected="false" style="--c:var(--lab);--soft:var(--lab-soft)"><i></i><span class="l">Laboratorio</span><span class="s">Lab</span></button>
+      <button role="tab" id="bEcg" aria-selected="false" style="--c:var(--ecg);--soft:var(--ecg-soft)"><i></i><span class="l">Cardiología</span><span class="s">Cardio</span></button>
+      <button role="tab" id="bNeo" aria-selected="false" style="--c:var(--neo);--soft:var(--neo-soft)"><i></i><span class="l">RCP · Bili · Sangre</span><span class="s">RCP+</span></button>
+      <button role="tab" id="bCre" aria-selected="false" style="--c:var(--cre);--soft:var(--cre-soft)"><i></i><span class="l">Crecimiento</span><span class="s">Creci.</span></button>
+      <button role="tab" id="bVad" aria-selected="false" style="--c:var(--vad);--soft:var(--vad-soft)"><i></i><span class="l">Vademécum</span><span class="s">Vadem.</span></button>
+    </div>
+  </div>
+</header>
+<div class="pac" role="group" aria-label="Datos del paciente">
+  <div class="in">
+    <b>Paciente</b>
+    <label for="gPeso">Peso <input id="gPeso" inputmode="numeric" autocomplete="off" placeholder="—"></label>
+    <span class="u" id="gU"><span class="gfix">g</span></span>
+    <label for="gEG">EG <input id="gEG" inputmode="decimal" autocomplete="off" placeholder="sem"></label>
+    <label for="gDias">Vida <input id="gDias" inputmode="numeric" autocomplete="off" placeholder="días"></label>
+    <button type="button" class="clr" id="gClr" title="Nuevo paciente: borrar peso, EG y días" aria-label="Nuevo paciente"><span class="t">Nuevo</span><span class="x">✕</span></button>
+  </div>
+</div>
+<div class="views">
+  <iframe id="vInf" src="infusiones.html" title="Calculadora de infusiones"></iframe>
+  <iframe id="vEle" src="electrolitos.html" title="Calculadora de electrolitos" hidden></iframe>
+  <iframe id="vSed" src="sedoanalgesia.html" title="Sedoanalgesia neonatal" hidden></iframe>
+  <iframe id="vNut" src="nutricion.html" title="Nutrición parenteral" hidden></iframe>
+  <iframe id="vIns" src="insulina.html" title="Infusión de insulina" hidden></iframe>
+  <iframe id="vLab" src="laboratorio.html" title="Laboratorio: valores corregidos" hidden></iframe>
+  <iframe id="vEcg" src="cardio.html" title="Cardiología" hidden></iframe>
+  <iframe id="vAtb" src="antimicrobianos.html" title="Antimicrobianos neonatales" hidden></iframe>
+  <iframe id="vNeo" src="neo.html" title="Reanimación, bilirrubina y transfusiones" hidden></iframe>
+  <iframe id="vCre" src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
+  <iframe id="vVad" src="vademecum.html" title="Vademécum Neonatal" hidden></iframe>
+</div>
+<script>
+const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],vad:["vVad","bVad"]};
+const show=k=>{for(const [key,[v,b]] of Object.entries(TABS)){const on=key===k;
+  document.getElementById(v).hidden=!on;document.getElementById(b).setAttribute("aria-selected",on);}};
+document.getElementById("bInf").onclick=()=>show("inf");
+document.getElementById("bEle").onclick=()=>show("ele");
+document.getElementById("bSed").onclick=()=>show("sed");
+document.getElementById("bNut").onclick=()=>show("nut");
+document.getElementById("bIns").onclick=()=>show("ins");
+document.getElementById("bLab").onclick=()=>show("lab");
+document.getElementById("bEcg").onclick=()=>show("ecg");
+document.getElementById("bAtb").onclick=()=>show("atb");
+document.getElementById("bNeo").onclick=()=>show("neo");
+document.getElementById("bCre").onclick=()=>show("cre");
+document.getElementById("bVad").onclick=()=>show("vad");
+if(location.hash==="#electrolitos")show("ele");
+if(location.hash==="#sedoanalgesia")show("sed");
+if(location.hash==="#nutricion")show("nut");
+if(location.hash==="#insulina")show("ins");
+if(location.hash==="#laboratorio")show("lab");
+if(location.hash==="#ecg"||location.hash==="#cardiologia")show("ecg");
+if(location.hash==="#antimicrobianos")show("atb");
+if(location.hash==="#neo"||location.hash==="#reanimacion")show("neo");
+if(location.hash==="#crecimiento")show("cre");
+if(location.hash==="#vademecum")show("vad");
+try{const t=localStorage.getItem("tab");if(!location.hash&&t&&TABS[t])show(t);}catch(e){}
+for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click",()=>{try{localStorage.setItem("tab",k)}catch(e){}});
+
+/* ---- Paciente compartido ---- */
+(function(){
+  const $=id=>document.getElementById(id);
+  const num=s=>{const n=parseFloat(String(s).trim().replace(",","."));return isFinite(n)?n:NaN;};
+  const fmt=(n,d)=>String(+n.toFixed(d)).replace(".",",");
+  const unit="g"; // v35: el peso se carga siempre en gramos en toda la app
+  const read=()=>{try{return JSON.parse(localStorage.getItem("pac")||"{}")||{}}catch(e){return{}}};
+  const write=p=>{try{localStorage.setItem("pac",JSON.stringify(p))}catch(e){}};
+  function paint(p){
+    if(document.activeElement!==$("gPeso"))$("gPeso").value=p.kg>0?(unit==="g"?fmt(p.kg*1000,0):fmt(p.kg,3)):"";
+    if(document.activeElement!==$("gEG"))$("gEG").value=p.eg>0?fmt(p.eg,1):"";
+    if(document.activeElement!==$("gDias"))$("gDias").value=(p.dias!=null&&isFinite(p.dias))?fmt(p.dias,0):"";
+    $("gPeso").classList.toggle("empty",!(p.kg>0));
+    $("gU").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===unit));
+    $("gPeso").placeholder="g";const wv=num($("gPeso").value);$("gPeso").classList.toggle("kgwarn",wv>0&&wv<100);$("gPeso").title=wv>0&&wv<100?"El peso va en gramos (ej.: 1500)":"";
+  }
+  function broadcast(p,except){document.querySelectorAll(".views iframe").forEach(f=>{if(f.contentWindow&&f.contentWindow!==except)f.contentWindow.postMessage({type:"pac",pac:p},"*")});}
+  function fromBar(){
+    const p=read(),w=num($("gPeso").value),eg=num($("gEG").value),d=num($("gDias").value);
+    p.kg=w>0?(unit==="g"?w/1000:w):null; p.eg=eg>0?eg:null; p.dias=isFinite(d)&&d>=0?d:null;
+    write(p);$("gPeso").classList.toggle("empty",!(p.kg>0));$("gPeso").classList.toggle("kgwarn",w>0&&w<100);$("gPeso").title=w>0&&w<100?"El peso va en gramos (ej.: 1500)":"";broadcast(p);
+  }
+  ["gPeso","gEG","gDias"].forEach(id=>$(id).addEventListener("input",fromBar));
+  
+  $("gClr").onclick=()=>{const p={};write(p);paint(p);broadcast(p);$("gPeso").focus();};
+  window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac-set"){write(e.data.pac);paint(e.data.pac);broadcast(e.data.pac,e.source);}});
+  document.querySelectorAll(".views iframe").forEach(f=>f.addEventListener("load",()=>f.contentWindow.postMessage({type:"pac",pac:read()},"*")));
+  paint(read());
+})();
+</script>
+
+<script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!reloaded){reloaded=true;location.reload();}});window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").then(r=>r.update()).catch(()=>{})})}</script>
+</body>
+</html>

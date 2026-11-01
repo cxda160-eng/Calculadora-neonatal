@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202436" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<title>Sedoanalgesia UCIN</title>
+<style>
+:root{
+  --bg:#f7f6fc; --card:#ffffff; --ink:#2e3147; --muted:#6c7090; --line:#e2e4f1; --field:#eef3fb;
+  --blue:#e3eefb; --blue-d:#5a8fd0; --pink:#ffe9ee; --pink-d:#ec8e9a;
+  --mint:#dcf2ec; --mint-d:#2b7a72; --mint-ink:#1f5c55; --lav:#ece6fb; --lav-d:#7a63b8;
+  --peach:#fdeadb; --peach-d:#d48a4a; --warn:#fff4d6; --warn-d:#86590a;
+  --danger:#ffe3e8; --danger-d:#a12d40;
+  --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-num:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#181a27; --card:#202436; --ink:#eceefa; --muted:#a7abc7; --line:#363c56; --field:#2a2f45;
+  --blue:#1f2f45; --blue-d:#9cc3ef; --pink:#3d2530; --pink-d:#f5a7b2;
+  --mint:#1e3a3b; --mint-d:#a6ecdc; --mint-ink:#dcf2ec; --lav:#2c2745; --lav-d:#c8b6f4;
+  --peach:#3d2d20; --peach-d:#f1b98a; --warn:#3b3014; --warn-d:#ffdc8f;
+  --danger:#43202a; --danger-d:#ffb9c4; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#181a27; --card:#202436; --ink:#eceefa; --muted:#a7abc7; --line:#363c56; --field:#2a2f45;
+  --blue:#1f2f45; --blue-d:#9cc3ef; --pink:#3d2530; --pink-d:#f5a7b2;
+  --mint:#1e3a3b; --mint-d:#a6ecdc; --mint-ink:#dcf2ec; --lav:#2c2745; --lav-d:#c8b6f4;
+  --peach:#3d2d20; --peach-d:#f1b98a; --warn:#3b3014; --warn-d:#ffdc8f;
+  --danger:#43202a; --danger-d:#ffb9c4; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg)}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.4}
+header{max-width:760px;margin:0 auto;padding:16px 16px 6px}
+header h1{margin:0;font-size:1.25rem}
+header p{margin:4px 0 0;font-size:.82rem;color:var(--muted)}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px max(16px,env(safe-area-inset-left,0px));background:var(--bg);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav{flex-wrap:wrap;overflow-x:visible;justify-content:center}
+@media (max-width:760px){nav{gap:5px;padding-block:8px}nav button{padding:7px 10px;font-size:.82rem}}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);font-family:inherit;font-weight:600;color:var(--ink);padding:8px 12px;border-radius:999px;font-size:.88rem;cursor:pointer}
+nav button.on{background:var(--mint);color:var(--mint-ink);border-color:var(--mint-d)}
+main{max-width:760px;margin:0 auto;padding:14px 16px calc(60px + env(safe-area-inset-bottom,0px))}
+section{display:none}
+section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 10px;font-size:1.05rem}
+.card h3{margin:12px 0 6px;font-size:.95rem}
+label{display:block;font-size:.82rem;color:var(--muted);margin:8px 0 4px}
+input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;font-size:1rem;background:var(--field);color:var(--ink);font-family:inherit}
+input[type=number]{font-family:var(--font-num)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.seg button{flex:1 1 auto;padding:9px 8px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:.88rem;cursor:pointer;color:var(--ink);font-family:inherit}
+.seg button.on{background:var(--mint);border-color:var(--mint-d);color:var(--mint-ink);font-weight:600}
+.out{background:var(--mint);border-radius:12px;padding:12px;margin-top:12px}
+.out .big{font-size:1.6rem;font-weight:700;color:var(--mint-d);font-family:var(--font-num)}
+.out .sub{font-size:.85rem;color:var(--mint-ink)}
+.out{color:var(--ink)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.9rem;margin-top:8px}
+.kv b{color:var(--muted);font-weight:500}
+.note{font-size:.82rem;padding:10px;border-radius:10px;margin-top:10px}
+.note.info{background:var(--blue);color:var(--ink)}
+.note.warn{background:var(--warn);color:var(--warn-d)}
+.note.danger{background:var(--danger);color:var(--danger-d)}
+.pill{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--lav);color:var(--lav-d);margin-left:6px;vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:.86rem;margin-top:8px}
+th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:.78rem}
+.proc-drug{border-left:4px solid var(--pink-d);padding:8px 10px;margin:8px 0;background:var(--pink);border-radius:8px}
+.proc-drug.opt{border-left-color:var(--peach-d);background:var(--peach)}
+.proc-drug .t{font-weight:700}
+.proc-drug .v{font-size:1.15rem;font-weight:700;margin-top:2px}
+.score-item{margin:10px 0}
+.score-item .q{font-weight:600;font-size:.9rem}
+.score-item .seg button{text-align:left;font-size:.8rem}
+.total{font-size:1.4rem;font-weight:700}
+.step{font-size:.85rem;color:var(--muted);margin-top:6px}
+.small{font-size:.78rem;color:var(--muted)}
+footer{font-size:.74rem;color:var(--muted);text-align:center;padding:20px 16px}
+@media (max-width:420px){.row3{grid-template-columns:1fr 1fr}}
+</style>
+<style id="tema-vivo">
+/* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
+:root{--bg:#f3effd;--field:#e9e2fb;--line:#dcd2f3;--blue:#d6e6fb;--blue-d:#3a7bd5;--pink:#ffdbe3;--pink-d:#e2607a;--mint:#c9efe2;--mint-d:#0d7a66;--lav:#e0d5fb;--lav-d:#6a4fc4;--peach:#ffdcc4;--peach-d:#c2621f;--glow:#e2d8fc;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#2a2350;}}
+:root[data-theme="dark"]{--glow:#2a2350;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+
+</style>
+</head>
+<body>
+<header>
+  <h1 style="font-size:1.2rem">Sedoanalgesia</h1>
+  <p>Basado en el Protocolo de Sedoanalgesia — UCIN Hospital J. A. Fernández (2021) + equivalencias de bibliografía</p>
+</header>
+<nav id="tabs">
+  <button data-s="calc" class="on">Calculadora</button>
+  <button data-s="proc">Procedimientos</button>
+  <button data-s="conv">Conversiones</button>
+  <button data-s="wean">Destete</button>
+  <button data-s="npass">N-PASS</button>
+  <button data-s="finn">Finnegan</button>
+  <button data-s="wat">WAT-1</button>
+  <button data-s="rev">Reversión</button>
+  <button data-s="dil">Diluciones</button>
+</nav>
+<main>
+
+<!-- Paciente (compartido) -->
+<div class="card">
+  <div class="row">
+    <div><label>Peso (g)</label><input id="peso" type="text" inputmode="numeric" autocomplete="off" value="1000"></div>
+    <div><label>Edad gestacional (semanas)</label><input id="eg" type="number" step="1" min="22" max="44" value="30"></div>
+  </div>
+  <div class="small" id="egTxt" style="margin-top:6px"></div>
+</div>
+
+<!-- CALCULADORA -->
+<section id="calc" class="on">
+  <div class="card">
+    <h2>Calcular dosis</h2>
+    <label>Fármaco</label>
+    <select id="drug"></select>
+    <label>Vía / modalidad</label>
+    <div class="seg" id="modes"></div>
+    <div id="calcBody"></div>
+  </div>
+</section>
+
+<!-- PROCEDIMIENTOS -->
+<section id="proc">
+  <div class="card">
+    <h2>Sedoanalgesia para procedimientos</h2>
+    <label>Procedimiento</label>
+    <select id="procSel"></select>
+    <div id="procBody"></div>
+  </div>
+</section>
+
+<!-- CONVERSIONES -->
+<section id="conv">
+  <div class="card">
+    <h2>Equivalencias de opioides <span class="pill">bibliografía</span></h2>
+    <div class="note warn">Estas equivalencias <b>no están en el protocolo institucional</b>. Las relaciones en neonatos tienen evidencia limitada y variable: usá la calculadora como punto de partida, revisá con farmacia y titulá por score (N-PASS / WAT-1 / Finnegan).</div>
+    <label>Opioide actual</label>
+    <select id="opFrom">
+      <option value="fentIVc">Fentanilo IV continuo (mcg/kg/h)</option>
+      <option value="morIVc">Morfina IV continua (mcg/kg/h)</option>
+      <option value="morIVi">Morfina IV intermitente (mcg/kg/dosis)</option>
+      <option value="morVO">Morfina VO (mcg/kg/dosis)</option>
+    </select>
+    <div class="row">
+      <div><label id="opDoseLbl">Dosis</label><input id="opDose" type="number" step="0.1" value="1"></div>
+      <div id="opIntWrap"><label>Intervalo (h)</label><select id="opInt"><option>3</option><option selected>4</option><option>6</option><option>8</option></select></div>
+    </div>
+    <label>Convertir a</label>
+    <select id="opTo">
+      <option value="morVO">Morfina VO (jarabe 1 mg/mL)</option>
+      <option value="morIVi">Morfina IV intermitente</option>
+      <option value="morIVc">Morfina IV continua</option>
+      <option value="metVO">Metadona VO</option>
+    </select>
+    <h3>Supuestos de conversión</h3>
+    <label>Fentanilo IV : Morfina IV</label>
+    <select id="rFM">
+      <option value="20" selected>1 : 20 — usado en estudios neonatales / guía neonatal CAHS (más conservador)</option>
+      <option value="50">1 : 50</option>
+      <option value="100">1 : 100 — derivado de adultos</option>
+    </select>
+    <label>Morfina IV → Morfina VO (multiplicar por)</label>
+    <select id="rIVVO">
+      <option value="2" selected>× 2 — Protocolo Fernández / CAHS</option>
+      <option value="3">× 3 — guía Woman's Hospital (mombaby) 2025</option>
+    </select>
+    <label>Morfina VO : Metadona VO (dosis diaria)</label>
+    <select id="rMM">
+      <option value="20" selected>20 : 1 — mediana ~19:1 en serie pediátrica (n=199)</option>
+      <option value="10">10 : 1</option>
+      <option value="5">5 : 1</option>
+    </select>
+    <label>Fentanilo → Metadona (vía directa, opcional)</label>
+    <select id="rFMet">
+      <option value="0" selected>No usar: pasar por morfina equivalente</option>
+      <option value="2.5">Metadona/día = 2,5 × fentanilo/día (serie retrospectiva PICU, n=42)</option>
+      <option value="1.1">Metadona/día = 1,1 × fentanilo/día (grupo de conversión lenta)</option>
+    </select>
+    <label class="seg-l">Tolerancia cruzada incompleta</label>
+    <div class="seg" id="ctol"><button data-v="1">Sin reducción</button><button data-v="0.75" class="on">Reducir 25%</button><button data-v="0.5">Reducir 50%</button></div>
+    <label>Intervalo de la nueva droga (h)</label>
+    <select id="toInt"><option>3</option><option selected>4</option><option>6</option><option>8</option><option>12</option></select>
+    <div id="convOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>Benzodiacepinas: Midazolam IV continuo → Lorazepam enteral</h2>
+    <label>Midazolam actual (mg/kg/h)</label>
+    <input id="midRate" type="number" step="0.01" value="0.05">
+    <div id="bzOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>Reglas para la transición</h2>
+    <ul class="small" style="font-size:.85rem;color:var(--ink);padding-left:18px">
+      <li>No convertir y descender el mismo día; esperar 24 h estable tras la conversión.</li>
+      <li>Fentanilo → morfina VO: 30 min después de la 1ª dosis VO bajar el goteo a la mitad; 30 min después de la 2ª dosis suspenderlo.</li>
+      <li>Fentanilo → metadona: tras la 2ª dosis de metadona bajar el goteo 50%, tras la 3ª otro 50%, tras la 4ª suspender.</li>
+      <li>Metadona: vida media larga y variable (mayor en prematuros); riesgo de acumulación y sedación tardía. Considerar ECG por QTc.</li>
+      <li>Si hay varios fármacos (opioide + BZD), descender de a uno, en días alternos.</li>
+      <li>Si se requiere analgesia prolongada, la guía CAHS sugiere rotar fentanilo ↔ morfina cada 1–2 semanas.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- DESTETE -->
+<section id="wean">
+  <div class="card">
+    <h2>Planificador de descenso</h2>
+    <label>Fármaco</label>
+    <select id="wDrug">
+      <option value="mcg/kg/h">Fentanilo IV continuo</option>
+      <option value="mcg/kg/h ">Morfina IV continua</option>
+      <option value="mg/kg/h">Midazolam IV continuo</option>
+      <option value="mcg/kg/dosis">Morfina VO</option>
+      <option value="mg/kg/dosis">Metadona VO</option>
+      <option value="mg/kg/dosis ">Lorazepam</option>
+    </select>
+    <div class="row">
+      <div><label>Dosis inicial (<span id="wUnit">mcg/kg/h</span>)</label><input id="wDose" type="number" step="0.01" value="2"></div>
+      <div><label>Días de exposición</label><input id="wDays" type="number" step="1" value="7"></div>
+    </div>
+    <div id="wOut"></div>
+  </div>
+</section>
+
+<!-- N-PASS -->
+<section id="npass">
+  <div class="card">
+    <h2>Score N-PASS</h2>
+    <div class="seg" id="npMode"><button data-v="dolor" class="on">Dolor / disconfort</button><button data-v="sed">Sedación</button></div>
+    <div id="npItems"></div>
+    <div class="out" id="npOut"></div>
+    <div class="small" style="margin-top:8px">Sedación: evaluar al menos 1 vez por turno en todo paciente con sedoanalgesia. Dolor: ante sospecha de dolor/disconfort.</div>
+  </div>
+  <div class="card">
+    <h2>Medidas no farmacológicas</h2>
+    <ol style="margin:0;padding-left:20px;font-size:.9rem">
+      <li>Mamá canguro / contacto piel a piel</li><li>Arropamiento y flexión facilitada</li><li>Amamantamiento</li><li>Succión no nutritiva</li><li>Sacarosa</li><li>Musicoterapia y contacto</li>
+    </ol>
+  </div>
+</section>
+
+<!-- FINNEGAN -->
+<section id="finn">
+  <div class="card">
+    <h2>Escala de Finnegan modificada <span class="pill">abstinencia</span></h2>
+    <div class="small">Evaluar cada 3–4 h, 30–60 min después de alimentar, con el niño despierto. Puntuar lo observado en todo el intervalo.</div>
+    <div id="fnItems"></div>
+    <div class="out" id="fnOut"></div>
+    <div class="row" style="margin-top:10px">
+      <button id="fnSave" style="padding:10px;border-radius:10px;border:1px solid var(--mint-d);background:var(--mint);color:var(--mint-ink);font-size:.9rem;cursor:pointer">Registrar puntaje</button>
+      <button id="fnReset" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.9rem;cursor:pointer">Limpiar escala</button>
+    </div>
+    <div id="fnLog"></div>
+  </div>
+  <div class="card">
+    <h2>Interpretación</h2>
+    <table>
+      <tr><th>Puntaje</th><th>Conducta</th></tr>
+      <tr><td>0–7</td><td>Abstinencia leve o ausente. Medidas no farmacológicas; continuar o avanzar el descenso.</td></tr>
+      <tr><td>≥ 8 en 3 evaluaciones consecutivas<br>(o promedio ≥ 8)</td><td>Indicación de tratamiento farmacológico o de aumentar la dosis / frenar el descenso.</td></tr>
+      <tr><td>≥ 12 en 2 evaluaciones consecutivas</td><td>Igual que arriba; requiere intervención inmediata y reevaluación médica.</td></tr>
+    </table>
+    <div class="note warn">La escala de Finnegan fue diseñada para abstinencia neonatal por exposición intrauterina en RN de término. En prematuros (signos menos expresivos) y en abstinencia iatrogénica en UCIN su validez es menor; algunas guías recomiendan usar WAT-1, o ambas en prematuros.</div>
+  </div>
+</section>
+
+<!-- WAT-1 -->
+<section id="wat">
+  <div class="card">
+    <h2>WAT-1 <span class="pill">abstinencia iatrogénica</span></h2>
+    <div class="small">Withdrawal Assessment Tool-1. Para pacientes con opioides y/o benzodiacepinas ≥ 5 días. Evaluar cada 12 h desde el primer día del descenso hasta 72 h después de la última dosis.</div>
+    <div id="watItems"></div>
+    <div class="out" id="watOut"></div>
+    <div class="row" style="margin-top:10px">
+      <button id="watSave" style="padding:10px;border-radius:10px;border:1px solid var(--mint-d);background:var(--mint);color:var(--mint-ink);font-size:.9rem;cursor:pointer">Registrar puntaje</button>
+      <button id="watReset" style="padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.9rem;cursor:pointer">Limpiar escala</button>
+    </div>
+    <div id="watLog"></div>
+  </div>
+  <div class="card">
+    <h2>Interpretación</h2>
+    <table>
+      <tr><th>Puntaje (0–12)</th><th>Conducta</th></tr>
+      <tr><td>0–2</td><td>Sin abstinencia significativa: continuar el descenso.</td></tr>
+      <tr><td>3–7</td><td>Abstinencia (WAT-1 ≥ 3). Frenar el descenso, considerar rescate o ajuste del esquema.</td></tr>
+      <tr><td>≥ 8</td><td>Abstinencia importante: volver a la última dosis estable, rescate y reevaluación médica.</td></tr>
+    </table>
+    <div class="small" style="margin-top:8px">Punto de corte ≥ 3: sensibilidad 0,87 y especificidad 0,88 en la validación original (Franck 2008, PICU). La conducta por rangos sigue los protocolos citados en Destete.</div>
+    <div class="note info"><b>SBS</b> (State Behavioral Scale): ≤ 0 = dormido o despierto y tranquilo; ≥ +1 = despierto con distrés / agitado.</div>
+  </div>
+</section>
+
+<!-- REVERSIÓN -->
+<section id="rev">
+  <div class="card" id="revBody"></div>
+</section>
+
+<!-- DILUCIONES -->
+<section id="dil">
+  <div class="card">
+    <h2>Estándares de dilución (protocolo)</h2>
+    <table id="dilTable"><thead><tr><th>Fármaco</th><th>Ampolla</th><th>Dilución</th><th>Concentración</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="card">
+    <h2>Observaciones sobre el protocolo</h2>
+    <div class="note danger"><b>Morfina IV intermitente:</b> el protocolo indica 50–100 mcg/kg/dosis, pero la tabla de ejemplo calcula 10 mcg/kg/dosis (0,1 / 0,2 / 0,3 mL de Dilución 2). Con 50 mcg/kg corresponden 0,5 / 1 / 1,5 mL. Además la morfina VO figura como "doble de la dosis EV: 100–200", coherente con 50–100 EV. La app usa el rango 50–100; conviene confirmar con el servicio.</div>
+    <div class="note warn"><b>Fentanilo para procedimientos:</b> las tablas de volumen están calculadas a 1 mcg/kg (dosis del RNPT). En RNT la dosis es 2 mcg/kg → el doble de volumen. La app ajusta según la EG.</div>
+    <div class="note warn"><b>N-PASS sedación:</b> los rangos "-10 a -5 profunda" y "-5 a -2 leve" se superponen en -5 (igual que en la escala original). La app clasifica -5 como sedación profunda.</div>
+    <div class="note info"><b>Naloxona:</b> el protocolo usa 0,1 mg/kg (dosis de reversión completa). En pacientes con dependencia a opioides puede desencadenar abstinencia aguda; algunas guías usan dosis menores tituladas (ej. 0,001–0,01 mg/kg) cuando el objetivo es revertir depresión respiratoria sin abstinencia.</div>
+  </div>
+</section>
+
+</main>
+<footer>Herramienta de apoyo. No reemplaza el criterio clínico ni la doble verificación de enfermería/farmacia. Verificá siempre dosis, dilución y bomba.</footer>
+
+<script>
+// ---------- utilidades ----------
+const $ = id => document.getElementById(id);
+const r2 = x => (Math.round(x*100)/100).toLocaleString('es-AR',{maximumFractionDigits:2});
+const r3 = x => (Math.round(x*1000)/1000).toLocaleString('es-AR',{maximumFractionDigits:3});
+const num = id => parseFloat(String($(id).value).replace(',','.')) || 0;
+const kg = () => num('peso') / 1000;
+const eg = () => num('eg');
+const isPT = () => eg() < 37;
+
+function segInit(el, cb){
+  el.addEventListener('click', e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    [...el.children].forEach(x=>x.classList.toggle('on', x===b));
+    cb && cb(b.dataset.v);
+  });
+}
+const segVal = el => (el.querySelector('.on')||el.children[0]).dataset.v;
+
+// ---------- datos del protocolo ----------
+// u = unidad base (mcg | mg). conc en u/mL.
+const DRUGS = {
+  morfina:{ name:'Morfina', amp:'1 mL = 10 mg (10.000 mcg)', modes:{
+    int:{label:'IV intermitente', u:'mcg', per:'dosis', range:()=>[50,100], def:()=>50, conc:100, concLbl:'Dilución 2 (100 mcg/mL)', freq:'c/4 h', admin:'Pasar en 5 minutos.',
+         warn:'Ver observación: la tabla del protocolo calcula 10 mcg/kg, el rango declarado es 50–100 mcg/kg.'},
+    cont:{label:'IV continua', u:'mcg', range:()=>[10,30], def:()=>10, prep:{drugMl:2, drugConc:1000, drugLbl:'Dilución 1 (1000 mcg/mL)', dilMl:22}},
+    vo:{label:'VO', u:'mcg', per:'dosis', range:()=>[100,200], def:()=>100, conc:1000, concLbl:'Jarabe magistral JAF 1 mg/mL', freq:'15 min antes del procedimiento', admin:'Dosis = doble de la dosis EV.'}
+  }},
+  fentanilo:{ name:'Fentanilo', amp:'1 mL = 0,05 mg (50 mcg)', modes:{
+    int:{label:'IV intermitente', u:'mcg', per:'dosis', range:()=>isPT()?[1,1]:[2,2], def:()=>isPT()?1:2, conc:5, concLbl:'Dilución estándar (5 mcg/mL)', freq:'c/4 h', admin:'Pasar lento en 5 minutos (riesgo de tórax rígido). RNPT 1 mcg/kg · RNT 2 mcg/kg.'},
+    cont:{label:'IV continua', u:'mcg', range:()=>[1,2], def:()=>1, prep:{drugMl:5, drugConc:50, drugLbl:'ampolla pura (50 mcg/mL)', dilMl:19}}
+  }},
+  paracetamol:{ name:'Paracetamol', amp:'Jarabe 100 mg/mL', modes:{
+    vo:{label:'VO', u:'mg', per:'dosis', range:()=> eg()<28?[10,10]: eg()<33?[10,10]: eg()<37?[10,15]:[10,15], def:()=>10, conc:100, concLbl:'Jarabe 100 mg/mL',
+        freq:'', freqFn:()=> eg()<33?'c/8 h': eg()<37?'c/6–8 h':'c/6 h',
+        warnFn:()=> eg()<28?'El protocolo no especifica dosis para < 28 semanas.':''}
+  }},
+  midazolam:{ name:'Midazolam', amp:'1 mL = 5 mg', modes:{
+    int:{label:'IV intermitente', u:'mg', per:'dosis', range:()=>[0.05,0.2], def:()=>0.1, conc:0.5, concLbl:'Dilución estándar (0,5 mg/mL)', freq:'c/6–8 h', admin:'Pasar en 5 minutos para evitar hipotensión.'},
+    cont:{label:'IV continua', u:'mg', range:()=> eg()<27?[0.02,0.03]: eg()<30?[0.03,0.04]:[0.03,0.06], def:()=> eg()<27?0.02:0.03,
+          prep:{drugMl:5, drugConc:0.5, drugLbl:'Dilución estándar (0,5 mg/mL)', dilMl:19},
+          warnFn:()=> eg()<24?'El protocolo da rangos a partir de 24 semanas.':''},
+    vo:{label:'VO', u:'mg', per:'dosis', range:()=>[0.25,0.5], def:()=>0.25, conc:1, concLbl:'Jarabe magistral JAF 1 mg/mL', freq:'c/6–8 h'}
+  }},
+  lorazepam:{ name:'Lorazepam', amp:'1 mL = 4 mg', modes:{
+    int:{label:'IV intermitente', u:'mg', per:'dosis', range:()=>[0.05,0.1], def:()=>0.1, conc:0.4, concLbl:'Dilución estándar (0,4 mg/mL)', freq:'c/6–8 h', admin:'Administrar lento en 5 minutos.'}
+  }},
+  cloral:{ name:'Hidrato de cloral', amp:'Jarabe magistral 50 mg/mL', modes:{
+    vo:{label:'VO', u:'mg', per:'dosis', range:()=>[25,25], def:()=>25, conc:50, concLbl:'Jarabe magistral JAF 50 mg/mL', freq:'c/6–8 h (para RM/TAC: dosis única 30–60 min antes)'}
+  }},
+  clonidina:{ name:'Clonidina', amp:'1 mL = 0,15 mg (150 mcg)', modes:{
+    vo:{label:'VO', u:'mcg', per:'dosis', range:()=>isPT()?[0.5,1]:[1,1], def:()=>isPT()?0.5:1, conc:10, concLbl:'Jarabe magistral JAF 10 mcg/mL', freq:'c/6 h'},
+    int:{label:'IV intermitente', u:'mcg', per:'dosis', range:()=>[0.5,1], def:()=>1, conc:10, concLbl:'Dilución estándar (10 mcg/mL: 1 mL + 14 mL SF)', freq:'c/6 h'},
+    cont:{label:'IV continua', u:'mcg', range:()=>[1,2], def:()=>1, prep:{drugMl:2.5, drugConc:10, drugLbl:'Dilución estándar (10 mcg/mL)', dilMl:21.5}}
+  }},
+  atropina:{ name:'Atropina', amp:'1 mL = 1 mg', modes:{
+    int:{label:'IV bolo', u:'mg', per:'dosis', range:()=>[0.02,0.02], def:()=>0.02, conc:0.1, concLbl:'Dilución estándar (0,1 mg/mL)', freq:'si bradicardia'}
+  }},
+  pancuronio:{ name:'Pancuronio', amp:'1 mL = 2 mg', modes:{
+    int:{label:'IV bolo', u:'mg', per:'dosis', range:()=>[0.05,0.1], def:()=>0.1, conc:0.2, concLbl:'Dilución estándar (0,2 mg/mL)', freq:'dosis única', admin:'Efecto máximo a los 2–3 min, duración 40–60 min. Solo en paciente intubado.'}
+  }},
+};
+
+// ---------- paciente ----------
+function egInfo(){
+  const e=eg();
+  $('egTxt').textContent = e ? (e<37 ? `RNPT (${e} sem)` : `RNT (${e} sem)`) + (e<30?' · < 30 sem: corrección en N-PASS':'') : '';
+}
+
+// ---------- calculadora ----------
+let curMode=null;
+function fillDrugs(){
+  $('drug').innerHTML = Object.entries(DRUGS).map(([k,d])=>`<option value="${k}">${d.name}</option>`).join('');
+}
+function renderModes(){
+  const d=DRUGS[$('drug').value];
+  const keys=Object.keys(d.modes);
+  if(!keys.includes(curMode)) curMode=keys[0];
+  $('modes').innerHTML = keys.map(k=>`<button data-v="${k}" class="${k===curMode?'on':''}">${d.modes[k].label}</button>`).join('');
+  renderCalcBody(true);
+}
+function renderCalcBody(reset){
+  const d=DRUGS[$('drug').value], m=d.modes[curMode];
+  const [lo,hi]=m.range();
+  const unit = m.u+'/kg/'+(m.prep?'h':'dosis');
+  const prevDose = reset ? m.def() : num('dose');
+  let html = `<label>Dosis (${unit}) <span class="pill">protocolo: ${lo===hi?lo:lo+' – '+hi}</span></label>
+    <input id="dose" type="number" step="${m.u==='mg'?0.005:0.1}" value="${prevDose}">`;
+  if(m.prep){
+    html += `<label>Jeringa (mL)</label><div class="seg" id="syr"><button data-v="12">12</button><button data-v="24" class="on">24</button><button data-v="48">48</button></div>
+      <label>…o fijá el goteo (mL/h) y calculo la dosis</label><input id="rateIn" type="number" step="0.01" placeholder="opcional">`;
+  }
+  html += `<div id="calcOut"></div>`;
+  $('calcBody').innerHTML = html;
+  $('dose').addEventListener('input',()=>{ if($('rateIn')) $('rateIn').value=''; calc(); });
+  if(m.prep){
+    segInit($('syr'), calc);
+    $('rateIn').addEventListener('input', calc);
+  }
+  calc();
+}
+function calc(){
+  const d=DRUGS[$('drug').value], m=d.modes[curMode], w=kg();
+  const [lo,hi]=m.range();
+  let dose=num('dose');
+  let out='', warn='';
+  if(!w){ $('calcOut').innerHTML='<div class="note warn">Ingresá el peso.</div>'; return; }
+  if(m.prep){
+    const S=parseFloat(segVal($('syr')));
+    const f=S/24, drugMl=m.prep.drugMl*f, dilMl=m.prep.dilMl*f;
+    const conc = (m.prep.drugMl*m.prep.drugConc)/(m.prep.drugMl+m.prep.dilMl); // u/mL
+    const rateIn = num('rateIn');
+    let rate;
+    if(rateIn>0){ rate=rateIn; dose = rate*conc/w; }
+    else rate = dose*w/conc;
+    out = `<div class="out">
+      <div class="big">${r2(rate)} mL/h</div>
+      <div class="sub">${rateIn>0?'Dosis resultante: <b>'+r3(dose)+' '+m.u+'/kg/h</b>':'para '+r3(dose)+' '+m.u+'/kg/h'}</div>
+      <div class="kv">
+        <b>Preparación</b><span>${r2(drugMl)} mL de ${m.prep.drugLbl} + ${r2(dilMl)} mL SF = ${S} mL</span>
+        <b>Concentración</b><span>${r3(conc)} ${m.u}/mL</span>
+        <b>Dosis/hora</b><span>${r3(dose*w)} ${m.u}/h</span>
+        <b>Duración jeringa</b><span>${rate>0? r2(S/rate)+' h':'—'}</span>
+      </div></div>`;
+  } else {
+    const tot=dose*w, ml=tot/m.conc;
+    const freq = m.freqFn? m.freqFn(): m.freq;
+    out = `<div class="out">
+      <div class="big">${r2(ml)} mL</div>
+      <div class="sub">de ${m.concLbl}</div>
+      <div class="kv">
+        <b>Dosis</b><span>${r3(tot)} ${m.u} (${r3(dose)} ${m.u}/kg)</span>
+        ${freq?`<b>Frecuencia</b><span>${freq}</span>`:''}
+        ${m.admin?`<b>Administración</b><span>${m.admin}</span>`:''}
+      </div></div>`;
+  }
+  if(dose<lo-1e-9 || dose>hi+1e-9) warn += `<div class="note danger">Dosis fuera del rango del protocolo (${lo===hi?lo:lo+'–'+hi} ${m.u}/kg).</div>`;
+  if(m.warn) warn += `<div class="note warn">${m.warn}</div>`;
+  if(m.warnFn && m.warnFn()) warn += `<div class="note warn">${m.warnFn()}</div>`;
+  $('calcOut').innerHTML = out+warn;
+}
+
+// ---------- procedimientos ----------
+const fent = () => ({t:'Fentanilo IV', dose:isPT()?1:2, u:'mcg', conc:5, lbl:'Dilución estándar 5 mcg/mL', admin:`${isPT()?'RNPT':'RNT'}: ${isPT()?1:2} mcg/kg · pasar lento en 5 min`});
+const atro = () => ({t:'Atropina IV — si bradicardia', dose:0.02, u:'mg', conc:0.1, lbl:'Dilución estándar 0,1 mg/mL', opt:true});
+const panc = (txt) => ({t:'Pancuronio IV — '+txt, dose:0.1, u:'mg', conc:0.2, lbl:'Dilución estándar 0,2 mg/mL', admin:'0,05–0,1 mg/kg (se muestra 0,1). Efecto máx 2–3 min, dura 40–60 min.', opt:true});
+const PROCS = {
+  iot:{name:'Intubación endotraqueal', items:()=>[fent(), atro(), panc('si tórax rígido')]},
+  rmhipo:{name:'RM post-hipotermia / TAC', items:()=>[{t:'Hidrato de cloral VO', dose:25, u:'mg', conc:50, lbl:'Jarabe magistral 50 mg/mL', admin:'Dosis única 30–60 min antes del estudio'}]},
+  perc:{name:'Colocación de percutánea', items:()=>[
+    Object.assign(fent(),{t:'A) Con acceso vascular: Fentanilo IV'}),
+    {t:'B) Sin acceso vascular: Morfina VO', dose:100, u:'mcg', conc:1000, lbl:'Jarabe magistral 1 mg/mL', admin:'100–200 mcg/kg, 15 min antes (se muestra 100)', opt:true}],
+    notes:['C) Si tiene goteo de opioides: dar dosis extra antes del procedimiento.']},
+  cvc:{name:'Colocación de catéter central', items:()=>[fent(), panc('considerar, solo si intubado')], notes:['Si tiene goteo de opioides: dosis extra antes del procedimiento.']},
+  dren:{name:'Colocación de drenaje pleural', items:()=>[fent(), panc('considerar, solo si intubado')], notes:['Si tiene goteo de opioides: dosis extra antes del procedimiento.']},
+  retdren:{name:'Retiro de drenaje pleural', items:()=>[fent()], notes:['Si tiene goteo de opioides: dosis extra antes del procedimiento.']},
+  rop:{name:'Fotocoagulación (ROP)', items:()=>[fent(), atro()], notes:['Gotas anestésicas locales: 1 en cada ojo inmediatamente antes.','Luego: tobramicina-dexametasona tópica c/4 h por 72 h.','Si tiene goteo de opioides: dosis extra antes.']},
+  rmvo:{name:'RMN > 30 min — Midazolam VO', items:()=>[{t:'Midazolam VO (cada dosis)', dose:0.25, u:'mg', conc:1, lbl:'Jarabe magistral 1 mg/mL'}],
+    notes:['1ª dosis 30 min antes de bajar al resonador.','2ª dosis 15 min antes.','3ª dosis en el resonador (hasta 0,5 mg/kg).','Dosis total máxima: 1 mg/kg.']},
+  rmiv:{name:'RMN > 30 min — Midazolam IV', items:()=>[{t:'Midazolam IV (cada dosis)', dose:0.05, u:'mg', conc:0.5, lbl:'Dilución estándar 0,5 mg/mL', admin:'Pasar en 5 min (hipotensión)'}],
+    notes:['1ª dosis 45 min antes.','2ª dosis 30 min antes.','3ª dosis 15 min antes.','4ª dosis inmediatamente antes o en el resonador.','Dosis total: 0,2 mg/kg.']},
+};
+function fillProcs(){ $('procSel').innerHTML = Object.entries(PROCS).map(([k,p])=>`<option value="${k}">${p.name}</option>`).join(''); }
+function renderProc(){
+  const p=PROCS[$('procSel').value], w=kg();
+  let h = p.items().map(it=>{
+    const tot=it.dose*w, ml=tot/it.conc;
+    return `<div class="proc-drug ${it.opt?'opt':''}"><div class="t">${it.t}</div>
+      <div class="v">${r2(ml)} mL <span class="small">de ${it.lbl}</span></div>
+      <div class="small">${r3(it.dose)} ${it.u}/kg → ${r3(tot)} ${it.u}${it.admin?' · '+it.admin:''}</div></div>`;
+  }).join('');
+  if(p.notes) h += `<ul style="font-size:.88rem;padding-left:18px">${p.notes.map(n=>`<li>${n}</li>`).join('')}</ul>`;
+  $('procBody').innerHTML = h;
+}
+
+// ---------- reversión ----------
+function renderRev(){
+  const w=kg();
+  $('revBody').innerHTML = `<h2>Reversión</h2>
+  <div class="proc-drug"><div class="t">Flumazenil — revierte benzodiacepinas</div>
+    <div class="v">${r2(0.01*w/0.1)} mL <span class="small">ampolla pura 0,1 mg/mL</span></div>
+    <div class="small">0,01 mg/kg = ${r3(0.01*w)} mg · pasar en 15 seg · repetir a los 45 seg y luego cada minuto · máx acumulado 0,05 mg/kg (${r3(0.05*w)} mg = ${r2(0.05*w/0.1)} mL)</div></div>
+  <div class="proc-drug"><div class="t">Naloxona — revierte opioides</div>
+    <div class="v">${r2(0.1*w/0.4)} mL <span class="small">ampolla pura 0,4 mg/mL</span></div>
+    <div class="small">0,1 mg/kg = ${r3(0.1*w)} mg · repetir cada 2–3 min</div></div>
+  <div class="note info">En pacientes con exposición prolongada a opioides, la reversión completa puede desencadenar abstinencia aguda. Ver observaciones en "Diluciones".</div>`;
+}
+
+// ---------- diluciones ----------
+function renderDil(){
+  const rows=[
+    ['Morfina','10 mg/mL','D1: 1 mL → 10 mL SF<br>D2: 1 mL de D1 → 10 mL SF','D1: 1000 mcg/mL<br>D2: 100 mcg/mL'],
+    ['Fentanilo','50 mcg/mL','1 mL → 10 mL SF','5 mcg/mL'],
+    ['Midazolam','5 mg/mL','1 mL → 10 mL SF','0,5 mg/mL'],
+    ['Lorazepam','4 mg/mL','1 mL → 10 mL SF','0,4 mg/mL'],
+    ['Clonidina','150 mcg/mL','1 mL → 15 mL SF','10 mcg/mL'],
+    ['Atropina','1 mg/mL','1 mL → 10 mL SF','0,1 mg/mL'],
+    ['Pancuronio','2 mg/mL','1 mL → 10 mL SF','0,2 mg/mL'],
+    ['Flumazenil','0,1 mg/mL','Pura','0,1 mg/mL'],
+    ['Naloxona','0,4 mg/mL','Pura','0,4 mg/mL'],
+  ];
+  $('dilTable').querySelector('tbody').innerHTML = rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('') +
+   `<tr><td colspan="4" class="small"><b>Goteos (24 mL):</b> Morfina 2 mL D1 + 22 SF (83,3 mcg/mL) · Fentanilo 5 mL puro + 19 SF (10,4 mcg/mL) · Midazolam 5 mL dil. + 19 SF (0,104 mg/mL) · Clonidina 2,5 mL dil. + 21,5 SF (1,04 mcg/mL)</td></tr>`;
+}
+
+// ---------- conversiones opioides ----------
+function updOpLbl(){
+  const f=$('opFrom').value;
+  $('opDoseLbl').textContent = {fentIVc:'Dosis (mcg/kg/h)', morIVc:'Dosis (mcg/kg/h)', morIVi:'Dosis (mcg/kg/dosis)', morVO:'Dosis (mcg/kg/dosis)'}[f];
+  $('opIntWrap').style.visibility = (f==='morIVi'||f==='morVO')?'visible':'hidden';
+}
+function convOp(){
+  const w=kg(), f=$('opFrom').value, to=$('opTo').value, d=num('opDose');
+  const rFM=+$('rFM').value, rIV=+$('rIVVO').value, rMM=+$('rMM').value, rFMet=+$('rFMet').value;
+  const ct=parseFloat(segVal($('ctol')));
+  const ti=+$('toInt').value, dosesDay=24/ti;
+  const steps=[];
+  if(!w||!d){ $('convOut').innerHTML='<div class="note warn">Completá peso y dosis.</div>'; return; }
+
+  // 1) Dosis diaria actual (mcg/día)
+  let dailyFrom, fromLbl;
+  if(f==='fentIVc'||f==='morIVc'){ dailyFrom=d*w*24; steps.push(`Dosis diaria actual: ${r3(d)} mcg/kg/h × ${r2(w)} kg × 24 h = <b>${r2(dailyFrom)} mcg/día</b>`); }
+  else { const n=24/(+$('opInt').value); dailyFrom=d*w*n; steps.push(`Dosis diaria actual: ${r3(d)} mcg/kg × ${r2(w)} kg × ${r2(n)} dosis = <b>${r2(dailyFrom)} mcg/día</b>`); }
+
+  let targetDaily, unit='mcg', directMet=false;
+  if(to==='metVO' && f==='fentIVc' && rFMet>0){
+    targetDaily = dailyFrom*rFMet; directMet=true;
+    steps.push(`Metadona/día = ${rFMet} × fentanilo/día = <b>${r2(targetDaily)} mcg/día</b>`);
+  } else {
+    // 2) a morfina IV equivalente
+    let morIV;
+    if(f==='fentIVc'){ morIV=dailyFrom*rFM; steps.push(`Fentanilo → morfina IV (×${rFM}) = <b>${r2(morIV)} mcg/día</b>`); }
+    else if(f==='morVO'){ morIV=dailyFrom/rIV; steps.push(`Morfina VO → IV (÷${rIV}) = <b>${r2(morIV)} mcg/día</b>`); }
+    else morIV=dailyFrom;
+    // 3) a destino
+    if(to==='morIVi'||to==='morIVc') targetDaily=morIV;
+    else if(to==='morVO'){ targetDaily = f==='morVO'? dailyFrom : morIV*rIV; if(f!=='morVO') steps.push(`Morfina IV → VO (×${rIV}) = <b>${r2(targetDaily)} mcg/día</b>`); }
+    else if(to==='metVO'){ const morVO = f==='morVO'? dailyFrom : morIV*rIV; if(f!=='morVO') steps.push(`Morfina IV → VO (×${rIV}) = <b>${r2(morVO)} mcg/día</b>`);
+      targetDaily = morVO/rMM; steps.push(`Morfina VO → metadona VO (÷${rMM}) = <b>${r2(targetDaily)} mcg/día</b>`); }
+  }
+  const sameDrug = (f.startsWith('mor') && to.startsWith('mor'));
+  const applyCt = !sameDrug;
+  if(applyCt && ct<1){ targetDaily*=ct; steps.push(`Tolerancia cruzada incompleta (×${ct}) = <b>${r2(targetDaily)} mcg/día</b>`); }
+
+  let res='';
+  if(to==='morIVc'){
+    const perKgH = targetDaily/w/24, rate = perKgH*w/(2000/24);
+    res = `<div class="big">${r2(perKgH)} mcg/kg/h</div><div class="sub">Goteo protocolo (2 mL D1 + 22 SF, 83,3 mcg/mL): <b>${r2(rate)} mL/h</b></div>`;
+    if(perKgH>30) res+=`<div class="note danger">Supera el rango del protocolo (10–30 mcg/kg/h).</div>`;
+  } else {
+    const perDose=targetDaily/dosesDay, perKgDose=perDose/w;
+    let vol='';
+    if(to==='morVO') vol=`${r2(perDose/1000)} mL de jarabe 1 mg/mL`;
+    if(to==='morIVi') vol=`${r2(perDose/100)} mL de Dilución 2 (100 mcg/mL)`;
+    if(to==='metVO') vol=`<span class="small">volumen según la concentración de metadona disponible</span>`;
+    res = `<div class="big">${r3(perDose/1000)} mg c/${ti} h</div>
+      <div class="sub">${r2(perKgDose)} mcg/kg/dosis (${r3(perKgDose/1000)} mg/kg/dosis) · ${r3(targetDaily/1000)} mg/día</div>
+      <div class="sub">${vol}</div>`;
+    if(to==='metVO'){
+      res += `<div class="note warn">Metadona no está en el protocolo institucional. Intervalo habitual c/6–12 h; por su vida media larga, evaluar acumulación a las 48–72 h. Como referencia, los protocolos de abstinencia neonatal suelen iniciar en 0,05–0,1 mg/kg/dosis.</div>`;
+      if(!directMet) res += `<div class="note info">En la serie pediátrica que da la relación ~19:1, el 42% de los pacientes quedó subtratado: titulá con score y dosis de rescate.</div>`;
+    }
+    if(to==='morVO' && (perKgDose<100||perKgDose>200) && ti===4) res+=`<div class="note info">El protocolo usa morfina VO 100–200 mcg/kg/dosis para procedimientos; en conversión, la dosis depende de la exposición previa.</div>`;
+  }
+  $('convOut').innerHTML = `<div class="out">${res}</div><div class="step">${steps.map(s=>'• '+s).join('<br>')}</div>`;
+}
+function convBz(){
+  const w=kg(), m=num('midRate');
+  let h;
+  if(m>0.15) h=`<div class="note danger">La fórmula solo se valida con midazolam ≤ 0,15 mg/kg/h.</div>`;
+  else {
+    const dose=m*w*1.2, perkg=dose/w, max=Math.min(0.18*w,5);
+    h=`<div class="out"><div class="big">${r3(Math.min(dose,max))} mg c/4 h</div>
+      <div class="sub">Lorazepam enteral · ${r3(perkg)} mg/kg/dosis${dose>max?' (limitado al máximo 0,18 mg/kg/dosis)':''}</div></div>
+      <div class="step">• Fórmula (CHOP): midazolam mg/kg/h × peso × 1,2 = lorazepam mg/dosis c/4 h<br>• Equivale a lorazepam/día ≈ 0,3 × midazolam/día</div>
+      <div class="note warn">El protocolo solo trae lorazepam IV (0,05–0,1 mg/kg c/6–8 h). La forma enteral requiere preparación magistral; confirmá disponibilidad con farmacia.</div>`;
+  }
+  $('bzOut').innerHTML=h;
+}
+
+// ---------- destete ----------
+function wean(){
+  const sel=$('wDrug'), unit=sel.value.trim(); $('wUnit').textContent=unit;
+  const d0=num('wDose'), days=num('wDays');
+  let pct, every, risk;
+  if(days<5){ pct=[20,50]; every='12 h'; risk='Bajo'; }
+  else if(days<=14){ pct=[10,20]; every='24–48 h'; risk='Moderado'; }
+  else { pct=[5,10]; every='24–48 h'; risk='Alto'; }
+  const p=pct[0]; // conservador
+  let rows='', dose=d0, step=0, t=0;
+  const dec=d0*p/100, stepH = days<5?12:24;
+  while(dose>d0*0.0001 && step<40){
+    rows+=`<tr><td>${step===0?'Inicio':'Paso '+step}</td><td>${step===0?'0 h': (days<5? (t)+' h':'día '+(t/24))}</td><td>${r3(dose)} ${unit}</td><td>${r2(dose/d0*100)}%</td></tr>`;
+    dose=Math.max(0, d0 - dec*(step+1)); step++; t+=stepH;
+    if(dose<=1e-9){ rows+=`<tr><td>Suspender</td><td>${days<5? t+' h':'día '+(t/24)}</td><td>—</td><td>0%</td></tr>`; break; }
+  }
+  $('wOut').innerHTML = `<div class="out"><div class="big">Riesgo ${risk}</div>
+    <div class="sub">Descender ${pct[0]}–${pct[1]}% de la dosis <b>original</b> cada ${every}. Plan con ${p}% (extremo conservador) cada ${days<5?'12 h':'24 h'}; si el intervalo es 48 h, duplicá los tiempos.</div></div>
+    <table><thead><tr><th>Paso</th><th>Momento</th><th>Dosis</th><th>% inicial</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="note info">Descender solo si el score de abstinencia está bajo (Finnegan/NAS &lt; 8 o WAT-1 &lt; 3–4). Si 3 scores consecutivos son altos: rescate y volver a la última dosis estable. Morfina VO puede suspenderse al llegar a 0,03–0,05 mg/kg/dosis; metadona/lorazepam habitualmente se suspenden en ~0,05 mg/kg/dosis espaciando intervalos.</div>
+    <div class="small">Esquema de % según guía neonatal CAHS (Perth) y Woman's Hospital (mombaby).</div>`;
+}
+
+// ---------- N-PASS ----------
+const NP = {
+  dolor:{vals:[0,1,2], items:[
+    ['Llanto / irritabilidad',['Llanto adecuado / tranquilo','Irritable o ataques de llanto, consolable','Llanto continuo, silencioso o agudo, inconsolable']],
+    ['Comportamiento',['Adecuado para la EG','Inquieto, se retuerce, se despierta seguido','Se arquea y patea, despierto todo el tiempo, o se despierta poco y no se mueve (no sedado)']],
+    ['Expresión facial',['Relajado','Muestra dolor esporádicamente','Muestra dolor continuamente']],
+    ['Tono de brazos y piernas',['Manos y pies relajados / tono normal','Ocasionalmente puños/dedos apretados o abre y separa dedos; sin cuerpo tenso','Puños y dedos apretados o abre y separa dedos; cuerpo tenso']],
+    ['Signos vitales (FC, FR, TA, Sat)',['Rango normal para la EG','↑ 10–20% de basales; Sat 76–85% con estímulo, recupera rápido','↑ > 20% de basales; Sat ≤ 75% con estímulo, recupera lento; desadaptación al respirador']],
+  ]},
+  sed:{vals:[0,-1,-2], items:[
+    ['Llanto / irritabilidad',['Llanto adecuado / tranquilo','Gime o llora con pocos estímulos dolorosos','No llora con estímulos dolorosos']],
+    ['Comportamiento',['Adecuado para la EG','Se despierta un poco con estímulos, se mueve muy poco','No se despierta con estímulos, no se mueve']],
+    ['Expresión facial',['Relajado','Poca expresión con estímulos','Boca relajada, sin expresión']],
+    ['Tono de brazos y piernas',['Manos y pies relajados / tono normal','Reflejo de prensión débil, menor tono','Sin reflejo de prensión, fláccido']],
+    ['Signos vitales (FC, FR, TA, Sat)',['Rango normal para la EG','Variación < 10% de basales con estímulos','Sin cambios con estímulos; hipoventilación o apneas']],
+  ]}
+};
+let npMode='dolor', npSel={};
+function renderNP(){
+  const S=NP[npMode]; npSel={};
+  $('npItems').innerHTML = S.items.map((it,i)=>`<div class="score-item"><div class="q">${it[0]}</div>
+    <div class="seg" data-i="${i}">${it[1].map((t,j)=>`<button data-v="${S.vals[j]}" class="${j===0?'on':''}"><b>${S.vals[j]}</b> · ${t}</button>`).join('')}</div></div>`).join('');
+  document.querySelectorAll('#npItems .seg').forEach(el=>{ npSel[el.dataset.i]=0; segInit(el,v=>{npSel[el.dataset.i]=+v; scoreNP();}); });
+  scoreNP();
+}
+function scoreNP(){
+  let s=Object.values(npSel).reduce((a,b)=>a+b,0);
+  const adj = eg()<30;
+  let txt='';
+  if(npMode==='dolor'){
+    if(adj) s+=1;
+    let cls, act;
+    if(s>=3){cls='Dolor moderado / severo'; act='Medidas no farmacológicas + medidas farmacológicas';}
+    else if(s>=1){cls='Dolor leve'; act='Medidas no farmacológicas';}
+    else {cls='Sin dolor'; act='Sin intervención';}
+    txt=`<div class="total">${s} — ${cls}</div><div class="sub">${act}${adj?' · incluye +1 por EG < 30 sem':''}</div>`;
+  } else {
+    if(adj) s-=1;
+    let cls = s<=-5?'Sedación profunda': s<=-2?'Sedación leve':'Sin sedación significativa';
+    txt=`<div class="total">${s} — ${cls}</div><div class="sub">-10 a -5: profunda · -5 a -2: leve${adj?' · incluye -1 por EG < 30 sem':''}</div>`;
+  }
+  $('npOut').innerHTML=txt;
+}
+
+// ---------- Finnegan ----------
+// Cada grupo: opciones mutuamente excluyentes [texto, puntos]; "No" = 0
+const FN = [
+  ['Sistema nervioso central', [
+    ['Llanto', [['Llanto agudo excesivo (u otro)',2],['Llanto agudo continuo',3]]],
+    ['Sueño después de alimentarse', [['Duerme < 3 h',1],['Duerme < 2 h',2],['Duerme < 1 h',3]]],
+    ['Reflejo de Moro', [['Hiperactivo',2],['Marcadamente hiperactivo',3]]],
+    ['Temblores al ser estimulado', [['Leves',1],['Moderados a severos',2]]],
+    ['Temblores sin estímulo', [['Leves',3],['Moderados a severos',4]]],
+    ['Tono muscular aumentado', [['Sí',2]]],
+    ['Excoriaciones (zona específica)', [['Sí',1]]],
+    ['Mioclonías', [['Sí',3]]],
+    ['Convulsiones generalizadas', [['Sí',5]]],
+  ]],
+  ['Metabólico, vasomotor y respiratorio', [
+    ['Sudoración', [['Sí',1]]],
+    ['Fiebre', [['37,3–38,3 °C',1],['≥ 38,4 °C',2]]],
+    ['Bostezos frecuentes (> 3–4 por intervalo)', [['Sí',1]]],
+    ['Piel moteada', [['Sí',1]]],
+    ['Congestión nasal', [['Sí',1]]],
+    ['Estornudos (> 3–4 por intervalo)', [['Sí',1]]],
+    ['Aleteo nasal', [['Sí',2]]],
+    ['Frecuencia respiratoria', [['> 60 rpm',1],['> 60 rpm con tiraje',2]]],
+  ]],
+  ['Gastrointestinal', [
+    ['Succión excesiva', [['Sí',1]]],
+    ['Alimentación pobre', [['Sí',2]]],
+    ['Regurgitación / vómitos', [['Regurgitación',2],['Vómito en proyectil',3]]],
+    ['Deposiciones', [['Blandas',2],['Líquidas',3]]],
+  ]],
+];
+let fnSel={}, fnLog=[];
+try{ fnLog=JSON.parse(localStorage.getItem('finneganLog')||'[]'); }catch(e){ fnLog=[]; }
+function renderFN(){
+  fnSel={}; let i=0, h='';
+  FN.forEach(([sys,items])=>{
+    h+=`<h3>${sys}</h3>`;
+    items.forEach(([q,opts])=>{
+      h+=`<div class="score-item"><div class="q">${q}</div><div class="seg" data-fi="${i}">
+        <button data-v="0" class="on">No · 0</button>${opts.map(([t,p])=>`<button data-v="${p}">${t} · <b>${p}</b></button>`).join('')}</div></div>`;
+      fnSel[i]=0; i++;
+    });
+  });
+  $('fnItems').innerHTML=h;
+  document.querySelectorAll('#fnItems .seg').forEach(el=>segInit(el,v=>{fnSel[el.dataset.fi]=+v; scoreFN();}));
+  scoreFN();
+}
+function fnTotal(){ return Object.values(fnSel).reduce((a,b)=>a+b,0); }
+function scoreFN(){
+  const s=fnTotal();
+  const cls = s>=12?'Abstinencia severa': s>=8?'Abstinencia significativa':'Leve o ausente';
+  const act = s>=8?'Si se repite (3 consecutivos ≥ 8 o 2 consecutivos ≥ 12): tratamiento farmacológico / aumentar dosis / frenar descenso.':'Medidas no farmacológicas; puede continuar el descenso.';
+  $('fnOut').style.background = s>=12?'var(--danger)': s>=8?'var(--warn)':'var(--mint)';
+  $('fnOut').innerHTML=`<div class="total">${s} — ${cls}</div><div class="sub">${act}</div>`;
+}
+function renderFNLog(){
+  if(!fnLog.length){ $('fnLog').innerHTML=''; return; }
+  const last=fnLog.slice(-3).map(x=>x.s);
+  let alert='';
+  const l3=fnLog.slice(-3), l2=fnLog.slice(-2);
+  if(l2.length===2 && l2.every(x=>x.s>=12)) alert='<div class="note danger">2 evaluaciones consecutivas ≥ 12: criterio de tratamiento farmacológico / escalar.</div>';
+  else if(l3.length===3 && (l3.every(x=>x.s>=8) || l3.reduce((a,b)=>a+b.s,0)/3>=8)) alert='<div class="note danger">3 evaluaciones consecutivas ≥ 8 (o promedio ≥ 8): criterio de tratamiento farmacológico / escalar.</div>';
+  $('fnLog').innerHTML = alert + `<table><thead><tr><th>Hora</th><th>Puntaje</th></tr></thead><tbody>${
+    fnLog.slice(-8).reverse().map(x=>`<tr><td>${x.t}</td><td><b>${x.s}</b></td></tr>`).join('')}</tbody></table>
+    <button id="fnClearLog" style="margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.8rem;cursor:pointer">Borrar registro</button>
+    <div class="small">El registro queda solo en este dispositivo. No reemplaza la hoja de enfermería.</div>`;
+  $('fnClearLog').onclick=()=>{ fnLog=[]; try{localStorage.removeItem('finneganLog');}catch(e){} renderFNLog(); };
+}
+$('fnSave').onclick=()=>{
+  const now=new Date();
+  fnLog.push({s:fnTotal(), t:now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})+' '+now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})});
+  try{ localStorage.setItem('finneganLog',JSON.stringify(fnLog.slice(-30))); }catch(e){}
+  renderFNLog(); renderFN();
+};
+$('fnReset').onclick=renderFN;
+
+// ---------- WAT-1 ----------
+const WAT = [
+  ['De la historia clínica (últimas 12 h)', [
+    ['Deposiciones blandas o líquidas', [['No',0],['Sí',1]]],
+    ['Vómitos, arcadas o náuseas', [['No',0],['Sí',1]]],
+    ['Temperatura > 37,8 °C', [['No',0],['Sí',1]]],
+  ]],
+  ['Observación 2 min antes del estímulo', [
+    ['Estado', [['SBS ≤ 0, dormido o despierto tranquilo',0],['SBS ≥ +1, despierto con distrés',1]]],
+    ['Temblores', [['Ausentes o leves',0],['Moderados o severos',1]]],
+    ['Sudoración', [['No',0],['Sí',1]]],
+    ['Movimientos incoordinados / repetitivos', [['Ausentes o leves',0],['Moderados o severos',1]]],
+    ['Bostezos o estornudos', [['0–1',0],['≥ 2',1]]],
+  ]],
+  ['Estímulo de 1 min (llamar, tocar, estímulo suave)', [
+    ['Sobresalto al tacto', [['Ausente o leve',0],['Moderado o severo',1]]],
+    ['Tono muscular', [['Normal',0],['Aumentado',1]]],
+  ]],
+  ['Recuperación post-estímulo', [
+    ['Tiempo hasta calmarse (SBS ≤ 0)', [['< 2 min',0],['2–5 min',1],['> 5 min',2]]],
+  ]],
+];
+let watSel={}, watLog=[];
+try{ watLog=JSON.parse(localStorage.getItem('wat1Log')||'[]'); }catch(e){ watLog=[]; }
+function renderWAT(){
+  watSel={}; let i=0, h='';
+  WAT.forEach(([sec,items])=>{
+    h+=`<h3>${sec}</h3>`;
+    items.forEach(([q,opts])=>{
+      h+=`<div class="score-item"><div class="q">${q}</div><div class="seg" data-wi="${i}">${
+        opts.map(([t,p],j)=>`<button data-v="${p}" class="${j===0?'on':''}">${t} · <b>${p}</b></button>`).join('')}</div></div>`;
+      watSel[i]=0; i++;
+    });
+  });
+  $('watItems').innerHTML=h;
+  document.querySelectorAll('#watItems .seg').forEach(el=>segInit(el,v=>{watSel[el.dataset.wi]=+v; scoreWAT();}));
+  scoreWAT();
+}
+const watTotal = () => Object.values(watSel).reduce((a,b)=>a+b,0);
+function scoreWAT(){
+  const s=watTotal();
+  const cls = s>=8?'Abstinencia importante': s>=3?'Abstinencia':'Sin abstinencia significativa';
+  const act = s>=8?'Volver a la última dosis estable, rescate y reevaluación médica.': s>=3?'Frenar el descenso; considerar rescate o ajustar el esquema.':'Puede continuar el descenso.';
+  $('watOut').style.background = s>=8?'var(--danger)': s>=3?'var(--warn)':'var(--mint)';
+  $('watOut').innerHTML=`<div class="total">${s} / 12 — ${cls}</div><div class="sub">${act}</div>`;
+}
+function renderWATLog(){
+  if(!watLog.length){ $('watLog').innerHTML=''; return; }
+  const l2=watLog.slice(-2);
+  const alert = (l2.length===2 && l2.every(x=>x.s>=3)) ? '<div class="note danger">2 evaluaciones consecutivas con WAT-1 ≥ 3: abstinencia persistente, revisar el esquema de descenso.</div>' : '';
+  $('watLog').innerHTML = alert + `<table><thead><tr><th>Hora</th><th>Puntaje</th></tr></thead><tbody>${
+    watLog.slice(-8).reverse().map(x=>`<tr><td>${x.t}</td><td><b>${x.s}</b></td></tr>`).join('')}</tbody></table>
+    <button id="watClearLog" style="margin-top:8px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:.8rem;cursor:pointer">Borrar registro</button>
+    <div class="small">El registro queda solo en este dispositivo. No reemplaza la hoja de enfermería.</div>`;
+  $('watClearLog').onclick=()=>{ watLog=[]; try{localStorage.removeItem('wat1Log');}catch(e){} renderWATLog(); };
+}
+$('watSave').onclick=()=>{
+  const now=new Date();
+  watLog.push({s:watTotal(), t:now.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})+' '+now.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})});
+  try{ localStorage.setItem('wat1Log',JSON.stringify(watLog.slice(-30))); }catch(e){}
+  renderWATLog(); renderWAT();
+};
+$('watReset').onclick=renderWAT;
+
+// ---------- eventos ----------
+segInit($('tabs'), null);
+$('tabs').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on', s.id===b.dataset.s));
+});
+segInit($('modes'), v=>{curMode=v; renderCalcBody(true);});
+segInit($('ctol'), convOp);
+segInit($('npMode'), v=>{npMode=v; renderNP();});
+$('drug').addEventListener('change',()=>{curMode=null; renderModes();});
+$('procSel').addEventListener('change',renderProc);
+['opFrom','opDose','opInt','opTo','rFM','rIVVO','rMM','rFMet','toInt'].forEach(id=>$(id).addEventListener('input',()=>{updOpLbl();convOp();}));
+$('opTo').addEventListener('change',()=>{ $('toInt').value = $('opTo').value==='metVO' ? '12' : '4'; convOp(); });
+$('midRate').addEventListener('input',convBz);
+['wDrug','wDose','wDays'].forEach(id=>$(id).addEventListener('input',wean));
+function refreshAll(){ egInfo(); renderCalcBody(true); renderProc(); renderRev(); convOp(); convBz(); wean(); scoreNP(); }
+$('peso').addEventListener('input',()=>{ calc(); renderProc(); renderRev(); convOp(); convBz(); });
+$('eg').addEventListener('input',refreshAll);
+
+fillDrugs(); fillProcs(); renderDil(); egInfo(); renderModes(); updOpLbl(); renderNP(); renderFN(); renderFNLog(); renderWAT(); renderWATLog(); refreshAll();
+</script>
+<script src="paciente.js?v=v37"></script>
+</body>
+</html>

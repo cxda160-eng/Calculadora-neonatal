@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nutrición Parenteral Neonatal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: misma línea que la Calculadora Neonatal — paciente, infusión, bolsa, lípidos y resultados en tarjetas; acento durazno para Nutrición */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#eef3fb; --line:#e2e4f1; --fg:#2e3147; --muted:#6c7090; --accent:#b8582a; --accent-soft:#fde9dc; --mint:#dcf2ec; --mint-fg:#2b6a60; --peach:#fff4d6; --peach-fg:#86590a; --rose:#ffe3e8; --rose-fg:#a12d40; --sky:#e6f0fb; --sky-fg:#2f5f93;
+  --display:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#f6bb9c; --accent-soft:#3a2a26; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }}
+:root[data-theme="dark"]{ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#f6bb9c; --accent-soft:#3a2a26; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5; color-scheme:dark; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header h1{font-family:var(--display);font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>*{flex:1 1 140px;min-width:0}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+input,select{font:inherit;font-family:var(--mono);font-size:1rem;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+input[readonly]{background:var(--accent-soft);border-color:transparent}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;font:inherit;font-size:.85rem;color:var(--muted);padding:7px 8px;border-radius:8px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.grid label span.u{font-family:var(--mono);font-size:.7rem;opacity:.8}
+.btn{font:inherit;font-size:.8rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:6px 10px;border-radius:999px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-family:var(--mono);font-size:1.45rem;font-weight:500;font-variant-numeric:tabular-nums}
+.tile .s{font-size:.75rem;color:var(--muted)}
+.tile.lav{background:var(--accent-soft)} .tile.mint{background:var(--mint)} .tile.peach{background:var(--peach)} .tile.sky{background:var(--sky)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500}
+td{font-family:var(--mono)} td:first-child{font-family:var(--body)}
+tr.sub td{color:var(--muted);font-size:.8rem}
+tr.zero td{color:var(--muted)}
+.alerts{display:flex;flex-direction:column;gap:6px}
+.pill{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;font-size:.85rem}
+.pill b{font-weight:600}
+.pill.warn{background:var(--peach);color:var(--peach-fg)}
+.pill.crit{background:var(--rose);color:var(--rose-fg)}
+.pill.ok{background:var(--mint);color:var(--mint-fg)}
+.pill.info{background:var(--sky);color:var(--sky-fg)}
+.check{flex-direction:row;align-items:center;gap:8px;color:var(--fg);font-size:.9rem}
+.check input{width:auto}
+footer{font-size:.75rem;color:var(--muted);text-align:center}
+textarea{position:absolute;left:-9999px}
+#prep:empty{display:none}
+#prep{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+#prep h3{margin:0;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+#prep table td{padding:5px 4px}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
+.modsel{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.modsel button{flex:1;border:0;background:transparent;font:inherit;font-weight:600;font-size:.95rem;color:var(--muted);padding:10px 8px;border-radius:10px;cursor:pointer;min-height:44px}
+.modsel button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.mod{display:flex;flex-direction:column;gap:16px}
+.mod[hidden]{display:none}
+.enrow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto;gap:8px;align-items:end;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.enrow:last-child{border-bottom:0;padding-bottom:0}
+.enrow .eq{grid-column:1/-1;font-size:.78rem;color:var(--muted);margin-top:-2px}
+.enrow select{font-family:var(--body);font-size:.92rem;padding-inline:8px}
+.x{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--muted);width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1.1rem}
+.comp input{padding:7px 6px;font-size:.9rem;text-align:right}
+.comp td,.comp th{padding:4px 3px}
+.comp td:first-child{font-size:.82rem;white-space:normal;min-width:96px}
+td.st{font-family:var(--body);font-size:.78rem;font-weight:600}
+#enTabla td,#enTabla th,#totTabla td,#totTabla th{padding:7px 4px}
+#enTabla td:first-child,#totTabla td:first-child{white-space:normal}
+#enTabla td small{text-align:right}#enTabla td:first-child small{text-align:left}
+#enTabla small,#totTabla small{display:block;font-size:.7rem;color:var(--muted);font-family:var(--body)}
+#enTabla tr.sub td{white-space:normal;text-align:left;font-family:var(--body)}
+#enTabla tr.sub td:last-child{font-family:var(--mono);font-size:.76rem}
+.tiles.en{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
+.bdg{display:inline-block;margin-top:3px;font-family:var(--body);font-size:.7rem;font-weight:600;padding:1px 7px;border-radius:999px}
+.bdg.ok{background:var(--mint);color:var(--mint-fg)} .bdg.warn{background:var(--peach);color:var(--peach-fg)} .bdg.info{background:var(--sky);color:var(--sky-fg)}
+#enDet{display:flex;flex-direction:column;gap:6px}
+#enDet div{background:var(--sunk);border-radius:10px;padding:8px 10px;font-size:.8rem}
+#enDet b{display:block;font-size:.85rem}
+#enDet span{font-family:var(--mono);font-size:.76rem;color:var(--muted)}
+</style>
+
+<style id="tema-vivo">
+/* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
+:root{--bg:#fff4ec;--sunk:#fde8da;--line:#f3d9c7;--accent:#c2551f;--accent-soft:#ffd9c4;--mint:#c9efe2;--mint-fg:#0d6b5a;--peach:#ffecb8;--sky:#d6e6fb;--glow:#ffe0cc;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--glow:#3a2620;}}
+:root[data-theme="dark"]{--glow:#3a2620;}
+body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repeat var(--bg)}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Nutrición</h1>
+    <p>Parenteral: aporte real desde la etiqueta de la bolsa. Enteral: leches, mezclas, módulo proteico y suplemento de sodio VO, con metas ESPGHAN.</p>
+  </header>
+
+  <section class="card">
+    <h2>Paciente</h2>
+    <div class="row">
+      <label for="peso">Peso (g)
+        <input id="peso" type="number" inputmode="decimal" step="any" value="1000">
+      </label>
+      <div style="display:none;flex-direction:column;gap:4px">
+        <span style="font-size:.8rem;color:var(--muted)">Unidad</span>
+        <div class="seg" id="unidad">
+          <button type="button" data-v="g" aria-pressed="true">gramos</button>
+          <button type="button" data-v="kg" aria-pressed="false">kg</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="modsel" id="modulo" role="group" aria-label="Tipo de nutrición">
+    <button type="button" data-v="np" aria-pressed="true">Parenteral</button>
+    <button type="button" data-v="en" aria-pressed="false">Enteral</button>
+  </div>
+
+  <div class="mod" id="modNP">
+  <section class="card">
+    <h2>Infusión de la NP</h2>
+    <div class="seg" id="modo">
+      <button type="button" data-v="bolsa" aria-pressed="true">Bolsa completa</button>
+      <button type="button" data-v="mlkg" aria-pressed="false">Indico ml/kg/día</button>
+      <button type="button" data-v="mlh" aria-pressed="false">Indico ml/h</button>
+    </div>
+    <div class="row">
+      <label for="ritmo"><span id="ritmoLbl">ml/kg/día de NP</span>
+        <input id="ritmo" type="number" inputmode="decimal" step="any" value="80">
+      </label>
+      <label for="horas">Horas de infusión
+        <input id="horas" type="number" inputmode="decimal" step="any" value="24">
+      </label>
+    </div>
+    <p class="hint" id="ritmoEq"></p>
+  </section>
+
+  <section class="card">
+    <h2>Composición de la bolsa</h2>
+    <div class="seg" id="bolsaModo">
+      <button type="button" data-v="neo" aria-pressed="true">Neo Inicio</button>
+      <button type="button" data-v="man" aria-pressed="false">Carga manual</button>
+    </div>
+    <div class="seg" id="manSub" style="display:none">
+      <button type="button" data-v="kg" aria-pressed="true">Indicación por kg/día</button>
+      <button type="button" data-v="tot" aria-pressed="false">Totales de la etiqueta</button>
+    </div>
+    <div id="manBtns" style="display:none;gap:6px;flex-wrap:wrap">
+      <button type="button" class="btn" id="manNeo">Partir de Neo Inicio</button>
+      <button type="button" class="btn" id="manClr">Vaciar campos</button>
+    </div>
+    <p class="hint" id="bolsaHint"></p>
+    <div class="grid" id="bolsa"></div>
+    <div class="row">
+      <label for="pfac">Conversión del fósforo de la etiqueta
+        <select id="pfac">
+          <option value="1">1 mEq = 1 mmol P</option>
+          <option value="2">1 mEq = 0,5 mmol P (divalente)</option>
+          <option value="1.8">1 mEq = 0,56 mmol P (pH 7,4)</option>
+        </select>
+      </label>
+    </div>
+    <p class="hint">Depende de la sal de fosfato que use la farmacia. Confirmá con Fresenius antes de usar los valores de P en mg/mmol y la relación Ca:P.</p>
+  </section>
+
+  <section class="card">
+    <h2>Lípidos y otros aportes</h2>
+    <label class="check" for="lipOn"><input type="checkbox" id="lipOn" checked> Sumar emulsión lipídica 20 %</label>
+    <div class="row" id="lipRow">
+      <label for="lipG">Lípidos g/kg/día
+        <input id="lipG" type="number" inputmode="decimal" step="any" value="1">
+      </label>
+      <label for="lipH">Horas de infusión de lípidos
+        <input id="lipH" type="number" inputmode="decimal" step="any" value="24">
+      </label>
+    </div>
+    <div class="row">
+      <label for="ent">Enteral (ml/kg/día, solo volumen)
+        <input id="ent" type="number" inputmode="decimal" step="any" value="0">
+      </label>
+      <label for="otros">Otras infusiones (ml/kg/día)
+        <input id="otros" type="number" inputmode="decimal" step="any" value="0">
+      </label>
+    </div>
+    <p class="hint">20 % = 0,2 g/ml y 2 kcal/ml. Enteral y otras infusiones solo suman al volumen total de líquidos.</p>
+  </section>
+
+  <section class="card">
+    <h2>Resultados <button type="button" class="btn primary" id="copy">Copiar resumen</button></h2>
+    <div class="tiles" id="tiles"></div>
+    <div id="prep"></div>
+    <div class="alerts" id="alerts"></div>
+    <div class="tablewrap"><table id="tabla"></table></div>
+  </section>
+
+  </div><!-- /modNP -->
+
+  <div class="mod" id="modEN" hidden>
+  <section class="card">
+    <h2>Leches indicadas</h2>
+    <div class="seg" id="enModo">
+      <button type="button" data-v="mlkg" aria-pressed="true">Indico ml/kg/día</button>
+      <button type="button" data-v="toma" aria-pressed="false">Indico ml por toma</button>
+    </div>
+    <div class="row">
+      <label for="tomas">Tomas por día
+        <input id="tomas" type="number" inputmode="decimal" step="any" value="8">
+      </label>
+      <div></div>
+    </div>
+    <div id="enRows" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div><button type="button" class="btn" id="enAdd">+ Agregar otra leche (mezcla)</button></div>
+    <p class="hint">Podés combinar hasta 4 leches (por ejemplo LH fortificada + complemento de LPT). Cada fila suma su volumen y sus aportes.</p>
+  </section>
+
+  <section class="card">
+    <h2>Módulo proteico</h2>
+    <label class="check" for="modOn"><input type="checkbox" id="modOn"> Sumar módulo proteico</label>
+    <div id="modBox" hidden style="display:flex;flex-direction:column;gap:12px">
+      <div class="row">
+        <label for="sobres">Sobres por día
+          <input id="sobres" type="number" inputmode="decimal" step="any" value="1">
+        </label>
+        <div></div>
+      </div>
+      <p class="hint" style="margin-bottom:-4px">Composición de 1 sobre (editable):</p>
+      <div class="grid" id="modComp"></div>
+      <p class="hint" id="modEq"></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Suplemento de sodio VO</h2>
+    <label class="check" for="naOn"><input type="checkbox" id="naOn"> Sumar suplemento oral de sodio</label>
+    <div id="naBox" style="display:none;flex-direction:column;gap:12px">
+      <div class="row">
+        <label for="naPrep">Preparación
+          <select id="naPrep">
+            <option value="3.42">ClNa 20 %</option>
+            <option value="1.71">ClNa 10 %</option>
+            <option value="0.513">ClNa 3 %</option>
+            <option value="1">Bicarbonato Na 8,4 %</option>
+            <option value="otra">Otra (editable)</option>
+          </select>
+        </label>
+        <label for="naConc">Concentración <span style="font-family:var(--mono);font-size:.7rem">mEq/ml</span>
+          <input id="naConc" type="number" inputmode="decimal" step="any" value="3.42" readonly>
+        </label>
+      </div>
+      <div class="seg" id="naModo">
+        <button type="button" data-v="meq" aria-pressed="true">Indico mEq/kg/día</button>
+        <button type="button" data-v="ml" aria-pressed="false">Indico ml por día</button>
+      </div>
+      <div class="row">
+        <label for="naVal"><span id="naLbl">mEq/kg/día</span>
+          <input id="naVal" type="number" inputmode="decimal" step="any" value="2">
+        </label>
+        <div></div>
+      </div>
+      <p class="hint" id="naEq"></p>
+      <p class="hint">Se reparte en las tomas indicadas arriba, diluido en la leche. El sodio se suma a los aportes enterales (y al total NP + enteral); su volumen no se suma a los líquidos.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Aportes enterales <button type="button" class="btn primary" id="enCopy">Copiar resumen</button></h2>
+    <div class="tiles en" id="enTiles"></div>
+    <div class="alerts" id="enAlerts"></div>
+    <div class="tablewrap"><table id="enTabla"></table></div>
+    <div id="enDet"></div>
+    <p class="hint">Metas: ESPGHAN 2022 para prematuros &lt; 1800 g en crecimiento estable. En término o en otras situaciones clínicas usá las metas de tu unidad.</p>
+  </section>
+
+  <section class="card">
+    <h2>Total NP + enteral</h2>
+    <label class="check" for="sumNP"><input type="checkbox" id="sumNP"> Sumar la NP cargada en el modo Parenteral (días de transición)</label>
+    <div id="totBox" hidden style="display:flex;flex-direction:column;gap:12px">
+      <div class="tablewrap"><table id="totTabla"></table></div>
+      <p class="hint">Usa la NP tal como está cargada en Parenteral (bolsa, ritmo, lípidos y "otras infusiones"). El campo "Enteral" de Parenteral no se suma acá para no contarlo dos veces. El P de la NP depende de la conversión elegida allá.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Composición de las leches <span style="text-transform:none;letter-spacing:0;font-weight:400">cada 100 ml</span> <button type="button" class="btn" id="compReset">Restaurar valores</button></h2>
+    <p class="hint">Valores de la planilla "Cálculo de aportes nutricionales 2025". Editalos si cambia el fortificador, su dosis o la fórmula; se guardan en este dispositivo.</p>
+    <div class="tablewrap"><table class="comp" id="compTabla"></table></div>
+  </section>
+  </div><!-- /modEN -->
+
+  <footer>Herramienta de apoyo al cálculo. Verificá cada indicación con la prescripción y el protocolo de tu unidad.</footer>
+</div>
+<textarea id="clip" aria-hidden="true" tabindex="-1"></textarea>
+
+<script>
+const NEO={vol:150,glu:12.3,aa:4.5,lip:0,na:1.2,k:0,cl:0,ca:1.8,p:1.8,mg:0,ac:2.61,zn:0,cu:0,se:0,osm:709};
+const FIELDS=[
+ ["vol","Volumen","ml"],["glu","Glucosa","g"],["aa","Aminoácidos","g"],["lip","Lípidos en bolsa","g"],
+ ["na","Na","mEq"],["k","K","mEq"],["cl","Cl","mEq"],["ac","Acetato","mEq"],
+ ["ca","Ca","mEq"],["p","P","mEq"],["mg","Mg","mEq"],
+ ["zn","Zn","mg"],["cu","Cu","mg"],["se","Se","mcg"],["osm","Osmolaridad","mOsm/L"]];
+const PERKG={vol:["Volumen de NP","ml/kg/día"],glu:["Flujo de glucosa","mg/kg/min"],aa:["Aminoácidos","g/kg/día"],lip:["Lípidos en bolsa","g/kg/día"],
+ na:["Na","mEq/kg/día"],k:["K","mEq/kg/día"],cl:["Cl","mEq/kg/día"],ac:["Acetato","mEq/kg/día"],ca:["Ca","mEq/kg/día"],p:["P","mEq/kg/día"],mg:["Mg","mEq/kg/día"],
+ zn:["Zn","mcg/kg/día"],cu:["Cu","mcg/kg/día"],se:["Se","mcg/kg/día"],osm:["Osmolaridad","mOsm/L · opcional"]};
+const $=id=>document.getElementById(id);
+const st={unidad:"g",modo:"bolsa"};let last={mlkgd:0,mlh:0};
+const bolsa=$("bolsa");
+FIELDS.forEach(([k,n,u])=>{bolsa.insertAdjacentHTML("beforeend",`<label for="b_${k}"><span id="bn_${k}">${n}</span> <span class="u" id="bu_${k}">${u}</span><input id="b_${k}" type="number" inputmode="decimal" step="any"></label>`)});
+function setLabels(perkg){FIELDS.forEach(([k,n,u])=>{$("bn_"+k).textContent=perkg?PERKG[k][0]:n;$("bu_"+k).textContent=perkg?PERKG[k][1]:u;});}
+function load(src){FIELDS.forEach(([k])=>$("b_"+k).value=src&&src[k]!==undefined&&src[k]!==""?src[k]:"")}
+// Bolsa: "neo" = Neo Inicio fija (solo lectura) · "man" = carga manual guardada en el dispositivo
+let manual=null;try{manual=JSON.parse(localStorage.getItem("np_manual")||"null")}catch(e){}
+if(!manual){try{const old=JSON.parse(localStorage.getItem("np_bolsa")||"null");
+  if(old&&FIELDS.some(([k])=>+old[k]!==+NEO[k]))manual=old;}catch(e){}}
+let perkgV=null;try{perkgV=JSON.parse(localStorage.getItem("np_perkg")||"null")}catch(e){}
+let bolsaModo="neo";try{bolsaModo=localStorage.getItem("np_modo")==="man"?"man":"neo"}catch(e){}
+let manSub="kg";try{manSub=localStorage.getItem("np_sub")==="tot"?"tot":"kg"}catch(e){}
+const isPerKg=()=>bolsaModo==="man"&&manSub==="kg";
+function setBolsa(m){bolsaModo=m;
+  $("bolsaModo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===m));
+  const ro=m==="neo";FIELDS.forEach(([k])=>{const i=$("b_"+k);i.readOnly=ro;i.placeholder=ro?"":"0"});
+  const pk=isPerKg();setLabels(pk);
+  load(ro?NEO:(pk?perkgV:manual));
+  $("manBtns").style.display=ro?"none":"flex";$("manSub").style.display=ro?"none":"flex";
+  $("manSub").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.v===manSub));
+  $("manNeo").hidden=pk;
+  $("modo").querySelectorAll("button").forEach(x=>{x.disabled=pk&&x.dataset.v!=="bolsa";if(pk)x.setAttribute("aria-pressed",x.dataset.v==="bolsa")});
+  if(pk)st.modo="bolsa";
+  $("bolsaHint").textContent=ro?"Bolsa estándar Neo Inicio (valores fijos). Para otra bolsa, elegí \"Carga manual\"."
+    :pk?"Escribí la indicación por kg/día (glucosa como flujo en mg/kg/min). La app calcula los totales de la bolsa para el peso actual y las horas de infusión. Campos vacíos = 0. Se guarda en este dispositivo."
+    :"Copiá los valores de la etiqueta: son totales de la bolsa, no por kg. Los campos vacíos cuentan como 0. Se guarda en este dispositivo.";
+  try{localStorage.setItem("np_modo",m);localStorage.setItem("np_sub",manSub)}catch(e){}}
+$("manSub").querySelectorAll("button").forEach(b=>b.onclick=()=>{manSub=b.dataset.v;setBolsa("man");calc()});
+$("bolsaModo").querySelectorAll("button").forEach(b=>b.onclick=()=>{setBolsa(b.dataset.v);calc()});
+$("manNeo").onclick=()=>{load(NEO);calc()};
+$("manClr").onclick=()=>{FIELDS.forEach(([k])=>$("b_"+k).value="");calc()};
+setBolsa(bolsaModo);
+function seg(id,key,after){$(id).querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  $(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));st[key]=b.dataset.v;after&&after(b.dataset.v);calc()})}
+seg("unidad","unidad",v=>{const p=+$("peso").value||0;$("peso").value=v==="kg"?+(p/1000).toFixed(3):Math.round(p*1000)});
+seg("modo","modo",v=>{if(v==="mlh")$("ritmo").value=+last.mlh.toFixed(2);else if(v==="mlkg")$("ritmo").value=+last.mlkgd.toFixed(1)});
+document.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",calc));
+function pesoKg(){const p=+$("peso").value||0;return st.unidad==="g"?p/1000:p}
+const f=(x,d=2)=>isFinite(x)?x.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
+let resumen="";
+function calc(){
+  const raw={};FIELDS.forEach(([k])=>raw[k]=+$("b_"+k).value||0);
+  const kg=pesoKg(),h=+$("horas").value||24,r=+$("ritmo").value||0;
+  const PK=isPerKg();let b=raw,osmEst=false;
+  if(bolsaModo==="man"){const vals={};FIELDS.forEach(([k])=>vals[k]=$("b_"+k).value);
+    if(PK){perkgV=vals;try{localStorage.setItem("np_perkg",JSON.stringify(vals))}catch(e){}}
+    else{manual=vals;try{localStorage.setItem("np_manual",JSON.stringify(vals))}catch(e){}}}
+  if(PK){
+    b={vol:raw.vol*kg,glu:raw.glu*1.44*kg,aa:raw.aa*kg,lip:raw.lip*kg,na:raw.na*kg,k:raw.k*kg,cl:raw.cl*kg,ac:raw.ac*kg,
+       ca:raw.ca*kg,p:raw.p*kg,mg:raw.mg*kg,zn:raw.zn*kg/1000,cu:raw.cu*kg/1000,se:raw.se*kg,osm:raw.osm};
+    if(!b.osm&&b.vol){const L=b.vol/1000;b.osm=Math.round((b.glu/L)*5+(b.aa/L)*10+((b.na+b.k)/L)*2+(b.ca/L)*1.4+(b.mg/L));osmEst=true;}}
+  let mlh,mlkgd;
+  const auto=st.modo==="bolsa";$("ritmo").readOnly=auto;
+  if(auto){mlkgd=kg?b.vol/kg:0;mlh=b.vol/h;$("ritmo").value=kg?+mlkgd.toFixed(1):"";$("ritmoLbl").textContent="ml/kg/día (volumen de bolsa ÷ peso)";$("ritmoEq").textContent=`${f(b.vol,0)} ml en ${h} h = ${f(mlh)} ml/h`}
+  else if(st.modo==="mlkg"){mlkgd=r;mlh=r*kg/h;$("ritmoLbl").textContent="ml/kg/día de NP";$("ritmoEq").textContent=`Equivale a ${f(mlh)} ml/h durante ${h} h · ${f(mlh*h,1)} ml/día`}
+  else{mlh=r;mlkgd=kg?r*h/kg:0;$("ritmoLbl").textContent="ml/h de NP";$("ritmoEq").textContent=`Equivale a ${f(mlkgd,1)} ml/kg/día · ${f(mlh*h,1)} ml/día`}
+  last={mlkgd,mlh};const volDia=mlh*h, fr=b.vol?volDia/b.vol:0, pk=x=>kg?x*fr/kg:0;
+  const glu=pk(b.glu), aa=pk(b.aa), lipB=pk(b.lip);
+  const gir=glu*1000/1440;
+  const lipOn=$("lipOn").checked; $("lipRow").hidden=!lipOn;
+  const lipG=lipOn?(+$("lipG").value||0):0, lipML=lipG*5, lipH=+$("lipH").value||24;
+  const lipTot=lipG+lipB;
+  const kGlu=glu*3.4, kAA=aa*4, kLip=lipML*2+lipB*10;
+  const kNP=kGlu+kLip, kTot=kNP+kAA, N=aa/6.25;
+  const ent=+$("ent").value||0, otros=+$("otros").value||0;
+  const liq=mlkgd+lipML+ent+otros;
+  const pfac=+$("pfac").value;
+  const caMg=pk(b.ca)*20, pMmol=pk(b.p)/pfac, pMg=pMmol*30.97;
+  const cGlu=b.vol?b.glu/b.vol*100:0, cAA=b.vol?b.aa/b.vol*100:0;
+
+  $("tiles").innerHTML=`
+   <div class="tile lav"><span class="k">GIR</span><span class="v">${f(gir,1)}</span><span class="s">mg/kg/min</span></div>
+   <div class="tile mint"><span class="k">Calorías totales</span><span class="v">${f(kTot,0)}</span><span class="s">kcal/kg/día · ${f(kNP,0)} no proteicas</span></div>
+   <div class="tile peach"><span class="k">Proteínas</span><span class="v">${f(aa,2)}</span><span class="s">g/kg/día de aminoácidos</span></div>
+   <div class="tile sky"><span class="k">Líquidos totales</span><span class="v">${f(liq,0)}</span><span class="s">ml/kg/día</span></div>`;
+
+  const rows=[
+   ["Glucosa",glu,"g/kg/d",`${f(cGlu,1)} %`],
+   ["Aminoácidos",aa,"g/kg/d",`${f(cAA,1)} %`],
+   ["Lípidos",lipTot,"g/kg/d",lipOn?`${f(lipML,1)} ml/kg/d · ${f(kg?lipML*kg/lipH:0)} ml/h`:"no indicados"],
+   ["Nitrógeno",N,"g/kg/d",`${f(N*kg,2)} g/día`],
+   ["Na",pk(b.na),"mEq/kg/d",""],["K",pk(b.k),"mEq/kg/d",""],["Cl",pk(b.cl),"mEq/kg/d",""],
+   ["Acetato",pk(b.ac),"mEq/kg/d",""],
+   ["Ca",pk(b.ca),"mEq/kg/d",`${f(caMg,1)} mg · ${f(pk(b.ca)/2,2)} mmol`],
+   ["P",pk(b.p),"mEq/kg/d",`${f(pMg,1)} mg · ${f(pMmol,2)} mmol`],
+   ["Mg",pk(b.mg),"mEq/kg/d",""],
+   ["Zn",pk(b.zn)*1000,"mcg/kg/d",""],["Cu",pk(b.cu)*1000,"mcg/kg/d",""],["Se",pk(b.se),"mcg/kg/d",""]];
+  $("tabla").innerHTML=`<thead><tr><th>Componente</th><th>Aporte</th><th>Unidad</th><th>Detalle</th></tr></thead><tbody>`+
+   rows.map(([n,v,u,d])=>`<tr class="${v===0?"zero":""}"><td>${n}</td><td>${f(v,2)}</td><td>${u}</td><td>${d}</td></tr>`).join("")+
+   `<tr class="sub"><td>kcal glucosa / AA / lípidos</td><td colspan="3">${f(kGlu,1)} / ${f(kAA,1)} / ${f(kLip,1)} kcal/kg/d</td></tr>
+    <tr class="sub"><td>kcal no proteicas / g N</td><td colspan="3">${N?f(kNP/N,0):"—"}</td></tr>
+    <tr class="sub"><td>Relación Ca:P (mg)</td><td colspan="3">${pMg?f(caMg/pMg,2)+" : 1":"—"}</td></tr>
+    <tr class="sub"><td>Volumen de bolsa usado</td><td colspan="3">${f(volDia,1)} de ${f(b.vol,0)} ml (${f(fr*100,0)} %)</td></tr></tbody>`;
+
+  const A=[];
+  if(!kg)A.push(["crit","Cargá el peso del paciente."]);
+  if(bolsaModo==="man"&&!b.vol)A.push(["crit",PK?"Carga manual: falta el volumen de NP (ml/kg/día).":"Carga manual: falta el volumen de la bolsa (ml)."]);
+  if(volDia>b.vol&&b.vol)A.push(["crit",`El volumen indicado (${f(volDia,0)} ml/día) supera el de la bolsa (${f(b.vol,0)} ml).`]);
+  if(gir>12)A.push(["crit",`GIR de ${f(gir,1)} mg/kg/min: por encima de 12.`]);
+  else if(gir>0&&gir<4)A.push(["warn",`GIR de ${f(gir,1)} mg/kg/min: por debajo de 4.`]);
+  const osmT=osmEst?`Osmolaridad estimada ≈ ${b.osm} mOsm/L`:`Osmolaridad ${b.osm} mOsm/L`;
+  if(b.osm>900)A.push(["warn",`${osmT}: supera el límite habitual para vía periférica (≈ 900).`]);
+  else if(b.osm)A.push(["ok",`${osmT}: apta para vía periférica.`]);
+  if(osmEst)A.push(["info","Osmolaridad estimada (glucosa, AA y electrolitos); si tenés la de la etiqueta, cargala en el campo Osmolaridad."]);
+  if(cGlu>12.5)A.push(["warn",`Glucosa al ${f(cGlu,1)} %: por vía periférica no conviene superar 12,5 %.`]);
+  if(aa>4)A.push(["warn",`Aminoácidos ${f(aa,2)} g/kg/día: por encima de 4.`]);
+  if(b.k===0&&b.mg===0)A.push(["info","La bolsa no aporta K ni Mg."]);
+  if(lipTot===0)A.push(["info","Sin lípidos en el cálculo."]);
+  $("alerts").innerHTML=A.map(([c,t])=>`<div class="pill ${c}"><span>${t}</span></div>`).join("");
+  if(PK&&kg&&b.vol){const P=[["Volumen",b.vol,"ml",0],["Glucosa",b.glu,`g · ${f(cGlu,1)} %`,2],["Aminoácidos",b.aa,`g · ${f(cAA,1)} %`,2],
+      ...(b.lip?[["Lípidos en bolsa",b.lip,"g",2]]:[]),["Na",b.na,"mEq",2],["K",b.k,"mEq",2],["Cl",b.cl,"mEq",2],["Acetato",b.ac,"mEq",2],
+      ["Ca",b.ca,"mEq",2],["P",b.p,"mEq",2],["Mg",b.mg,"mEq",2],["Zn",b.zn*1000,"mcg",0],["Cu",b.cu*1000,"mcg",0],["Se",b.se,"mcg",1]].filter(x=>x[1]||x[0]==="Volumen");
+    $("prep").innerHTML=`<h3>Totales de la bolsa · ${f(b.vol,0)} ml para ${f(h,0)} h (peso ${f(kg,3)} kg)</h3><table>`+P.map(([n,v,u,d])=>`<tr><td>${n}</td><td>${f(v,d)}</td><td>${u}</td></tr>`).join("")+`</table>`;}
+  else $("prep").innerHTML="";
+
+  window.NP={kg,mlkgd,kTot,aa,na:pk(b.na),caMg,pMg,lipML,otros,liq:mlkgd+lipML+otros,glu};
+  if(window.calcEN)calcEN();
+  resumen=`NP ${f(mlkgd,1)} ml/kg/d (${f(mlh)} ml/h) · peso ${f(kg,3)} kg
+GIR ${f(gir,1)} mg/kg/min · Glucosa ${f(glu,2)} g/kg/d (${f(cGlu,1)}%)
+AA ${f(aa,2)} g/kg/d · Lípidos ${f(lipTot,2)} g/kg/d
+Kcal ${f(kTot,0)}/kg/d (${f(kNP,0)} no prot) · kcal NP/gN ${N?f(kNP/N,0):"—"}
+Na ${f(pk(b.na))} · K ${f(pk(b.k))} · Ca ${f(pk(b.ca))} · P ${f(pk(b.p))} · Mg ${f(pk(b.mg))} mEq/kg/d
+Líquidos totales ${f(liq,0)} ml/kg/d`;
+}
+$("copy").onclick=()=>{const done=()=>{$("copy").textContent="Copiado";setTimeout(()=>$("copy").textContent="Copiar resumen",1500)};
+  const fb=()=>{const t=$("clip");t.value=resumen;t.select();try{document.execCommand("copy");done()}catch(e){}};
+  if(navigator.clipboard)navigator.clipboard.writeText(resumen).then(done,fb);else fb()};
+calc();
+</script>
+<script>
+/* ===== Módulo ENTERAL ===== */
+const EN_DEF=[
+ {id:"cal", n:"LH calostro",     kcal:58, p:2.3, na:1.92, ca:23,  ph:14},
+ {id:"mad", n:"LH madura",       kcal:62, p:0.9, na:0.6,  ca:29,  ph:15},
+ {id:"fort",n:"LH fortificada",  kcal:78, p:2.2, na:2.1,  ca:95,  ph:53},
+ {id:"lpt", n:"LPT",             kcal:80, p:2.5, na:3,    ca:141, ph:78},
+ {id:"lfi", n:"LFI",             kcal:65, p:1.2, na:1,    ca:54,  ph:33},
+ {id:"inf", n:"Infatrini",       kcal:100,p:2.6, na:1.6,  ca:100, ph:56},
+ {id:"otra",n:"Otra (editable)", kcal:0,  p:0,   na:0,    ca:0,   ph:0}];
+const MOD_DEF={kcal:3.2,p:0.82,na:0.33,ca:5.2,ph:5.2};
+const NUT=[["kcal","kcal"],["p","Prot g"],["na","Na mEq"],["ca","Ca mg"],["ph","P mg"]];
+// Metas ESPGHAN 2022 (prematuros < 1800 g), por kg/día
+const META={vol:[150,180],kcal:[115,140],p:[3.5,4.0],na:[3,5],ca:[120,200],ph:[70,115],pe:[2.8,3.6]};
+const clone=o=>JSON.parse(JSON.stringify(o));
+let COMP=clone(EN_DEF), MOD=clone(MOD_DEF);
+try{const c=JSON.parse(localStorage.getItem("en_comp")||"null");if(Array.isArray(c)&&c.length===EN_DEF.length)COMP=c;}catch(e){}
+try{const m=JSON.parse(localStorage.getItem("en_mod")||"null");if(m)MOD=m;}catch(e){}
+const saveComp=()=>{try{localStorage.setItem("en_comp",JSON.stringify(COMP));localStorage.setItem("en_mod",JSON.stringify(MOD))}catch(e){}};
+const enSt={modo:"mlkg"};
+let rows=[{m:"fort",v:150}];
+let enResumen="";
+
+function drawComp(){
+  $("compTabla").innerHTML=`<thead><tr><th>Leche</th>${NUT.map(([,l])=>`<th>${l}</th>`).join("")}</tr></thead><tbody>`+
+   COMP.map((c,i)=>`<tr><td>${c.id==="otra"?`<input data-ci="${i}" data-k="n" value="${c.n}" style="text-align:left;font-family:var(--body)">`:c.n}</td>${NUT.map(([k])=>`<td><input data-ci="${i}" data-k="${k}" type="number" inputmode="decimal" step="any" value="${c[k]}" aria-label="${c.n} ${k}"></td>`).join("")}</tr>`).join("")+"</tbody>";
+  $("modComp").innerHTML=NUT.map(([k,l])=>`<label for="mc_${k}">${l.replace(" g"," (g)").replace(" mEq"," (mEq)").replace(" mg"," (mg)")}<input id="mc_${k}" data-mk="${k}" type="number" inputmode="decimal" step="any" value="${MOD[k]}"></label>`).join("");
+}
+function drawRows(){
+  const lbl=enSt.modo==="mlkg"?"ml/kg/día":"ml por toma";
+  $("enRows").innerHTML=rows.map((r,i)=>`<div class="enrow">
+    <label for="em_${i}">Leche ${rows.length>1?i+1:""}<select id="em_${i}" data-ri="${i}">${COMP.map(c=>`<option value="${c.id}"${c.id===r.m?" selected":""}>${c.n}</option>`).join("")}</select></label>
+    <label for="ev_${i}">${lbl}<input id="ev_${i}" data-ri="${i}" type="number" inputmode="decimal" step="any" value="${r.v}"></label>
+    ${rows.length>1?`<button type="button" class="x" data-del="${i}" aria-label="Quitar leche ${i+1}">×</button>`:"<span></span>"}
+    <div class="eq" id="eq_${i}"></div></div>`).join("");
+  $("enAdd").hidden=rows.length>=4;
+}
+$("enRows").addEventListener("input",e=>{const i=+e.target.dataset.ri;if(isNaN(i))return;
+  if(e.target.tagName==="SELECT")rows[i].m=e.target.value;else rows[i].v=e.target.value===""?"":+e.target.value;calcEN();});
+$("enRows").addEventListener("click",e=>{const d=e.target.dataset.del;if(d===undefined)return;rows.splice(+d,1);drawRows();calcEN();});
+$("enAdd").onclick=()=>{if(rows.length<4){rows.push({m:"lpt",v:0});drawRows();calcEN();}};
+$("compTabla").addEventListener("input",e=>{const i=+e.target.dataset.ci,k=e.target.dataset.k;if(isNaN(i))return;
+  COMP[i][k]=k==="n"?e.target.value:(+e.target.value||0);saveComp();if(k==="n")drawRows();calcEN();});
+$("modComp").addEventListener("input",e=>{const k=e.target.dataset.mk;if(!k)return;MOD[k]=+e.target.value||0;saveComp();calcEN();});
+$("compReset").onclick=()=>{COMP=clone(EN_DEF);MOD=clone(MOD_DEF);saveComp();drawComp();drawRows();calcEN();};
+$("enModo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  if(b.dataset.v===enSt.modo)return;
+  const kg=pesoKg(),t=+$("tomas").value||8;
+  rows.forEach(r=>{const v=+r.v||0;if(!v||!kg)return;r.v=b.dataset.v==="toma"?+(v*kg/t).toFixed(1):+(v*t/kg).toFixed(1);});
+  enSt.modo=b.dataset.v;$("enModo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));drawRows();calcEN();});
+// Suplemento de sodio VO
+const naSt={modo:"meq"};
+$("naPrep").addEventListener("change",()=>{const v=$("naPrep").value;$("naConc").readOnly=v!=="otra";if(v!=="otra")$("naConc").value=v;calcEN();});
+$("naModo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  if(b.dataset.v===naSt.modo)return;const kg=pesoKg(),c=+$("naConc").value||0,v=+$("naVal").value||0;
+  if(kg&&c&&v)$("naVal").value=b.dataset.v==="ml"?+(v*kg/c).toFixed(2):+(v*c/kg).toFixed(2);
+  naSt.modo=b.dataset.v;$("naLbl").textContent=b.dataset.v==="ml"?"ml por día":"mEq/kg/día";
+  $("naModo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));calcEN();});
+["naOn","naConc","naVal"].forEach(id=>$(id).addEventListener("input",calcEN));
+$("naOn").addEventListener("change",calcEN);
+["tomas","modOn","sobres","sumNP"].forEach(id=>$(id).addEventListener("input",calcEN));
+["modOn","sumNP"].forEach(id=>$(id).addEventListener("change",calcEN));
+$("modulo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  $("modulo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $("modNP").hidden=b.dataset.v!=="np";$("modEN").hidden=b.dataset.v!=="en";
+  try{localStorage.setItem("nut_mod",b.dataset.v)}catch(e){}calc();});
+
+const estado=(v,[lo,hi],extra)=>{if(!isFinite(v)||v===0)return["","—"];
+  if(v<lo)return["warn","Bajo"];if(v<=hi)return["ok","En meta"];
+  if(extra&&v<=extra)return["info","Aceptable"];return["warn","Alto"];};
+
+function calcEN(){
+  const kg=pesoKg(),t=+$("tomas").value||0,byId=Object.fromEntries(COMP.map(c=>[c.id,c]));
+  const tot={vol:0,kcal:0,p:0,na:0,ca:0,ph:0},det=[];
+  rows.forEach((r,i)=>{const c=byId[r.m]||COMP[0],v=+r.v||0;
+    const mlkg=enSt.modo==="mlkg"?v:(kg?v*t/kg:0), mldia=mlkg*kg, mltoma=t?mldia/t:0;
+    const eq=$("eq_"+i);if(eq)eq.textContent=kg&&v?(enSt.modo==="mlkg"?`= ${f(mltoma,1)} ml por toma × ${t} · ${f(mldia,0)} ml/día`:`= ${f(mlkg,1)} ml/kg/día · ${f(mldia,0)} ml/día`):"";
+    const a={vol:mlkg};NUT.forEach(([k])=>a[k]=mlkg*(+c[k]||0)/100);
+    for(const k in tot)tot[k]+=a[k];det.push([c.n,a]);});
+  const modOn=$("modOn").checked;$("modBox").style.display=modOn?"flex":"none";
+  if(modOn){const s=+$("sobres").value||0,a={vol:0};NUT.forEach(([k])=>a[k]=kg?s*(+MOD[k]||0)/kg:0);
+    NUT.forEach(([k])=>tot[k]+=a[k]);det.push([`Módulo proteico (${f(s,1)} sobre${s===1?"":"s"}/día)`,a]);
+    $("modEq").textContent=kg?`1 sobre aporta ${f(MOD.p/kg,2)} g/kg de proteína y ${f(MOD.kcal/kg,1)} kcal/kg con este peso.${t?` ${f(s,1)} sobres/día ≈ ${f(s/t,2)} por toma.`:""}`:"";}
+  const naOn=$("naOn").checked;$("naBox").style.display=naOn?"flex":"none";let naSup=null;
+  if(naOn){const c=+$("naConc").value||0,v=+$("naVal").value||0;
+    const meqkg=naSt.modo==="meq"?v:(kg?v*c/kg:0), meqd=meqkg*kg, mld=c?meqd/c:0;
+    naSup={meqkg,meqd,mld,c};tot.na+=meqkg;
+    const pn=$("naPrep").selectedOptions[0].text;
+    det.push([`Suplemento de Na VO (${pn})`,{vol:0,kcal:0,p:0,na:meqkg,ca:0,ph:0}]);
+    $("naEq").innerHTML=kg&&c&&v?`<b>${f(meqkg,2)} mEq/kg/día</b> = ${f(meqd,2)} mEq/día = <b>${f(mld,2)} ml/día</b>${t?` → ${f(mld/t,2)} ml por toma (${f(meqd/t,2)} mEq) × ${t} tomas`:""}`:(kg?"":"Cargá el peso del paciente.");}
+  const pe=tot.kcal?tot.p/tot.kcal*100:NaN, cap=tot.ph?tot.ca/tot.ph:NaN;
+
+  $("enTiles").innerHTML=`
+   <div class="tile sky"><span class="k">Volumen</span><span class="v">${f(tot.vol,0)}</span><span class="s">ml/kg/día · ${f(tot.vol*kg,0)} ml/día</span></div>
+   <div class="tile mint"><span class="k">Calorías</span><span class="v">${f(tot.kcal,0)}</span><span class="s">kcal/kg/día</span></div>
+   <div class="tile peach"><span class="k">Proteínas</span><span class="v">${f(tot.p,2)}</span><span class="s">g/kg/día</span></div>
+   <div class="tile lav"><span class="k">Prot / energía</span><span class="v">${f(pe,2)}</span><span class="s">g/100 kcal</span></div>`;
+
+  const R=[["Volumen",tot.vol,"ml/kg/d",META.vol,0,0],["Calorías",tot.kcal,"kcal/kg/d",META.kcal,0,160],["Proteínas",tot.p,"g/kg/d",META.p,2,4.5],
+   ["Na",tot.na,"mEq/kg/d",META.na,2,0],["Ca",tot.ca,"mg/kg/d",META.ca,0,0],["P",tot.ph,"mg/kg/d",META.ph,0,0],["Prot/energía",pe,"g/100 kcal",META.pe,2,0]];
+  $("enTabla").innerHTML=`<thead><tr><th>Aporte</th><th>Valor</th><th>Meta</th></tr></thead><tbody>`+
+   R.map(([n,v,u,m,d,x])=>{const [c,txt]=estado(v,m,x);return`<tr><td>${n}<small>${u}</small></td><td>${f(v,d)}${c?`<br><span class="bdg ${c}">${txt}</span>`:""}</td><td>${f(m[0],m[0]%1?1:0)}–${f(m[1],m[1]%1?1:0)}${x?`<small>hasta ${f(x,x%1?1:0)}</small>`:""}</td></tr>`}).join("")+
+   `<tr class="sub"><td>Relación Ca:P (mg)</td><td colspan="2">${isFinite(cap)?f(cap,2)+" : 1":"—"}</td></tr>`+
+   "</tbody>";
+  $("enDet").innerHTML=det.length>1?det.map(([n,a])=>`<div><b>${n}</b><span>${a.vol?f(a.vol,0)+" ml/kg · ":""}${f(a.kcal,0)} kcal · ${f(a.p,2)} g prot · ${f(a.na,2)} mEq Na · ${f(a.ca,0)} mg Ca · ${f(a.ph,0)} mg P</span></div>`).join(""):"";
+
+  const A=[];
+  if(!kg)A.push(["crit","Cargá el peso del paciente."]);
+  if(!tot.vol)A.push(["info","Cargá el volumen de al menos una leche."]);
+  if(enSt.modo==="toma"&&!t)A.push(["crit","Indicá el número de tomas por día."]);
+  if(naSup&&!naSup.c)A.push(["crit","Cargá la concentración del suplemento de sodio (mEq/ml)."]);
+  if(naSup&&naSup.c>=1.7&&t&&naSup.mld/t>0)A.push(["info",`ClNa/bicarbonato concentrado: diluir cada dosis (${f(naSup.mld/t,2)} ml) en la leche de la toma.`]);
+  if(tot.p>4.5)A.push(["warn",`Proteínas ${f(tot.p,2)} g/kg/día: por encima de 4,5.`]);
+  if(rows.some(r=>r.m==="otra"&&+r.v)&&!(+byId.otra.kcal))A.push(["warn","La leche \"Otra\" no tiene composición cargada (abajo, en Composición de las leches)."]);
+  $("enAlerts").innerHTML=A.map(([c,x])=>`<div class="pill ${c}"><span>${x}</span></div>`).join("");
+
+  const sum=$("sumNP").checked, N=window.NP;$("totBox").style.display=sum?"flex":"none";
+  if(sum&&N){const T=[["Líquidos totales",N.liq,tot.vol,"ml/kg/d",0],["Calorías",N.kTot,tot.kcal,"kcal/kg/d",0],["Proteínas / AA",N.aa,tot.p,"g/kg/d",2],
+     ["Na",N.na,tot.na,"mEq/kg/d",2],["Ca",N.caMg,tot.ca,"mg/kg/d",0],["P",N.pMg,tot.ph,"mg/kg/d",0]];
+    $("totTabla").innerHTML=`<thead><tr><th>Aporte</th><th>NP</th><th>Enteral</th><th>Total</th></tr></thead><tbody>`+
+     T.map(([n,a,b,u,d])=>`<tr><td>${n}<small>${u}</small></td><td>${f(a,d)}</td><td>${f(b,d)}</td><td><b>${f(a+b,d)}</b></td></tr>`).join("")+
+     `<tr class="sub"><td colspan="4" style="white-space:normal;text-align:left;font-family:var(--body)">GIR de la NP: ${f(N.glu*1000/1440,1)} mg/kg/min (sin contar la lactosa enteral)</td></tr></tbody>`;}
+
+  enResumen=`Enteral · peso ${f(kg,3)} kg · ${t} tomas/día
+${det.filter(([,a])=>a.vol).map(([n,a])=>`${n}: ${f(a.vol,0)} ml/kg/d (${f(t?a.vol*kg/t:0,1)} ml/toma)`).join("\n")}${modOn?`\nMódulo proteico: ${f(+$("sobres").value||0,1)} sobres/día`:""}${naSup?`\nSuplemento de Na VO: ${f(naSup.meqkg,2)} mEq/kg/día = ${f(naSup.mld,2)} ml/día${t?` (${f(naSup.mld/t,2)} ml por toma)`:""} de ${$("naPrep").selectedOptions[0].text} (${f(naSup.c,2)} mEq/ml)`:""}
+Volumen ${f(tot.vol,0)} ml/kg/d · Kcal ${f(tot.kcal,0)}/kg/d · Prot ${f(tot.p,2)} g/kg/d (P/E ${f(pe,2)} g/100 kcal)
+Na ${f(tot.na,2)} mEq/kg/d · Ca ${f(tot.ca,0)} mg/kg/d · P ${f(tot.ph,0)} mg/kg/d · Ca:P ${isFinite(cap)?f(cap,2):"—"}`;
+}
+$("enCopy").onclick=()=>{const done=()=>{$("enCopy").textContent="Copiado";setTimeout(()=>$("enCopy").textContent="Copiar resumen",1500)};
+  const fb=()=>{const t=$("clip");t.value=enResumen;t.select();try{document.execCommand("copy");done()}catch(e){}};
+  if(navigator.clipboard)navigator.clipboard.writeText(enResumen).then(done,fb);else fb()};
+
+drawComp();drawRows();
+try{if(localStorage.getItem("nut_mod")==="en")$("modulo").querySelector('[data-v="en"]').click();}catch(e){}
+calc();
+</script>
+<script src="paciente.js?v=v37"></script>
+</body>
+</html>
