@@ -702,7 +702,7 @@ function vis(){
   else if (hi) h += pill('crit', `<b>VIS alto (grupo ${grp}).</b> En lactantes operados, un VIS máximo ≥ 20 en las primeras 24 h se asoció a mayor morbimortalidad, más días de ventilación y de internación en la UCI. Buscar causas tratables de bajo gasto.`);
   else if (grp >= 2) h += pill('warn', `<b>Soporte moderado (grupo ${grp}).</b> Seguir la tendencia: un VIS que no desciende en las 24–48 h es peor señal que un valor aislado.`);
   else h += pill('ok', `<b>Soporte bajo (grupo 1).</b>`);
-  const vaso = v('vVaso'); if (isFinite(vaso) && vaso > 0.04) h += pill('warn', `Vasopresina de ${f(vaso, 4)} U/kg/min: ¿la cargaste en mU/kg/min? Este campo va en U/kg/min (rango habitual 0,0003–0,002).`);
+  const vaso = v('vVaso'); if (isFinite(vaso) && vaso > 0.04) h += pill('warn', `Vasopresina de ${f(vaso, 4)} U/kg/min: ¿la cargaste en mU/kg/min? Este campo va en U/kg/min (rango 0,0001–0,02).`);
   h += `<p class="hint">Grupos de Gaies: primeras 24 h &lt; 10, 10–14, 15–19, 20–24, ≥ 25 · de 24 a 48 h &lt; 5, 5–9, 10–14, 15–19, ≥ 20. Se asigna el grupo más alto de los dos períodos.</p>`;
   $('rVIS').innerHTML = h;
 }

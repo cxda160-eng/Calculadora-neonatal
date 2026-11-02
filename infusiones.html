@@ -315,11 +315,11 @@ const DRUGS=[
   adv:"Hipotensión, arritmias, trombocitopenia, hipopotasemia.",
   mon:"TA, FC, plaquetas, potasio, función renal.",
   notas:"Eliminación renal: reducir dosis en insuficiencia renal. Vida media prolongada en prematuros. Precipita con furosemida en la misma vía."},
- {id:"vasopresina",name:"Vasopresina",g:"ino",unit:"min",base:"U",amtU:"U",range:[0.0001,0.002],step:0.00005,ref:0.0005,start:0.0003,dp:5,
-  amp:{txt:"20 U/mL",c:20},dil:"SF o SG 5%",titr:[0.0001,0.0002,0.0003,0.0005,0.00075,0.001,0.0015,0.002],
+ {id:"vasopresina",name:"Vasopresina",g:"ino",unit:"min",base:"U",amtU:"U",range:[0.0001,0.02],step:0.00005,ref:0.0005,start:0.0003,dp:5,
+  amp:{txt:"20 U/mL",c:20},dil:"SF o SG 5%",titr:[0.0001,0.0002,0.0003,0.0005,0.001,0.002,0.005,0.01,0.02],
   inter:{c:1,txt:"1 mL de ampolla (20 U) + 19 mL de SF = 1 U/mL"},
   ind:"Hipotensión refractaria a catecolaminas (shock vasodilatado). Rescate en HPPN refractaria al óxido nítrico.",
-  dosis:"0,0003–0,002 U/kg/min (= 0,3–2 mU/kg/min = 0,018–0,12 U/kg/h). En prematuros extremos se describieron 0,00017–0,0007 U/kg/min (0,01–0,04 U/kg/h). Titular de a 0,0001 U/kg/min cada 15 min según TA. Máximo habitual para hipotensión: 0,002 U/kg/min. Vademécum Neonatal 2019 (Travaglianti): shock vasodilatado refractario y poscirugía cardíaca con bypass 0,0001–0,02 U/kg/min (máxima reportada 0,04); > 1 mes 0,0002–0,002 U/kg/min. No suspender en forma abrupta: descender en 24–48 h.",
+  dosis:"0,0003–0,002 U/kg/min (= 0,3–2 mU/kg/min = 0,018–0,12 U/kg/h). En prematuros extremos se describieron 0,00017–0,0007 U/kg/min (0,01–0,04 U/kg/h). Titular de a 0,0001 U/kg/min cada 15 min según TA. Rango habitual para hipotensión hasta 0,002 U/kg/min; la app permite hasta 0,02 U/kg/min según el Vademécum. Vademécum Neonatal 2019 (Travaglianti): shock vasodilatado refractario y poscirugía cardíaca con bypass 0,0001–0,02 U/kg/min (máxima reportada 0,04); > 1 mes 0,0002–0,002 U/kg/min. No suspender en forma abrupta: descender en 24–48 h.",
   adv:"Hiponatremia por retención de agua, oliguria, vasoconstricción excesiva con isquemia periférica o esplácnica, bradicardia, hipertensión, trombocitopenia, necrosis por extravasación.",
   mon:"TA invasiva, FC, natremia frecuente, diuresis y balance hídrico, perfusión periférica, lactato, plaquetas, sitio de infusión.",
   notas:"Dosis en UNIDADES por kg por minuto (U/kg/min), como el Vademécum Neonatal. Cuidado con las miliunidades: 0,0005 U/kg/min = 0,5 mU/kg/min. Concentración de administración 0,1–1 U/mL (Vademécum); con volúmenes de ampolla muy chicos, usar la dilución intermedia de 1 U/mL. Vida media de 10–30 min: el efecto de un cambio de velocidad se estabiliza en alrededor de 1 h. Suele permitir descender otras catecolaminas. Este rango es solo para hipotensión: en diabetes insípida las dosis son unas 1000 veces menores. Incompatibles en Y según el Vademécum: anfotericina B (convencional y complejo lipídico), diazepam, diazóxido, fenitoína e indometacina. Medicamento de alto riesgo: doble chequeo."},
@@ -487,6 +487,7 @@ function update(src){
   if(d.perDay&&S.dose*1440/1000>d.perDay) A.push(["",`Equivale a ${fmt(S.dose*1440/1000,1)} mg/kg/día: supera el máximo diario que fijan algunas guías (${d.perDay} mg/kg/día). Confirmar con cardiología.`]);
   if(P) A.push(["",`Rango del protocolo UCIN: ${P.range}.`]);
   if(!P&&ampMl<0.1&&isFinite(ampMl)) A.push(["","Volumen de ampolla menor a 0,1 mL: considerá una dilución intermedia para medir con precisión."]);
+  if(d.id==="vasopresina"&&S.dose>0.002) A.push(["",`Dosis por encima de 0,002 U/kg/min (2 mU/kg/min), el rango habitual neonatal: el Vademécum la describe hasta 0,02 U/kg/min en shock refractario y poscirugía cardíaca. Monitorear isquemia periférica y esplácnica, natremia y diuresis.`]);
   if(d.id==="vasopresina"&&(c<0.1||c>1)&&isFinite(c)) A.push(["",`Concentración de ${cTxt(c,d)}: el Vademécum indica administrar entre 0,1 y 1 U/mL. ${c<0.1?"Podés aumentar la cantidad o bajar la velocidad de referencia.":"Aumentá el volumen."}`]);
   if(ampMl>S.vol) A.push(["bad","El volumen de ampolla supera el volumen de la jeringa. Reducí la cantidad o aumentá el volumen."]);
   if(r<0.1&&isFinite(r)) A.push(["","Velocidad menor a 0,1 mL/h: puede ser imprecisa en algunas bombas. Considerá diluir más."]);
