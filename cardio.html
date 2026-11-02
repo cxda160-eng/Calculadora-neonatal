@@ -197,7 +197,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <label for="vAdre">Adrenalina <span class="u">mcg/kg/min</span><input id="vAdre" inputmode="decimal" autocomplete="off" placeholder="—"></label>
       <label for="vNora">Noradrenalina <span class="u">mcg/kg/min</span><input id="vNora" inputmode="decimal" autocomplete="off" placeholder="—"></label>
       <label for="vMil">Milrinona <span class="u">mcg/kg/min</span><input id="vMil" inputmode="decimal" autocomplete="off" placeholder="—"></label>
-      <label for="vVaso">Vasopresina <span class="u">mU/kg/min</span><input id="vVaso" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="vVaso">Vasopresina <span class="u">U/kg/min</span><input id="vVaso" inputmode="decimal" autocomplete="off" placeholder="—"></label>
     </div>
     <div class="segrow">
       <div><span class="lbl">Momento del posoperatorio</span>
@@ -206,7 +206,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
         </div></div>
     </div>
     <div class="res" id="rVIS"></div>
-    <p class="hint">VIS = dopamina + dobutamina + 100 × adrenalina + 100 × noradrenalina + 10 × milrinona + 10 000 × vasopresina (U/kg/min). Con vasopresina en mU/kg/min, el factor es 10. IS (score inotrópico de Wernovsky) = dopamina + dobutamina + 100 × adrenalina. El valor pronóstico es el VIS máximo del período: cargá la combinación de dosis más alta.</p>
+    <p class="hint">VIS = dopamina + dobutamina + 100 × adrenalina + 100 × noradrenalina + 10 × milrinona + 10 000 × vasopresina (U/kg/min). La app la pide en U/kg/min (ej. 0,0005). IS (score inotrópico de Wernovsky) = dopamina + dobutamina + 100 × adrenalina. El valor pronóstico es el VIS máximo del período: cargá la combinación de dosis más alta.</p>
   </section>
 
   <!-- SUPERFICIE CORPORAL Y Z-SCORES -->
@@ -686,7 +686,7 @@ function score(){
 // ---------- VIS ----------
 let visT = '24';
 $('sVisT').querySelectorAll('button').forEach(b => b.onclick = () => { visT = b.dataset.v; $('sVisT').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); vis(); });
-const VIS_IN = [['vDopa',1,'Dopamina'],['vDobu',1,'Dobutamina'],['vAdre',100,'Adrenalina'],['vNora',100,'Noradrenalina'],['vMil',10,'Milrinona'],['vVaso',10,'Vasopresina']];
+const VIS_IN = [['vDopa',1,'Dopamina'],['vDobu',1,'Dobutamina'],['vAdre',100,'Adrenalina'],['vNora',100,'Noradrenalina'],['vMil',10,'Milrinona'],['vVaso',10000,'Vasopresina']];
 function vis(){
   const vals = VIS_IN.map(([id,w,n]) => { const x = v(id); return {id, w, n, x: isFinite(x) ? x : 0, set: isFinite(x)}; });
   if (!vals.some(o => o.set)) { $('rVIS').innerHTML = '<div class="empty">Cargá al menos una infusión.</div>'; return; }
@@ -702,7 +702,7 @@ function vis(){
   else if (hi) h += pill('crit', `<b>VIS alto (grupo ${grp}).</b> En lactantes operados, un VIS máximo ≥ 20 en las primeras 24 h se asoció a mayor morbimortalidad, más días de ventilación y de internación en la UCI. Buscar causas tratables de bajo gasto.`);
   else if (grp >= 2) h += pill('warn', `<b>Soporte moderado (grupo ${grp}).</b> Seguir la tendencia: un VIS que no desciende en las 24–48 h es peor señal que un valor aislado.`);
   else h += pill('ok', `<b>Soporte bajo (grupo 1).</b>`);
-  const vaso = v('vVaso'); if (isFinite(vaso) && vaso > 5) h += pill('warn', `Vasopresina de ${f(vaso, 2)} mU/kg/min: ¿la cargaste en U/kg/h? Este campo va en mU/kg/min (rango habitual 0,3–2).`);
+  const vaso = v('vVaso'); if (isFinite(vaso) && vaso > 0.04) h += pill('warn', `Vasopresina de ${f(vaso, 4)} U/kg/min: ¿la cargaste en mU/kg/min? Este campo va en U/kg/min (rango habitual 0,0003–0,002).`);
   h += `<p class="hint">Grupos de Gaies: primeras 24 h &lt; 10, 10–14, 15–19, 20–24, ≥ 25 · de 24 a 48 h &lt; 5, 5–9, 10–14, 15–19, ≥ 20. Se asigna el grupo más alto de los dos períodos.</p>`;
   $('rVIS').innerHTML = h;
 }
