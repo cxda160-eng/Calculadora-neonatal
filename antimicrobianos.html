@@ -118,7 +118,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 <div class="wrap">
   <header>
     <h1>Antimicrobianos neonatales</h1>
-    <p>Dosis por peso y edad según la tabla de neonatología del Hospital Garrahan, versión 2024. Consulta comparativa opcional con el Taketomo 18.ª ed. (2011).</p>
+    <p>Dosis por peso y edad según la tabla de neonatología del Hospital Garrahan, versión 2026 (octubre). Consulta comparativa opcional con el Taketomo 18.ª ed. (2011).</p>
   </header>
 
   <section class="card" id="s-pac">
@@ -138,28 +138,28 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <section class="card" id="s-src">
     <h2>Fuente</h2>
     <div class="seg" role="group" aria-label="Fuente de dosis">
-      <button data-src="gar" aria-pressed="true">Garrahan 2024<small>principal</small></button>
+      <button data-src="gar" aria-pressed="true">Garrahan 2026<small>principal</small></button>
       <button data-src="tk" aria-pressed="false">Taketomo 2011<small>consulta</small></button>
       <button data-src="cmp" aria-pressed="false">Comparar<small>lado a lado</small></button>
     </div>
   </section>
 
   <section class="card" id="s-gar">
-    <h2>Antimicrobianos · Garrahan 2024</h2>
+    <h2>Antimicrobianos · Garrahan 2026</h2>
     <input class="search" id="q" type="search" placeholder="Buscar antimicrobiano…" aria-label="Buscar antimicrobiano">
     <div class="list" id="list"></div>
   </section>
 
   <section class="card tk" id="s-tk" hidden>
     <h2>Antimicrobianos · Taketomo 2011</h2>
-    <div class="tkban" id="tkBanner"><span class="ic">⚠</span><div><b>Taketomo 18.ª ed. (2011) – referencia histórica, puede estar desactualizada</b>Manual de prescripción pediátrica y neonatal, edición en español con contenido cerrado hacia enero de 2011. La fuente principal de la app sigue siendo Garrahan 2024. Dosis resumidas y transcriptas desde el libro: verificá en la página indicada.</div></div>
+    <div class="tkban" id="tkBanner"><span class="ic">⚠</span><div><b>Taketomo 18.ª ed. (2011) – referencia histórica, puede estar desactualizada</b>Manual de prescripción pediátrica y neonatal, edición en español con contenido cerrado hacia enero de 2011. La fuente principal de la app es Garrahan 2026. Dosis resumidas y transcriptas desde el libro: verificá en la página indicada.</div></div>
     <input class="search" id="tq" type="search" placeholder="Buscar en el Taketomo (nombre o grupo)…" aria-label="Buscar en el Taketomo">
     <div class="list" id="tklist"></div>
   </section>
 
   <section class="card tk" id="s-cmp" hidden>
-    <h2>Comparación Garrahan 2024 vs Taketomo 2011</h2>
-    <div class="tkban" id="cmpBanner"><span class="ic">⚠</span><div><b>Taketomo 18.ª ed. (2011) – referencia histórica, puede estar desactualizada</b>Manual de prescripción pediátrica y neonatal, edición en español con contenido cerrado hacia enero de 2011. La fuente principal de la app sigue siendo Garrahan 2024. Dosis resumidas y transcriptas desde el libro: verificá en la página indicada.</div></div>
+    <h2>Comparación Garrahan 2026 vs Taketomo 2011</h2>
+    <div class="tkban" id="cmpBanner"><span class="ic">⚠</span><div><b>Taketomo 18.ª ed. (2011) – referencia histórica, puede estar desactualizada</b>Manual de prescripción pediátrica y neonatal, edición en español con contenido cerrado hacia enero de 2011. La fuente principal de la app es Garrahan 2026. Dosis resumidas y transcriptas desde el libro: verificá en la página indicada.</div></div>
     <div class="hint">Se compara la dosis por toma y el intervalo para el paciente cargado. <span class="badge eq">Coinciden</span> rangos superpuestos · <span class="badge dif">Difiere</span> dosis o intervalo distinto · <span class="badge man">A mano</span> sin dato comparable.</div>
     <label class="chk"><input type="checkbox" id="onlyDif"> Mostrar solo los que difieren</label>
     <input class="search" id="cq" type="search" placeholder="Buscar…" aria-label="Buscar en la comparación">
@@ -171,19 +171,25 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <div class="prof" id="prof"></div>
   </section>
 
+  <section class="card" id="s-pqx">
+    <h2>Profilaxis antibiótica prequirúrgica</h2>
+    <div class="prof" id="pqx"></div>
+  </section>
+
   <footer>
-    Fuente: Tabla de dosis de antimicrobianos en neonatología, versión 2024. Travaglianti M, Berberian G, Castro G. Terapia Intensiva Neonatal, Farmacia y Epidemiología e Infectología, Hospital de Pediatría J. P. Garrahan, Buenos Aires.
-    Abreviaturas: FQP fibrosis quística del páncreas; IRA insuficiencia renal aguda; ITU infección urinaria; OMR microorganismos multirresistentes; RNPT/RNT recién nacido pretérmino/de término; EG edad gestacional.
+    Fuente: Tabla de dosis de antimicrobianos y profilaxis en neonatología, versión 2026 (octubre). Travaglianti M, Berberian G, Otaño J, Aguirre Y. Terapia Intensiva Neonatal, Farmacia y Epidemiología e Infectología, Hospital de Pediatría J. P. Garrahan, Buenos Aires.
+    Abreviaturas: FQP fibrosis quística del páncreas; IRA insuficiencia renal aguda; MTD monitoreo terapéutico de drogas; HT hipotermia terapéutica; TEI tratamiento empírico inicial; ITU infección urinaria; OMR microorganismos multirresistentes; RNPT/RNT recién nacido pretérmino/de término; EG edad gestacional.
     <br>Consulta comparativa: Taketomo CK, Hodding JH, Kraus DM. Manual de prescripción pediátrica y neonatal, 18.ª ed. en español (contenido ~2011). Referencia histórica; no reemplaza a la fuente principal.
     <br>Herramienta de apoyo: verificá la dosis con la tabla original, la función renal y hepática y el criterio de Infectología.
   </footer>
 </div>
 
-<script src="taketomo.js?v=v37"></script>
+<script src="taketomo.js?v=v41"></script>
 <script>
-// Tabla de dosis de antimicrobianos en neonatología – Versión 2024 (Hospital de Pediatría J. P. Garrahan).
+// Tabla de dosis de antimicrobianos en neonatología – Versión 2026 (octubre) (Hospital de Pediatría J. P. Garrahan).
 // Columnas: c0 <1200 g 0–4 sem · c1 1200–2000 g 0–7 d · c2 1200–2000 g >7 d · c3 >2000 g 0–7 d · c4 >2000 g >7 d · c5 RNPT >45 sem EG o RNT >1 mes
 // Celdas en mg/kg/dosis "dosis c/intervalo (h)"; '-' = sin dato. "all" = misma indicación para todas las columnas.
+// "sel" = la tabla define grupos por EG / EPM / días de vida en lugar de peso (se elige el grupo del paciente).
 const COLS = [
   {k:0, n:'< 1200 g · 0–4 semanas'},
   {k:1, n:'1200–2000 g · 0–7 días'},
@@ -193,86 +199,161 @@ const COLS = [
   {k:5, n:'RNPT > 45 sem EG corregida o RNT > 1 mes'}
 ];
 const ATB = [
-  {id:'aciclovir', n:'Aciclovir', via:'IV', rows:[
-    {v:'Herpes simplex', c:['-','20 c/12','20 c/8','20 c/12','20 c/8','20 c/8']},
-    {v:'Varicela', c:['-','10 c/12','10 c/8','10 c/12','10 c/8','10 c/8']}],
-   obs:['VO: no recomendado como tratamiento inicial.','Varicela VO > 1 mes: 20 c/6.','Profilaxis secundaria de HSV: ver Profilaxis.']},
-  {id:'amikacina', n:'Amikacina', via:'IV-IM', rows:[{c:['7,5 c/24','7,5 c/24','10 c/12','10 c/12','10 c/12','15 c/24']}],
-   obs:['FQP: 10 c/8.'], dosar:'Dosar en la 3.ª dosis. Dosis c/12 h: valle (previo a la dosis) 1–8 µg/mL; pico (30 min posinfusión) 15–40 µg/mL. Dosis c/24 h: valle < 1 µg/mL; pico 35–60 µg/mL.'},
-  {id:'amoxicilina', n:'Amoxicilina', via:'VO', rows:[{c:['-','-','40 c/12','50 c/12','30 c/8','50 c/12 ó 30 c/8']}], obs:['No usar como tratamiento empírico inicial.']},
-  {id:'amoxclav', n:'Amoxicilina-clavulánico', via:'VO', rows:[{c:['-','-','-','15 c/12','15 c/12','15-45 c/12']}], obs:['No usar como tratamiento empírico inicial.']},
-  {id:'ampicilina', n:'Ampicilina', via:'EV-IM', rows:[
+  {id:'aciclovir', n:'Aciclovir', via:'EV (VO solo varicela > 1 mes)', rows:[
+    {v:'Herpes simplex', all:'20 c/8'},
+    {v:'Varicela', all:'10 c/8'},
+    {v:'Varicela VO', c:['-','-','-','-','-','20 c/6']}],
+   obs:['Profilaxis secundaria de HSV: ver Profilaxis.','Insuf. renal: Clear 25–50 mL/min/1,73 m² o Crea 0,7–1 mg/dL → 20 c/12 · Clear 10–24 o Crea 1,01–1,3 → 20 c/24 · Clear < 10 o Crea > 1,3 y/o diuresis < 1 mL/kg/h → 10 c/24.','CRRT, HD, DP: ajusta; consultar al farmacéutico. Insuf. hepática: no ajusta.']},
+  {id:'amikacina', n:'Amikacina', via:'EV-IM', rows:[{c:['7,5 c/24','7,5 c/24','10 c/12','10 c/12','10 c/12','15 c/24']}],
+   obs:['FQP: 10 c/8.','Hipotermia terapéutica: ampliar el intervalo 12 h (c/12 → c/24; c/24 → c/36) y MTD.','Insuf. renal y ECMO: dar la dosis y hacer MTD antes de la siguiente.'], dosar:'MTD: dosar en la 3.ª dosis. Dosis c/12 h: valle (previo a la dosis) 1–8 µg/mL; pico (30 min posinfusión) 15–40 µg/mL. Dosis c/24 h: valle < 1 µg/mL; pico 35–60 µg/mL.'},
+  {id:'amoxicilina', n:'Amoxicilina', via:'VO', rows:[{c:['-','25 c/12','25 c/12','25 c/12','25 c/12','30 c/8']}], obs:['No usar como tratamiento empírico inicial.','Insuf. renal: ajustar con Clear < 30. Insuf. hepática: no ajusta.']},
+  {id:'amoxclav', n:'Amoxicilina-clavulánico', via:'VO', rows:[{c:['-','-','15-20 c/12','-','15-20 c/12','13 c/8'], c0b:'15-20 c/12', c0d:7}], obs:['Dosis en base a amoxicilina.','< 1200 g: solo con > 7 días de vida (15–20 c/12).','No usar como tratamiento empírico inicial.','Insuf. renal: ampliar intervalo con Clear < 30.']},
+  {id:'ampicilina', n:'Ampicilina', via:'EV', rows:[
     {v:'Sepsis', c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/6','50 c/6']},
-    {v:'Meningitis', c:['100 c/12','100 c/12','100 c/8','100 c/8','75 c/6','75-100 c/6']}], obs:[]},
-  {id:'ampisulb', n:'Ampicilina-sulbactam', via:'EV', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/6','50 c/8']}], obs:['Alternativa para completar VO: amoxicilina-clavulánico.']},
-  {id:'anfob', n:'Anfotericina B', via:'EV', rows:[{all:'0,5 y luego 1 c/24'}], obs:['Tiempo de infusión: 6 h.']},
-  {id:'anfolip', n:'Anfotericina complejo lipídico', via:'EV (infusión 2,5 mg/kg/h)', rows:[{c:['Inicio 1, luego 3 a 5 c/24','Inicio 1, luego 3 a 5 c/24','Inicio 3, luego 5 c/24','Inicio 3, luego 5 c/24','Inicio 3, luego 5 c/24','Inicio 3, luego 5 c/24']}],
-   obs:['Requiere autorización de Infectología.','Indicación: RN < 1500 g, IRA y/o hipokalemia refractaria.']},
+    {v:'Meningitis', c:['100 c/12','100 c/12','100 c/8','100 c/12','100 c/8','100 c/6']}], obs:['Insuf. renal: ampliar intervalo con Clear < 30; consultar al farmacéutico. Insuf. hepática: no ajusta.']},
+  {id:'ampisulb', n:'Ampicilina-sulbactam', via:'EV', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/6','50 c/8']}], obs:['Alternativa para completar VO: amoxicilina-clavulánico.','Insuf. renal: ampliar intervalo con Clear < 30.']},
+  {id:'anfob', n:'Anfotericina B', via:'EV', rows:[{all:'0,5 y luego 1 c/24'}], obs:['Tiempo de infusión: 4–6 h.','Insuf. renal: ajustar solo si es secundaria a la anfotericina.']},
+  {id:'anfolip', n:'Anfotericina B complejo lipídico', via:'EV (en 1–2 h)', rows:[{all:'3 c/24, máximo 5 c/24'}],
+   obs:['Requiere autorización de Infectología.','Indicación: RN < 1500 g, IRA y/o hipokalemia refractaria, foco endovascular.']},
+  {id:'anfolipo', n:'Anfotericina B liposomal', via:'EV (en 1–2 h)', rows:[{all:'3 c/24, máximo 5 c/24'}],
+   obs:['Requiere autorización de Infectología.','Indicación: RN < 1500 g, IRA y/o hipokalemia refractaria, foco endovascular.']},
   {id:'anidula', n:'Anidulafungina', via:'EV', rows:[{all:'Inicio 3, luego 1,5 c/24'}], obs:['Requiere autorización de Infectología.']},
   {id:'azitro', n:'Azitromicina', via:'VO', rows:[{v:'Bordetella pertussis', all:'10 c/24', dur:'× 5 días'},{v:'Chlamydia trachomatis, Ureaplasma urealyticum', all:'20 c/24', dur:'× 3 días'}], obs:[]},
-  {id:'caspo', n:'Caspofungina', via:'EV', rows:[{all:'2 mg/kg (o 25 mg/m²)'}], obs:['Requiere autorización de Infectología.','Candidiasis invasiva con falla de tratamiento.']},
-  {id:'aztreonam', n:'Aztreonam', via:'EV', rows:[{c:['30 c/24','-','30 c/8','-','30 c/6','30 c/6']}], obs:['Requiere autorización de Infectología.']},
-  {id:'cefalexina', n:'Cefalexina', via:'VO', rows:[{c:['-','-','25 c/8','25 c/12','25 c/8','12,5-25 c/6']}], obs:['Rango de dosis según la gravedad de la enfermedad.']},
+  {id:'aztreonam', n:'Aztreonam', via:'EV', rows:[{sel:[
+    {eg:[0,33.99], d:[0,7], c:'30 c/12', lab:'< 34 sem EG · ≤ 7 días'},
+    {eg:[0,33.99], d:[8,9999], c:'30 c/8', lab:'< 34 sem EG · > 7 días'},
+    {eg:[34,99], d:[0,7], c:'30 c/8', lab:'≥ 34 sem EG · ≤ 7 días'},
+    {eg:[34,99], d:[8,9999], c:'30 c/6', lab:'≥ 34 sem EG · > 7 días'}]}],
+   obs:['Requiere autorización de Infectología.','OMR: pasar en 3 h.','Insuf. renal: sin datos neonatales; ajustar con Clear < 30.']},
+  {id:'benznidazol', n:'Benznidazol', via:'VO', rows:[{c:['Mitad de dosis (ver obs.)','5 c/12','5 c/12','5 c/12','5 c/12','5 c/12'], dur:'× 60 días'}],
+   obs:['Requiere autorización de Infectología.','RNPT: iniciar con la mitad de la dosis y aumentar c/48–72 h hasta la dosis terapéutica.','Insuf. renal y hepática: sin datos.']},
+  {id:'caspo', n:'Caspofungina', via:'EV', rows:[{all:'2 mg/kg (o 25 mg/m²)'}], obs:['Requiere autorización de Infectología.','Candidiasis invasiva con fallo de tratamiento.','> 3 meses: 50 mg/m².']},
+  {id:'cefalexina', n:'Cefalexina', via:'VO', rows:[{c:['25 c/12','25 c/12','25 c/8','25 c/12','25 c/8','25 c/6']}], obs:['Insuf. renal: sin datos neonatales; ampliar intervalo en IR moderada o grave.']},
   {id:'cefalotina', n:'Cefalotina', via:'EV', rows:[{c:['20 c/12','20 c/12','20 c/8','20 c/8','20 c/6','25 c/6']}], obs:['Endocarditis: 50 c/6.']},
-  {id:'cefotaxima', n:'Cefotaxima', via:'EV-IM', rows:[
+  {id:'cefotaxima', n:'Cefotaxima', via:'EV', rows:[
     {v:'Sepsis', c:['50 c/12','50 c/12','50 c/8','50 c/12','50 c/8','50 c/6']},
     {v:'Meningitis', c:['100 c/12','100 c/12','100 c/8','100 c/12','75 c/6','75 c/6']}],
-   obs:['Dosis de meningitis en tratamiento empírico inicial: asociar ampicilina.','Oftalmía neonatal gonocócica: homologar dosis de sepsis.']},
-  {id:'ceftazidima', n:'Ceftazidima', via:'EV-IM', rows:[
-    {v:'Sepsis', c:['50 c/12','50 c/12','50 c/8','50 c/12','50 c/8','50 c/8']},
-    {v:'Meningitis', c:['50 c/12','50 c/12','50 c/8','50 c/12','75 c/8','50 c/6']}], obs:['FQP: 50 c/6.']},
-  {id:'ceftazavi', n:'Ceftazidima-avibactam', via:'EV', rows:[{all:'50 c/8'}], obs:['50 mg/kg = 40 de ceftazidima + 10 de avibactam.','Requiere autorización de Infectología.']},
-  {id:'ceftriaxona', n:'Ceftriaxona', via:'EV-IM', rows:[{c:['50 c/24','50 c/24','50 c/24','50 c/24','75 c/24','50-80 c/24']}],
-   obs:['En RN, limitar su uso.','Meningitis: 100 c/24.','No usar como tratamiento empírico inicial. Individualizar.']},
-  {id:'cefuroxima', n:'Cefuroxima', via:'EV-IM', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/8','50 c/8']}], obs:['No se recomienda en meningitis.']},
-  {id:'cipro', n:'Ciprofloxacina', via:'EV-VO', rows:[{c:['10 c/24','7,5 c/12','7,5 c/12','12,5 c/24','12,5 c/12','10-15 c/12']}], obs:['No usar como tratamiento empírico inicial.','FQP: 20 c/12.']},
-  {id:'claritro', n:'Claritromicina', via:'EV-VO', rows:[{c:['-','-','-','-','-','7,5 c/12']}], obs:['< 1 mes: consultar con Infectología.']},
-  {id:'clinda', n:'Clindamicina', via:'EV-VO', rows:[{c:['5 c/12','5 c/8','5 c/8','7,5 c/8','7,5 c/6','7,5 c/6 ó 10 c/8'], c0b:'5 c/8', c0d:14}], obs:['< 1200 g con > 14 días: 5 c/8.','Precaución en disfunción hepática.']},
-  {id:'colistin', n:'Colistín', via:'EV', rows:[{all:'1,7 c/8'}], obs:['No usar como tratamiento empírico inicial. Solo para OMR.']},
-  {id:'dapto', n:'Daptomicina', via:'', rows:[{all:'6 c/12'}], obs:['Requiere autorización de Infectología.']},
-  {id:'estrepto', n:'Estreptomicina', via:'EV-IM', rows:[{all:'10-15 c/12'}], obs:['Según sensibilidad del germen.']},
+   obs:['Dosis de meningitis en tratamiento empírico inicial: asociar ampicilina.','Oftalmía neonatal gonocócica: homologar dosis de sepsis.','ECMO: EPN < 7 días 50 c/12; 7–28 días 50 c/8; > 28 días 37,5 c/6.','Insuf. renal: ajustar con Clear < 20.']},
+  {id:'ceftarolina', n:'Ceftarolina', via:'EV', rows:[{all:'6-8 c/8'}], obs:['Requiere autorización de Infectología.','Insuf. renal (AKI estadio 3): 3–4 c/8.']},
+  {id:'ceftazidima', n:'Ceftazidima', via:'EV-IM', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/12','50 c/8','50 c/8']}],
+   obs:['OMR: pasar en 3 h.','FQP: 50 c/6.','Hipotermia terapéutica: 50 c/12 (EPN < 7 días y peso > 2 kg).','ECMO: no ajusta. Insuf. renal: sin datos neonatales; considerar ampliar intervalo.']},
+  {id:'ceftazavi', n:'Ceftazidima-avibactam', via:'EV (en 3 h)', rows:[{sel:[
+    {eg:[0,36.99], pma:[26,30.99], c:'25 c/12', lab:'Prematuro · EPM 26 a < 31 sem'},
+    {eg:[0,36.99], pma:[31,44], c:'25 c/8', lab:'Prematuro · EPM 31 a 44 sem'},
+    {eg:[0,36.99], pma:[44.01,52.99], c:'37,5 c/8', lab:'Prematuro · EPM > 44 a < 53 sem'},
+    {eg:[37,99], d:[0,28], c:'25 c/8', lab:'Término · ≤ 28 días'},
+    {eg:[37,99], d:[29,89], c:'37,5 c/8', lab:'Término · > 28 días a < 3 meses'},
+    {eg:[37,99], d:[90,183], c:'50 c/8', lab:'Término · 3 a 6 meses'}]}],
+   obs:['Dosis en base a ceftazidima + avibactam.','Requiere autorización de Infectología. Tratamiento empírico inicial si está colonizado por KPC con hemocultivo positivo para BGN: consultar a Infectología.','Insuf. renal: ajusta, sin datos neonatales; consultar al farmacéutico. ECMO: no ajusta.']},
+  {id:'ceftolozano', n:'Ceftolozano-tazobactam', via:'EV (en 3 h)', rows:[{all:'30 c/8'}],
+   obs:['Requiere autorización de Infectología.','Dosis definida a partir de > 32 sem EG y > 7 días de vida.','Dosis en base a ceftolozano-tazobactam. Neumonía: consultar dosis.']},
+  {id:'ceftriaxona', n:'Ceftriaxona', via:'EV-IM', rows:[
+    {v:'Sepsis', c:['50 c/24','50 c/24','50 c/24','50 c/24','50 c/24','50-80 c/24']},
+    {v:'Meningitis', all:'100 c/24'}],
+   obs:['En RN, limitar su uso. Evitar con hiperbilirrubinemia.','No recomendada en prematuros < 41 sem EPM (EG + EPN).','Insuf. renal: no ajustar salvo insuficiencia renal + hepática.']},
+  {id:'cefuroxima', n:'Cefuroxima', via:'EV-IM', rows:[{c:['50 c/12','50 c/12','50 c/8','50 c/8','50 c/8','50 c/8']}], obs:['No se recomienda en meningitis.','Insuf. renal: ajustar con Clear < 20; considerar ampliar intervalo.']},
+  {id:'cipro', n:'Ciprofloxacina', via:'EV-VO', rows:[{c:['10 c/24','10 c/12','10 c/12','10 c/12','10 c/12','10-15 c/12']}], obs:['FQP: 20 c/12.','Insuf. renal: sin datos neonatales; consultar.']},
+  {id:'claritro', n:'Claritromicina', via:'EV-VO', rows:[{all:'7,5 c/12'}], obs:['Insuf. renal: sin datos neonatales; consultar.']},
+  {id:'clinda', n:'Clindamicina', via:'EV-VO', rows:[{c:['5 c/12','5 c/8','5 c/8','7,5 c/8','7,5 c/6','7,5 c/6 ó 10 c/8'], c0b:'5 c/8', c0d:14}], obs:['< 1200 g con > 14 días: 5 c/8.','Insuf. hepática: sin datos neonatales; consultar.']},
+  {id:'colistin', n:'Colistina', via:'EV', rows:[{all:'1,7 c/8'}], obs:['Dosis expresada como colistina base.','Insuf. renal: sin datos neonatales; consultar.']},
+  {id:'dapto', n:'Daptomicina', via:'EV', rows:[{c:['6 c/12','6 c/12','6 c/12','6 c/12','6 c/12','8-10 c/24']}], obs:['Requiere autorización de Infectología.']},
+  {id:'ertapenem', n:'Ertapenem', via:'EV', rows:[{all:'15 c/12'}], obs:['Insuf. renal: sin datos neonatales (en adultos ajusta con Clear < 30).']},
+  {id:'estrepto', n:'Estreptomicina', via:'EV-IM', rows:[{all:'10-15 c/12'}], obs:['Según sensibilidad del germen.','Insuf. renal: ajustar con Clear < 50; considerar ampliar intervalo.']},
   {id:'fluco', n:'Fluconazol', via:'EV-VO', rows:[{c:['fluco0','6-12 c/24','12 c/24','12 c/24','12 c/24','12 c/24']}],
-   obs:['No usar como tratamiento empírico inicial.','Sin anfotericina previa: iniciar con dosis de carga de 25 mg/kg.']},
-  {id:'ganci', n:'Ganciclovir', via:'EV', rows:[{all:'6 c/12'}], obs:['Contraindicado con < 25 000 plaquetas o < 500 neutrófilos.']},
+   obs:['No usar como tratamiento empírico inicial. Dosis referida a candidiasis sistémica.','Sin anfotericina previa: iniciar con dosis de carga de 25 mg/kg.','Insuf. renal: Clear 10–50 mL/min/1,73 m² → reducir la dosis 50 % (3–6 c/24).']},
+  {id:'ganci', n:'Ganciclovir', via:'EV', rows:[{all:'6 c/12'}], obs:['No recomendado con < 25 000 plaquetas, < 500 neutrófilos o Hb < 8. Reducir a la mitad si neutrófilos < 500. Monitorear laboratorio.','Insuf. renal: sin datos neonatales (en pediatría ajusta con Clear < 50).']},
   {id:'genta', n:'Gentamicina', via:'EV', rows:[{c:['2,5 c/24','2,5 c/24','2,5 c/12','4 c/24','4 c/24','5 c/24']}],
-   obs:['FQP: 2,5–3,3 c/8.','Endocarditis: 1 c/8.'], dosar:'Dosar en la 3.ª dosis (en RNPT, IRA, FQP, endocarditis). Dosis c/12 h: valle < 2 µg/mL; pico (30 min posinfusión) 4–12 µg/mL. Dosis c/24 h: valle < 1 µg/mL; pico 4–12 µg/mL (RN y hasta 24 meses).'},
-  {id:'imipenem', n:'Imipenem', via:'EV-IM', rows:[{c:['20 c/24','25 c/12','25 c/12','25 c/12','25 c/8','25 c/6']}], obs:['Priorizar meropenem.']},
+   obs:['FQP: 2,5–3,3 c/8.','Endocarditis: 1 c/8.','Hipotermia terapéutica según creatinina: dar la dosis y hacer MTD antes de la 2.ª.','Ajuste en insuficiencia renal por creatinina: 0,2–0,7 mg/dL → 4 c/24 · 0,8–1,2 → 4 c/36 · 1,3–1,5 → 4 c/48.'],
+   dosar:'MTD: dosar en la 3.ª dosis (en RNPT, IRA, FQP, endocarditis). Dosis c/12 h: valle < 2 µg/mL; pico (30 min posinfusión) 4–12 µg/mL. Dosis c/24 h: valle < 1 µg/mL; pico 4–12 µg/mL (RN y hasta 24 meses).'},
+  {id:'imipenem', n:'Imipenem', via:'EV-IM', rows:[{c:['25 c/24','25 c/12','25 c/8','25 c/12','25 c/8','25 c/6'], c0b:'25 c/12', c0d:6}],
+   obs:['< 1200 g: < 7 días 25 c/24; ≥ 7 días 25 c/12.','Priorizar meropenem.','Insuf. renal: sin datos neonatales; información insuficiente en < 3 meses o con creatinina > 2 mg/dL.']},
+  {id:'isoniazida', n:'Isoniazida', via:'EV-VO', rows:[{all:'10 c/24'}],
+   obs:['Requiere autorización de Infectología y monitoreo estricto.','Profilaxis con piridoxina 1–2 mg/kg.','Contraindicada en insuficiencia hepática aguda. Suspender si las transaminasas superan 3–5 veces el límite superior normal.']},
   {id:'linezolid', n:'Linezolid', via:'EV-VO', rows:[{c:['10 c/12','10 c/12','10 c/8','10 c/12','10 c/8','10 c/8']}], obs:['Requiere autorización de Infectología.']},
+  {id:'levoflox', n:'Levofloxacina', via:'EV', rows:[{all:'10 c/12'}], obs:['Requiere autorización de Infectología.','Insuf. renal: en pediatría ajusta con Clear < 30.']},
   {id:'meropenem', n:'Meropenem', via:'EV', rows:[
-    {v:'Sepsis', c:['20 c/24','20 c/12','20 c/8','20 c/12','20 c/8','20 c/8']},
-    {v:'Meningitis', c:['40 c/12','40 c/12','40 c/8','40 c/12','40 c/8','40 c/8']}], obs:['FQP: 40 c/8.','OMR y ECMO: infusión en 3 h.']},
+    {v:'Sepsis', sel:[
+      {eg:[0,31.99], d:[0,13], c:'20 c/12', lab:'< 32 sem EG · < 14 días'}, {eg:[0,31.99], d:[14,9999], c:'20 c/8', lab:'< 32 sem EG · ≥ 14 días'},
+      {eg:[32,99], d:[0,13], c:'20 c/8', lab:'≥ 32 sem EG · < 14 días'}, {eg:[32,99], d:[14,9999], c:'30 c/8', lab:'≥ 32 sem EG · ≥ 14 días'},
+      {col5:true, c:'20 c/8', lab:'RNPT > 45 sem EG corregida o RNT > 1 mes'}]},
+    {v:'Meningitis y Pseudomonas', sel:[
+      {eg:[0,31.99], d:[0,13], c:'40 c/12', lab:'< 32 sem EG · < 14 días'}, {eg:[0,31.99], d:[14,9999], c:'40 c/8', lab:'< 32 sem EG · ≥ 14 días'},
+      {eg:[32,99], d:[0,9999], c:'40 c/8', lab:'≥ 32 sem EG'}, {col5:true, c:'40 c/8', lab:'RNPT > 45 sem EG corregida o RNT > 1 mes'}]}],
+   obs:['OMR y ECMO: dosis de meningitis en infusión de 3 h.','Hipotermia terapéutica: sin datos.','Insuf. renal (FG mL/min/1,72 m²): 30–50 → 20–40 c/12 · 10–29 → 10–20 c/12 · < 10 → 10–20 c/24.']},
   {id:'metro', n:'Metronidazol', via:'EV-VO', load:15, rows:[{c:['7,5 c/48','7,5 c/12','7,5 c/12','7,5 c/8','10 c/8','10 c/8'], c0b:'7,5 c/24', c0d:28}],
-   obs:['Dosis de carga: 15 mg/kg.','< 1200 g con > 28 días: 7,5 c/24.','Mantenimiento: en < 1200 g se inicia 24 h después de la carga; en el resto, al intervalo de la dosis de mantenimiento.']},
+   obs:['Dosis de carga: 15 mg/kg.','< 1200 g con > 28 días: 7,5 c/24.','Mantenimiento: en < 1200 g se inicia 24 h después de la carga; en el resto, al intervalo de la dosis de mantenimiento.','Insuf. hepática grave: reducir la dosis 50 %.']},
   {id:'peni', n:'Penicilina G sódica', via:'EV', u:'U', rows:[
     {v:'Sepsis', c:['50000 c/12','50000 c/12','50000 c/8','50000 c/12','50000 c/8','50000 c/6']},
-    {v:'Meningitis', c:['150000 c/12','150000 c/8','125000 c/6','150000 c/8','125000 c/6','100000 c/4-6']}],
-   obs:['Sífilis congénita: < 7 días de vida 50 000 U c/12; 7–28 días 50 000 U c/8; > 28 días 50 000 U c/6.','Estreptococo del grupo B: homologar dosis de meningitis.','Endocarditis: 100 000 U c/6.']},
-  {id:'pipetazo', n:'Piperacilina-tazobactam', via:'IV', rows:[{c:['100 c/12','100 c/12','100 c/8','100 c/12','100 c/8','100 c/8'], c0b:'100 c/8', c0d:14}], obs:['< 1200 g con > 14 días: 100 c/8.','FQP: 100 c/6.']},
+    {v:'Meningitis o SGB', c:['150000 c/12','150000 c/8','125000 c/6','150000 c/8','125000 c/6','100000 c/4-6']}],
+   obs:['Sífilis congénita: < 7 días de vida 50 000 U c/12; 7–28 días 50 000 U c/8; > 28 días 50 000 U c/6.','Endocarditis: 100 000 U c/6.']},
+  {id:'pipetazo', n:'Piperacilina-tazobactam', via:'EV', rows:[{c:['100 c/12','100 c/12','100 c/8','100 c/12','100 c/8','100 c/8'], c0b:'100 c/8', c0d:14}], obs:['< 1200 g con > 14 días: 100 c/8.','FQP: 100 c/6.']},
   {id:'rifampicina', n:'Rifampicina', via:'EV-VO', rows:[
     {v:'Sepsis', c:['-','10 c/24','10 c/24','10 c/24','10 c/24','10 c/12']},
-    {v:'Meningitis', c:['-','10 c/24','10 c/12','10 c/24','10 c/12','10 c/12']}], obs:['Precaución en disfunción hepática.']},
-  {id:'tms', n:'Trimetoprima-sulfametoxazol (TMS)', via:'IV-VO', rows:[
-    {v:'ITU', c:['-','-','-','-','-','5 c/12']},
-    {v:'Sepsis', c:['-','-','-','-','-','5 c/12']},
-    {v:'Meningitis', c:['-','-','-','-','-','10 c/12 ó 5 c/6']}],
-   obs:['VO: 3–6 c/12. Profilaxis: ver Profilaxis.','Dosis de sepsis homologada a osteomielitis, mediastinitis, endocarditis y FQP.','Pneumocystis jirovecii: 5 c/6.','La tabla no lo aclara: habitualmente la dosis se expresa como trimetoprima.']},
-  {id:'vanco', n:'Vancomicina', via:'IV', rows:[
+    {v:'Meningitis', c:['-','10 c/24','10 c/12','10 c/24','10 c/12','10 c/12']}], obs:['Insuf. hepática: precaución; consultar.']},
+  {id:'teico', n:'Teicoplanina', via:'EV-IM', load:16, rows:[{c:['8 c/24','8 c/24','8 c/24','8 c/24','8 c/24','10 c/24']}],
+   obs:['Dosis de carga: 16 mg/kg (c/24), luego mantenimiento.','> 2 meses: las primeras 3 dosis 10 c/12, luego 10 c/24.','Insuf. renal: ajusta; sin datos neonatales, consultar.']},
+  {id:'tms', n:'Trimetoprima-sulfametoxazol (TMS)', via:'EV-VO', rows:[
+    {v:'ITU', c:['-','-','-','-','5 c/12','5 c/12']},
+    {v:'Infección severa', c:['-','-','-','-','2-3 c/6','2-3 c/6']},
+    {v:'Pneumocystis jirovecii', c:['-','-','-','-','3,75-5 c/6','3,75-5 c/6']}],
+   obs:['Dosis en base a trimetoprima.','No recomendado en < 48 sem EPM.','Insuf. renal: ajusta; IR grave contraindicado. Insuf. hepática grave: contraindicado.','Profilaxis: ver Profilaxis.']},
+  {id:'vanco', n:'Vancomicina', via:'EV', rows:[
     {v:'Sepsis', c:['15 c/24','10 c/12','10 c/8','15 c/12','10 c/8','10 c/6']},
     {v:'Meningitis', c:['15 c/12','15 c/12','15 c/8','15 c/8','15 c/6','15 c/6']}],
-   obs:['FQP: 20–30 c/12.'], dosar:'Dosar en la 3.ª dosis. Valle (previo a la dosis) 5–15 µg/mL; pico (60 min posinfusión) 25–40 µg/mL.'}
+   obs:['Infusión continua (mg/kg/día) según creatinina y EG corregida: Crea < 0,4 y EG corr. ≥ 40 sem → 50 · Crea < 0,4 y < 40 sem → 40 · Crea 0,4–0,6 → 30 · Crea > 0,6 → 20.','Hipotermia y ECMO: iniciar dosis habitual, luego MTD.','Insuf. renal: iniciar 15 mg/kg, luego MTD previo a la 2.ª dosis. CRRT: 10 c/12, luego MTD. HD/DP: 10 dosis única, luego MTD.'],
+   dosar:'MTD: valle (previo a la dosis) 8–12 µg/mL (15–20 mg/L en SAMR, infección ósea, meningitis y endocarditis) y/o AUC/CIM ≥ 400 para CIM ≤ 1; pico (60 min posinfusión) 25–40 µg/mL. Toma de muestra: dosis c/24 h antes de la 2.ª dosis; c/12 h antes de la 3.ª; c/8 h y c/6 h antes de la 4.ª.'},
+  {id:'vori', n:'Voriconazol', via:'EV-VO', rows:[{all:'8 c/12'}],
+   obs:['Requiere autorización de Infectología.','Requiere MTD (muestras solo miércoles y viernes); consultar al farmacéutico.','Insuf. renal: no usar la vía EV, evaluar riesgo/beneficio. Insuf. hepática: precaución.']}
 ];
 const PROF = [
-  {t:'Descolonización de SAMR', d:'Mupirocina 2% en fosas nasales cada 12 h, 5 días.'},
+  {t:'Descolonización de SAMR-SAMS (prequirúrgica)', d:'Mupirocina 2 % en fosas nasales c/8 h + baño de clorhexidina × 5 días antes de la cirugía. Si recibió mupirocina en los 7 días previos, no repetir.', extra:'Pacientes prequirúrgicos de cirugía cardiovascular, neurocirugía, ortopedia con material protésico y antecedente de infección por S. aureus. Colonizado o con antecedente de SAMR: dosis prequirúrgica de cefalotina 50 mg/kg + vancomicina 15 mg/kg, única.'},
   {t:'Descolonización intestinal selectiva', d:'Rifaximina 15 mg/kg c/12 h × 5 días.', mgkg:15, int:'c/12 h', extra:'Síndrome de pseudoobstrucción intestinal crónica: iniciar la profilaxis al comenzar la nutrición enteral trófica y continuar mensual.'},
-  {t:'Profilaxis neonatal de infección materna gonocócica no tratada', d:'Ceftriaxona 50 mg/kg EV-IM, dosis única diaria. Alternativa: cefotaxima 100 mg/kg EV-IM, dosis única diaria.', mgkg:50, int:'dosis única (ceftriaxona)', alt:[100,'cefotaxima']},
-  {t:'Profilaxis de ITU < 1 mes', d:'Cefalexina 25 mg/kg/día, dosis única diaria.', mgkg:25, int:'una vez al día'},
+  {t:'Profilaxis neonatal de infección materna gonocócica no tratada', d:'Ceftriaxona 50 mg/kg EV-IM, dosis única diaria (máximo 250 mg/día). Alternativa: cefotaxima 100 mg/kg EV-IM, dosis única diaria.', mgkg:50, int:'dosis única (ceftriaxona, máx. 250 mg)', alt:[100,'cefotaxima']},
+  {t:'Profilaxis de ITU < 1 mes', d:'Cefalexina 25 mg/kg/día, dosis única diaria.', mgkg:25, int:'una vez al día', extra:'Indicaciones: hidronefrosis prenatal, dilatación ureteral y pielocalicial, reflujo vesicoureteral grave (grados 3–5), MMC y antecedente de ITU hasta la cistouretrografía.'},
   {t:'Profilaxis de ITU > 1 mes', d:'TMS 2 mg/kg/día, dosis única diaria.', mgkg:2, int:'una vez al día'},
   {t:'Profilaxis de Pneumocystis jirovecii (> 1 mes)', d:'TMS VO 5 mg/kg/día en días alternos (lunes, miércoles y viernes).', mgkg:5, int:'lun, mié y vie'},
-  {t:'Profilaxis secundaria de HSV', d:'Aciclovir VO 20 mg/kg c/8 h durante 6 meses.', mgkg:20, int:'c/8 h'},
   {t:'Profilaxis en asplenia', d:'Ampicilina EV 10 mg/kg/dosis c/12 h. Alternativa: amoxicilina VO 10 mg/kg/dosis c/12 h.', mgkg:10, int:'c/12 h'},
-  {t:'Profilaxis de candidiasis en prematuros < 1000 g', d:'Fluconazol 3 mg/kg dos veces por semana × 45 días. Usar solo con prevalencia > 5% en la UCIN.', mgkg:3, int:'2 veces por semana'},
-  {t:'Candidiasis en ECMO prolongado', d:'Fluconazol: día 1, 12 mg/kg/día; luego 6 mg/kg/día hasta la salida.', mgkg:12, int:'día 1; luego 6 mg/kg/día', alt:[6,'desde el día 2']}
+  {t:'Profilaxis de candidiasis en prematuros < 1000 g', d:'Fluconazol 3 mg/kg dos veces por semana × 45 días. Usar solo con prevalencia > 5 % en la UCIN.', mgkg:3, int:'2 veces por semana'},
+  {t:'Candidiasis en ECMO prolongado', d:'Fluconazol: día 1, 12 mg/kg/día; luego 6 mg/kg/día hasta la salida.', mgkg:12, int:'día 1; luego 6 mg/kg/día', alt:[6,'desde el día 2']},
+  {t:'Estudio por imágenes con contraste de patología intestinal y/o fístula rectal', d:'Ampicilina-sulbactam 50 mg/kg/dosis previa y una posprocedimiento dentro de las 12 h (paciente con ≤ 3 días de internación). Con más internación: piperacilina-tazobactam 100 mg/kg dosis previa + 2 dosis posprocedimiento.', mgkg:50, int:'ampicilina-sulbactam', alt:[100,'piperacilina-tazobactam'], extra:'Colon por enema o tránsito intestinal, cistouretrografía con fístula vesicorrectal o vaginorrectal.'},
+  {t:'Profilaxis secundaria de HSV', d:'Aciclovir VO 20 mg/kg c/8 h durante 6 meses.', mgkg:20, int:'c/8 h'},
+  {t:'Profilaxis de VIH perinatal', d:'Bajo riesgo: zidovudina (AZT) en monoterapia × 2–4 semanas. Mediano y alto riesgo: terapia combinada; de elección AZT 6 semanas + lamivudina (3TC) y raltegravir (RAL) 2–6 semanas; alternativa AZT + 3TC 6 semanas + nevirapina (NVP) 4 semanas (dosis de tratamiento).',
+   extra:'Lamivudina (≥ 32 sem EG): 0–4 semanas 2 mg/kg c/12 h; 4–6 semanas 4 mg/kg c/12 h. Nevirapina profilaxis: 1,5–2 kg al nacer 8 mg/dosis y > 2 kg 12 mg/dosis, los días 0, 2 y 6; tratamiento: ≥ 37 sem EG 0–28 días 6 mg/kg c/12 h; 34–37 sem 0–7 días 4 mg/kg c/12 h y > 7–28 días 6 mg/kg c/12 h. Raltegravir (≥ 37 sem EG y > 2 kg): 0–7 días 1,5 mg/kg c/24 h; 2–4 semanas 3 mg/kg c/12 h; 5–6 semanas 6 mg/kg c/12 h (evaluar diferir el inicio 24 h si la madre lo recibió en las 24 h previas al parto). Zidovudina: ver la ficha en la lista.'}
 ];
+// Profilaxis antibiótica prequirúrgica neonatal 2026
+const PREQX = [
+  {cl:'Limpia (1–5 %)', g:[
+    {s:'Piel y TCS: partes blandas y pared, escarectomía, biopsia de ganglio, exéresis tumoral', a:'Cefalotina (2.ª: cefazolina)', mg:50, o:'Única dosis'},
+    {s:'Cabeza y cuello sin apertura de mucosa: fractura mandibular o de cráneo', a:'Cefalotina (2.ª: cefazolina)', mg:50, o:'Única dosis'},
+    {s:'Oftalmología: glaucoma, enucleación, cataratas', a:'Cefalotina (2.ª: cefazolina)', mg:50, o:'Única dosis. Ablación láser: no requiere profilaxis.'},
+    {s:'Neurocirugía: craneotomía, laminectomía, MMC abierto o cerrado < 24 h', a:'Cefalotina (2.ª: cefazolina)', mg:50, o:'Única dosis. Fractura abierta de cráneo: prolongar 3–5 días.'},
+    {s:'Neurocirugía: MMC abierto > 24 h', a:'Cefuroxima', mg:100, o:'Única dosis'},
+    {s:'Neurocirugía: DVP (shunt o prótesis)', a:'Cefuroxima', mg:50, o:'Única dosis'},
+    {s:'Ortopedia: fracturas no expuestas, columna, amputación, material protésico, biopsia ósea, PAMO', a:'Cefalotina (2.ª: clindamicina 10 mg/kg)', mg:50, o:'Única dosis'},
+    {s:'Abdominal: hernia inguinal, biopsia hepática, esplenectomía, gastrosquisis con cierre primario', a:'Cefalotina', mg:50, o:'Única dosis'},
+    {s:'Cardiovascular: cerradas, cerradas con infección previa por S. aureus, abiertas (CEC), ECMO neonatal', a:'Cefalotina', mg:50, o:'Única dosis. Colonizado o con antecedente de infección por S. aureus: cefalotina 50 mg/kg + vancomicina 15 mg/kg, única dosis.'}]},
+  {cl:'Limpia-contaminada (5–15 %)', g:[
+    {s:'Cabeza y cuello con apertura de mucosa: atresia de coanas', a:'Cefalotina', mg:50, o:'Única dosis'},
+    {s:'Traqueotomía, cuerdas vocales, tumor nasolabial o de cavidad oral', a:'Ampicilina-sulbactam', mg:[50,100], o:'Luego 50 mg/kg c/8 h, solo 2 dosis posquirúrgicas.'},
+    {s:'Distracción mandibular (piel y tejido óseo)', a:'Cefalotina', mg:50, o:'Única dosis'},
+    {s:'Neurocirugía transesfenoidal y otras por vía de mucosa sinusal u oral', a:'Ampicilina-sulbactam', mg:[50,100], o:'Luego 50 mg/kg c/8 h.'},
+    {s:'Pulmonar: lobectomía o neumonectomía, biopsia pulmonar, HDC, tumor de mediastino', a:'Cefalotina', mg:50, o:'Luego 20 mg/kg c/8 h, solo 2 dosis posquirúrgicas. No se recomienda profilaxis para colocación o permanencia de drenaje pleural.'},
+    {s:'Cesárea', a:'Cefalotina', fixed:'1 g', o:'Y luego 1 dosis posquirúrgica.'},
+    {s:'Atresia de esófago, gastrostomía', a:'Cefalotina', mg:50, o:'Luego 20 mg/kg c/8 h, solo 2 dosis posquirúrgicas.'},
+    {s:'Atresia intestinal (anastomosis entérica u ostomías), cirugía biliar o pancreática; ovarectomía, biopsia rectal, anoplastia o descenso de colon, endoscopía digestiva', a:'Ampicilina-sulbactam', mg:50, o:'Luego 50 mg/kg c/8 h, solo 2 dosis posquirúrgicas. (Las últimas cuatro figuran en la continuación de la tabla, en el mismo grupo.)'},
+    {s:'Gastrosquisis con sufrimiento de asas intestinales', a:'Ampicilina-sulbactam', mg:50, o:'Y luego 5 días de tratamiento.'},
+    {s:'Urológicas: reflujo, ureterostomía, biopsia renal', a:'Cefalotina', mg:50, o:'Obtener urocultivo previo.'}]},
+  {cl:'Contaminada (15–40 %)', g:[
+    {s:'Gástrica por hemorragia, úlcera o rotura', a:'Ampicilina-sulbactam', mg:[50,100], o:'Luego 50 mg/kg c/8 h, solo 2 dosis posquirúrgicas.'},
+    {s:'NEC no perforada', a:'Ampicilina-sulbactam', mg:[50,100], o:'Luego 50 mg/kg c/8 h, solo 2 dosis posquirúrgicas.'}]},
+  {cl:'Sucia (40–60 %)', g:[
+    {s:'Cierre de fístula vesicorrectal; cirugía de colon-recto, cierre de ostomías', a:'Ampicilina-sulbactam', mg:50, o:'Luego 50 mg/kg c/8 h × 2 dosis.'},
+    {s:'NEC perforada', a:'Piperacilina-tazobactam', mg:100, o:'Tratamiento.'}]}
+];
+const PREQX_NOTES = ['No prolongar la profilaxis más de 24 h. Las dosis posquirúrgicas comienzan 6–12 h después del procedimiento; indicar dosis intraquirúrgica si la cirugía se prolonga más de 4–6 h.',
+  'No se recomiendan antibióticos para la colocación, permanencia o remoción de drenajes y catéteres centrales, ni en pacientes sondados para prevenir ITU.',
+  'Antes de un procedimiento urológico quirúrgico o endoscópico, tomar urocultivo. Con urocultivo positivo, completar el tratamiento y certificar la negativización; si no se puede postergar, iniciar ATB según cultivo, operar después de 72 h y dar una dosis preinducción EV.',
+  'Cirugía videoasistida: el mismo esquema que la cirugía convencional.'];
 
 const $ = id => document.getElementById(id);
 const num = id => { const s = String($(id).value).trim().replace(',', '.'); if (!s) return NaN; const n = parseFloat(s); return isFinite(n) ? n : NaN; };
@@ -317,8 +398,14 @@ function doseText(cell, a, P){
   });
   return { short: out.map(o => o.short).join(' ó '), sub: out.map(o => o.sub).filter(Boolean).join(' ó '), long: out.map(o => o.long).join('<br>ó '), na: false };
 }
+function selMatch(sel, P){
+  const inR = (v, r) => !r || (isFinite(v) && v >= r[0] && v <= r[1]);
+  if (P.col === 5) { const c5 = sel.find(x => x.col5); if (c5) return c5; }
+  return sel.find(x => !x.col5 && (!x.eg || isFinite(P.eg)) && (!x.pma || isFinite(P.pma)) && (!x.d || isFinite(P.d)) && inR(P.eg, x.eg) && inR(P.pma, x.pma) && inR(P.d, x.d)) || null;
+}
 function cellFor(row, a, P){
   if (row.all) return row.all;
+  if (row.sel) { const m = selMatch(row.sel, P); return m ? m.c : null; }
   if (P.col === null) return null;
   let c = row.c[P.col];
   if (c === 'fluco0') c = !isFinite(P.d) ? '6-12 c/72' : P.d < 14 ? '6-12 c/72' : P.d <= 28 ? '6-12 c/48' : '12 c/24';
@@ -327,6 +414,7 @@ function cellFor(row, a, P){
 }
 function rowTable(row, P){
   if (row.all) return '';
+  if (row.sel) { const m = selMatch(row.sel, P); return `<div class="bands">${row.sel.map(x => `<div class="${x === m ? 'cur' : ''}">${x.lab}: ${x.c}</div>`).join('')}</div>`; }
   const cells = row.c.map((c, i) => `<td class="${i === P.col ? 'cur' : ''}">${c === 'fluco0' ? '6-12 c/72 (< 14 d) · 6-12 c/48 (≥ 14 d) · 12 c/24 (> 28 d)' : c}</td>`).join('');
   return `<div style="overflow-x:auto"><table class="row"><tr><th>&lt;1200 g<br>0–4 sem</th><th>1200–2000<br>0–7 d</th><th>1200–2000<br>&gt;7 d</th><th>&gt;2000 g<br>0–7 d</th><th>&gt;2000 g<br>&gt;7 d</th><th>RNPT &gt;45 sem<br>RNT &gt;1 mes</th></tr><tr>${cells}</tr></table></div>`;
 }
@@ -350,8 +438,8 @@ function render(){
   const open = new Set([...document.querySelectorAll('details.d[open]')].map(d => d.dataset.id));
   const items = ATB.filter(a => !q || a.n.toLowerCase().includes(q)).map(a => {
     const main = doseText(cellFor(a.rows[0], a, P), a, P);
-    const sumTxt = P.col === null && !a.rows[0].all ? '<span class="ds na">Cargá el paciente</span>' : `<span class="ds${main.na ? ' na' : ''}">${a.rows.length > 1 ? `<small>${a.rows[0].v}</small>` : ''}${main.short}${main.sub ? `<small>${main.sub}</small>` : ''}</span>`;
-    const vars = a.rows.map(r => { const t = doseText(cellFor(r, a, P), a, P); return `<div class="var">${r.v ? `<div class="vn">${r.v}</div>` : ''}<div>${P.col === null && !r.all ? 'Cargá el paciente.' : t.long}${r.dur ? ' ' + r.dur : ''}</div>${rowTable(r, P)}</div>`; }).join('');
+    const sumTxt = P.col === null && !a.rows[0].all && !(a.rows[0].sel && cellFor(a.rows[0], a, P)) ? '<span class="ds na">Cargá el paciente</span>' : `<span class="ds${main.na ? ' na' : ''}">${a.rows.length > 1 ? `<small>${a.rows[0].v}</small>` : ''}${main.short}${main.sub ? `<small>${main.sub}</small>` : ''}</span>`;
+    const vars = a.rows.map(r => { const t = doseText(cellFor(r, a, P), a, P); return `<div class="var">${r.v ? `<div class="vn">${r.v}</div>` : ''}<div>${P.col === null && !r.all && !(r.sel && cellFor(r, a, P)) ? 'Cargá el paciente.' : (r.sel && !cellFor(r, a, P) ? 'Cargá EG y días de vida (la tabla define grupos por EG/EPM).' : t.long)}${r.dur ? ' ' + r.dur : ''}</div>${rowTable(r, P)}</div>`; }).join('');
     const load = a.load && isFinite(P.w) ? `<div class="pill info">Dosis de carga: ${a.load} mg/kg = <b>${f(a.load * P.w / 1000, 2)} mg</b>.</div>` : '';
     const flu = a.id === 'fluco' && isFinite(P.w) ? `<div class="pill info">Carga si no recibió anfotericina: 25 mg/kg = <b>${f(25 * P.w / 1000, 2)} mg</b>.</div>` : '';
     return `<details class="d" data-id="${a.id}"${open.has(a.id) ? ' open' : ''}><summary><span class="nm">${a.n}</span>${sumTxt}<span class="vi">${a.via || 'Vía no especificada'}</span></summary><div class="db">${vars}${load}${flu}${a.dosar ? `<div class="pill warn">${a.dosar}</div>` : ''}${a.obs.length ? `<ul class="obs">${a.obs.map(o => `<li>${o}</li>`).join('')}</ul>` : ''}</div></details>`;
@@ -360,6 +448,7 @@ function render(){
   $('list').innerHTML = items.join('') || '<div class="hint">Sin resultados.</div>';
   // profilaxis
   renderSrc(P);
+  $('pqx').innerHTML = PREQX.map(gr => `<div class="it"><b>${gr.cl}</b>${gr.g.map(x => { const m = Array.isArray(x.mg) ? x.mg : (x.mg ? [x.mg] : null); const w = P.w / 1000; const calc = m && isFinite(w) ? ` → <b>${m.map(v => f(v * w, 1)).join('–')} mg</b>` : ''; return `<div style="margin-top:8px"><div>${x.s}</div><div class="calc">${x.a}: ${x.fixed ? x.fixed : m.join('–') + ' mg/kg'}${calc}</div><div class="hint">${x.o}</div></div>`; }).join('')}</div>`).join('') + `<div class="it"><b>Comentarios generales</b><ul class="obs">${PREQX_NOTES.map(n => `<li>${n}</li>`).join('')}</ul></div>`;
   $('prof').innerHTML = PROF.map(p => `<div class="it"><b>${p.t}</b>${p.d}${p.mgkg && isFinite(P.w) ? `<div class="calc">→ ${f(p.mgkg * P.w / 1000, 2)} mg ${p.int}${p.alt ? ` · ${f(p.alt[0] * P.w / 1000, 2)} mg ${p.alt[1]}` : ''}</div>` : ''}${p.extra ? `<div class="hint" style="margin-top:4px">${p.extra}</div>` : ''}</div>`).join('');
 }
 
@@ -369,12 +458,12 @@ function special(P, q){
   if (!q || 'zidovudina'.includes(q)) {
     let ev = null, vo = null, grp = '';
     if (isFinite(P.eg) && isFinite(P.d)) {
-      if (P.eg < 30) { grp = '< 30 sem EG, ' + (P.d < 30 ? '< 30 días' : '≥ 30 días'); [ev, vo] = P.d < 30 ? [1.5, 2] : [2, 3]; }
-      else if (P.eg < 35) { grp = '30 a < 35 sem EG, ' + (P.d < 14 ? '< 14 días' : '≥ 14 días'); [ev, vo] = P.d < 14 ? [1.5, 2] : [2, 3]; }
-      else { grp = '≥ 35 sem EG, hasta 30 días'; [ev, vo] = [3, 4]; }
+      if (P.eg < 30) { grp = '< 30 sem EG, ' + (P.d < 28 ? '0–4 semanas de vida' : '4–6 semanas de vida'); [ev, vo] = P.d < 28 ? [1.5, 2] : [2, 3]; }
+      else if (P.eg < 35) { grp = '30 a < 35 sem EG, ' + (P.d < 14 ? '0–2 semanas de vida' : '2–6 semanas de vida'); [ev, vo] = P.d < 14 ? [1.5, 2] : [2, 3]; }
+      else { grp = '≥ 35 sem EG, 0–6 semanas de vida'; [ev, vo] = [3, 4]; }
     }
     const d = x => `<b>${f(x, 1)} mg/kg c/12 h</b>${isFinite(kg) ? ` → <b>${f(x * kg, 2)} mg</b>` : ''}`;
-    out.push(`<details class="d" data-id="azt"><summary><span class="nm">Zidovudina</span><span class="ds${ev ? '' : ' na'}">${ev ? `EV ${f(ev, 1)} · VO ${f(vo, 1)} mg/kg c/12 h` : 'Requiere EG y días de vida'}</span><span class="vi">EV-VO · según EG y días de vida</span></summary><div class="db">${ev ? `<div>${grp}</div><div>EV: ${d(ev)}</div><div>VO: ${d(vo)}</div>` : ''}${P.eg >= 35 && P.d > 30 ? '<div class="pill warn">La tabla define ≥ 35 semanas hasta 30 días de vida.</div>' : ''}<ul class="obs"><li>&lt; 30 sem: &lt; 30 días EV 1,5 / VO 2; ≥ 30 días EV 2 / VO 3 (mg/kg c/12 h).</li><li>30 a &lt; 35 sem: &lt; 14 días EV 1,5 / VO 2; ≥ 14 días EV 2 / VO 3.</li><li>≥ 35 sem (hasta 30 días): EV 3 / VO 4.</li><li>RN de mediano y alto riesgo: terapia combinada. Consultar con Infectología y ver las recomendaciones de HIV perinatal.</li></ul></div></details>`);
+    out.push(`<details class="d" data-id="azt"><summary><span class="nm">Zidovudina</span><span class="ds${ev ? '' : ' na'}">${ev ? `EV ${f(ev, 1)} · VO ${f(vo, 1)} mg/kg c/12 h` : 'Requiere EG y días de vida'}</span><span class="vi">EV-VO · según EG y días de vida</span></summary><div class="db">${ev ? `<div>${grp}</div><div>EV: ${d(ev)}</div><div>VO: ${d(vo)}</div>` : ''}${P.d > 42 ? '<div class="pill warn">La tabla define la profilaxis hasta las 6 semanas de vida.</div>' : ''}<ul class="obs"><li>&lt; 30 sem: 0–4 semanas EV 1,5 / VO 2; 4–6 semanas EV 2 / VO 3 (mg/kg c/12 h).</li><li>30 a &lt; 35 sem: 0–2 semanas EV 1,5 / VO 2; 2–6 semanas EV 2 / VO 3.</li><li>≥ 35 sem (0–6 semanas): EV 3 / VO 4.</li><li>Con alta sospecha de infección, dosis de tratamiento 12 mg/kg c/12 h (&lt; 30 sem desde las 8–10 semanas de vida; 30–35 sem desde las 6–8; ≥ 35 sem desde las 4).</li><li>RN de mediano y alto riesgo: terapia combinada (ver Profilaxis de VIH). Precaución con granulocitos &lt; 1000/mm³ o Hb &lt; 9,5 g/dL: consultar a Infectología.</li></ul></div></details>`);
   }
   if (!q || 'oseltamivir'.includes(q)) {
     let x = null; if (isFinite(P.pma)) x = P.pma < 38 ? 1 : P.pma <= 40 ? 1.5 : 3;
@@ -382,7 +471,7 @@ function special(P, q){
   }
   return out;
 }
-// ───────── Consulta Taketomo 18.ª ed. (2011) y comparación con Garrahan 2024
+// ───────── Consulta Taketomo 18.ª ed. (2011) y comparación con Garrahan 2026
 let SRC = 'gar';
 try { const v = localStorage.getItem('atbFuente'); if (['gar','tk','cmp'].includes(v)) SRC = v; } catch (e) {}
 const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -440,7 +529,7 @@ function overlap(c1, c2){
 function garRows(id, P){
   if (id === 'azt') {
     if (!(isFinite(P.eg) && isFinite(P.d))) return [{ v: 'VO', cell: null, why: 'Requiere EG y días de vida' }];
-    const vo = P.eg < 30 ? (P.d < 30 ? 2 : 3) : P.eg < 35 ? (P.d < 14 ? 2 : 3) : 4;
+    const vo = P.eg < 30 ? (P.d < 28 ? 2 : 3) : P.eg < 35 ? (P.d < 14 ? 2 : 3) : 4;
     return [{ v: 'Prevención perinatal VO', k: 'sep', cell: `${String(vo)} c/12` }];
   }
   if (id === 'osel') {
@@ -467,7 +556,7 @@ function cmpItem(t, P){
       `<span class="hint">${gr.k === 'men' && (t.s || []).length ? 'Sin fila específica de meningitis' : (t.s && t.s[0] ? (tkCell(t, t.s[0], P).why || 'Sin dato estructurado') : 'Solo texto: ver detalle')}</span>`;
     const badge = st === 'dif' ? '<span class="badge dif">Difiere</span>' : st === 'eq' ? '<span class="badge eq">Coinciden</span>' : '<span class="badge man">A mano</span>';
     return `<div class="cmprow">${gr.v || G.length > 1 ? `<div class="vn">${gr.v || 'General'} ${badge}</div>` : `<div class="vn">Dosis para el paciente ${badge}</div>`}
-      <div class="two"><div class="g"><span class="lb">Garrahan 2024</span>${gd ? `<span class="v">${gd.short}</span>${gd.sub ? `<small>${gd.sub}</small>` : ''}` : `<span class="hint">${gr.why || 'Sin dato'}</span>`}</div>
+      <div class="two"><div class="g"><span class="lb">Garrahan 2026</span>${gd ? `<span class="v">${gd.short}</span>${gd.sub ? `<small>${gd.sub}</small>` : ''}` : `<span class="hint">${gr.why || 'Sin dato'}</span>`}</div>
       <div class="t${st === 'eq' ? ' same' : ''}"><span class="lb">Taketomo 2011</span>${tTxt}</div></div></div>`;
   }).join('');
   const head = status === 'dif' ? '<span class="badge dif">Difiere</span>' : status === 'eq' ? '<span class="badge eq">Coinciden</span>' : '<span class="badge man">A mano</span>';
