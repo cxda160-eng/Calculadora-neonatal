@@ -204,6 +204,17 @@
       var box = w.closest(".weight") || w.closest(".row");
       if (box) { var lb = box.previousElementSibling; if (lb && lb.classList.contains("lbl")) lb.style.display = "none"; box.style.display = "none"; }
     }
+    // Antimicrobianos, Nutrición y RCP: se ocultan peso, EG y días (y el bloque si queda vacío)
+    if (/^(antimicrobianos|nutricion|neo)$/.test(page)) {
+      var hide = function (n) { if (n) n.style.display = "none"; };
+      var vis = function (n) { return n.style.display !== "none" && getComputedStyle(n).display !== "none" && (n.textContent.trim() || n.querySelector("input,select,button,svg,canvas")); };
+      (FIELDS[page] || []).forEach(function (f) { var el = document.querySelector(f[0]); if (el) hide(el.closest("label")); });
+      document.querySelectorAll(".grid,.row").forEach(function (g) { if (g.children.length && ![].some.call(g.children, vis)) hide(g); });
+      document.querySelectorAll("section.card,div.card").forEach(function (c) {
+        var rest = [].filter.call(c.children, function (n) { return !/^H[1-3]$/.test(n.tagName) && vis(n); });
+        if ([].some.call(c.children, function (n) { return /^H2$/.test(n.tagName) && /^Paciente$/i.test(n.textContent.trim()); }) && !rest.length) hide(c);
+      });
+    }
   }
   window.CalcNeo = window.CalcNeo || {};
   function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); }
