@@ -198,6 +198,12 @@
       el.addEventListener("click", function () { window.parent.postMessage({ type: "pac-edit" }, "*"); });
     });
     ["#wMinus", "#wPlus"].forEach(function (s) { var b = document.querySelector(s); if (b) b.style.display = "none"; });
+    // Peso repetido: en Infusiones, Electrolitos y Balance se oculta (ya está en la barra del paciente)
+    var w = document.querySelector("#peso");
+    if (w && /^(infusiones|electrolitos|balance)$/.test(page)) {
+      var box = w.closest(".weight") || w.closest(".row");
+      if (box) { var lb = box.previousElementSibling; if (lb && lb.classList.contains("lbl")) lb.style.display = "none"; box.style.display = "none"; }
+    }
   }
   window.CalcNeo = window.CalcNeo || {};
   function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); }
