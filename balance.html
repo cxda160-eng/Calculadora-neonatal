@@ -162,7 +162,7 @@ document.querySelectorAll("input").forEach(x=>x.addEventListener("input",calc));
 $("hs").onclick=e=>{const b=e.target.closest("button");if(!b)return;H=+b.dataset.h;
   [...$("hs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));calc()};
 $("borrar").onclick=()=>{ids.slice(4).forEach(i=>$(i).value="");calc()};
-$("copiar").onclick=async()=>{const r=calc();const kg=r.kg;
+function balText(){const r=calc();const kg=r.kg;
   const t=[`Balance ${H} h${kg?` · peso ${f0(kg*1000)} g`:""}`,
   `Ingresos: ${kg?f1(r.Ik)+" mL/kg":"—"} (${f0(r.I)} mL)`+det(LI,kg),
   `Egresos: ${kg?f1(r.Ek)+" mL/kg":"—"} (${f0(r.E)} mL)`+det(LE,kg),
@@ -172,12 +172,15 @@ $("copiar").onclick=async()=>{const r=calc();const kg=r.kg;
   kg&&r.diu?`Ritmo diurético: ${f2(r.diu/kg/H)} mL/kg/h`:"",
   ...r.W.map(([a,b])=>`Peso ${a.toLowerCase()}: ${b}`),
   H<24&&kg?`Proyección 24 h: ingresos ${f1(r.Ik*24/H)} mL/kg, egresos ${f1(r.Ek*24/H)} mL/kg, balance ${(r.Bk>0?"+":"")+f1(r.Bk*24/H)} mL/kg${r.diu?`, diuresis ${f0(r.diu*24/H)} mL (${f1(r.diu/kg*24/H)} mL/kg)`:""}`:""].filter(Boolean).join("\n");
+  return t}
+window.customSummary=()=>{const r=calc();return (r.I||r.E)?balText():""};
+$("copiar").onclick=async()=>{const t=balText();
   try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
   $("toast").classList.add("on");setTimeout(()=>$("toast").classList.remove("on"),1200)};
 const s=store.get();ids.forEach(i=>{if(s[i])$(i).value=s[i]});
 if(s.H){const b=[...$("hs").children].find(x=>+x.dataset.h===s.H);if(b)b.click()}
 calc();
 </script>
-<script src="paciente.js?v=v53"></script>
+<script src="paciente.js?v=v54"></script>
 </body>
 </html>

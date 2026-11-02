@@ -122,7 +122,7 @@
     crecimiento: ["#rRes", "#rTrend"]
   };
   var TITLES = { infusiones: "Infusiones", electrolitos: "Electrolitos", sedoanalgesia: "Sedoanalgesia", insulina: "Insulina",
-    laboratorio: "Laboratorio", antimicrobianos: "Antimicrobianos", cardio: "Cardiología", neo: "RCP · Bilirrubina · Transfusiones", crecimiento: "Crecimiento INTERGROWTH-21st" };
+    laboratorio: "Laboratorio", antimicrobianos: "Antimicrobianos", cardio: "Cardiología", neo: "RCP · Bilirrubina · Transfusiones", crecimiento: "Crecimiento INTERGROWTH-21st", balance: "Balance hídrico" };
 
   function visible(el) {
     if (!el || !el.getClientRects().length) return false;
@@ -158,7 +158,8 @@
     var p = read(), pac = [];
     if (p.kg) pac.push("peso " + trim(p.kg, 3).replace(".", ",") + " kg");
     if (p.eg) pac.push("EG " + trim(p.eg, 1).replace(".", ",") + " sem");
-    if (ok(p.dias)) pac.push(trim(p.dias, 0) + " días de vida");
+    if (p.nac) { var hv = (Date.now() - Date.parse(p.nac)) / 36e5; if (hv >= 0) p.dias = hv / 24; }
+    if (ok(p.dias)) pac.push(Math.floor(p.dias + 1e-9) + " días de vida");
     var d = new Date(), fecha = d.toLocaleDateString("es-AR") + " " + d.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
     return "Calculadora Neonatal · " + (TITLES[page] || "") + " · " + fecha + (pac.length ? "\nPaciente: " + pac.join(" · ") : "") + "\n\n" + out.join("\n\n") +
       "\n\n(Herramienta de apoyo: verificar con protocolo y doble chequeo.)";
@@ -181,9 +182,25 @@
     // espacio al final para que el botón no tape el pie
     document.body.style.paddingBottom = "calc(" + (getComputedStyle(document.body).paddingBottom || "0px") + " + 56px)";
   }
-  window.CalcNeo = { read: read, buildSummary: buildSummary, copyText: copyText };
+  window.CalcNeo = { read: read, buildSummary: buildSummary, copyText: copyText, hasSummary: function () { return !!(COPY[page] || window.customSummary); } };
 
-  function init() { hook(); apply(read()); addCopyButton(); }
+  /* Dentro de la app: los datos del paciente se editan solo en la barra superior */
+  var EMB = window.parent !== window;
+  function lockFields() {
+    if (!EMB) return;
+    var st = document.createElement("style");
+    st.textContent = "input.pac-lock{cursor:pointer;background-image:none}input.pac-lock:focus{outline:2px solid #0f9a83}";
+    document.head.appendChild(st);
+    (FIELDS[page] || []).forEach(function (f) {
+      var el = document.querySelector(f[0]); if (!el) return;
+      el.readOnly = true; el.classList.add("pac-lock"); el.setAttribute("inputmode", "none");
+      el.title = "Se edita en la barra del paciente, arriba";
+      el.addEventListener("click", function () { window.parent.postMessage({ type: "pac-edit" }, "*"); });
+    });
+    ["#wMinus", "#wPlus"].forEach(function (s) { var b = document.querySelector(s); if (b) b.style.display = "none"; });
+  }
+  window.CalcNeo = window.CalcNeo || {};
+  function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
   else setTimeout(init, 0);
 })();
