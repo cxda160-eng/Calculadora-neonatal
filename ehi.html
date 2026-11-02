@@ -83,10 +83,10 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
 <div class="wrap">
   <header>
     <h1>Encefalopatía neonatal</h1>
-    <p>Diagnóstico, estabilización y derivación en RN ≥ 35 semanas · algoritmos CEFEN · SAP · Ministerio de Salud</p>
+    <p>Centro de referencia: recepción de RN ≥ 35 semanas derivados para hipotermia terapéutica · algoritmos CEFEN · SAP · Ministerio de Salud</p>
   </header>
   <div class="emerg">Emergencia neurológica: la ventana terapéutica son las primeras 6 horas de vida como máximo.</div>
-  <nav class="nav"><a href="#s-reloj">Ventana 6 h</a><a href="#s-crit">Criterios</a><a href="#s-sarnat">Sarnat</a><a href="#s-conv">Convulsiones</a><a href="#s-est">Estabilización</a><a href="#s-glu">Glucosa</a><a href="#s-ht">Hipotermia</a><a href="#s-ref">Centro de referencia</a></nav>
+  <nav class="nav"><a href="#s-reloj">Ventana 6 h</a><a href="#s-crit">Criterios</a><a href="#s-sarnat">Sarnat</a><a href="#s-conv">Convulsiones</a><a href="#s-ref">Derivación</a><a href="#s-ht">Hipotermia</a><a href="#s-est">Estabilización</a><a href="#s-glu">Glucosa</a></nav>
 
   <section class="card" id="s-reloj">
     <h2>Ventana terapéutica</h2>
@@ -127,9 +127,34 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     <p class="hint">Dosis del algoritmo. NeoFax usa para levetiracetam una carga de 40 mg/kg (ver pestaña NeoFax).</p>
   </section>
 
+  <section class="card" id="s-ref">
+    <h2>Paciente derivado</h2>
+    <div class="grid">
+      <label>Centro derivador<input id="refH" style="font-family:var(--body)" placeholder="Hospital de origen"></label>
+      <label>Contacto<input id="refC" style="font-family:var(--body)" placeholder="Teléfono o médico"></label>
+      <label>Hora de la llamada<input id="tCall" type="datetime-local"></label>
+      <label>Hora de llegada<input id="tArr" type="datetime-local"></label>
+      <label>T° al ingreso (°C)<input id="tIng" inputmode="decimal" placeholder="35,2"></label>
+    </div>
+    <div class="row"><button class="btn sec sm" id="arrNow">Llegó ahora</button><button class="btn sec sm" id="refClr">Nuevo paciente</button></div>
+    <div id="refTel"></div><div id="refRes"></div>
+    <p class="hint">Se guarda en este dispositivo. Las horas de vida se calculan con la hora de nacimiento de arriba.</p>
+  </section>
+
+  <section class="card" id="s-ht">
+    <h2>Cronograma de hipotermia terapéutica</h2>
+    <p class="hint">Esquema habitual (NICHD/TOBY): 72 h a 33,5 °C y recalentamiento a 0,5 °C por hora hasta 36,5 °C. Ajustalo al protocolo de tu unidad.</p>
+    <div class="grid">
+      <label>Inicio del enfriamiento<input id="htIni" type="datetime-local"></label>
+      <label>Temperatura objetivo (°C)<input id="htT" inputmode="decimal" value="33,5"></label>
+      <label>Duración (h)<input id="htH" inputmode="numeric" value="72"></label>
+    </div>
+    <div id="htRes"></div>
+  </section>
+
   <section class="card" id="s-est">
-    <h2>3 · Estabilización previa al traslado (moderado-grave)</h2>
-    <p class="hint">La comunicación con el centro receptor continúa durante todos los pasos.</p>
+    <h2>3 · Estabilización hasta la llegada (moderado-grave)</h2>
+    <p class="hint">Indicaciones para dar por teléfono al centro derivador y mantener durante el traslado. Al ingreso, tildá cada punto que verificaste.</p>
     <div id="est"></div>
   </section>
 
@@ -157,27 +182,6 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     <p class="hint">Objetivo: glucemia &gt; 47 mg/dL con control cada 3 h · líquidos 40–60 mL/kg/día como máximo · flujo de glucosa mínimo 4 mg/kg/min. Flujo (mg/kg/min) = mL/kg/día × % dextrosa ÷ 144.</p>
   </section>
 
-  <section class="card" id="s-ht">
-    <h2>Cronograma de hipotermia terapéutica</h2>
-    <p class="hint">Para cuando el paciente se recibe para tratamiento. Esquema habitual (NICHD/TOBY): 72 h a 33,5 °C y recalentamiento a 0,5 °C por hora hasta 36,5 °C. Ajustalo al protocolo de tu unidad.</p>
-    <div class="grid">
-      <label>Inicio del enfriamiento<input id="htIni" type="datetime-local"></label>
-      <label>Temperatura objetivo (°C)<input id="htT" inputmode="decimal" value="33,5"></label>
-      <label>Duración (h)<input id="htH" inputmode="numeric" value="72"></label>
-    </div>
-    <div id="htRes"></div>
-  </section>
-
-  <section class="card" id="s-ref">
-    <h2>Centro de referencia</h2>
-    <div class="grid">
-      <label>Hospital<input id="refH" style="font-family:var(--body)" placeholder="Nombre del centro"></label>
-      <label>Contacto<input id="refC" style="font-family:var(--body)" placeholder="Teléfono o nombre"></label>
-    </div>
-    <div id="refTel"></div>
-    <p class="hint">Se guarda en este dispositivo.</p>
-  </section>
-
   <p class="hint">Fuente: Encefalopatía neonatal. Diagnóstico, tratamiento inicial y derivación; Estabilización previa al traslado a un centro de hipotermia terapéutica. Grupo de Encefalopatía Neonatal CEFEN, Sociedad Argentina de Pediatría, Ministerio de Salud de la Nación. Herramienta de apoyo: no reemplaza el criterio clínico ni el protocolo de tu unidad.</p>
 </div>
 <script>
@@ -203,10 +207,10 @@ function reloj(){
   const t=new Date(v), now=new Date(), age=now-t, left=6*3600e3-age;
   const c=left<=0?"crit":left<2*3600e3?"warn":"ok";
   $("reloj").innerHTML=`<div class="tiles">${tile("Horas de vida",hm(age),"",true)}${tile(left>0?"Quedan para 6 h":"Ventana",left>0?hm(left):"cerrada",`límite ${hora(new Date(t.getTime()+6*3600e3))}`)}</div>`+
-    (left<=0?pill("crit","Pasaron las 6 h de vida: la hipotermia ya no está dentro de la ventana recomendada. Consultá con el centro de referencia."):left<2*3600e3?pill("warn","Quedan menos de 2 h de ventana: activar el código de hipotermia sin demora."):"");
+    (left<=0?pill("crit","Pasaron las 6 h de vida: la hipotermia ya no está dentro de la ventana recomendada. Decidir en equipo según el caso."):left<2*3600e3?pill("warn","Quedan menos de 2 h de ventana: priorizar el traslado y el inicio de la hipotermia activa."):"");
 }
 $("nac").value=LS.get("nac","");
-$("nac").oninput=()=>{LS.set("nac",$("nac").value);reloj()};
+$("nac").oninput=()=>{LS.set("nac",$("nac").value);reloj();ref();ht();hist()};
 $("nacNow").onclick=()=>{$("nac").value=toLocal(new Date());LS.set("nac",$("nac").value);reloj()};
 $("nacClr").onclick=()=>{$("nac").value="";LS.set("nac","");reloj()};
 setInterval(reloj,30000);
@@ -219,7 +223,7 @@ function elig(){
   if(P.eg==null)out.push(pill("info","Cargá la EG en la barra superior."));
   else out.push(P.eg>=35?pill("ok",`EG ${f(P.eg,1)} sem: cumple ≥ 35 semanas.`):pill("crit",`EG ${f(P.eg,1)} sem: el algoritmo es para RN ≥ 35 semanas.`));
   if(P.kg==null)out.push(pill("info","Cargá el peso (de nacimiento) en la barra superior."));
-  else out.push(P.kg*1000>=1800?pill("ok",`Peso ${f(P.kg*1000,0)} g: cumple ≥ 1800 g.`):pill("crit",`Peso ${f(P.kg*1000,0)} g: con PN &lt; 1800 g no se recomienda la hipotermia terapéutica. Seguir con los cuidados habituales.`));
+  else out.push(P.kg*1000>=1800?pill("ok",`Peso ${f(P.kg*1000,0)} g: cumple ≥ 1800 g.`):pill("crit",`Peso ${f(P.kg*1000,0)} g: con PN &lt; 1800 g no se recomienda la hipotermia terapéutica; cuidados habituales.`));
   $("elig").innerHTML=out.join("")+`<p class="hint">El criterio es el peso de nacimiento: la app usa el peso cargado arriba.</p>`;
 }
 function crit(){
@@ -256,8 +260,8 @@ function sres(){
   const done=SS.filter(x=>x!=null).length, mg=SS.filter(x=>x>=2).length, g=SS.filter(x=>x===3).length, lv=SS.filter(x=>x===1).length;
   if(!done)return{html:`<div class="res na">Sin examen cargado</div>`,txt:""};
   let cls,txt,sub;
-  if(mg>=3){cls="mg";txt=g>=3?"MODERADO-GRAVE (predominio grave)":"MODERADO-GRAVE";sub=`${mg} ítems en moderado o grave. Llamar y activar el código de hipotermia · comunicarse con la familia con precisión y claridad.`}
-  else if(mg+lv>=1){cls="lv";txt="LEVE";sub=`${mg} ítems moderados o graves (se necesitan 3). Si tiene dudas, comunicarse con el centro de referencia. Observar y reclasificar con Sarnat durante 12 h: si empeora, activar el código de hipotermia.`}
+  if(mg>=3){cls="mg";txt=g>=3?"MODERADO-GRAVE (predominio grave)":"MODERADO-GRAVE";sub=`${mg} ítems en moderado o grave. Activar el código de hipotermia: aceptar la derivación, coordinar el traslado e iniciar la hipotermia activa dentro de las 6 h de vida. Comunicarse con la familia con precisión y claridad.`}
+  else if(mg+lv>=1){cls="lv";txt="LEVE";sub=`${mg} ítems moderados o graves (se necesitan 3). Indicar al centro derivador observación y reclasificación con Sarnat durante 12 h y que vuelva a llamar si empeora: en ese caso, activar el código de hipotermia. Seguimiento de alto riesgo para neurodesarrollo.`}
   else{cls="no";txt="Sin signos de encefalopatía";sub="Reevaluar si cambia la clínica."}
   const conv=SS[6]===3?pill("crit","Convulsiones presentes: ver tratamiento abajo."):"";
   return{html:`<div class="res ${cls}">${txt}<small>${sub}${done<7?` · ${7-done} signos sin cargar`:""}</small></div>${conv}`,txt,cls};
@@ -276,17 +280,19 @@ function conv(){const kg=P.kg;
 
 /* ---------- estabilización ---------- */
 function est(){const kg=P.kg, mg=x=>kg?` → <span class="calc">${f(x*kg,1)}</span>`:"";
-  const S=(n,t,body)=>`<div class="step"><div class="n">${n}</div><div><b>${t}</b>${body}</div></div>`;
+  const V=LS.get("ver",{});
+  const S=(n,t,body)=>`<div class="step"><div class="n">${n}</div><div><b>${t}</b>${body}<label class="chk${V[n]?" on":""}" style="margin-top:6px"><input type="checkbox" data-ver="${n}"${V[n]?" checked":""}><span>Verificado al ingreso</span></label></div></div>`;
   $("est").innerHTML=[
    S(1,"Mantener la temperatura constante",`<ul><li>Servocontrol de la incubadora sobre la piel con objetivo 35 °C.</li><li>Sin servocontrol: mantener al RN entre 36 y 36,5 °C.</li><li>Evitar la hipertermia. No usar medios físicos de enfriamiento pasivo durante el traslado.</li></ul>`),
    S(2,"Función respiratoria",`<ul><li>Apnea o dificultad respiratoria grave: considerar intubación y ARM.</li><li>Monitorear SpO₂, FR y mecánica. Evitar hiperoxia e hiperventilación.</li><li>Objetivos: <b>PaO₂ 50–70 mmHg · PCO₂ 45–55 mmHg</b>. SpO₂ 92–95 % (término) o 89–94 % (pretérmino) con oxigenoterapia.</li><li>EAB coordinado con el centro receptor.</li><li>En VPP inicial, empezar con FiO₂ 0,21 y encender el cronómetro.</li></ul>`),
    S(3,"Función cardiovascular",`<ul><li>Acceso vascular seguro. Objetivos: FC 110–160 lpm; TA media 40–60 mmHg según EG.</li><li>Inestabilidad: FC &gt; 180, relleno capilar &gt; 3 s, pulsos débiles, hipotensión.</li><li>Hipovolemia: SF 10 mL/kg en 20 min${mg(10)}${kg?" mL":""}. Evitar expansiones salvo hipovolemia o desprendimiento de placenta normoinserta.</li><li>Sostén inotrópico (si es posible, con ecocardiograma previo): dobutamina 5–10 mcg/kg/min${kg?` (${f(5*kg,1)}–${f(10*kg,1)} mcg/min)`:""}; adrenalina 0,03–0,05 mcg/kg/min${kg?` (${f(.03*kg,3)}–${f(.05*kg,3)} mcg/min)`:""}. Velocidad en mL/h: pestaña Infusiones.</li><li>No corregir con bicarbonato.</li></ul>`),
    S(4,"Eventos convulsivos clínicos y eléctricos",`<ul><li>Descartar hipoglucemia e hipocalcemia.</li><li>Fenobarbital 20 mg/kg/dosis${mg(20)}${kg?" mg":""} hasta 40 mg/kg; luego levetiracetam 20 mg/kg/dosis${mg(20)}${kg?" mg":""} hasta 40 mg/kg.</li></ul>`),
    S(5,"Medio interno y laboratorio",`<ul><li>Glucemia &gt; 47 mg/dL, control cada 3 h (calculadora abajo).</li><li>Líquidos 40–60 mL/kg/día como máximo, con flujo de glucosa mínimo de 4 mg/kg/min.</li><li>Laboratorio: hemograma, hepatograma, coagulograma, CPK total y MB, troponina, ácido láctico, calcio iónico, creatinina, ionograma.</li></ul>`),
-   S(6,"Infectología",`<ul><li>Sospecha de sepsis temprana: hemocultivo e indicar ATB EV, con la primera dosis antes del traslado (pestaña Antimicrobianos).</li></ul>`),
+   S(6,"Infectología",`<ul><li>Sospecha de sepsis temprana: hemocultivo e indicar ATB EV, con la primera dosis antes del traslado. Al ingreso, confirmar hora y dosis recibidas (pestaña Antimicrobianos).</li></ul>`),
    S(7,"Traslado",`<ul><li>Todo el equipamiento de traslado neonatal, con mezcla de gases (fundamental).</li><li>Control continuo de la temperatura (prioritario). No usar medios físicos de enfriamiento pasivo.</li><li>Signos vitales antes, durante y al llegar. Idealmente con especialista en pediatría o neonatología y enfermería.</li></ul>`),
    S(8,"Comunicación con la familia",`<ul><li>Explicar los objetivos del tratamiento, la evolución clínica y la respuesta al tratamiento, con precisión y claridad.</li></ul>`)
   ].join("");
+  document.querySelectorAll("[data-ver]").forEach(c=>c.onchange=()=>{const V=LS.get("ver",{});V[c.dataset.ver]=c.checked;LS.set("ver",V);c.closest(".chk").classList.toggle("on",c.checked)});
 }
 
 /* ---------- glucosa ---------- */
@@ -319,10 +325,22 @@ function ht(){const v=$("htIni").value;if(!v){$("htRes").innerHTML=pill("info","
 }
 
 /* ---------- centro de referencia ---------- */
-["refH","refC"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ref()})});
-function ref(){const c=$("refC").value.trim(),tel=c.replace(/[^\d+]/g,"");$("refTel").innerHTML=tel.length>=6?`<a class="btn sec sm" style="text-decoration:none;align-self:flex-start;display:inline-block" href="tel:${tel}">Llamar ${c}</a>`:""}
+["refH","refC","tCall","tArr","tIng"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ref()})});
+$("arrNow").onclick=()=>{$("tArr").value=toLocal(new Date());LS.set("tArr",$("tArr").value);ref()};
+$("refClr").onclick=()=>{["refH","refC","tCall","tArr","tIng","nac","apgar","ph","eb","lac","htIni"].forEach(k=>{$(k).value="";LS.set(k,"")});$("vpp").checked=false;LS.set("vpp",false);LS.set("ver",{});SS=Array(7).fill(null);LS.set("sn",SS);LS.set("hist",[]);all();ref()};
+function ref(){const c=$("refC").value.trim(),tel=c.replace(/[^\d+]/g,"");$("refTel").innerHTML=tel.length>=6?`<a class="btn sec sm" style="text-decoration:none;align-self:flex-start;display:inline-block" href="tel:${tel}">Llamar ${c}</a>`:"";
+  const nac=$("nac").value?new Date($("nac").value):null,call=$("tCall").value?new Date($("tCall").value):null,arr=$("tArr").value?new Date($("tArr").value):null,T=num("tIng");
+  const t=[],m=[];
+  if(nac&&call)t.push(tile("Llamada",hm(call-nac)+" de vida",""));
+  if(nac&&arr){t.push(tile("Llegada",hm(arr-nac)+" de vida","",true));if(arr-nac>6*3600e3)m.push(pill("crit","Llegó después de las 6 h de vida."));else m.push(pill("info",`Al llegar quedaban ${hm(6*3600e3-(arr-nac))} de ventana.`))}
+  if(call&&arr)t.push(tile("Traslado",hm(arr-call),"desde la llamada"));
+  if(isFinite(T)){t.push(tile("T° al ingreso",f(T,1)+" °C",""));
+    if(T>=37.5)m.push(pill("crit","Hipertermia al ingreso: es lo que más hay que evitar."));
+    else if(T<33)m.push(pill("crit","Temperatura menor de 33 °C: sobreenfriamiento durante el traslado."));
+    else if(T>=33&&T<=35)m.push(pill("ok","Llegó con hipotermia pasiva controlada."))}
+  $("refRes").innerHTML=(t.length?`<div class="tiles">${t.join("")}</div>`:"")+m.join("");}
 
-function all(){elig();crit();sarnat();conv();est();glu();ht();hist();reloj()}
+function all(){elig();crit();sarnat();conv();est();glu();ht();hist();reloj();ref()}
 setPac();ref();
 </script>
 </body>
