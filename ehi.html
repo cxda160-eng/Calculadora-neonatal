@@ -80,6 +80,18 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
 .aopt{display:flex;gap:6px;flex-wrap:wrap}
 .aopt button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:6px 11px;font:inherit;font-size:.8rem;font-weight:600;cursor:pointer}
 .aopt button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.am{background:#0d1517;border-radius:16px;padding:10px 12px 12px;color:#cfe7e2}
+.am-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:.74rem}
+.am-vit{display:flex;gap:12px;align-items:baseline}.am-vit b{font-size:1.3rem;color:#6cf0c2;font-variant-numeric:tabular-nums}.am-vit .u{color:#8fb3ad}
+.am-st{display:inline-block;margin-top:4px;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:#1d2b2e;color:#cfe7e2}
+.am-st.ok{background:#173b30;color:#8ff0c8}.am-st.warn{background:#3a3016;color:#ffd98a}.am-st.crit{background:#46202a;color:#ffb3bf}
+.am-lb{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.66rem;color:#7fa39d;margin-top:8px}
+#amRaw{width:100%;height:96px;display:block}
+#amTr{width:100%;height:190px;display:block;touch-action:none;cursor:crosshair}
+.am-ctrl{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.am-ctrl button,.am-ctrl select{font:inherit;font-family:var(--mono);font-size:.78rem;width:auto;background:#1a2729;color:#cfe7e2;border:1px solid #2c4245;border-radius:8px;padding:7px 10px;cursor:pointer}
+.am-ctrl label{flex-direction:row;align-items:center;gap:6px;color:#9fbdb8;font-size:.75rem}
+.am-h{margin:6px 0 0;font-size:.72rem;color:#7fa39d}
 .aviz{background:var(--sunk);border-radius:12px;padding:6px}
 .aviz svg{width:100%;height:auto;display:block}
 .adef{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.88rem}
@@ -129,9 +141,20 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
 
   <section class="card" id="s-aeeg">
     <h2>aEEG · Monitor de función cerebral</h2>
-    <p class="hint">Escala semilogarítmica: 0–10 µV lineal (mitad inferior) y 10–100 µV logarítmica (mitad superior). Se lee el <b>margen inferior</b> y el <b>margen superior</b> de la banda, el ciclo sueño-vigilia y las crisis. Los trazados son esquemáticos (3 h de registro).</p>
+    <p class="hint">Escala semilogarítmica: 0–10 µV lineal (mitad inferior) y 10–100 µV logarítmica (mitad superior). Se lee el <b>margen inferior</b> y el <b>margen superior</b> de la banda, el ciclo sueño-vigilia y las crisis. Simulación didáctica: tiempos y morfologías aproximados.</p>
     <div class="aopt" id="aTabs"></div>
-    <div class="aviz"><svg id="aSvg" viewBox="0 0 360 190" role="img" aria-label="Trazado de aEEG esquemático"></svg></div>
+    <div class="am" aria-label="Monitor de función cerebral simulado">
+      <div class="am-top"><div class="am-vit"><span>Inf <b id="amLo">--</b></span><span>Sup <b id="amHi">--</b></span><span class="u">µV</span></div><span id="amT">0 h 00 min</span></div>
+      <div class="am-st" id="amSt">—</div>
+      <div class="am-lb"><span>EEG crudo · C3–C4</span><span>8 s · ±50 µV</span></div>
+      <canvas id="amRaw" aria-label="EEG crudo simulado"></canvas>
+      <div class="am-lb"><span>aEEG · escala semilogarítmica</span><span>3 h</span></div>
+      <canvas id="amTr" aria-label="Tendencia de aEEG; tocá o arrastrá para moverte en el registro"></canvas>
+      <div class="am-ctrl"><button id="amPlay" type="button">Pausa</button>
+        <label>Velocidad <select id="amSpd"><option value="60">1 min/s</option><option value="180" selected>3 min/s</option><option value="480">8 min/s</option></select></label>
+        <button id="amRst" type="button">Reiniciar</button></div>
+      <p class="am-h">Tocá o arrastrá el aEEG para ver el EEG crudo de ese momento.</p>
+    </div>
     <div id="aTxt"></div>
 
     <h3>Clasificación por voltaje (al Naqeeb, 1999)</h3>
@@ -389,7 +412,7 @@ const AP={
  DNV:{n:"Discontinuo normal (DNV)",c:"Margen inferior variable, por debajo de 5 µV; margen superior por encima de 10 µV. Actividad discontinua.",s:"Moderadamente anormal en el término (habitual en prematuros). Pronóstico generalmente favorable si recupera a CNV en las primeras 24–48 h.",g:"warn"},
  BSp:{n:"Brote-supresión (BS+ / BS−)",c:"Margen inferior sin variabilidad, en 0–1 (2) µV, con brotes que superan los 25 µV. BS+: 100 brotes/h o más. BS−: menos de 100 brotes/h (se dibuja BS+).",s:"Gravemente anormal. Sin hipotermia, a las 6 h predice muerte o discapacidad. Con hipotermia es desfavorable sobre todo si persiste más allá de las 24–48 h. BS− es peor que BS+.",g:"crit"},
  LV:{n:"Bajo voltaje (LV)",c:"Fondo continuo de muy bajo voltaje, alrededor o por debajo de 5 µV.",s:"Gravemente anormal; valor pronóstico similar al brote-supresión.",g:"crit"},
- FT:{n:"Plano / inactivo (FT)",c:"Fondo inactivo, isoeléctrico, por debajo de 5 µV. Suele quedar en 1–3 µV por artefacto del ECG.",s:"El patrón más grave. Si persiste, mal pronóstico.",g:"crit"},
+ FT:{n:"Plano / inactivo (FT)",c:"Fondo inactivo, isoeléctrico, por debajo de 5 µV. Suele quedar en 1–3 µV por artefacto del ECG (en el EEG crudo se ven las espigas del QRS).",s:"El patrón más grave. Si persiste, mal pronóstico.",g:"crit"},
  SZ:{n:"Crisis aislada",c:"Elevación brusca del margen inferior (y en general del superior), con forma de arco, seguida de descenso; puede haber depresión posictal.",s:"Confirmar en el EEG crudo del canal. Descartar hipoglucemia e hipocalcemia. Las crisis subclínicas son frecuentes en EHI.",g:"warn"},
  RS:{n:"Crisis repetitivas",c:"Crisis aisladas frecuentes, separadas por menos de 30 minutos.",s:"Alta carga de crisis: tratar y controlar la respuesta en el trazado.",g:"crit"},
  SE:{n:"Estado de mal",c:"Actividad convulsiva continua más de 30 minutos: patrón en «dientes de sierra».",s:"Emergencia. Se asocia a mayor lesión; tratar y monitorizar continuamente.",g:"crit"}
@@ -410,22 +433,62 @@ function band(k,t,r){ // t 0..1 (3 h) → [inferior, superior] µV
    case"SE":{const ph=(t*9)%1, a=ph<.8?ph/.8:(1-ph)/.2;return[5+a*12+n()*2,30+a*35+n()*8]}
   }
 }
-function drawA(k){
-  const W=360,H=190,L=34,R=8,T=8,B=22,h=H-T-B,w=W-L-R;
+/* monitor aEEG animado */
+const AM={k:null,N:720,lo:null,hi:null,t:0,play:true,raw:new Float32Array(1024),ri:0,rs:{ar:0,ar2:0,env:.5,envT:0,burst:0,next:2,alt:0,altT:4,ph:0,ecg:0},last:0};
+function amLoad(k){if(AM.k===k)return;AM.k=k;const r=rng(AK.indexOf(k)*97+11);AM.lo=new Float32Array(AM.N);AM.hi=new Float32Array(AM.N);
+  for(let i=0;i<AM.N;i++){const[l,h]=band(k,i/AM.N,r);AM.lo[i]=Math.max(.2,l);AM.hi[i]=Math.max(l+.4,h)}AM.t=0;amFill()}
+function amFill(){for(let i=0;i<AM.raw.length;i++){AM.raw[AM.ri]=amSample(1/128);AM.ri=(AM.ri+1)%AM.raw.length}}
+function amFit(c){const d=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d)}const x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);return[x,w,h]}
+function amAt(t){const i=Math.min(AM.N-1,Math.max(0,Math.floor(t*AM.N)));let l=0,h=0,n=0;for(let j=Math.max(0,i-3);j<=Math.min(AM.N-1,i+3);j++){l+=AM.lo[j];h+=AM.hi[j];n++}return[l/n,h/n]}
+function amSz(t){const k=AM.k,a=(c,w)=>Math.exp(-(((t-c)/w)**2));
+  if(k==="SZ")return a(.45,.05);if(k==="RS")return Math.max(a(.18,.03),a(.42,.035),a(.66,.03),a(.88,.035));
+  if(k==="SE"){const ph=(t*9)%1;return .35+.65*(ph<.8?ph/.8:(1-ph)/.2)}return 0}
+const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+function amSample(dt){const S=AM.rs,k=AM.k,[lo,hi]=amAt(AM.t);
+  S.envT-=dt;if(S.envT<=0){S.env=Math.random();S.envT=.3+Math.random()*.7}
+  S.ar=.92*S.ar+gauss()*.4;S.ar2=.6*S.ar2+gauss()*.5; // ruido lento + rápido
+  let base=(S.ar*.8+S.ar2*.35)/1.05; // ≈ ±1
+  let amp=(lo+(hi-lo)*S.env)/2, v;
+  if(k==="BSp"){S.next-=dt;if(S.burst>0){S.burst-=dt;amp=25+Math.random()*12}else{amp=.9;if(S.next<=0){S.burst=1+Math.random()*1.8;S.next=S.burst+2+Math.random()*4}}}
+  else if(k==="DNV"){S.altT-=dt;if(S.altT<=0){S.alt^=1;S.altT=2+Math.random()*3}amp=S.alt?hi/2*1.1:lo/2}
+  else if(k==="FT"){amp=.6}
+  v=base*amp;
+  if(k==="FT"){S.ecg+=dt;if(S.ecg>.42){S.ecg=0}v+=S.ecg<.03?2.6*Math.sin(S.ecg/.03*Math.PI):0}
+  const z=amSz(AM.t);if(z>.15){S.ph+=dt*2*Math.PI*(1.6+z*1.2);const w=Math.sin(S.ph);v=v*(1-z*.6)+z*38*Math.sign(w)*Math.abs(w)**.45}
+  return v}
+function amTrendDraw(){const c=$("amTr");if(!c.clientWidth)return;const[x,W,H]=amFit(c),L=26,R=6,T=6,B=16,h=H-T-B,w=W-L-R;
   const y=v=>{v=Math.max(0,Math.min(100,v));return T+(v<=10?h-(v/10)*(h/2):h/2-Math.log10(v/10)*(h/2))};
-  let g="";
-  [0,5,10,25,50,100].forEach(v=>{const yy=y(v).toFixed(1),strong=v===5||v===10;g+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="currentColor" stroke-opacity="${strong?.45:.15}" ${strong?'stroke-dasharray="3 3"':""}/><text x="${L-5}" y="${+yy+3.5}" text-anchor="end" font-size="9" fill="currentColor" opacity=".7">${v}</text>`});
-  [0,1,2,3].forEach(i=>{const x=L+w*i/3;g+=`<line x1="${x}" x2="${x}" y1="${T}" y2="${T+h}" stroke="currentColor" stroke-opacity=".1"/><text x="${x}" y="${H-7}" text-anchor="middle" font-size="9" fill="currentColor" opacity=".7">${i} h</text>`});
-  g+=`<text x="4" y="${H-7}" font-size="8.5" fill="currentColor" opacity=".7">µV</text>`;
-  const r=rng(AK.indexOf(k)*97+11);let d="";
-  for(let x=0;x<=w;x+=.75){const[lo,hi]=band(k,x/w,r);d+=`M${(L+x).toFixed(2)} ${y(lo).toFixed(1)}V${y(Math.max(hi,lo+.3)).toFixed(1)}`}
-  g+=`<path d="${d}" stroke="var(--accent)" stroke-width=".75" stroke-opacity=".85" fill="none"/>`;
-  $("aSvg").innerHTML=g;
-}
+  x.clearRect(0,0,W,H);x.font="9px ui-monospace,monospace";x.textAlign="right";
+  [0,5,10,25,50,100].forEach(v=>{const yy=Math.round(y(v))+.5;x.strokeStyle=v===5||v===10?"rgba(255,214,120,.45)":"rgba(160,200,195,.16)";x.setLineDash(v===5||v===10?[3,3]:[]);x.beginPath();x.moveTo(L,yy);x.lineTo(W-R,yy);x.stroke();x.fillStyle="#7fa39d";x.fillText(v,L-4,yy+3)});
+  x.setLineDash([]);x.textAlign="center";[0,1,2,3].forEach(i=>{const xx=L+w*i/3;x.strokeStyle="rgba(160,200,195,.1)";x.beginPath();x.moveTo(xx,T);x.lineTo(xx,T+h);x.stroke();x.fillStyle="#7fa39d";x.fillText(i+" h",Math.min(Math.max(xx,L+8),W-R-8),H-3)});
+  const n=Math.floor(AM.t*AM.N);x.strokeStyle="#6cf0c2";x.lineWidth=Math.max(1,w/AM.N*1.05);x.globalAlpha=.85;x.beginPath();
+  for(let i=0;i<n;i++){const xx=L+(i+.5)*w/AM.N;x.moveTo(xx,y(AM.lo[i]));x.lineTo(xx,y(AM.hi[i]))}x.stroke();x.globalAlpha=1;x.lineWidth=1;
+  const cx=L+AM.t*w;x.strokeStyle="#ffd47a";x.beginPath();x.moveTo(cx,T);x.lineTo(cx,T+h);x.stroke();
+  AM.geo={L,w}}
+function amRawDraw(){const c=$("amRaw");if(!c.clientWidth)return;const[x,W,H]=amFit(c),mid=H/2,sc=(H/2-4)/50,n=AM.raw.length;
+  x.clearRect(0,0,W,H);x.strokeStyle="rgba(160,200,195,.14)";x.beginPath();[-25,0,25].forEach(v=>{const yy=Math.round(mid-v*sc)+.5;x.moveTo(0,yy);x.lineTo(W,yy)});for(let s=1;s<8;s++){const xx=Math.round(W*s/8)+.5;x.moveTo(xx,0);x.lineTo(xx,H)}x.stroke();
+  x.strokeStyle="#ffe08a";x.lineWidth=1.1;x.beginPath();for(let i=0;i<n;i++){const v=AM.raw[(AM.ri+i)%n],xx=i/(n-1)*W,yy=mid-Math.max(-55,Math.min(55,v))*sc;i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.stroke()}
+function amInfo(){const[lo,hi]=amAt(AM.t),z=amSz(AM.t),m=Math.round(AM.t*180);
+  $("amLo").textContent=lo.toFixed(1).replace(".",",");$("amHi").textContent=hi<10?hi.toFixed(1).replace(".",","):Math.round(hi);
+  $("amT").textContent=`${Math.floor(m/60)} h ${String(m%60).padStart(2,"0")} min`;
+  let c,t;if(z>.35){c="crit";t="Crisis en curso"}else if(AM.k==="BSp"){c="crit";t="Brote-supresión"}else if(hi<10&&lo<5){c="crit";t="Suprimido (sup < 10, inf < 5)"}else if(lo<=5){c="warn";t="Moderadamente anormal (inf ≤ 5)"}else{c="ok";t="Voltaje normal (sup > 10, inf > 5)"}
+  const st=$("amSt");st.className="am-st "+c;st.textContent=t}
+function amFrame(ts){const dt=Math.min(.1,(ts-(AM.last||ts))/1000);AM.last=ts;
+  const sec=$("s-aeeg"),vis=!document.hidden&&sec&&sec.offsetParent!==null;
+  if(AM.k&&vis){
+    if(AM.play){AM.t+=dt*(+$("amSpd").value)/10800;if(AM.t>=1)AM.t=0}
+    const fs=128,steps=Math.round(dt*fs);for(let i=0;i<steps;i++){AM.raw[AM.ri]=amSample(1/fs);AM.ri=(AM.ri+1)%AM.raw.length}
+    amTrendDraw();amRawDraw();amInfo()}
+  requestAnimationFrame(amFrame)}
+requestAnimationFrame(amFrame);
+$("amPlay").onclick=()=>{AM.play=!AM.play;$("amPlay").textContent=AM.play?"Pausa":"Seguir"};
+$("amRst").onclick=()=>{AM.t=0;amFill()};
+(()=>{const c=$("amTr");let dn=false;const seek=e=>{if(!AM.geo)return;const r=c.getBoundingClientRect();AM.t=Math.max(0,Math.min(.999,(e.clientX-r.left-AM.geo.L)/AM.geo.w));amFill()};
+  c.addEventListener("pointerdown",e=>{dn=true;c.setPointerCapture(e.pointerId);seek(e)});c.addEventListener("pointermove",e=>{if(dn)seek(e)});c.addEventListener("pointerup",()=>dn=false);c.addEventListener("pointercancel",()=>dn=false)})();
 function aAtlas(){
   $("aTabs").innerHTML=AK.map(k=>`<button data-k="${k}" aria-pressed="${k===aSel}">${AP[k].n.replace(/ \(.*\)/,"")}</button>`).join("");
   $("aTabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{aSel=b.dataset.k;LS.set("aSel",aSel);aAtlas()});
-  const p=AP[aSel];drawA(aSel);
+  const p=AP[aSel];amLoad(aSel);
   $("aTxt").innerHTML=`<div class="adef"><b>Patrón</b><span><b style="color:var(--fg)">${p.n}</b></span><b>Criterios</b><span>${p.c}</span></div>`+pill(p.g==="ok"?"ok":p.g,`<b>Significado en EHI:</b> ${p.s}`);
 }
 const AF={CNV:0,DNV:1,"BS+":2,"BS-":2,LV:2,FT:2},AFN={CNV:"CNV",DNV:"DNV","BS+":"BS+","BS-":"BS−",LV:"LV",FT:"FT"},
