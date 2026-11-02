@@ -48,6 +48,7 @@ td:first-child{font-weight:700;white-space:nowrap}
   <header>
     <h1>Fuentes y alcance de la Calculadora Neonatal</h1>
     <p>De dónde sale cada dato, qué tipo de evidencia lo respalda y qué límites tiene.</p>
+    <p>Versión instalada: <b id="verApp">—</b></p>
   </header>
 
   <div class="aviso">
@@ -190,13 +191,15 @@ td:first-child{font-weight:700;white-space:nowrap}
 
   <section class="card" id="bal">
     <h3>Balance hídrico</h3>
-    <ul class="src"><li><span class="t t6">Fórmula</span><span>Fórmulas usadas en la unidad: ingresos y egresos = total ÷ peso (mL/kg); balance = ingresos − egresos; relación E/I = egresos ÷ ingresos; ritmo diurético = diuresis (mL/kg) ÷ horas del balance. La proyección a 24 h es una extrapolación lineal.</span></li></ul>
-    <div class="lim"><b>Límites:</b> no incluye pérdidas insensibles. Los cortes de oliguria (&lt; 1 mL/kg/h) y poliuria (&gt; 4 mL/kg/h) son orientativos. La proyección supone que el ritmo se mantiene igual.</div>
+    <ul class="src"><li><span class="t t6">Fórmula</span><span>Fórmulas usadas en la unidad: ingresos y egresos = total ÷ peso (mL/kg); balance = ingresos − egresos; relación E/I = egresos ÷ ingresos; ritmo diurético = diuresis (mL/kg) ÷ horas del balance. La proyección a 24 h es una extrapolación lineal.</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>KDIGO neonatal modificado, criterio por diuresis: Jetton J. G. y Askenazi D. J. (Curr Opin Pediatr 2012), usado en el estudio AWAKEN.</span></li></ul>
+    <div class="lim"><b>Límites:</b> no incluye pérdidas insensibles. Los cortes de oliguria (&lt; 1 mL/kg/h) y poliuria (&gt; 4 mL/kg/h) son orientativos. La proyección supone que el ritmo se mantiene igual. Las pérdidas insensibles las carga el usuario según su protocolo; la app no las estima.</div>
   </section>
 
   <section class="card" id="ver">
     <h2>Registro de versiones (noviembre 2026)</h2>
     <table><tbody>
+      <tr><td>v51</td><td>Buscador global; hora de nacimiento en la barra del paciente (días y horas de vida automáticos); aviso de actualización y versión visible; Balance con KDIGO neonatal, variación de peso y pérdidas insensibles; diluciones intermedias para adrenalina, noradrenalina, alprostadil y dexmedetomidina; planilla de verificación.</td></tr>
       <tr><td>v50</td><td>aEEG animado: monitor con EEG crudo en tiempo real y tendencia que se dibuja, con cursor para recorrer el registro.</td></tr>
       <tr><td>v49</td><td>Encefalopatía: atlas de patrones de aEEG (monitor de función cerebral), valor pronóstico y registro de lecturas.</td></tr>
       <tr><td>v48</td><td>Pestaña Balance hídrico (ingresos, egresos, relación E/I, ritmo diurético y proyección a 24 h).</td></tr>
@@ -212,5 +215,6 @@ td:first-child{font-weight:700;white-space:nowrap}
 
   <p class="hint">Si encontrás un error o una fuente desactualizada, anotá la pestaña, el dato y la fuente correcta para corregirlo en la próxima versión.</p>
 </div>
+<script>(async()=>{try{const k=(await caches.keys()).map(x=>/^calc-neonatal-v(\d+)$/.exec(x)).filter(Boolean).map(m=>+m[1]);if(k.length)document.getElementById("verApp").textContent="v"+Math.max(...k)}catch(e){}})();</script>
 </body>
 </html>

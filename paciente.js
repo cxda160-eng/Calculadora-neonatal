@@ -38,6 +38,7 @@
 
   function apply(p) {
     var list = FIELDS[page]; if (!list) return;
+    if (p && p.nac) { var hv = (Date.now() - Date.parse(p.nac)) / 36e5; if (isFinite(hv) && hv >= 0) { p = Object.assign({}, p, { dias: hv / 24, _h: hv }); } }
     applying = true;
     list.forEach(function (f) {
       var el = document.querySelector(f[0]); if (!el) return;
@@ -48,8 +49,8 @@
           val = u === "g" ? fmt(el, p.kg * 1000, p.kg * 1000 < 100 ? 2 : 0) : fmt(el, p.kg, 3);
         }
       } else if (f[1] === "eg") { if (ok(p.eg) && p.eg > 0) val = fmt(el, p.eg, 1); }
-      else if (f[1] === "dias") { if (ok(p.dias) && p.dias >= 0) val = fmt(el, p.dias, 0); }
-      else if (f[1] === "horas") { if (ok(p.dias) && p.dias >= 0) val = fmt(el, p.dias * 24, 0); }
+      else if (f[1] === "dias") { if (ok(p.dias) && p.dias >= 0) val = fmt(el, Math.floor(p.dias + 1e-9), 0); }
+      else if (f[1] === "horas") { if (ok(p.dias) && p.dias >= 0) val = fmt(el, Math.floor(p.dias * 24 + 1e-9), 0); }
       else if (f[1] === "egw") { if (ok(p.eg) && p.eg > 0) val = fmt(el, Math.floor(p.eg + 1e-6), 0); }
       else if (f[1] === "egd") { if (ok(p.eg) && p.eg > 0) { var dd = Math.round((p.eg - Math.floor(p.eg + 1e-6)) * 7); val = fmt(el, Math.min(6, Math.max(0, dd)), 0); } }
       if (el.value !== val) {
@@ -67,8 +68,8 @@
       var u = f[2] === "nut" ? nutUnit() : f[2];
       p.kg = isFinite(n) && n > 0 ? (u === "g" ? n / 1000 : n) : null;
     } else if (f[1] === "eg") p.eg = isFinite(n) ? n : null;
-    else if (f[1] === "dias") p.dias = isFinite(n) ? n : null;
-    else if (f[1] === "horas") p.dias = isFinite(n) ? n / 24 : null;
+    else if (f[1] === "dias") { p.dias = isFinite(n) ? n : null; delete p.nac; }
+    else if (f[1] === "horas") { p.dias = isFinite(n) ? n / 24 : null; delete p.nac; }
     else if (f[1] === "egw" || f[1] === "egd") {
       var w = num((document.querySelector("#cEGw") || {}).value), d = num((document.querySelector("#cEGd") || {}).value);
       p.eg = isFinite(w) && w > 0 ? w + (isFinite(d) ? Math.min(6, d) : 0) / 7 : null;

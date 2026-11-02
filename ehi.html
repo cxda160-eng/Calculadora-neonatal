@@ -259,7 +259,7 @@ const pill=(c,t)=>`<div class="pill ${c}">${t}</div>`;
 const LS={get(k,d){try{const v=localStorage.getItem("ehi_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ehi_"+k,JSON.stringify(v))}catch(e){}}};
 let P={};
 function readPac(){try{return JSON.parse(localStorage.getItem("pac")||"{}")||{}}catch(e){return{}}}
-function setPac(p){p=p||readPac();P={kg:p.kg>0?p.kg:null,eg:p.eg>0?p.eg:null,dias:(p.dias!=null&&isFinite(p.dias))?p.dias:null};all()}
+function setPac(p){p=p||readPac();if(p.nac){const v=toLocal(new Date(p.nac));if($("nac").value!==v){$("nac").value=v;LS.set("nac",v)}}P={kg:p.kg>0?p.kg:null,eg:p.eg>0?p.eg:null,dias:(p.dias!=null&&isFinite(p.dias))?p.dias:null};all()}
 window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setPac(e.data.pac)});
 window.addEventListener("storage",e=>{if(e.key==="pac")setPac()});
 const toLocal=d=>{const z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`};
@@ -275,9 +275,10 @@ function reloj(){
     (left<=0?pill("crit","Pasaron las 6 h de vida: la hipotermia ya no está dentro de la ventana recomendada. Decidir en equipo según el caso."):left<2*3600e3?pill("warn","Quedan menos de 2 h de ventana: priorizar el traslado y el inicio de la hipotermia activa."):"");
 }
 $("nac").value=LS.get("nac","");
-$("nac").oninput=()=>{LS.set("nac",$("nac").value);reloj();ref();ht();hist()};
-$("nacNow").onclick=()=>{$("nac").value=toLocal(new Date());LS.set("nac",$("nac").value);reloj()};
-$("nacClr").onclick=()=>{$("nac").value="";LS.set("nac","");reloj()};
+function nacUp(){const v=$("nac").value,p=readPac();if(v){p.nac=new Date(v).toISOString();p.dias=(Date.now()-new Date(v))/864e5}else delete p.nac;try{localStorage.setItem("pac",JSON.stringify(p))}catch(e){}if(window.parent!==window)window.parent.postMessage({type:"pac-set",pac:p,from:"ehi"},"*")}
+$("nac").oninput=()=>{LS.set("nac",$("nac").value);nacUp();reloj();ref();ht();hist();aHist();aRes()};
+$("nacNow").onclick=()=>{$("nac").value=toLocal(new Date());LS.set("nac",$("nac").value);nacUp();reloj();aRes()};
+$("nacClr").onclick=()=>{$("nac").value="";LS.set("nac","");nacUp();reloj();aRes()};
 setInterval(reloj,30000);
 
 /* ---------- criterios ---------- */

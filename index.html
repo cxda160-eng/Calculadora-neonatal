@@ -67,6 +67,30 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
   .seg{display:grid;grid-template-columns:repeat(6,1fr);gap:3px}
   .seg button{font-size:.78rem;padding:7px 1px;gap:4px;min-height:38px;letter-spacing:-.02em}
   .seg button i{display:inline-block;width:7px;height:7px}}
+[hidden]{display:none!important}
+.nacb{border:1px solid var(--line,#ddd);background:var(--surface,#fff);color:inherit;border-radius:9px;padding:6px 7px;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;min-width:34px}
+.nacb.on{background:var(--neo-soft);border-color:var(--neo);color:var(--neo)}
+.nacpop{position:fixed;z-index:40;right:10px;top:150px;width:min(320px,calc(100vw - 20px));background:var(--surface,#fff);color:var(--fg,#222);border:1px solid var(--line,#ddd);border-radius:14px;padding:12px;box-shadow:0 14px 34px -10px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:8px;font-size:.85rem}
+.nacpop label{display:flex;flex-direction:column;gap:4px;font-weight:600}
+.nacpop input{font:inherit;font-size:1rem;padding:8px;border-radius:9px;border:1px solid var(--line,#ddd);background:var(--bg);color:inherit}
+.np-r{display:flex;gap:6px}.np-r button,.bus-f button{flex:1;font:inherit;font-weight:600;padding:8px;border-radius:9px;border:1px solid var(--line,#ddd);background:var(--bg);color:inherit;cursor:pointer}
+.np-r .pri{background:var(--neo);border-color:var(--neo);color:#fff}
+.nacpop p{margin:0;color:var(--muted,#777);font-size:.76rem}
+.seg .busb{background:var(--surface-2,rgba(255,255,255,.6));border-style:dashed}
+.bus{position:fixed;inset:0;z-index:60;background:rgba(10,12,25,.45);display:flex;justify-content:center;align-items:flex-start;padding:max(10px,env(safe-area-inset-top)) 10px 10px}
+.bus-in{background:var(--surface,#fff);color:var(--fg,#222);width:min(560px,100%);max-height:calc(100dvh - 20px);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px -15px rgba(0,0,0,.5)}
+.bus-top{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--line,#ddd)}
+.bus-top input{flex:1;font:inherit;font-size:1.05rem;padding:10px 12px;border-radius:11px;border:1px solid var(--line,#ddd);background:var(--bg);color:inherit}
+.bus-top button{font:inherit;border:0;background:none;color:inherit;font-size:1.1rem;padding:0 8px;cursor:pointer}
+.bus-r{overflow:auto;padding:6px 8px;display:flex;flex-direction:column;gap:2px;min-height:60px}
+.bus-r button{display:flex;align-items:center;gap:10px;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:9px 8px;border-radius:10px;cursor:pointer}
+.bus-r button:hover,.bus-r button:focus{background:var(--bg)}
+.bus-r .tg{flex:none;font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--c);min-width:78px;text-align:center}
+.bus-r .tx{font-size:.92rem}.bus-r .tx small{display:block;color:var(--muted,#777);font-size:.74rem}
+.bus-r p{color:var(--muted,#777);font-size:.85rem;margin:10px 6px}
+.bus-f{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line,#ddd);font-size:.78rem;color:var(--muted,#777)}
+.bus-f button{flex:none;font-size:.78rem;padding:6px 10px}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:70;background:#2e3147;color:#fff;padding:9px 16px;border-radius:999px;font-size:.85rem;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
 </style>
 <style id="tema-vivo">
 /* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
@@ -101,6 +125,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button role="tab" id="bEhi" aria-selected="false" style="--c:var(--ehi);--soft:var(--ehi-soft)"><i></i><span class="l">Encefalopatía</span><span class="s">EHI</span></button>
       <button role="tab" id="bBal" aria-selected="false" style="--c:var(--bal);--soft:var(--bal-soft)"><i></i><span class="l">Balance</span><span class="s">Balance</span></button>
       <button role="tab" id="bFue" aria-selected="false" style="--c:var(--fue);--soft:var(--fue-soft)"><i></i><span class="l">Fuentes</span><span class="s">Fuentes</span></button>
+      <button type="button" id="bBus" class="busb" aria-label="Buscar en toda la app"><span class="l">🔍 Buscar</span><span class="s">🔍 Buscar</span></button>
     </div>
   </div>
 </header>
@@ -111,9 +136,21 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <span class="u" id="gU"><span class="gfix">g</span></span>
     <label for="gEG">EG <input id="gEG" inputmode="decimal" autocomplete="off" placeholder="sem"></label>
     <label for="gDias">Vida <input id="gDias" inputmode="numeric" autocomplete="off" placeholder="días"></label>
+    <button type="button" class="nacb" id="gNac" title="Fecha y hora de nacimiento" aria-label="Fecha y hora de nacimiento">🕐</button>
     <button type="button" class="clr" id="gClr" title="Nuevo paciente: borrar peso, EG y días" aria-label="Nuevo paciente"><span class="t">Nuevo</span><span class="x">✕</span></button>
   </div>
 </div>
+<div class="nacpop" id="nacPop" hidden>
+  <label for="gNacIn">Nacimiento (fecha y hora)<input id="gNacIn" type="datetime-local"></label>
+  <div class="np-r"><button type="button" id="npNow">Ahora</button><button type="button" id="npClr">Borrar</button><button type="button" id="npOk" class="pri">Listo</button></div>
+  <p id="npTxt">Con la hora de nacimiento, los días y las horas de vida se calculan solos en todas las pestañas.</p>
+</div>
+<div class="bus" id="bus" hidden role="dialog" aria-label="Buscar">
+  <div class="bus-in"><div class="bus-top"><input id="busQ" type="search" placeholder="Fármaco, cálculo o sección…" autocomplete="off"><button type="button" id="busX" aria-label="Cerrar">✕</button></div>
+  <div id="busR" class="bus-r"></div>
+  <div class="bus-f"><span>Versión instalada: <b id="verTxt">—</b></span><button type="button" id="verUp">Buscar actualización</button></div></div>
+</div>
+<div class="toast" id="toast" hidden></div>
 <div class="views">
   <iframe id="vInf" src="infusiones.html" title="Calculadora de infusiones"></iframe>
   <iframe id="vEle" src="electrolitos.html" title="Calculadora de electrolitos" hidden></iframe>
@@ -175,15 +212,20 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   function paint(p){
     if(document.activeElement!==$("gPeso"))$("gPeso").value=p.kg>0?(unit==="g"?fmt(p.kg*1000,0):fmt(p.kg,3)):"";
     if(document.activeElement!==$("gEG"))$("gEG").value=p.eg>0?fmt(p.eg,1):"";
-    if(document.activeElement!==$("gDias"))$("gDias").value=(p.dias!=null&&isFinite(p.dias))?fmt(p.dias,0):"";
+    const lv=live(p);
+    if(document.activeElement!==$("gDias"))$("gDias").value=(lv.dias!=null&&isFinite(lv.dias))?fmt(Math.floor(lv.dias+1e-9),0):"";
+    const nb=$("gNac");nb.classList.toggle("on",!!p.nac);nb.textContent=p.nac?(lv.h<168?Math.floor(lv.h)+" h":Math.floor(lv.h/24)+" d"):"🕐";
+    nb.title=p.nac?"Nació: "+new Date(p.nac).toLocaleString("es-AR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"Fecha y hora de nacimiento";
     $("gPeso").classList.toggle("empty",!(p.kg>0));
     $("gU").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===unit));
     $("gPeso").placeholder="g";const wv=num($("gPeso").value);$("gPeso").classList.toggle("kgwarn",wv>0&&wv<100);$("gPeso").title=wv>0&&wv<100?"El peso va en gramos (ej.: 1500)":"";
   }
+  function live(p){if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(isFinite(h)&&h>=0)return{h,dias:h/24}}return{h:null,dias:p.dias}}
   function broadcast(p,except){document.querySelectorAll(".views iframe").forEach(f=>{if(f.contentWindow&&f.contentWindow!==except)f.contentWindow.postMessage({type:"pac",pac:p},"*")});}
   function fromBar(){
     const p=read(),w=num($("gPeso").value),eg=num($("gEG").value),d=num($("gDias").value);
-    p.kg=w>0?(unit==="g"?w/1000:w):null; p.eg=eg>0?eg:null; p.dias=isFinite(d)&&d>=0?d:null;
+    p.kg=w>0?(unit==="g"?w/1000:w):null; p.eg=eg>0?eg:null;
+    if(document.activeElement===$("gDias")){p.dias=isFinite(d)&&d>=0?d:null;if(p.nac){delete p.nac;paint(p)}}
     write(p);$("gPeso").classList.toggle("empty",!(p.kg>0));$("gPeso").classList.toggle("kgwarn",w>0&&w<100);$("gPeso").title=w>0&&w<100?"El peso va en gramos (ej.: 1500)":"";broadcast(p);
   }
   ["gPeso","gEG","gDias"].forEach(id=>$(id).addEventListener("input",fromBar));
@@ -191,10 +233,71 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   $("gClr").onclick=()=>{const p={};write(p);paint(p);broadcast(p);$("gPeso").focus();};
   window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac-set"){write(e.data.pac);paint(e.data.pac);broadcast(e.data.pac,e.source);}});
   document.querySelectorAll(".views iframe").forEach(f=>f.addEventListener("load",()=>f.contentWindow.postMessage({type:"pac",pac:read()},"*")));
+  /* hora de nacimiento */
+  const toLocal=d=>{const z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`};
+  function setNac(v){const p=read();if(v){const t=new Date(v);if(isNaN(t)||t>Date.now()+6e4)return;p.nac=t.toISOString();p.dias=(Date.now()-t)/864e5}else{delete p.nac}write(p);paint(p);broadcast(p);}
+  $("gNac").onclick=()=>{const pp=$("nacPop");pp.hidden=!pp.hidden;if(!pp.hidden){const p=read();$("gNacIn").value=p.nac?toLocal(new Date(p.nac)):"";const r=$("gNac").getBoundingClientRect();pp.style.top=(r.bottom+8)+"px"}};
+  $("gNacIn").addEventListener("change",()=>setNac($("gNacIn").value));
+  $("npNow").onclick=()=>{$("gNacIn").value=toLocal(new Date());setNac($("gNacIn").value)};
+  $("npClr").onclick=()=>{$("gNacIn").value="";setNac("")};
+  $("npOk").onclick=()=>{if($("gNacIn").value)setNac($("gNacIn").value);$("nacPop").hidden=true};
+  let lastD=null;setInterval(()=>{const p=read();if(!p.nac)return;const d=Math.floor(live(p).dias);paint(p);if(d!==lastD){lastD=d;p.dias=live(p).dias;write(p);broadcast(p)}},60000);
+  window.CalcPac={read,write,paint,broadcast};
   paint(read());
+})();
+
+/* ---- Buscador ---- */
+(function(){
+  const $=id=>document.getElementById(id);
+  const norm=t=>String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+  const NAMES={};for(const k in TABS){const b=$(TABS[k][1]);NAMES[k]={n:(b.querySelector(".l")||b).textContent.trim(),st:b.getAttribute("style")||""}}
+  const STOP=/^(calcular |copiar |guardar |ver )|^(borrar|calcular|copiar|guardar|nuevo|reiniciar|pausa|seguir|listo|ahora|cerrar|ver|mas|menos|si|no|ok|—|-|\+|−|g|kg|ml|h|min)$/;
+  let IDX=null;
+  function build(){IDX=[];
+    for(const k in TABS){let d;try{d=$(TABS[k][0]).contentDocument}catch(e){continue}if(!d||!d.body)continue;
+      const seen=new Set();
+      const add=(el,txt,kind,rank,extra)=>{txt=String(txt||"").replace(/\s+/g," ").trim();if(txt.length<2||txt.length>80)return;const nn=norm(txt);if(STOP.test(nn)||seen.has(kind+nn))return;seen.add(kind+nn);IDX.push(Object.assign({k,el,txt,n:nn,kind,rank},extra||{}))};
+      add(null,NAMES[k].n,"tab",-1);
+      const lab=e=>{const t=[...e.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(" ").trim();if(t.length>=2)return t;const c=[...e.children].find(c=>c.textContent.trim().length>=2);return c?lab(c):e.textContent};
+      d.querySelectorAll("h1,h2,h3,summary,legend").forEach(e=>add(e,lab(e),"sec",0));
+      d.querySelectorAll("select").forEach(sel=>[...sel.options].forEach(o=>{if(o.value!=="")add(sel,o.textContent,"opt",1,{val:o.value})}));
+      d.querySelectorAll("button").forEach(e=>{if(e.closest("nav,.nav"))return;add(e,lab(e),"btn",2)});
+      d.querySelectorAll("table tr td:first-child,table tr th:first-child").forEach(e=>add(e,e.textContent,"row",3));
+    }}
+  function reveal(d,el){
+    for(let a=el;a&&a!==d.body;a=a.parentElement){
+      if(a.tagName==="DETAILS")a.open=true;
+      if(a.hidden&&a.id&&/^view/i.test(a.id)){const v=a.id.replace(/^view/i,"").toLowerCase();const b=[...d.querySelectorAll("button[data-v]")].find(x=>x.dataset.v.toLowerCase()===v);if(b)b.click()}
+    }}
+  function go(r){show(r.k);try{localStorage.setItem("tab",r.k)}catch(e){}close();
+    setTimeout(()=>{const d=$(TABS[r.k][0]).contentDocument,el=r.el;if(!d||!el)return;reveal(d,el);
+      if(r.kind==="opt"){el.value=r.val;el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}))}
+      else if(r.kind==="btn")el.click();
+      setTimeout(()=>{el.scrollIntoView({block:"center",behavior:"smooth"});const o=el.style.outline,t=el.style.transition;el.style.transition="outline-color .6s";el.style.outline="3px solid #f0a37c";setTimeout(()=>{el.style.outline=o;el.style.transition=t},1600)},60)},30)}
+  function run(){const q=norm($("busQ").value),R=$("busR");if(!q){R.innerHTML=`<p>Escribí un fármaco (vanco, adrenalina), un cálculo (MAP, GIR, QTc) o una sección (Sarnat, balance).</p>`;return}
+    if(!IDX)build();const w=q.split(" ");
+    const hits=IDX.filter(r=>w.every(x=>r.n.includes(x))).map(r=>({r,s:(r.n.startsWith(q)?0:r.n.split(/[^a-z0-9]/).some(t=>t.startsWith(w[0]))?1:2)*10+r.rank})).sort((a,b)=>a.s-b.s||a.r.txt.length-b.r.txt.length).slice(0,40);
+    if(!hits.length){R.innerHTML=`<p>Sin resultados para «${$("busQ").value.replace(/</g,"&lt;")}».</p>`;return}
+    R.innerHTML="";hits.forEach(({r})=>{const b=document.createElement("button");b.type="button";b.setAttribute("style",NAMES[r.k].st);
+      b.innerHTML=`<span class="tg">${NAMES[r.k].n}</span><span class="tx">${r.txt.replace(/</g,"&lt;")}<small>${{tab:"Pestaña",sec:"Sección",opt:"Opción de lista",btn:"Botón",row:"Fila de tabla"}[r.kind]}</small></span>`;b.onclick=()=>go(r);R.appendChild(b)})}
+  function open(){IDX=null;$("bus").hidden=false;$("busQ").value="";run();setTimeout(()=>$("busQ").focus(),30);verPaint()}
+  function close(){$("bus").hidden=true}
+  $("bBus").onclick=open;$("busX").onclick=close;$("bus").addEventListener("click",e=>{if(e.target.id==="bus")close()});
+  $("busQ").addEventListener("input",run);$("busQ").addEventListener("keydown",e=>{if(e.key==="Enter"){const f=$("busR").querySelector("button");if(f)f.click()}if(e.key==="Escape")close()});
+  document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();open()}});
+  /* versión */
+  async function verPaint(){$("verTxt").textContent=await window.appVersion()}
+  $("verUp").onclick=async()=>{const b=$("verUp");b.textContent="Buscando…";try{const r=await navigator.serviceWorker.getRegistration();if(!r){b.textContent="Sin conexión";return}await r.update();b.textContent=(r.installing||r.waiting)?"Descargando versión nueva…":"Ya tenés la última"}catch(e){b.textContent="Sin conexión"}setTimeout(()=>b.textContent="Buscar actualización",3500)};
 })();
 </script>
 
-<script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let reloaded=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!reloaded){reloaded=true;location.reload();}});window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").then(r=>r.update()).catch(()=>{})})}</script>
+<script>
+window.appVersion=async()=>{try{const k=(await caches.keys()).map(x=>/^calc-neonatal-v(\d+)$/.exec(x)).filter(Boolean).map(m=>+m[1]);return k.length?"v"+Math.max(...k):"—"}catch(e){return "—"}};
+function toast(t){const e=document.getElementById("toast");e.textContent=t;e.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,4000)}
+if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let reloaded=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!reloaded){reloaded=true;try{sessionStorage.setItem("upd","1")}catch(e){}location.reload();}});
+  window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(!document.hidden)r.update().catch(()=>{})})}).catch(()=>{})});
+  try{if(sessionStorage.getItem("upd")){sessionStorage.removeItem("upd");window.addEventListener("load",async()=>toast("Calculadora actualizada a "+await window.appVersion()))}}catch(e){}}
+</script>
 </body>
 </html>
