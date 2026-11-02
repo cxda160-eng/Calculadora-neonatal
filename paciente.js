@@ -16,6 +16,7 @@
     antimicrobianos: [["#pPeso", "peso", "g"], ["#pEG", "eg"], ["#pDias", "dias"]],
     cardio: [["#zPeso", "peso", "g"], ["#aPeso", "peso", "g"], ["#dPeso", "peso", "g"], ["#pdaPeso", "peso", "g"], ["#pdaDias", "dias"]],
     neo: [["#nPeso", "peso", "g"], ["#nEG", "eg"], ["#nHoras", "horas"]],
+    balance: [["#peso", "peso", "g"]],
     crecimiento: [["#cPeso", "peso", "g"], ["#cEGw", "egw"], ["#cEGd", "egd"], ["#cDias", "dias"]]
   };
 

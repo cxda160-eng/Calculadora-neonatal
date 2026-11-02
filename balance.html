@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2b6a8a">
+<title>Balance hídrico neonatal</title>
+<style>
+:root{--bg:#f4f8fb;--surface:#fff;--sunk:#eaf1f6;--line:#d8e3ec;--fg:#1f3140;--muted:#647a8c;--accent:#2b6a8a;--soft:#dcecf5;
+--in:#1f7a5c;--in-soft:#dcf2e8;--out:#b0472b;--out-soft:#fbe5dd;--ok:#1f7a5c;--okb:#dcf2e8;--warn:#86590a;--warnb:#fff1cf;--bad:#a12d40;--badb:#ffe1e6;
+--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#121b23;--surface:#1a2631;--sunk:#22313e;--line:#2f4252;--fg:#e6eef4;--muted:#9ab0c0;--accent:#8cc4e2;--soft:#1e3342;
+--in:#8fe0bf;--in-soft:#183a2e;--out:#ffb39b;--out-soft:#3c2620;--ok:#8fe0bf;--okb:#183a2e;--warn:#ffd98a;--warnb:#3a3016;--bad:#ffb3bf;--badb:#43202a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;
+padding:16px max(14px,env(safe-area-inset-left)) calc(30px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right))}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+h1{font-size:1.25rem;margin:0}
+.sub{color:var(--muted);font-size:.85rem;margin:2px 0 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--accent)}
+.card.in h2{color:var(--in)}.card.out h2{color:var(--out)}
+.row{display:grid;grid-template-columns:1fr 112px;gap:8px;align-items:center}
+.row label{font-size:.92rem}
+.row small{display:block;color:var(--muted);font-size:.75rem}
+.f{display:flex;align-items:center;background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:0 8px}
+.f input{width:100%;border:0;background:transparent;color:var(--fg);font:600 1rem var(--mono);padding:9px 2px;text-align:right;outline:none;min-width:0}
+.f span{color:var(--muted);font-size:.75rem;padding-left:4px}
+.f:focus-within{border-color:var(--accent)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--sunk);padding:3px;border-radius:10px}
+.seg button{border:0;background:transparent;color:var(--fg);font:600 .9rem var(--font);padding:7px 0;border-radius:8px}
+.seg button[aria-pressed=true]{background:var(--surface);box-shadow:0 1px 3px #0002}
+.tot{display:flex;justify-content:space-between;font-weight:700;border-top:1px dashed var(--line);padding-top:8px}
+.tot b{font-family:var(--mono)}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.k{border-radius:14px;padding:12px;background:var(--sunk)}
+.k .n{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.k .v{font:700 1.5rem var(--mono);margin-top:2px}
+.k .u{font-size:.78rem;color:var(--muted)}
+.br{margin-top:6px;border-top:1px solid var(--line);padding-top:5px;display:flex;flex-direction:column;gap:1px}
+.br div{display:flex;justify-content:space-between;gap:6px;font-size:.74rem;color:var(--muted)}
+.br b{font-family:var(--mono);color:var(--fg);font-weight:600;white-space:nowrap}
+.k.pj{background:var(--soft)}
+.k.pj .br div{font-size:.88rem;color:var(--fg)}
+.k.pj .br b{font-size:.95rem}
+.k .d{font-size:.8rem;margin-top:4px;font-weight:600}
+.k.ok{background:var(--okb)}.k.ok .d{color:var(--ok)}
+.k.warn{background:var(--warnb)}.k.warn .d{color:var(--warn)}
+.k.bad{background:var(--badb)}.k.bad .d{color:var(--bad)}
+.btns{display:flex;gap:8px}
+.btns button{flex:1;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 .9rem var(--font);padding:11px;border-radius:12px}
+.btns button.p{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.note{font-size:.78rem;color:var(--muted);margin:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.85rem;opacity:0;transition:.2s;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>Balance hídrico neonatal</h1><p class="sub">Ingresos, egresos, relación E/I y ritmo diurético</p></header>
+
+  <section class="card">
+    <h2>Paciente y período</h2>
+    <div class="row"><label>Peso<small>usá el peso de cálculo del día</small></label><div class="f"><input id="peso" inputmode="numeric" placeholder="0"><span>g</span></div></div>
+    <div><div style="font-size:.92rem;margin-bottom:6px">Horas del balance</div>
+      <div class="seg" id="hs"><button data-h="6">6 h</button><button data-h="8">8 h</button><button data-h="12">12 h</button><button data-h="24" aria-pressed="true">24 h</button></div></div>
+  </section>
+
+  <section class="card in">
+    <h2>Ingresos</h2>
+    <div class="row"><label>Parenteral (PN / plan EV)</label><div class="f"><input class="i" id="i_pn" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="row"><label>Infusiones y diluciones de drogas</label><div class="f"><input class="i" id="i_inf" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="row"><label>Enteral (VO / SOG)</label><div class="f"><input class="i" id="i_ent" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="row"><label>Otros<small>bolos, hemoderivados, lavados</small></label><div class="f"><input class="i" id="i_otr" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="tot"><span>Total ingresos</span><b id="tI">0 mL</b></div>
+  </section>
+
+  <section class="card out">
+    <h2>Egresos</h2>
+    <div class="row"><label>Diuresis<small>pañal: 1 g = 1 mL (restá el pañal seco)</small></label><div class="f"><input class="e" id="e_diu" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="row"><label>Débito SOG / residuo</label><div class="f"><input class="e" id="e_sog" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="row"><label>Drenajes / ostomías</label><div class="f"><input class="e" id="e_dre" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="row"><label>Otros<small>deposiciones, extracciones</small></label><div class="f"><input class="e" id="e_otr" inputmode="decimal" placeholder="0"><span>mL</span></div></div>
+    <div class="tot"><span>Total egresos</span><b id="tE">0 mL</b></div>
+  </section>
+
+  <section class="card">
+    <h2>Resultado</h2>
+    <div class="res">
+      <div class="k" id="kI"><div class="n">Ingresos</div><div class="v" id="vI">—</div><div class="u" id="uI">mL/kg</div><div class="br" id="bI"></div></div>
+      <div class="k" id="kE"><div class="n">Egresos</div><div class="v" id="vE">—</div><div class="u" id="uE">mL/kg</div><div class="br" id="bE"></div></div>
+      <div class="k" id="kB"><div class="n">Balance (I − E)</div><div class="v" id="vB">—</div><div class="u" id="uB">mL/kg</div><div class="d" id="dB"></div></div>
+      <div class="k" id="kR"><div class="n">Relación E/I</div><div class="v" id="vR">—</div><div class="u">egresos ÷ ingresos</div><div class="d" id="dR"></div></div>
+      <div class="k" id="kD" style="grid-column:1/-1"><div class="n">Ritmo diurético</div><div class="v" id="vD">—</div><div class="u">mL/kg/h · diuresis (mL/kg) ÷ horas</div><div class="d" id="dD"></div></div>
+<div class="k pj" id="kP" style="grid-column:1/-1" hidden><div class="n" id="nP">Proyección a 24 h</div>
+        <div class="br" id="bP" style="border-top:0;padding-top:2px"></div>
+        <div class="u" style="margin-top:6px">Estimación lineal: supone que el ritmo de las primeras horas se mantiene.</div></div>
+    </div>
+    <div class="btns"><button id="borrar">Borrar</button><button class="p" id="copiar">Copiar resumen</button></div>
+    <p class="note">Ingresos y egresos = total ÷ peso (kg). Balance = ingresos − egresos (mL/kg). Relación E/I = egresos ÷ ingresos. Ritmo diurético = diuresis (mL/kg) ÷ horas del balance (débito, drenajes y otros cuentan solo en el total de egresos): &lt; 1 mL/kg/h oliguria; 1–4 habitual; &gt; 4 poliuria (orientativo, interpretar según edad, EG y clínica). No incluye pérdidas insensibles.</p>
+  </section>
+</div>
+<div class="toast" id="toast">Copiado</div>
+<script>
+const $=id=>document.getElementById(id);
+const num=v=>{v=parseFloat(String(v).replace(",","."));return isFinite(v)?v:0};
+const f0=n=>Math.round(n).toLocaleString("es-AR");
+const f1=n=>n.toLocaleString("es-AR",{minimumFractionDigits:1,maximumFractionDigits:1});
+const f2=n=>n.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
+let H=24;
+const store={get(){try{return JSON.parse(localStorage.getItem("balance")||"{}")}catch(e){return{}}},set(o){try{localStorage.setItem("balance",JSON.stringify(o))}catch(e){}}};
+const LI=[["i_pn","NPT / EV"],["i_inf","Infusiones"],["i_ent","VO / SOG"],["i_otr","Otros"]],LE=[["e_diu","Diuresis"],["e_sog","Débito SOG"],["e_dre","Drenajes"],["e_otr","Otros"]];
+const brk=(L,kg)=>kg?L.map(([id,n])=>{const v=num($(id).value);return v?`<div><span>${n}</span><b>${f1(v/kg)}</b></div>`:""}).join(""):"";
+const det=(L,kg)=>{if(!kg)return"";const a=L.filter(([id])=>num($(id).value)).map(([id,n])=>`${n} ${f1(num($(id).value)/kg)}`);return a.length?" — "+a.join(", "):""};
+const ids=["peso","i_pn","i_inf","i_ent","i_otr","e_diu","e_sog","e_dre","e_otr"];
+function setK(k,cls,txt,d){$(k).className="k "+(cls||"");if(d)$(d).textContent=txt||""}
+function calc(){
+  const kg=num($("peso").value)/1000;
+  const I=[...document.querySelectorAll(".i")].reduce((s,x)=>s+num(x.value),0);
+  const E=[...document.querySelectorAll(".e")].reduce((s,x)=>s+num(x.value),0);
+  $("tI").textContent=f0(I)+" mL";$("tE").textContent=f0(E)+" mL";
+  const diu=num($("e_diu").value);const Ik=kg?I/kg:0,Ek=kg?E/kg:0,Bk=Ik-Ek,B=I-E;
+  $("vI").textContent=kg?f1(Ik):"—";$("uI").textContent=kg?`mL/kg en ${H} h (total ${f0(I)} mL)`:"mL/kg · falta peso";
+  $("vE").textContent=kg?f1(Ek):"—";$("uE").textContent=kg?`mL/kg en ${H} h (total ${f0(E)} mL)`:"mL/kg · falta peso";
+  $("bI").innerHTML=brk(LI,kg);$("bE").innerHTML=brk(LE,kg);
+  $("vB").textContent=kg?(Bk>0?"+":"")+f1(Bk):"—";
+  $("uB").textContent=kg?`mL/kg (${(B>0?"+":"")+f0(B)} mL)`:"mL/kg · falta peso";
+  if(!kg||(!I&&!E)){setK("kB","","","dB");$("dB").textContent=""}
+  else setK("kB",Bk>=0?"ok":"warn",Bk>0?"Balance positivo":Bk<0?"Balance negativo":"Balance neutro","dB");
+  if(I){const r=E/I;$("vR").textContent=f2(r);
+    setK("kR",r>1?"warn":"ok",r>1?"Egresa más de lo que ingresa":"Egresa menos de lo que ingresa","dR")}
+  else{$("vR").textContent="—";setK("kR","","","dR");$("dR").textContent=""}
+  if(kg&&diu){const rd=diu/kg/H;$("vD").textContent=f2(rd);
+    setK("kD",rd<1?"bad":rd>4?"warn":"ok",rd<1?"Oliguria (< 1 mL/kg/h)":rd>4?"Poliuria (> 4 mL/kg/h)":"Dentro de lo habitual","dD")}
+  else{$("vD").textContent="—";setK("kD","","","dD");$("dD").textContent=kg?"":"Cargá el peso y la diuresis"}
+  const m=24/H;
+  if(H<24&&kg&&(I||E)){$("kP").hidden=false;$("nP").textContent=`Proyección a 24 h (× ${m})`;
+    const L=[["Ingresos",`${f1(Ik*m)} mL/kg (${f0(I*m)} mL)`],["Egresos",`${f1(Ek*m)} mL/kg (${f0(E*m)} mL)`],["Balance",`${(Bk>0?"+":"")+f1(Bk*m)} mL/kg`]];
+    if(diu)L.push(["Diuresis",`${f0(diu*m)} mL (${f1(diu/kg*m)} mL/kg)`]);
+    $("bP").innerHTML=L.map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join("")}
+  else $("kP").hidden=true;
+  const o={H};ids.forEach(i=>o[i]=$(i).value);store.set(o);
+  return {kg,I,E,Ik,Ek,Bk,diu};
+}
+document.querySelectorAll("input").forEach(x=>x.addEventListener("input",calc));
+$("hs").onclick=e=>{const b=e.target.closest("button");if(!b)return;H=+b.dataset.h;
+  [...$("hs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));calc()};
+$("borrar").onclick=()=>{ids.slice(1).forEach(i=>$(i).value="");calc()};
+$("copiar").onclick=async()=>{const r=calc();const kg=r.kg;
+  const t=[`Balance ${H} h${kg?` · peso ${f0(kg*1000)} g`:""}`,
+  `Ingresos: ${kg?f1(r.Ik)+" mL/kg":"—"} (${f0(r.I)} mL)`+det(LI,kg),
+  `Egresos: ${kg?f1(r.Ek)+" mL/kg":"—"} (${f0(r.E)} mL)`+det(LE,kg),
+  kg?`Balance: ${(r.Bk>0?"+":"")+f1(r.Bk)} mL/kg`:"",
+  r.I?`Relación E/I: ${f2(r.E/r.I)}`:"",
+  kg&&r.diu?`Ritmo diurético: ${f2(r.diu/kg/H)} mL/kg/h`:"",
+  H<24&&kg?`Proyección 24 h: ingresos ${f1(r.Ik*24/H)} mL/kg, egresos ${f1(r.Ek*24/H)} mL/kg, balance ${(r.Bk>0?"+":"")+f1(r.Bk*24/H)} mL/kg${r.diu?`, diuresis ${f0(r.diu*24/H)} mL (${f1(r.diu/kg*24/H)} mL/kg)`:""}`:""].filter(Boolean).join("\n");
+  try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
+  $("toast").classList.add("on");setTimeout(()=>$("toast").classList.remove("on"),1200)};
+const s=store.get();ids.forEach(i=>{if(s[i])$(i).value=s[i]});
+if(s.H){const b=[...$("hs").children].find(x=>+x.dataset.h===s.H);if(b)b.click()}
+calc();
+</script>
+<script src="paciente.js?v=v48"></script>
+</body>
+</html>
