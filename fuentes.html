@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fuentes y alcance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: página de lectura — aviso de alcance arriba, leyenda de tipos de fuente, una tarjeta por pestaña con sus fuentes y limitaciones, y registro de versiones; acento gris pizarra */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#eef0f5; --line:#dfe2ec; --fg:#2e3147; --muted:#6c7090; --accent:#4a5878; --accent-soft:#e3e8f3;
+  --rose:#ffe3e8; --rose-fg:#a12d40; --peach:#fff4d6; --peach-fg:#86590a;
+  --t1:#dcf2ec; --t1f:#2b6a60; --t2:#e6f0fb; --t2f:#2f5f93; --t3:#ece6fb; --t3f:#5b47a0; --t4:#fde9dc; --t4f:#8a3a1c; --t5:#fff4d6; --t5f:#86590a; --t6:#eef0f5; --t6f:#4a5878;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#b9c6e4; --accent-soft:#2a3248;
+  --rose:#43202a; --rose-fg:#ffb9c4; --peach:#3b3014; --peach-fg:#ffdc8f;
+  --t1:#1e3a3b; --t1f:#a6ecdc; --t2:#1f2f45; --t2f:#b5d3f5; --t3:#2c2745; --t3f:#cdbff6; --t4:#3a2a26; --t4f:#ffd2bd; --t5:#3b3014; --t5f:#ffdc8f; --t6:#2a2f45; --t6f:#c4cbe0; color-scheme:dark; }}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header h1{font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.88rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.card h3{margin:0;font-size:1.02rem}
+.aviso{background:var(--rose);color:var(--rose-fg);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.aviso b{font-size:1rem}
+.aviso ul{margin:0;padding-left:18px}.aviso li{margin:3px 0}
+ul.src{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.src li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:start}
+.t{font-size:.68rem;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap;margin-top:2px}
+.t1{background:var(--t1);color:var(--t1f)}.t2{background:var(--t2);color:var(--t2f)}.t3{background:var(--t3);color:var(--t3f)}.t4{background:var(--t4);color:var(--t4f)}.t5{background:var(--t5);color:var(--t5f)}.t6{background:var(--t6);color:var(--t6f)}
+.lim{background:var(--sunk);border-radius:10px;padding:8px 12px;font-size:.85rem;color:var(--muted)}
+.lim b{color:var(--fg)}
+.leg{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:start;font-size:.88rem}
+.nav{display:flex;gap:6px;flex-wrap:wrap}
+.nav a{text-decoration:none;color:var(--fg);border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:.78rem;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td:first-child{font-weight:700;white-space:nowrap}
+.hint{font-size:.8rem;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Fuentes y alcance de la Calculadora Neonatal</h1>
+    <p>De dónde sale cada dato, qué tipo de evidencia lo respalda y qué límites tiene.</p>
+  </header>
+
+  <div class="aviso">
+    <b>Herramienta personal de apoyo, no validada institucionalmente</b>
+    <ul>
+      <li>Desarrollada por un neonatólogo y cardiólogo infantil con asistencia de inteligencia artificial para la programación, la transcripción y el resumen de las fuentes.</li>
+      <li>Las dosis y tablas se transcribieron o resumieron a mano desde las fuentes citadas. No tuvieron revisión independiente por farmacia ni por un comité: puede haber errores.</li>
+      <li>No reemplaza el criterio clínico, el protocolo de cada unidad, la ficha técnica del producto ni el doble chequeo antes de preparar y administrar.</li>
+      <li>Ante cualquier discrepancia, vale la fuente original.</li>
+    </ul>
+  </div>
+
+  <section class="card">
+    <h2>Tipos de fuente</h2>
+    <div class="leg">
+      <span class="t t1">Guía / consenso</span><span>Guía de práctica clínica o consenso de sociedades científicas (AAP, ILCOR/NRP, ESC, ESPGHAN, SAP). Mayor respaldo.</span>
+      <span class="t t2">Protocolo</span><span>Protocolo o tabla institucional (Hospital Garrahan, Hospital J. A. Fernández, protocolo de la UCIN). Refleja la práctica de ese centro.</span>
+      <span class="t t3">Compendio</span><span>Compendio farmacológico de referencia (NeoFax, Vademécum Neonatal, Taketomo). Resume la literatura; la calidad varía por fármaco.</span>
+      <span class="t t4">Estándar</span><span>Estándar poblacional internacional (INTERGROWTH-21st).</span>
+      <span class="t t5">Estudio</span><span>Ensayo clínico o serie de casos puntual. Respaldo acotado a la población estudiada.</span>
+      <span class="t t6">Fórmula</span><span>Fórmula fisiológica o estimación. Útil para orientar; puede ser poco confiable en neonatos.</span>
+    </div>
+    <div class="nav"><a href="#inf">Infusiones</a><a href="#sed">Sedoanalgesia</a><a href="#atb">Antimicrobianos</a><a href="#ins">Insulina</a><a href="#ele">Electrolitos</a><a href="#nut">Nutrición</a><a href="#lab">Laboratorio</a><a href="#ecg">Cardiología</a><a href="#neo">RCP · Bili · Sangre</a><a href="#cre">Crecimiento</a><a href="#nfx">NeoFax</a><a href="#ehi">Encefalopatía</a><a href="#ver">Versiones</a></div>
+  </section>
+
+  <section class="card" id="inf">
+    <h3>Infusiones</h3>
+    <ul class="src">
+      <li><span class="t t2">Protocolo</span><span>Protocolo de Sedoanalgesia, UCIN Hospital J. A. Fernández (2021): diluciones estándar de fentanilo, morfina, midazolam y clonidina en jeringa de 24 mL.</span></li>
+      <li><span class="t t3">Compendio</span><span>Rangos de dosis e información de fármacos resumidos de referencias neonatales habituales (NeoFax / Micromedex, Lexicomp neonatal).</span></li>
+      <li><span class="t t3">Compendio</span><span>Vasopresina: Vademécum Neonatal 2019 (Travaglianti M., Edifarma), dosis en U/kg/min.</span></li>
+      <li><span class="t t2">Protocolo</span><span>Compatibilidad en Y: tabla de compatibilidad de Farmacia, Hospital J. P. Garrahan.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> los rangos son orientativos. La concentración y la vía (central o periférica) deben ajustarse al protocolo de la unidad. Los fármacos que no figuran en la tabla de compatibilidad no tienen datos.</div>
+  </section>
+
+  <section class="card" id="sed">
+    <h3>Sedoanalgesia</h3>
+    <ul class="src">
+      <li><span class="t t2">Protocolo</span><span>Protocolo de Sedoanalgesia, UCIN Hospital J. A. Fernández (2021): dosis, diluciones, destete y reversión.</span></li>
+      <li><span class="t t2">Protocolo</span><span>Equivalencias de opioides: guía neonatal CAHS; guía Woman's Hospital (mombaby) 2025.</span></li>
+      <li><span class="t t5">Estudio</span><span>Conversión morfina–metadona (serie pediátrica, n = 199) y fentanilo–metadona (serie PICU, n = 42).</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>Escalas validadas: N-PASS, Finnegan modificado, WAT-1 (Franck 2008) y SBS.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> las equivalencias entre opioides en neonatos tienen evidencia limitada y variable, y no forman parte del protocolo institucional. Usarlas como punto de partida y titular por score.</div>
+  </section>
+
+  <section class="card" id="atb">
+    <h3>Antimicrobianos</h3>
+    <ul class="src">
+      <li><span class="t t2">Protocolo</span><span>Tabla de dosis de antimicrobianos y profilaxis en neonatología, versión 2026 (octubre). Travaglianti M., Berberian G., Otaño J., Aguirre Y. Hospital de Pediatría J. P. Garrahan. Fuente principal.</span></li>
+      <li><span class="t t3">Compendio</span><span>Taketomo C. K. y col. Manual de prescripción pediátrica y neonatal, 18.ª ed. en español (contenido ~2011). Solo consulta y comparación: referencia histórica.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> dosis transcriptas a mano desde la tabla. Requiere ajustar por función renal y hepática, ECMO e hipotermia, y por indicación de Infectología cuando corresponda.</div>
+  </section>
+
+  <section class="card" id="ins">
+    <h3>Insulina</h3>
+    <ul class="src"><li><span class="t t2">Protocolo</span><span>Protocolo institucional de infusión de insulina para hiperglucemia neonatal (hoja de protocolo de la unidad): dilución estándar, dosis y máximo de 0,2 U/kg/h.</span></li></ul>
+    <div class="lim"><b>Límites:</b> refleja un protocolo local. Las metas de glucemia y los pasos de titulación pueden diferir entre centros.</div>
+  </section>
+
+  <section class="card" id="ele">
+    <h3>Electrolitos</h3>
+    <ul class="src"><li><span class="t t2">Protocolo</span><span>Guía de Medicina Interna Pediátrica, Hospital de Niños R. Gutiérrez (2016): fórmulas de corrección de Na, K, Ca, Mg, bicarbonato, glucosa y agua libre.</span></li>
+      <li><span class="t t6">Fórmula</span><span>Ajustes neonatales señalados en la pestaña (por ejemplo, agua corporal total del neonato en lugar de 0,6).</span></li></ul>
+    <div class="lim"><b>Límites:</b> la guía es pediátrica, no específicamente neonatal. Los ajustes neonatales son adaptaciones y conviene validarlos con el protocolo de la unidad.</div>
+  </section>
+
+  <section class="card" id="nut">
+    <h3>Nutrición</h3>
+    <ul class="src">
+      <li><span class="t t2">Protocolo</span><span>Parenteral: composición de las bolsas Fresenius Kabi según su etiqueta.</span></li>
+      <li><span class="t t2">Protocolo</span><span>Enteral: planilla «Cálculo de aportes nutricionales 2025» de la unidad (fórmulas y fortificador), con correcciones.</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>Metas de aporte: ESPGHAN 2022 para prematuros &lt; 1800 g en crecimiento estable.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> la conversión del fósforo depende de la sal que use la farmacia (confirmar con Fresenius). Si cambian la fórmula o el fortificador, hay que actualizar sus valores.</div>
+  </section>
+
+  <section class="card" id="lab">
+    <h3>Laboratorio</h3>
+    <ul class="src">
+      <li><span class="t t6">Fórmula</span><span>Calcio corregido por albúmina, potasio corregido por pH, sodio corregido por glucemia, anión gap y su corrección por albúmina, delta ratio, compensación respiratoria (Winters), osmolaridad.</span></li>
+      <li><span class="t t6">Fórmula</span><span>LCR con punción traumática, FENa, filtrado glomerular de Schwartz (k 0,33 prematuro; 0,45 término; 0,413 bedside).</span></li>
+      <li><span class="t t6">Fórmula</span><span>Índice de oxigenación, OSI y presión media en la vía aérea (MAP) calculada con PIP, PEEP, Ti y FR.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> son estimaciones. El calcio corregido se correlaciona mal con el iónico en neonatos, la corrección del K por pH es aproximada y la MAP calculada supone onda de presión cuadrada. Preferir siempre el valor medido.</div>
+  </section>
+
+  <section class="card" id="ecg">
+    <h3>Cardiología</h3>
+    <ul class="src">
+      <li><span class="t t1">Guía / consenso</span><span>Arritmias: EHRA/AEPC 2013, PACES/HRS 2012–2016, AHA 2024 (arritmias fetales y neonatales), ESC 2019 y 2022 (Zeppenfeld y col.), PALS 2025.</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>QT: recomendaciones AHA/ACCF/HRS 2009 (Rautaharju; Surawicz), Schwartz PJ y Crotti L. (Circulation 2011), Stramba-Badiale y col. (Eur Heart J 2018).</span></li>
+      <li><span class="t t5">Estudio</span><span>ECG normal por edad: Davignon y col. (Pediatr Cardiol 1979/80).</span></li>
+      <li><span class="t t4">Estándar</span><span>Z-scores: Pediatric Heart Network (Lopez y col., 2017) y Detroit (Pettersen y col., JASE 2008); coronarias: AHA 2017 (McCrindle y col.).</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>Anticoagulación: CHEST 2012 (Monagle y col.). Score vasoactivo-inotrópico: Gaies y col.</span></li>
+      <li><span class="t t3">Compendio</span><span>Cierre farmacológico del ductus: NeoFax / Micromedex y Lexicomp neonatal.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> el simulador de arritmias y el corazón 3D son material educativo con morfologías aproximadas. No reemplazan el trazado real ni la evaluación de cardiología.</div>
+  </section>
+
+  <section class="card" id="neo">
+    <h3>RCP · Bilirrubina · Sangre</h3>
+    <ul class="src">
+      <li><span class="t t1">Guía / consenso</span><span>Reanimación neonatal: NRP 2020 (8.ª ed.) / ILCOR. Catéteres umbilicales: fórmula de Shukla-Ferrara.</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>Hiperbilirrubinemia ≥ 35 semanas: AAP 2022 (Kemper y col., Pediatrics 2022;150:e2022058859), tablas hora por hora; NICE CG98 (actualización 2023).</span></li>
+      <li><span class="t t5">Estudio</span><span>Prematuros &lt; 35 semanas: Maisels y col. (J Perinatol 2012).</span></li>
+      <li><span class="t t5">Estudio</span><span>Umbrales de transfusión: ensayo TOP (Kirpalani y col., NEJM 2020), prematuros &lt; 1000 g.</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> los umbrales de transfusión de plaquetas y plasma y algunos volúmenes son prácticas habituales. Verificar con el banco de sangre y el protocolo local.</div>
+  </section>
+
+  <section class="card" id="cre">
+    <h3>Crecimiento</h3>
+    <ul class="src">
+      <li><span class="t t4">Estándar</span><span>INTERGROWTH-21st Newborn Size Standards: Villar y col., Lancet 2014 (33–42 semanas) y Lancet 2016 (24–32+6 semanas).</span></li>
+      <li><span class="t t4">Estándar</span><span>INTERGROWTH-21st Postnatal Growth Standards for Preterm Infants: Villar y col., Lancet Glob Health 2015 (27–64 semanas de EPM).</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> el estándar posnatal es para prematuros. En el RN de término, y después de las 64 semanas, se usan los estándares OMS.</div>
+  </section>
+
+  <section class="card" id="nfx">
+    <h3>NeoFax</h3>
+    <ul class="src"><li><span class="t t3">Compendio</span><span>Micromedex NeoFax, edición noviembre 2024 (Merative). 26 fármacos resumidos en castellano con palabras propias, con la página para verificar; el resto figura solo como índice.</span></li></ul>
+    <div class="lim"><b>Límites:</b> es un resumen, no la monografía completa. Las tablas de dosis se cargaron a mano. Verificar en la página indicada antes de indicar.</div>
+  </section>
+
+  <section class="card" id="ehi">
+    <h3>Encefalopatía neonatal</h3>
+    <ul class="src">
+      <li><span class="t t1">Guía / consenso</span><span>Algoritmos «Encefalopatía neonatal: diagnóstico, tratamiento inicial y derivación» y «Estabilización previa al traslado a un centro de hipotermia terapéutica». Grupo de Encefalopatía Neonatal CEFEN, Sociedad Argentina de Pediatría y Ministerio de Salud de la Nación.</span></li>
+      <li><span class="t t1">Guía / consenso</span><span>Clasificación de Sarnat &amp; Sarnat (modificada, según el algoritmo).</span></li>
+      <li><span class="t t5">Estudio</span><span>Cronograma de hipotermia (72 h a 33,5 °C y recalentamiento a 0,5 °C/h): esquema de los ensayos NICHD (Shankaran y col., NEJM 2005) y TOBY (Azzopardi y col., NEJM 2009).</span></li>
+    </ul>
+    <div class="lim"><b>Límites:</b> el cronograma de hipotermia no está en los algoritmos CEFEN: ajustarlo al protocolo de la unidad. El algoritmo no indica la dosis de la corrección de glucosa EV.</div>
+  </section>
+
+  <section class="card" id="ver">
+    <h2>Registro de versiones (noviembre 2026)</h2>
+    <table><tbody>
+      <tr><td>v47</td><td>Pestaña Fuentes y alcance.</td></tr>
+      <tr><td>v45–v46</td><td>Vasopresina en U/kg/min, como el Vademécum Neonatal, con dilución intermedia de 1 U/mL y rango hasta 0,02 U/kg/min. VIS con vasopresina en U/kg/min.</td></tr>
+      <tr><td>v43–v44</td><td>Pestaña Encefalopatía neonatal (algoritmos CEFEN/SAP/MSAL), adaptada al centro de referencia que recibe pacientes derivados.</td></tr>
+      <tr><td>v42</td><td>Laboratorio: cálculo de la MAP con parámetros del respirador.</td></tr>
+      <tr><td>v41</td><td>Antimicrobianos actualizado a Garrahan 2026 (octubre), con profilaxis prequirúrgica y de VIH.</td></tr>
+      <tr><td>v40</td><td>Pestaña NeoFax (noviembre 2024), primeros 26 fármacos.</td></tr>
+      <tr><td>v39</td><td>Se retira la pestaña Vademécum. La app pasa de Netlify a GitHub Pages.</td></tr>
+    </tbody></table>
+  </section>
+
+  <p class="hint">Si encontrás un error o una fuente desactualizada, anotá la pestaña, el dato y la fuente correcta para corregirlo en la próxima versión.</p>
+</div>
+</body>
+</html>
