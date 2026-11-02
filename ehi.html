@@ -97,6 +97,14 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
 .adef{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:.88rem}
 .adef b{color:var(--muted);font-weight:600}
 .pm{display:flex;gap:6px}.pm input{flex:1;min-width:0}.pm button{flex:none;width:44px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;font:700 1.1rem var(--mono);cursor:pointer}
+.ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:.88rem}
+.labt{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:12px;padding:10px}
+.labt.now{border-color:var(--accent);background:var(--accent-soft)}
+.labt .hd{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:.9rem}
+.labt .its{display:flex;flex-wrap:wrap;gap:5px}
+.labt .its label{flex-direction:row;align-items:center;gap:5px;font-size:.8rem;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:4px 9px;background:var(--surface);cursor:pointer}
+.labt .its input{width:auto;margin:0;accent-color:var(--accent)}
+.labt .its label.ok{background:var(--mint);color:var(--mint-fg);border-color:transparent}
 </style>
 </head>
 <body>
@@ -106,7 +114,7 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     <p>Centro de referencia: recepción de RN ≥ 35 semanas derivados para hipotermia terapéutica · algoritmos CEFEN · SAP · Ministerio de Salud</p>
   </header>
   <div class="emerg">Emergencia neurológica: la ventana terapéutica son las primeras 6 horas de vida como máximo.</div>
-  <nav class="nav"><a href="#s-reloj">Ventana 6 h</a><a href="#s-crit">Criterios</a><a href="#s-sarnat">Sarnat</a><a href="#s-aeeg">aEEG</a><a href="#s-conv">Convulsiones</a><a href="#s-ref">Derivación</a><a href="#s-ht">Hipotermia</a><a href="#s-est">Estabilización</a><a href="#s-glu">Glucosa</a></nav>
+  <nav class="nav"><a href="#s-reloj">Ventana 6 h</a><a href="#s-crit">Criterios</a><a href="#s-sarnat">Sarnat</a><a href="#s-aeeg">aEEG</a><a href="#s-conv">Convulsiones</a><a href="#s-ref">Derivación</a><a href="#s-ht">Hipotermia</a><a href="#s-dur">Durante</a><a href="#s-est">Estabilización</a><a href="#s-glu">Glucosa</a></nav>
 
   <section class="card" id="s-reloj">
     <h2>Ventana terapéutica</h2>
@@ -128,6 +136,8 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     </div>
     <label class="chk" id="vppL"><input type="checkbox" id="vpp"><span>Necesidad de soporte ventilatorio durante 10 minutos o más</span></label>
     <div id="critRes"></div>
+    <details><summary style="cursor:pointer;font-weight:600;font-size:.88rem">Criterios de exclusión (consenso CEFEN 2017)</summary>
+      <ul class="ul" style="margin-top:6px"><li>Sin evidencia de EHI ni de asfixia perinatal.</li><li>Peso al nacer &lt; 1800 g.</li><li>Trastorno de la coagulación que no corrige con plaquetas, plasma o crioprecipitados.</li><li>Estado muy grave con futilidad del tratamiento acordada con los padres.</li><li>Anomalías congénitas mayores o cromosómicas: decisión individual del equipo.</li></ul></details>
     <p class="hint">Criterios: Apgar &lt; 5 al minuto 5 · pH ≤ 7 · déficit de base de 12 o más (EB ≤ −12) · láctico ≥ 9,5 · soporte ventilatorio ≥ 10 min. El EAB se mide en el cordón lo antes posible, dentro de la 1.ª hora.</p>
   </section>
 
@@ -172,7 +182,7 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
       <tr><td>Fondo anormal persistente</td><td>Desfavorable</td><td>Más allá de las 48 h: alto riesgo de evolución desfavorable</td></tr>
       <tr><td>Ciclo sueño-vigilia</td><td>Aparición precoz: favorable</td><td>Aparición después de ~36 h o ausente: desfavorable</td></tr>
     </tbody></table>
-    <div class="pill warn"><b>Para tener en cuenta:</b> fenobarbital, midazolam y opioides deprimen el fondo y el ciclo sueño-vigilia de forma transitoria. El ECG y la impedancia alta elevan falsamente el margen inferior; la VAFO, el movimiento y el manejo agregan artefactos. Confirmar crisis en el EEG crudo: el aEEG no detecta crisis breves o focales lejos de los electrodos.</div>
+    <div class="pill warn"><b>Para tener en cuenta:</b> fenobarbital, midazolam y opioides deprimen el fondo y el ciclo sueño-vigilia de forma transitoria. El ECG y la impedancia alta elevan falsamente el margen inferior; la VAFO, el movimiento y el manejo agregan artefactos. Confirmar crisis en el EEG crudo: el aEEG detecta alrededor del 80 % de las crisis (no las breves ni las focales lejos de los electrodos). La impedancia debe ser &lt; 10 para que el registro sea confiable. Un aEEG normal no contraindica la hipotermia si la clínica es moderada-grave. Con hipotermia el trazado se normaliza más tarde (~48 h) que en normotermia (~24 h).</div>
 
     <h3>Registrar lectura</h3>
     <div class="grid">
@@ -209,13 +219,40 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
 
   <section class="card" id="s-ht">
     <h2>Cronograma de hipotermia terapéutica</h2>
-    <p class="hint">Esquema habitual (NICHD/TOBY): 72 h a 33,5 °C y recalentamiento a 0,5 °C por hora hasta 36,5 °C. Ajustalo al protocolo de tu unidad.</p>
+    <p class="hint">72 h a 33,5 °C (corporal total; 34–35 °C si es selectiva de cabeza) y recalentamiento lento de 0,2–0,5 °C por hora hasta 36,5 °C (consenso CEFEN 2017). No suspender la hipotermia por mejoría clínica ni del aEEG; si aparecen convulsiones al recalentar, detener o enlentecer.</p>
     <div class="grid">
       <label>Inicio del enfriamiento<input id="htIni" type="datetime-local"></label>
       <label>Temperatura objetivo (°C)<input id="htT" inputmode="decimal" value="33,5"></label>
       <label>Duración (h)<input id="htH" inputmode="numeric" value="72"></label>
+      <label>Recalentamiento (°C/h)<select id="htR"><option value="0.2">0,2</option><option value="0.3">0,3</option><option value="0.4">0,4</option><option value="0.5" selected>0,5</option></select></label>
     </div>
     <div id="htRes"></div>
+  </section>
+
+  <section class="card" id="s-dur">
+    <h2>4 · Durante la hipotermia</h2>
+    <p class="hint">Metas y controles del consenso CEFEN 2017. Tildá lo que vas verificando; se guarda en este dispositivo.</p>
+    <div id="metas"></div>
+    <h3>Cronograma de laboratorio</h3>
+    <p class="hint">Desde el ingreso a la unidad (o, si no está cargado, desde el inicio del enfriamiento).</p>
+    <div id="labRes"></div>
+    <h3>Fármacos y cuidados</h3>
+    <ul class="ul">
+      <li>Sedoanalgesia: morfina a dosis menores y titulada (metabolismo hepático y aclaramiento reducidos).</li>
+      <li>No usar relajantes musculares: no aportan beneficio y enmascaran convulsiones.</li>
+      <li>Fenobarbital profiláctico: no de rutina. Si se usa para convulsiones, dosar niveles y ajustar.</li>
+      <li>Sospecha de sepsis: ampicilina + gentamicina; suspender temprano si los cultivos son negativos.</li>
+      <li>Hipotensión: SF 10–20 mL/kg solo si hay hipovolemia. Mala contractilidad → dobutamina; vasodilatado sin hipovolemia → dopamina o adrenalina. Ecocardiograma.</li>
+      <li>Catéteres umbilicales venoso y arterial antes de enfriar. SNG abierta. NPT desde el día 1; considerar calostro.</li>
+      <li>Hipertensión pulmonar: manejo habitual; la hipotermia no cambia las indicaciones de ONi ni ECMO. Enfriar más lento si FiO₂ &gt; 50 % o sube &gt; 30 %.</li>
+      <li>Esperable: bradicardia sinusal y caída de plaquetas (hasta 40 %); vigilar necrosis grasa subcutánea.</li>
+    </ul>
+    <h3>Al terminar</h3>
+    <ul class="ul">
+      <li>RMN cerebral con difusión entre el día 4–5 y el 10 de vida (después del día 10–14 solo secuencias convencionales).</li>
+      <li>Potenciales evocados auditivos automatizados antes del alta.</li>
+      <li>Seguimiento multidisciplinario: pediatra, neurólogo, rehabilitación, psicología y servicio social.</li>
+    </ul>
   </section>
 
   <section class="card" id="s-est">
@@ -248,7 +285,7 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     <p class="hint">Objetivo: glucemia &gt; 47 mg/dL con control cada 3 h · líquidos 40–60 mL/kg/día como máximo · flujo de glucosa mínimo 4 mg/kg/min. Flujo (mg/kg/min) = mL/kg/día × % dextrosa ÷ 144.</p>
   </section>
 
-  <p class="hint">Fuente: Encefalopatía neonatal. Diagnóstico, tratamiento inicial y derivación; Estabilización previa al traslado a un centro de hipotermia terapéutica. Grupo de Encefalopatía Neonatal CEFEN, Sociedad Argentina de Pediatría, Ministerio de Salud de la Nación. Herramienta de apoyo: no reemplaza el criterio clínico ni el protocolo de tu unidad.</p>
+  <p class="hint">Fuentes: Recomendación para el tratamiento con hipotermia en RN con EHI, Grupo de Trabajo Hipotermia Terapéutica CEFEN, Arch Argent Pediatr 2017;115 Supl 3:s38-s52 (metas, laboratorio, exclusiones, recalentamiento). Encefalopatía neonatal. Diagnóstico, tratamiento inicial y derivación; Estabilización previa al traslado a un centro de hipotermia terapéutica. Grupo de Encefalopatía Neonatal CEFEN, Sociedad Argentina de Pediatría, Ministerio de Salud de la Nación. Herramienta de apoyo: no reemplaza el criterio clínico ni el protocolo de tu unidad.</p>
 </div>
 <script>
 "use strict";
@@ -376,26 +413,47 @@ function glu(){const g=num("glu"),l=num("liq"),d=num("dex"),kg=P.kg;let h="";
 }
 
 /* ---------- hipotermia ---------- */
-["htIni","htT","htH"].forEach(k=>{const s=LS.get(k,null);if(s!=null)$(k).value=s;$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ht()})});
+["htIni","htT","htH"].forEach(k=>{const s=LS.get(k,null);if(s!=null)$(k).value=s;$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ht();lab()})});
+$("htR").value=LS.get("htR","0.5");$("htR").addEventListener("change",()=>{LS.set("htR",$("htR").value);ht();lab()});
 function ht(){const v=$("htIni").value;if(!v){$("htRes").innerHTML=pill("info","Cargá el inicio del enfriamiento.");return}
   const t0=new Date(v),T=num("htT"),H=num("htH");if(!(H>0)||!isFinite(T)){$("htRes").innerHTML="";return}
-  const fin=new Date(t0.getTime()+H*3600e3),rh=Math.max(0,(36.5-T)/0.5),fin2=new Date(fin.getTime()+rh*3600e3),now=new Date();
+  const fin=new Date(t0.getTime()+H*3600e3),R=parseFloat($("htR").value)||0.5,rh=Math.max(0,(36.5-T)/R),fin2=new Date(fin.getTime()+rh*3600e3),now=new Date();
   const el=now-t0,pct=Math.min(100,Math.max(0,el/(H*3600e3)*100));
   const nac=$("nac").value?new Date($("nac").value):null;
-  let h=`<div class="tiles">${tile("Inicio",hora(t0),nac?`a las ${hm(t0-nac)} de vida`:"")}${tile("Fin del enfriamiento",hora(fin),`${f(H,0)} h a ${f(T,1)} °C`,true)}${tile("Normotermia (36,5 °C)",hora(fin2),`recalentar ${f(rh,0)} h a 0,5 °C/h`)}</div>`;
+  let h=`<div class="tiles">${tile("Inicio",hora(t0),nac?`a las ${hm(t0-nac)} de vida`:"")}${tile("Fin del enfriamiento",hora(fin),`${f(H,0)} h a ${f(T,1)} °C`,true)}${tile("Normotermia (36,5 °C)",hora(fin2),`recalentar ${f(rh,1)} h a ${f(R,1)} °C/h`)}</div>`;
   if(el>0&&el<H*3600e3)h+=pill("info",`En hipotermia: ${hm(el)} transcurridas (${f(pct,0)} %). Faltan ${hm(H*3600e3-el)} para iniciar el recalentamiento.`);
-  else if(el>=H*3600e3&&now<fin2){const tt=T+((now-fin)/3600e3)*0.5;h+=pill("warn",`Recalentando: temperatura objetivo ahora ≈ ${f(Math.min(36.5,tt),1)} °C.`)}
+  else if(el>=H*3600e3&&now<fin2){const tt=T+((now-fin)/3600e3)*R;h+=pill("warn",`Recalentando: temperatura objetivo ahora ≈ ${f(Math.min(36.5,tt),1)} °C.`)}
   else if(now>=fin2)h+=pill("ok","Cronograma completo.");
   if(nac&&t0-nac>6*3600e3)h+=pill("crit","El enfriamiento empezó después de las 6 h de vida.");
-  const rows=[];for(let k=0;k<=rh;k++)rows.push(`<tr><td>${hora(new Date(fin.getTime()+k*3600e3))}</td><td>${f(Math.min(36.5,T+k*0.5),1)} °C</td></tr>`);
+  const rows=[];for(let k=0;k<=Math.ceil(rh);k++)rows.push(`<tr><td>${hora(new Date(fin.getTime()+k*3600e3))}</td><td>${f(Math.min(36.5,T+k*R),1)} °C</td></tr>`);
   h+=`<details><summary style="cursor:pointer;font-weight:600;font-size:.88rem">Ver escalones del recalentamiento</summary><table><thead><tr><th>Hora</th><th>Temperatura objetivo</th></tr></thead><tbody>${rows.join("")}</tbody></table></details>`;
   $("htRes").innerHTML=h;
 }
 
+
+/* ---------- durante la hipotermia ---------- */
+const METAS=[["T° central 33–34 °C (sonda rectal 5–6 cm o esofágica) + control no invasivo","temp"],["Líquidos 40–50 mL/kg/día · balance estricto (riesgo de SIHAD e insuficiencia renal)","liq"],["Glucemia 70–120 mg/dL · sin insulina en la fase de mantenimiento","glu"],["Ca total > 8,5 mg/dL (iónico > 1 mmol/L) · Mg > 1,9 mg/dL","ca"],["Na 135–145 mEq/L · K 3,5–4,5 mEq/L (cuidado con el aporte de K: hiperpotasemia de rebote al recalentar)","na"],["SatO₂ preductal 90–95 % · evitar hiperoxia","sat"],["pCO₂ ≥ 35 mmHg si está ventilado · avisar al laboratorio la T° del paciente (la pCO₂ baja ~4 % por °C)","co2"],["PAM en rango normal · ecocardiograma","pam"],["aEEG continuo desde el ingreso, con impedancia < 10","aeeg"],["Información a los padres","pad"]];
+function metas(){const M=LS.get("metas",{});
+  $("metas").innerHTML=METAS.map(([t,k])=>`<label class="chk${M[k]?" on":""}"><input type="checkbox" data-m="${k}"${M[k]?" checked":""}><span>${t}</span></label>`).join("")+`<button class="btn sec sm" id="mClr" style="align-self:flex-start">Desmarcar todo</button>`;
+  $("metas").querySelectorAll("[data-m]").forEach(c=>c.onchange=()=>{const M=LS.get("metas",{});M[c.dataset.m]=c.checked;LS.set("metas",M);metas()});
+  $("mClr").onclick=()=>{LS.set("metas",{});metas()}}
+const LAB=[["Al ingreso",0,["EAB","Ácido láctico","Hemograma","Plaquetas","Coagulograma","Glucemia","GOT/GPT","Urea","Creatinina","Enzimas cardíacas","Hemocultivo"]],
+  ["12 h",12,["EAB","Ácido láctico","Ionograma","Calcio"]],
+  ["24 h",24,["EAB","Ácido láctico","Hemograma","Plaquetas","Coagulograma","Glucemia","Ionograma","Calcio","GOT/GPT","Amonio","Fósforo/magnesio","Urea","Creatinina"]]];
+function lab(){const v=$("tIng").value||$("htIni").value,t0=v?new Date(v):null,now=Date.now(),D=LS.get("lab",{});
+  let nxt=-1;if(t0)for(let i=0;i<LAB.length;i++){const due=t0.getTime()+LAB[i][1]*36e5;if(!LAB[i][2].every(x=>D[i+"|"+x])){nxt=i;break}}
+  let h=t0?"":pill("info","Cargá la hora de ingreso (Paciente derivado) o el inicio del enfriamiento para ver los horarios.");
+  h+=LAB.map(([n,hh,its],i)=>{const due=t0?new Date(t0.getTime()+hh*36e5):null,late=due&&now>due.getTime()&&i===nxt;
+    return `<div class="labt${i===nxt?" now":""}"><div class="hd"><span>${n}</span><span>${due?hora(due):""}${late?" · pendiente":""}</span></div><div class="its">${its.map(x=>{const k=i+"|"+x;return `<label class="${D[k]?"ok":""}"><input type="checkbox" data-l="${k}"${D[k]?" checked":""}>${x}</label>`}).join("")}</div></div>`}).join("");
+  h+=pill("info","Glucemia cada 6 h entre las tomas, y más seguido al recalentar (riesgo de hipoglucemia). Con ajustes del respirador o alteraciones hidroelectrolíticas, controles más frecuentes.")+`<button class="btn sec sm" id="lClr" style="align-self:flex-start">Nuevo paciente: desmarcar</button>`;
+  $("labRes").innerHTML=h;
+  $("labRes").querySelectorAll("[data-l]").forEach(c=>c.onchange=()=>{const D=LS.get("lab",{});D[c.dataset.l]=c.checked;LS.set("lab",D);lab()});
+  $("lClr").onclick=()=>{LS.set("lab",{});lab()}}
+
 /* ---------- centro de referencia ---------- */
-["refH","refC","tCall","tArr","tIng"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ref()})});
+["refH","refC","tCall","tArr","tIng"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ref();lab()})});
 $("arrNow").onclick=()=>{$("tArr").value=toLocal(new Date());LS.set("tArr",$("tArr").value);ref()};
-$("refClr").onclick=()=>{["refH","refC","tCall","tArr","tIng","nac","apgar","ph","eb","lac","htIni"].forEach(k=>{$(k).value="";LS.set(k,"")});$("vpp").checked=false;LS.set("vpp",false);LS.set("ver",{});SS=Array(7).fill(null);LS.set("sn",SS);LS.set("hist",[]);all();ref()};
+$("refClr").onclick=()=>{["refH","refC","tCall","tArr","tIng","nac","apgar","ph","eb","lac","htIni"].forEach(k=>{$(k).value="";LS.set(k,"")});$("vpp").checked=false;LS.set("vpp",false);LS.set("ver",{});SS=Array(7).fill(null);LS.set("sn",SS);LS.set("hist",[]);LS.set("metas",{});LS.set("lab",{});all();ref()};
 function ref(){const c=$("refC").value.trim(),tel=c.replace(/[^\d+]/g,"");$("refTel").innerHTML=tel.length>=6?`<a class="btn sec sm" style="text-decoration:none;align-self:flex-start;display:inline-block" href="tel:${tel}">Llamar ${c}</a>`:"";
   const nac=$("nac").value?new Date($("nac").value):null,call=$("tCall").value?new Date($("tCall").value):null,arr=$("tArr").value?new Date($("tArr").value):null,T=num("tIng");
   const t=[],m=[];
@@ -515,7 +573,7 @@ function aHist(){const H=LS.get("ahist",[]),nac=$("nac").value?new Date($("nac")
   $("aHist").innerHTML=H.length?H.map(h=>`<div><span>${hora(new Date(h.t))}${nac?` · ${hm(h.t-nac)} de vida`:""}</span><b>${h.r}</b></div>`).join("")+`<button class="btn sec sm" id="ahClr" style="margin-top:6px">Borrar lecturas</button>`:`<p class="hint">Guardá una lectura al ingreso y luego a las 6, 24, 48 y 72 h y en el recalentamiento.</p>`;
   const c=$("ahClr");if(c)c.onclick=()=>{LS.set("ahist",[]);aHist()}}
 
-function all(){aAtlas();aRes();aHist();elig();crit();sarnat();conv();est();glu();ht();hist();reloj();ref()}
+function all(){metas();lab();aAtlas();aRes();aHist();elig();crit();sarnat();conv();est();glu();ht();hist();reloj();ref()}
 setPac();ref();
 </script>
 </body>
