@@ -115,7 +115,7 @@ function lista(){
     const L=D.filter(d=>(st.cat==="Todos"||d.cat===st.cat)&&(!t||norm(d.n+" "+d.en).includes(t))).sort((a,b)=>a.n.localeCompare(b.n,"es"));
     $("#ls").innerHTML=L.map(d=>`<button class="it" data-d="${d.id}"><span class="nm">${esc(d.n)}</span><span class="b">${esc(d.cat)}</span><span class="us">${esc(d.regs.map(r=>r.t).slice(0,3).join(" · "))}</span></button>`).join("")||`<p class="hint">Sin resultados entre los resumidos.</p>`;
     $$("[data-d]").forEach(b=>b.onclick=()=>{st.drug=D.find(x=>x.id===b.dataset.d);ficha(st.drug);window.scrollTo(0,0)});
-    const done=new Set(D.map(d=>norm(d.en)));
+    const done=new Set(D.flatMap(d=>d.en.split(" / ").map(norm)));
     const R=IDX.filter(([n])=>!done.has(norm(n))&&(!t||norm(n).includes(t)));
     $("#rest").innerHTML=R.map(([n,p])=>`<div class="it off"><span class="nm">${esc(n)}</span><span class="b" style="background:var(--sunk);color:var(--muted)">pág. ${p}</span></div>`).join("")||`<p class="hint">—</p>`;}
 }

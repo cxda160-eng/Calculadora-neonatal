@@ -163,7 +163,7 @@
     prep: ["Vial 12,5 mg/mL. Usar dentro de 24 h; la coloración rosada no implica pérdida de potencia."],
     mon: ["FC y presión arterial; perfusión."] },
 
-  { id: "adrenalina", n: "Adrenalina (epinefrina)", en: "EPINEPHrine", pg: 340, cat: "Cardiovascular",
+  { id: "adrenalina", n: "Adrenalina (epinefrina)", en: "EPINEPHrine (Adrenaline)", pg: 340, cat: "Cardiovascular",
     regs: [
       { t: "Reanimación y bradicardia grave: IV", via: "IV (solución 0,1 mg/mL)", u: "mg/kg", kind: "once", d: [0.01, 0.03], note: "Seguir con 0,5–1 mL de SF." },
       { t: "Reanimación: endotraqueal", via: "ET (0,1 mg/mL)", u: "mg/kg", kind: "once", d: [0.05, 0.1], note: "Nunca dar estas dosis por vía IV. Preferir IV." },
@@ -290,6 +290,201 @@
       { t: "Profilaxis de DBP, dosis baja", via: "IV", u: "mg/kg/dosis", d: [0.5], int: "c/12 h × 7 días; luego 0,5 mg/kg/día × 3 días" },
       { t: "RN < 1000 g expuestos a corioamnionitis", via: "IV", u: "mg/kg/dosis", d: [0.5], int: "c/12 h × 12 días; luego 0,25 mg/kg c/12 h × 3 días" }],
     adm: [], prep: [],
-    mon: ["Superficie corporal: SC (m²) = 0,05 × kg + 0,05.", "Crisis suprarrenal en lactantes: 25 mg IV y luego 6,25 mg c/6 h."] }
+    mon: ["Superficie corporal: SC (m²) = 0,05 × kg + 0,05.", "Crisis suprarrenal en lactantes: 25 mg IV y luego 6,25 mg c/6 h."] },
+
+  /* ================= TANDA 2 (v52) ================= */
+  { id: "adenosina", n: "Adenosina", en: "Adenosine", pg: 27, cat: "Cardiovascular",
+    regs: [
+      { t: "TPSV: dosis inicial", via: "IV en bolo rápido", u: "mg/kg", kind: "once", d: [0.05, 0.1], note: "Si no revierte en 1–2 min, repetir aumentando 0,05–0,1 mg/kg por dosis c/1–2 min." },
+      { t: "TPSV: dosis máxima", via: "IV en bolo rápido", u: "mg/kg", kind: "once", d: [0.3], note: "Máximo 0,3 mg/kg por dosis o 12 mg por dosis." }],
+    adm: ["Bolo IV rápido, central o periférico, lo más cerca posible del paciente, seguido de lavado rápido con SF. La vía IO es una opción en reanimación."],
+    prep: ["Vial 3 mg/mL (6 mg/2 mL), sin conservantes. No refrigerar (cristaliza).", "Para dosis menores de 0,2 mL: 1 mL (3 mg) + 9 mL de SF = 300 mcg/mL."],
+    mon: ["ECG continuo durante la administración."] },
+
+  { id: "amiodarona", n: "Amiodarona", en: "Amiodarone", pg: 69, cat: "Cardiovascular",
+    regs: [
+      { t: "Carga", via: "IV en 20–60 min (preferible central)", u: "mg/kg", kind: "once", d: [5], note: "Diluir la carga a 1,5 mg/mL." },
+      { t: "Mantenimiento", via: "IV continua", kind: "inf", u: "mcg/kg/min", d: [7, 15], conc: 1500, cu: "mcg/mL", note: "Empezar en 7 mcg/kg/min y titular (= 10–20 mg/kg/día). Pasar a VO en 24–48 h." },
+      { t: "Vía oral", via: "VO", u: "mg/kg/dosis", d: [5, 10], int: "c/12 h" }],
+    adm: ["Infusión: 1–6 mg/mL; si dura más de 1 h, no superar 2 mg/mL salvo por vía central. Usar filtro en línea; preferir catéter central.", "Corregir antes hipopotasemia, hipomagnesemia e hipocalcemia."],
+    prep: ["Preferido: Nexterone® premezclado 1,5 mg/mL o 1,8 mg/mL (sin alcohol bencílico ni polisorbato).", "Genérico 50 mg/mL con alcohol bencílico y polisorbato 80. Proteger de la luz."],
+    mon: ["ECG continuo, presión arterial y función tiroidea y hepática en tratamientos prolongados."] },
+
+  { id: "propranolol", n: "Propranolol", en: "Propranolol", pg: 792, cat: "Cardiovascular",
+    regs: [
+      { t: "Hipertensión y taquiarritmias: VO", via: "VO", u: "mg/kg/dosis", d: [0.25, 1], int: "c/6 h", note: "Aumentar según necesidad hasta un máximo de 3,5 mg/kg/dosis c/6 h." },
+      { t: "Hipertensión y taquiarritmias: IV", via: "IV en 10 min", u: "mg/kg/dosis", d: [0.01], int: "c/6 h", note: "Aumentar según necesidad hasta 0,15 mg/kg/dosis c/6 h." },
+      { t: "Hemangioma infantil (desde 5 semanas)", via: "VO", u: "mg/kg/dosis", kind: "seq", seq: [["Semana 1", 0.6], ["Semana 2", 1.1], ["Semana 3 en adelante", 1.7]],
+        note: "c/12 h, con al menos 9 h entre dosis. Mantener habitualmente hasta los 8–12 meses de vida. En PHACE, titular lento y dividir en 3 dosis." }],
+    adm: ["IV en 10 minutos."],
+    prep: ["Ampolla 1 mg/mL: 1 mL + 9 mL de SF = 0,1 mg/mL.", "Solución oral 4 y 8 mg/mL; Hemangeol® 3,75 mg/mL de propranolol."],
+    mon: ["FC, presión arterial y glucemia (riesgo de hipoglucemia, sobre todo en ayunas)."] },
+
+  { id: "digoxina", n: "Digoxina", en: "Digoxin", pg: 296, cat: "Cardiovascular",
+    regs: [
+      { t: "Digitalización: dosis total IV", via: "IV (no IM)", u: "mcg/kg", kind: "day",
+        rows: [{ pma: [0, 29], d: [20] }, { pma: [30, 36], d: [25] }, { pma: [37, 48], d: [40] }, { pma: [49, 99], d: [50] }],
+        txt: "dosis total, dividida en 3 dosis en 24 h", note: "Solo para arritmias e insuficiencia cardíaca aguda. La dosis VO es un 25 % mayor." },
+      { t: "Digitalización: dosis total VO", via: "VO", u: "mcg/kg", kind: "day",
+        rows: [{ pma: [0, 29], d: [15] }, { pma: [30, 36], d: [20] }, { pma: [37, 48], d: [30] }, { pma: [49, 99], d: [40] }],
+        txt: "dosis total, dividida en 3 dosis en 24 h" },
+      { t: "Mantenimiento IV", via: "IV", u: "mcg/kg/dosis",
+        rows: [{ pma: [0, 29], d: [5], i: 24 }, { pma: [30, 36], d: [6], i: 24 }, { pma: [37, 48], d: [5], i: 12 }, { pma: [49, 99], d: [6], i: 12 }] },
+      { t: "Mantenimiento VO", via: "VO", u: "mcg/kg/dosis",
+        rows: [{ pma: [0, 29], d: [4], i: 24 }, { pma: [30, 36], d: [5], i: 24 }, { pma: [37, 48], d: [4], i: 12 }, { pma: [49, 99], d: [5], i: 12 }],
+        note: "Titular por respuesta clínica. Reducir en proporción a la caída del clearance de creatinina." }],
+    adm: ["IV en 15–30 min, a 20 o 100 mcg/mL. VO siempre igual respecto de las tomas."],
+    prep: ["Inyectable 100 mcg/mL; elixir 50 mcg/mL. Diluir en ≥ 4 volúmenes de diluyente y usar enseguida.", "Amiodarona, indometacina y espironolactona disminuyen su clearance."],
+    mon: ["ECG, FC, potasio y función renal; vigilar signos de toxicidad (bradicardia, arritmias, vómitos)."] },
+  { id: "sildenafil", n: "Sildenafil", en: "Sildenafil", pg: 832, cat: "Cardiovascular",
+    regs: [
+      { t: "HPPN coadyuvante: carga IV", via: "IV en 3 h", u: "mg/kg", kind: "once", d: [0.4] },
+      { t: "HPPN coadyuvante: infusión IV", via: "IV continua", kind: "inf", u: "mg/kg/h", d: [0.067], conc: 0.8, cu: "mg/mL", note: "= 1,6 mg/kg/día. Datos de un ensayo de escalada de dosis (n = 36), no de eficacia." },
+      { t: "HPPN coadyuvante: VO", via: "VO", u: "mg/kg/dosis", d: [0.5, 1], int: "c/8 h" }],
+    adm: ["Solución IV 0,8 mg/mL; la carga se pasa en 3 h.", "En prematuros extremos, usar solo con la vascularización retiniana completa."],
+    prep: ["Revatio® suspensión oral 10 mg/mL (reconstituida: 30 días); comprimidos de 20 mg."],
+    mon: ["Oxigenación y presión arterial: titular con cuidado (farmacocinética muy variable). La FDA desaconseja el uso crónico en pediatría."] },
+
+  { id: "espironolactona", n: "Espironolactona", en: "Spironolactone", pg: 860, cat: "Cardiovascular",
+    regs: [{ t: "Dosis habitual", via: "VO", u: "mg/kg/dosis", d: [1, 3], int: "c/24 h", note: "En DBP junto con otros diuréticos; en insuficiencia cardíaca como agregado." }],
+    adm: [], prep: ["Suspensión 5 mg/mL; comprimidos de 25, 50 y 100 mg. Preparado magistral de 25 mg/mL estable 60 días."],
+    mon: ["Potasio y sodio séricos; función renal."] },
+
+  { id: "hidroclorotiazida", n: "Hidroclorotiazida", en: "HydroCHLOROthiazide", pg: 471, cat: "Cardiovascular",
+    regs: [{ t: "Dosis habitual", via: "VO con alimento", u: "mg/kg/dosis", d: [1, 2], int: "c/12 h", note: "No confundir con clorotiazida. Efecto mayor junto con furosemida o espironolactona." }],
+    adm: ["Dar con la leche: mejora la absorción."], prep: ["Comprimidos de 25, 50 y 100 mg; existe preparado magistral con espironolactona (5 mg + 5 mg por mL)."],
+    mon: ["Electrolitos (Na, K, Ca), glucemia y bilirrubina."] },
+
+  { id: "metadona", n: "Metadona", en: "Methadone", pg: 602, cat: "Sedoanalgesia",
+    regs: [
+      { t: "Síndrome de abstinencia neonatal: inicio", via: "VO", u: "mg/kg/dosis", d: [0.05, 0.1], int: "c/6–24 h", note: "Ajustar de a 10–20 % según los signos de abstinencia." },
+      { t: "Esquema de descenso (EG ≥ 34 sem)", via: "VO", u: "mg/kg", kind: "seq",
+        seq: [["Paso 1 · c/6 h × 4 dosis", 0.1], ["Paso 2 · c/12 h × 2", 0.07], ["Paso 3 · c/12 h × 2", 0.05], ["Paso 4 · c/12 h × 2", 0.04], ["Paso 5 · c/12 h × 2", 0.03], ["Paso 6 · c/12 h × 2", 0.02], ["Paso 7 · c/12 h × 2", 0.01], ["Paso 8 · c/24 h × 1", 0.01]],
+        note: "Empezar en el paso 1 con 3 Finnegan seguidos ≥ 8 o 2 seguidos ≥ 12. Bajar de paso si el promedio de 24 h es < 8; no bajar con 8–12; con ≥ 12, dosis extra o volver al paso anterior. Observar 72 h tras el paso 8." }],
+    adm: [], prep: ["Solución oral 1 y 2 mg/mL (8 % de alcohol) y 10 mg/mL sin alcohol."],
+    mon: ["Score de Finnegan; FR y saturación. Con benzodiacepinas u otros depresores, usar la menor dosis posible."] },
+
+  { id: "naloxona", n: "Naloxona", en: "Naloxone", pg: 658, cat: "Sedoanalgesia",
+    regs: [
+      { t: "Depresión por opioides terapéuticos", via: "IV", u: "mg/kg", kind: "once", d: [0.001, 0.005], note: "Titular según efecto." },
+      { t: "Reversión opioide completa (PALS)", via: "IV o IO", u: "mg/kg", kind: "once", d: [0.1] },
+      { t: "Dosis de la ficha (FDA)", via: "IV, IM o SC", u: "mg/kg", kind: "once", d: [0.01], note: "Repetir c/2–3 min hasta lograr la reversión; puede requerir dosis c/1–2 h." }],
+    adm: ["No se recomienda en la reanimación inicial en sala de partos: primero ventilar. Evitar en hijos de madre con dependencia de opioides (riesgo de convulsiones por abstinencia)."],
+    prep: ["Ampolla 0,4 mg/mL y 1 mg/mL. No mezclar con soluciones alcalinas."],
+    mon: ["FR y saturación: el efecto puede durar menos que el del opioide."] },
+  { id: "vecuronio", n: "Vecuronio", en: "Vecuronium", pg: 914, cat: "Sedoanalgesia",
+    regs: [{ t: "Parálisis en ARM", via: "IV push en 5–10 s", u: "mg/kg/dosis", d: [0.1], int: "c/1–2 h según necesidad", note: "Rango 0,03–0,15 mg/kg. Siempre con analgesia y sedación adecuadas." }],
+    adm: ["Infusión continua: diluir a 0,1–0,2 mg/mL o pasar puro a 1 mg/mL."],
+    prep: ["Polvo de 10 y 20 mg: 10 mg + 10 mL = 1 mg/mL (24 h en heladera). Dilución 0,4 mg/mL: 1 mL + 1,5 mL de SF."],
+    mon: ["FC, presión arterial y ventilación. Proteger córneas."] },
+
+  { id: "rocuronio", n: "Rocuronio", en: "Rocuronium", pg: 828, cat: "Sedoanalgesia",
+    regs: [
+      { t: "Intubación", via: "IV push en 5–10 s", u: "mg/kg", kind: "once", d: [0.45, 0.6], note: "Siempre con anestesia o sedación adecuada. En neonatos el bloqueo tarda más en llegar al máximo." },
+      { t: "Mantenimiento: bolo", via: "IV", u: "mg/kg", kind: "once", d: [0.15], note: "Al reaparecer T3 en el tren de cuatro." },
+      { t: "Mantenimiento: infusión", via: "IV continua", kind: "inf", u: "mcg/kg/min", d: [7, 10], conc: 1000, cu: "mcg/mL", note: "Los neonatos requieren la dosis más baja del rango." }],
+    adm: ["Infusión hasta 5 mg/mL. No mezclar con soluciones alcalinas."],
+    prep: ["Vial 10 mg/mL, en heladera (a temperatura ambiente: 60 días). 1 mL + 9 mL de SF = 1 mg/mL (24 h)."],
+    mon: ["Tren de cuatro, FC y presión arterial."] },
+
+  { id: "atropina", n: "Atropina", en: "Atropine", pg: 122, cat: "Cardiovascular",
+    regs: [
+      { t: "Bradicardia: IV o IM", via: "IV en 1 min o IM", u: "mg/kg", kind: "once", d: [0.01, 0.03], note: "Repetir c/10–15 min; máximo acumulado 0,04 mg/kg." },
+      { t: "Bradicardia: endotraqueal", via: "ET + 1 mL de SF", u: "mg/kg", kind: "once", d: [0.01, 0.03] },
+      { t: "Premedicación para intubación", via: "IV en 1 min", u: "mg/kg", kind: "once", d: [0.01, 0.02], note: "Antes que el resto de la premedicación." },
+      { t: "Vía oral", via: "VO", u: "mg/kg/dosis", d: [0.02], int: "c/4–6 h", note: "Aumentar gradualmente hasta 0,09 mg/kg/dosis." }],
+    adm: [], prep: ["Ampollas de 0,05, 0,1, 0,4 y 1 mg/mL. La forma IV puede darse por VO."],
+    mon: ["FC y ECG."] },
+
+  { id: "heparina", n: "Heparina sódica", en: "Heparin", pg: 453, cat: "Otros",
+    regs: [
+      { t: "Permeabilidad de catéter central", via: "IV continua", kind: "inf", u: "U/kg/h", d: [0.5], conc: 1, cu: "U/mL", note: "En catéter periférico: 0,5–1 U por mL de solución." },
+      { t: "Trombosis: carga", via: "IV en 10 min", u: "U/kg", kind: "once", d: [75] },
+      { t: "Trombosis: infusión", via: "IV continua", kind: "inf", u: "U/kg/h", d: [28], conc: 100, cu: "U/mL",
+        note: "A las 4 h medir KPTT y ajustar a anti-Xa 0,35–0,7 (KPTT ≈ 60–85 s). Tratar 10–14 días; considerar pasar a enoxaparina a los 3–5 días." },
+      { t: "ECMO: carga antes de canular", via: "IV", u: "U/kg", kind: "once", d: [100], note: "Luego infusión para ACT 180–220 s." }],
+    adm: ["No IM (hematomas). Verificar siempre la concentración: hay de 10 a 20 000 U/mL."],
+    prep: ["Tener protamina disponible. Presentaciones de 10, 100, 1000, 5000 U/mL y más."],
+    mon: ["KPTT o anti-Xa, plaquetas y signos de sangrado."] },
+
+  { id: "enoxaparina", n: "Enoxaparina", en: "Enoxaparin", pg: 334, cat: "Otros",
+    regs: [
+      { t: "Tratamiento de trombosis", via: "SC", u: "mg/kg/dosis", rows: [{ ga: [0, 36], d: [2], i: 12 }, { ga: [37, 99], d: [1.7], i: 12 }],
+        note: "Ajustar a anti-Xa 0,5–1 U/mL (tarda varios días). En prematuros el requerimiento varía de 0,8 a 3 mg/kg c/12 h." },
+      { t: "Profilaxis de bajo riesgo", via: "SC", u: "mg/kg/dosis", d: [0.75], int: "c/12 h", note: "Anti-Xa objetivo 0,1–0,4 U/mL." }],
+    adm: ["Descartar trastorno de la coagulación antes de empezar, salvo urgencia."],
+    prep: ["Jeringas prellenadas 100 mg/mL sin conservantes (el frasco multidosis tiene alcohol bencílico: no en neonatos). Dilución 20 mg/mL en agua estéril estable 4 semanas."],
+    mon: ["Anti-Xa 4 h después de la dosis; plaquetas; signos de sangrado."] },
+  { id: "insulina", n: "Insulina regular", en: "Insulin Human Regular", pg: 513, cat: "Otros",
+    regs: [
+      { t: "Hiperglucemia", via: "IV continua", kind: "inf", u: "U/kg/h", d: [0.01, 0.1], conc: 0.1, cu: "U/mL", note: "Titular con glucemias o tiras reactivas." },
+      { t: "Hiperpotasemia", via: "IV continua", kind: "inf", u: "U/kg/h", d: [0.1, 0.2], conc: 0.1, cu: "U/mL", note: "Junto con dextrosa 0,5 g/kg/h. Ajustar según glucemia y potasio." }],
+    adm: ["Solo la insulina regular va por vía IV. Concentración para infusión 0,05–1 U/mL.", "Purgar la tubuladura con la solución antes de conectar (la insulina se adsorbe al plástico)."],
+    prep: ["Frasco 100 U/mL: preparar 10 U/mL con agua estéril y luego diluir a 0,05–1 U/mL. Conservar en heladera."],
+    mon: ["Glucemia frecuente (c/30–60 min al iniciar o cambiar) y potasio."] },
+
+  { id: "gluconatoca", n: "Gluconato de calcio 10 %", en: "Calcium Gluconate", pg: 177, cat: "Otros",
+    regs: [
+      { t: "Hipocalcemia sintomática: bolo", via: "IV en 10–30 min", u: "mg/kg", kind: "once", d: [100, 200], note: "= 1–2 mL/kg de gluconato 10 % (10–20 mg/kg de calcio elemental)." },
+      { t: "Hipocalcemia sintomática: infusión", via: "IV continua", u: "mg/kg/día", kind: "day", d: [538, 860], txt: "durante 48 h; luego bajar 50 % por 24 h y suspender",
+        note: "= 50–80 mg/kg/día de calcio elemental." },
+      { t: "Hipocalcemia leve o mantenimiento", via: "IV o VO", u: "mg/kg/día", kind: "day", d: [430, 860], txt: "en 3–4 dosis", note: "= 40–80 mg/kg/día de calcio elemental. Calciuria objetivo < 4 mg/kg/día." },
+      { t: "Reanimación (hipocalcemia, hiperpotasemia o hipermagnesemia documentadas)", via: "IV lenta o IO", u: "mg/kg", kind: "once", d: [60, 100], note: "Máx. 2 g por dosis. No es de uso rutinario en la reanimación." }],
+    adm: ["Exanguinotransfusión: 1 mL de gluconato 10 % por cada 100 mL de sangre citratada recambiada, en 10 min.", "Necesidad en NP: prematuros 2–4 mEq/kg/día; término 0,5–4 mEq/kg/día."],
+    prep: ["Gluconato 10 % = 100 mg/mL de sal = 9,3 mg/mL de calcio elemental (0,46 mEq/mL). Osmolaridad 700 mOsm/L."],
+    mon: ["Calcio iónico, FC y ECG durante el bolo. Vigilar extravasación."] },
+
+  { id: "bicarbonato", n: "Bicarbonato de sodio", en: "Sodium Bicarbonate", pg: 839, cat: "Otros",
+    regs: [
+      { t: "Hiperpotasemia con acidosis metabólica", via: "IV o IO en 10–15 min", u: "mEq/kg", kind: "once", d: [1], note: "Solo la solución 4,2 % (0,5 mEq/mL) = 2 mL/kg. Máx. 50 mEq." },
+      { t: "Acidosis metabólica: dosis según déficit", via: "IV lenta", u: "mEq/kg", kind: "once", d: [0.3], note: "Esta es la dosis por cada mEq/L de déficit de HCO₃: mEq = déficit × 0,3 × kg. Dar la mitad y reevaluar." }],
+    adm: ["IV lenta; nunca rápido (hipernatremia, HIC). Máx. 8 mEq/kg/día. No por vía ET. No se recomienda en la reanimación neonatal."],
+    prep: ["En neonatos, concentración máxima 4,2 % (0,5 mEq/mL): diluir el 8,4 % 1:1 con agua estéril. No mezclar con calcio ni fosfato."],
+    mon: ["Gases, sodio y potasio."] },
+
+  { id: "piptazo", n: "Piperacilina-tazobactam", en: "Piperacillin/Tazobactam", pg: 772, cat: "Antimicrobianos",
+    regs: [{ t: "Dosis habitual", via: "IV en 30 min", u: "mg/kg/dosis", d: [100], rows: PMA_STD(8), note: "Dosis del componente piperacilina. Basado en estudios farmacocinéticos limitados." }],
+    adm: [], prep: ["Viales de 2,25, 3,375 y 4,5 g; reconstituidos ≈ 180 mg/mL de piperacilina. Aportan sodio."],
+    mon: ["Función renal (ajustar en insuficiencia renal), hemograma y electrolitos."] },
+  { id: "clindamicina", n: "Clindamicina", en: "Clindamycin", pg: 245, cat: "Antimicrobianos",
+    regs: [
+      { t: "Infecciones graves (ficha FDA)", via: "IV", u: "mg/kg/dosis", rows: [{ pma: [0, 32], d: [5], i: 8 }, { pma: [33, 40], d: [7], i: 8 }], note: "En < 1 mes, rango 15–20 mg/kg/día en 3–4 dosis." },
+      { t: "Toxoplasmosis congénita", via: "VO o IV", u: "mg/kg/dosis", d: [5, 7.5], int: "c/6 h", note: "Junto con pirimetamina y ácido folínico." }],
+    adm: ["No en bolo sin diluir. Diluir a ≤ 18 mg/mL en SG 5% o SF."],
+    prep: ["Ampolla 150 mg/mL (con alcohol bencílico); solución oral 15 mg/mL."],
+    mon: ["Diarrea (colitis por C. difficile) y función hepática."] },
+
+  { id: "metronidazol", n: "Metronidazol", en: "MetroNIDAZOLE", pg: 613, cat: "Antimicrobianos",
+    regs: [
+      { t: "Infecciones por anaerobios: carga", via: "IV o VO", u: "mg/kg", kind: "once", d: [15] },
+      { t: "Infecciones por anaerobios: mantenimiento", via: "IV o VO", u: "mg/kg/dosis",
+        rows: [{ pma: [24, 25], d: [7.5], i: 24 }, { pma: [26, 27], d: [10], i: 24 }, { pma: [28, 33], d: [7.5], i: 12 }, { pma: [34, 40], d: [7.5], i: 8 }, { pma: [41, 99], d: [7.5], i: 6 }],
+        note: "Esquemas basados en farmacocinética; seguridad y eficacia no establecidas." },
+      { t: "Profilaxis quirúrgica", via: "IV 60 min antes de la incisión", u: "mg/kg", kind: "once", rows: [{ wt: [0, 1199], d: [7.5] }, { wt: [1200, 99999], d: [15] }], note: "Si sigue después de la cirugía, menos de 24 h." }],
+    adm: ["Insuficiencia hepática grave: reducir la dosis 50 %."],
+    prep: ["Solución lista 5 mg/mL (no refrigerar). El vial reconstituido debe diluirse a ≤ 8 mg/mL y neutralizarse con bicarbonato."],
+    mon: ["Hemograma; signos neurológicos en tratamientos prolongados."] },
+
+  { id: "anfolip", n: "Anfotericina B liposomal", en: "Amphotericin B Liposome", pg: 86, cat: "Antimicrobianos",
+    regs: [{ t: "Infección fúngica sistémica", via: "IV en 2 h", u: "mg/kg/dosis", d: [2.5, 7], int: "c/24 h", note: "Alternativa a la deoxicolato; precaución si hay compromiso urinario." }],
+    adm: ["Diluir en SG 5% a < 2 mg/mL. No lavar ni mezclar con SF (precipita)."],
+    prep: ["Vial 50 mg + 12 mL de agua estéril = 4 mg/mL; agitar 30 s. Para 1 mg/mL: 1 mL filtrado (5 µm) + 3 mL de SG 5%. Usar dentro de 6 h."],
+    mon: ["Potasio, magnesio, función renal y hepática, hemograma."] },
+
+  { id: "dexametasona", n: "Dexametasona", en: "Dexamethasone", pg: 273, cat: "Respiratorio",
+    regs: [{ t: "Facilitar la extubación (esquema DART)", via: "IV lenta o VO", u: "mg/kg/dosis", kind: "seq",
+      seq: [["Días 1–3 · c/12 h", 0.075], ["Días 4–6 · c/12 h", 0.05], ["Días 7–8 · c/12 h", 0.025], ["Días 9–10 · c/12 h", 0.01]],
+      note: "Dosis total 0,89 mg/kg en 10 días. AAP: no usar dosis altas; si no hay respuesta en 72 h, no continuar. No junto con indometacina." }],
+    adm: [], prep: ["Ampolla 4 mg/mL (con alcohol bencílico) y 10 mg/mL; solución oral 0,1 y 1 mg/mL."],
+    mon: ["Glucemia, presión arterial, signos de infección y de perforación intestinal."] },
+
+  { id: "surfactante", n: "Surfactante (poractant · beractant)", en: "Poractant alfa / Beractant", pg: 780, cat: "Respiratorio",
+    regs: [
+      { t: "Poractant alfa (Curosurf®): dosis inicial", via: "Intratraqueal, 1–2 alícuotas", u: "mL/kg", kind: "once", d: [2.5], note: "= 200 mg/kg. Rescate: lo antes posible, idealmente < 2 h de vida." },
+      { t: "Poractant alfa: repetición", via: "Intratraqueal", u: "mL/kg", kind: "once", d: [1.25], note: "= 100 mg/kg, c/12 h, hasta 2 dosis más. Máximo total 5 mL/kg (400 mg/kg)." },
+      { t: "Beractant (Survanta®)", via: "Intratraqueal, 4 alícuotas", u: "mL/kg", kind: "once", d: [4], note: "= 100 mg/kg de fosfolípidos (NeoFax pág. 135). Hasta 4 dosis en las primeras 48 h, no antes de c/6 h." }],
+    adm: ["Preferir CPAP desde el nacimiento y surfactante selectivo. Considerar rescate en falla respiratoria por déficit secundario (meconio, sepsis/neumonía)."],
+    prep: ["Curosurf® 80 mg/mL (viales 1,5 y 3 mL); Survanta® 25 mg/mL (4 y 8 mL). Entibiar a temperatura ambiente sin calor artificial; no agitar."],
+    mon: ["Saturación, FiO₂ y ventilación inmediatamente después (bajar parámetros según respuesta)."] }
   ];
 })();
