@@ -19,15 +19,15 @@
 /* Layout: barra superior fija con el nombre de la app y un selector de dos calculadoras; cada calculadora ocupa el resto de la pantalla */
 :root{
   --bg:#f7f6fc; --surface:#ffffff; --surface-2:#eef3fb; --fg:#2e3147; --muted:#6c7090; --line:#e2e4f1;
-  --inf:#2b7a72; --inf-soft:#dcf2ec; --ele:#5a8fd0; --ele-soft:#e3eefb; --sed:#ad94e4; --sed-soft:#ece6fb; --nut:#f0a37c; --nut-soft:#fde9dc; --ins:#e0679a; --ins-soft:#fde0ec; --lab:#6aa84f; --lab-soft:#dcf1cf; --ecg:#c0392b; --ecg-soft:#fde0e0; --atb:#b26a00; --atb-soft:#ffe6c2; --neo:#0e7490; --neo-soft:#cff1f8; --cre:#4f46e5; --cre-soft:#e0e1ff; --vad:#8d5b3e; --vad-soft:#f3e3d6;
+  --inf:#2b7a72; --inf-soft:#dcf2ec; --ele:#5a8fd0; --ele-soft:#e3eefb; --sed:#ad94e4; --sed-soft:#ece6fb; --nut:#f0a37c; --nut-soft:#fde9dc; --ins:#e0679a; --ins-soft:#fde0ec; --lab:#6aa84f; --lab-soft:#dcf1cf; --ecg:#c0392b; --ecg-soft:#fde0e0; --atb:#b26a00; --atb-soft:#ffe6c2; --neo:#0e7490; --neo-soft:#cff1f8; --cre:#4f46e5; --cre-soft:#e0e1ff; --vad:#8d5b3e; --vad-soft:#f3e3d6; --ehi:#5b4fc4; --ehi-soft:#e6e3fb;
   --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
-  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; color-scheme:dark;}}
+  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; --ehi:#b4abff; --ehi-soft:#2c2850; color-scheme:dark;}}
 :root[data-theme="dark"]{
   --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
-  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; color-scheme:dark;}
+  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; --ehi:#b4abff; --ehi-soft:#2c2850; color-scheme:dark;}
 html,body{height:100%}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);display:flex;flex-direction:column;overflow:hidden}
@@ -98,6 +98,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button role="tab" id="bNeo" aria-selected="false" style="--c:var(--neo);--soft:var(--neo-soft)"><i></i><span class="l">RCP · Bili · Sangre</span><span class="s">RCP+</span></button>
       <button role="tab" id="bCre" aria-selected="false" style="--c:var(--cre);--soft:var(--cre-soft)"><i></i><span class="l">Crecimiento</span><span class="s">Creci.</span></button>
       <button role="tab" id="bNfx" aria-selected="false" style="--c:var(--vad);--soft:var(--vad-soft)"><i></i><span class="l">NeoFax</span><span class="s">NeoFax</span></button>
+      <button role="tab" id="bEhi" aria-selected="false" style="--c:var(--ehi);--soft:var(--ehi-soft)"><i></i><span class="l">Encefalopatía</span><span class="s">EHI</span></button>
     </div>
   </div>
 </header>
@@ -123,9 +124,10 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <iframe id="vNeo" src="neo.html" title="Reanimación, bilirrubina y transfusiones" hidden></iframe>
   <iframe id="vCre" src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
   <iframe id="vNfx" src="neofax.html" title="NeoFax" hidden></iframe>
+  <iframe id="vEhi" src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
 </div>
 <script>
-const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"]};
+const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"],ehi:["vEhi","bEhi"]};
 const show=k=>{for(const [key,[v,b]] of Object.entries(TABS)){const on=key===k;
   document.getElementById(v).hidden=!on;document.getElementById(b).setAttribute("aria-selected",on);}};
 document.getElementById("bInf").onclick=()=>show("inf");
@@ -139,6 +141,7 @@ document.getElementById("bAtb").onclick=()=>show("atb");
 document.getElementById("bNeo").onclick=()=>show("neo");
 document.getElementById("bCre").onclick=()=>show("cre");
 document.getElementById("bNfx").onclick=()=>show("nfx");
+document.getElementById("bEhi").onclick=()=>show("ehi");
 if(location.hash==="#electrolitos")show("ele");
 if(location.hash==="#sedoanalgesia")show("sed");
 if(location.hash==="#nutricion")show("nut");
@@ -149,6 +152,7 @@ if(location.hash==="#antimicrobianos")show("atb");
 if(location.hash==="#neo"||location.hash==="#reanimacion")show("neo");
 if(location.hash==="#crecimiento")show("cre");
 if(location.hash==="#neofax")show("nfx");
+if(location.hash==="#ehi"||location.hash==="#encefalopatia")show("ehi");
 try{const t=localStorage.getItem("tab");if(!location.hash&&t&&TABS[t])show(t);}catch(e){}
 for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click",()=>{try{localStorage.setItem("tab",k)}catch(e){}});
 

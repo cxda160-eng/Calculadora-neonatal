@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Encefalopatía neonatal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0}
+/* Layout: algoritmo de encefalopatía neonatal en pasos — reloj de la ventana de 6 h, criterios, Sarnat interactivo, estabilización con dosis calculadas y cronograma de hipotermia; acento violeta azulado */
+:root{ --bg:#f7f6fc; --surface:#ffffff; --sunk:#eef0fb; --line:#dcdff2; --fg:#2e3147; --muted:#6c7090; --accent:#5b4fc4; --accent-soft:#e6e3fb;
+  --mint:#dcf2ec; --mint-fg:#2b6a60; --peach:#fff4d6; --peach-fg:#86590a; --rose:#ffe3e8; --rose-fg:#a12d40; --sky:#e6f0fb; --sky-fg:#2f5f93;
+  --lv:#f2f7c9; --lv-fg:#5d6410; --md:#fde1cf; --md-fg:#8a3a12; --gr:#ffd2d2; --gr-fg:#9b1c1c;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"Azeret Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#b4abff; --accent-soft:#2c2850; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5;
+  --lv:#33361a; --lv-fg:#e6ee9a; --md:#432a1c; --md-fg:#ffc9a6; --gr:#4a1f24; --gr-fg:#ffb3b3; color-scheme:dark; }}
+:root[data-theme="dark"]{ --bg:#181a27; --surface:#202436; --sunk:#2a2f45; --line:#363c56; --fg:#eceefa; --muted:#a7abc7; --accent:#b4abff; --accent-soft:#2c2850; --mint:#1e3a3b; --mint-fg:#a6ecdc; --peach:#3b3014; --peach-fg:#ffdc8f; --rose:#43202a; --rose-fg:#ffb9c4; --sky:#1f2f45; --sky-fg:#b5d3f5;
+  --lv:#33361a; --lv-fg:#e6ee9a; --md:#432a1c; --md-fg:#ffc9a6; --gr:#4a1f24; --gr-fg:#ffb3b3; color-scheme:dark; }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(40px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header h1{font-weight:700;font-size:1.25rem;letter-spacing:-.01em;margin:0}
+header p{margin:4px 0 0;color:var(--muted);font-size:.88rem}
+.emerg{background:#c62828;color:#fff;border-radius:14px;padding:12px 14px;font-weight:700;font-size:.92rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{margin:0;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.card h3{margin:4px 0 0;font-size:.95rem}
+.nav{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;color:var(--fg);border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:600}
+label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--muted)}
+input,select{font:inherit;font-family:var(--mono);font-size:.98rem;color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.tile{background:var(--sunk);border-radius:12px;padding:9px 12px;display:flex;flex-direction:column;gap:2px}
+.tile .k{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tile .v{font-family:var(--mono);font-size:1.12rem;font-weight:700}
+.tile .s{font-size:.75rem;color:var(--muted)}
+.tile.main{background:var(--accent-soft)}
+.pill{padding:9px 12px;border-radius:10px;font-size:.86rem}
+.pill.warn{background:var(--peach);color:var(--peach-fg)}.pill.crit{background:var(--rose);color:var(--rose-fg)}.pill.info{background:var(--sky);color:var(--sky-fg)}.pill.ok{background:var(--mint);color:var(--mint-fg)}
+.chk{display:flex;align-items:flex-start;gap:10px;font-size:.92rem;color:var(--fg);flex-direction:row;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}
+.chk input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--accent)}
+.chk.on{background:var(--accent-soft);border-color:var(--accent)}
+.chk small{display:block;color:var(--muted);font-size:.78rem}
+.btn{border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:12px;padding:10px 14px;font:inherit;font-weight:700;min-height:44px;cursor:pointer}
+.btn.sec{background:var(--surface);color:var(--accent)}
+.btn.sm{min-height:34px;padding:6px 10px;font-size:.8rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.clock{font-family:var(--mono);font-size:1.6rem;font-weight:700}
+/* Sarnat */
+.sn{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:12px;padding:10px}
+.sn .t{font-weight:700;font-size:.9rem}
+.opts{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.opts button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:7px 5px;font:inherit;font-size:.76rem;line-height:1.2;cursor:pointer;min-height:48px;text-align:center}
+.opts button b{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;opacity:.8}
+.opts button[data-l="0"][aria-pressed="true"]{background:var(--mint);border-color:var(--mint-fg);color:var(--mint-fg)}
+.opts button[data-l="1"][aria-pressed="true"]{background:var(--lv);border-color:var(--lv-fg);color:var(--lv-fg)}
+.opts button[data-l="2"][aria-pressed="true"]{background:var(--md);border-color:var(--md-fg);color:var(--md-fg)}
+.opts button[data-l="3"][aria-pressed="true"]{background:var(--gr);border-color:var(--gr-fg);color:var(--gr-fg)}
+@media (max-width:420px){.opts{grid-template-columns:repeat(2,1fr)}}
+.res{border-radius:14px;padding:12px 14px;font-weight:700}
+.res.lv{background:var(--lv);color:var(--lv-fg)}.res.mg{background:var(--gr);color:var(--gr-fg)}.res.no{background:var(--mint);color:var(--mint-fg)}.res.na{background:var(--sunk);color:var(--muted)}
+.res small{display:block;font-weight:500;margin-top:3px}
+.hist{display:flex;flex-direction:column;gap:6px}
+.hist div{display:flex;justify-content:space-between;gap:8px;font-size:.85rem;border-bottom:1px solid var(--line);padding:6px 0}
+table{border-collapse:collapse;width:100%;font-size:.86rem}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.step{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start}
+.step .n{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+.step ul{margin:4px 0 0;padding-left:18px}.step li{margin:3px 0}
+.calc{font-family:var(--mono);font-weight:700;color:var(--accent)}
+.hint{font-size:.78rem;color:var(--muted);margin:0}
+.big{font-family:var(--mono);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Encefalopatía neonatal</h1>
+    <p>Diagnóstico, estabilización y derivación en RN ≥ 35 semanas · algoritmos CEFEN · SAP · Ministerio de Salud</p>
+  </header>
+  <div class="emerg">Emergencia neurológica: la ventana terapéutica son las primeras 6 horas de vida como máximo.</div>
+  <nav class="nav"><a href="#s-reloj">Ventana 6 h</a><a href="#s-crit">Criterios</a><a href="#s-sarnat">Sarnat</a><a href="#s-conv">Convulsiones</a><a href="#s-est">Estabilización</a><a href="#s-glu">Glucosa</a><a href="#s-ht">Hipotermia</a><a href="#s-ref">Centro de referencia</a></nav>
+
+  <section class="card" id="s-reloj">
+    <h2>Ventana terapéutica</h2>
+    <label>Fecha y hora de nacimiento<input id="nac" type="datetime-local"></label>
+    <div class="row"><button class="btn sec sm" id="nacNow">Nació recién</button><button class="btn sec sm" id="nacClr">Borrar</button></div>
+    <div id="reloj"></div>
+  </section>
+
+  <section class="card" id="s-crit">
+    <h2>1 · ¿Es candidato a hipotermia?</h2>
+    <div id="elig"></div>
+    <div class="pill info"><b>Comunicación con el equipo perinatal.</b> Monitoreo fetal no tranquilizador (bradicardia sostenida, pérdida de variabilidad, DIPS II) o evento centinela (desprendimiento de placenta, rotura uterina, procidencia de cordón, eclampsia, otros).</div>
+    <h3>Al menos una de estas condiciones</h3>
+    <div class="grid">
+      <label>Apgar al 5′<input id="apgar" inputmode="numeric" placeholder="4"></label>
+      <label>pH (cordón o 1.ª hora)<input id="ph" inputmode="decimal" placeholder="6,95"></label>
+      <label>EB (mmol/L)<input id="eb" inputmode="decimal" placeholder="-14"></label>
+      <label>Ácido láctico (mmol/L)<input id="lac" inputmode="decimal" placeholder="10"></label>
+    </div>
+    <label class="chk" id="vppL"><input type="checkbox" id="vpp"><span>Necesidad de soporte ventilatorio durante 10 minutos o más</span></label>
+    <div id="critRes"></div>
+    <p class="hint">Criterios: Apgar &lt; 5 al minuto 5 · pH ≤ 7 · déficit de base de 12 o más (EB ≤ −12) · láctico ≥ 9,5 · soporte ventilatorio ≥ 10 min. El EAB se mide en el cordón lo antes posible, dentro de la 1.ª hora.</p>
+  </section>
+
+  <section class="card" id="s-sarnat">
+    <h2>2 · Clínica neurológica: Sarnat &amp; Sarnat</h2>
+    <p class="hint">Marcá el hallazgo de cada signo. Moderado-grave = al menos 3 ítems en moderado o grave.</p>
+    <div id="sarnat"></div>
+    <div id="sRes"></div>
+    <div class="row"><button class="btn" id="sSave">Guardar examen con la hora</button><button class="btn sec" id="sClr">Nuevo examen</button></div>
+    <div><h3>Exámenes guardados</h3><div class="hist" id="sHist"></div></div>
+  </section>
+
+  <section class="card" id="s-conv">
+    <h2>Evento convulsivo</h2>
+    <div class="pill warn">Siempre descartar alteraciones metabólicas: evaluar glucemia e hipocalcemia antes de tratar.</div>
+    <div id="conv"></div>
+    <p class="hint">Dosis del algoritmo. NeoFax usa para levetiracetam una carga de 40 mg/kg (ver pestaña NeoFax).</p>
+  </section>
+
+  <section class="card" id="s-est">
+    <h2>3 · Estabilización previa al traslado (moderado-grave)</h2>
+    <p class="hint">La comunicación con el centro receptor continúa durante todos los pasos.</p>
+    <div id="est"></div>
+  </section>
+
+  <section class="card">
+    <h2>Evitar las 7 H</h2>
+    <table><thead><tr><th>Evitar</th><th>Objetivo</th></tr></thead><tbody>
+      <tr><td>Hipertermia</td><td>T° &lt; 37 °C</td></tr>
+      <tr><td>Hipotermia (no controlada)</td><td>T° ≥ 35 °C</td></tr>
+      <tr><td>Hiperoxia</td><td>SpO₂ término 92–95 % · pretérmino 89–94 % (con oxigenoterapia)</td></tr>
+      <tr><td>Hipoglucemia</td><td>Glucemia ≥ 47 mg/dL</td></tr>
+      <tr><td>Hipocapnia</td><td>Ventilación gentil (PCO₂ 45–55)</td></tr>
+      <tr><td>Hipotensión</td><td>Rango según edad gestacional</td></tr>
+      <tr><td>Hipocalcemia</td><td>Ca²⁺ iónico 1 mmol/L</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="card" id="s-glu">
+    <h2>Glucemia y aporte de líquidos</h2>
+    <div class="grid">
+      <label>Glucemia (mg/dL)<input id="glu" inputmode="decimal" placeholder="40"></label>
+      <label>Aporte (mL/kg/día)<input id="liq" inputmode="decimal" placeholder="60"></label>
+      <label>Dextrosa (%)<input id="dex" inputmode="decimal" placeholder="10"></label>
+    </div>
+    <div id="gluRes"></div>
+    <p class="hint">Objetivo: glucemia &gt; 47 mg/dL con control cada 3 h · líquidos 40–60 mL/kg/día como máximo · flujo de glucosa mínimo 4 mg/kg/min. Flujo (mg/kg/min) = mL/kg/día × % dextrosa ÷ 144.</p>
+  </section>
+
+  <section class="card" id="s-ht">
+    <h2>Cronograma de hipotermia terapéutica</h2>
+    <p class="hint">Para cuando el paciente se recibe para tratamiento. Esquema habitual (NICHD/TOBY): 72 h a 33,5 °C y recalentamiento a 0,5 °C por hora hasta 36,5 °C. Ajustalo al protocolo de tu unidad.</p>
+    <div class="grid">
+      <label>Inicio del enfriamiento<input id="htIni" type="datetime-local"></label>
+      <label>Temperatura objetivo (°C)<input id="htT" inputmode="decimal" value="33,5"></label>
+      <label>Duración (h)<input id="htH" inputmode="numeric" value="72"></label>
+    </div>
+    <div id="htRes"></div>
+  </section>
+
+  <section class="card" id="s-ref">
+    <h2>Centro de referencia</h2>
+    <div class="grid">
+      <label>Hospital<input id="refH" style="font-family:var(--body)" placeholder="Nombre del centro"></label>
+      <label>Contacto<input id="refC" style="font-family:var(--body)" placeholder="Teléfono o nombre"></label>
+    </div>
+    <div id="refTel"></div>
+    <p class="hint">Se guarda en este dispositivo.</p>
+  </section>
+
+  <p class="hint">Fuente: Encefalopatía neonatal. Diagnóstico, tratamiento inicial y derivación; Estabilización previa al traslado a un centro de hipotermia terapéutica. Grupo de Encefalopatía Neonatal CEFEN, Sociedad Argentina de Pediatría, Ministerio de Salud de la Nación. Herramienta de apoyo: no reemplaza el criterio clínico ni el protocolo de tu unidad.</p>
+</div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const num=id=>{const s=String($(id).value).trim().replace(",",".");if(!s)return NaN;const n=parseFloat(s);return isFinite(n)?n:NaN};
+const f=(n,d=1)=>isFinite(n)?n.toLocaleString("es-AR",{maximumFractionDigits:d}):"–";
+const tile=(k,v,s,m)=>`<div class="tile${m?" main":""}"><span class="k">${k}</span><span class="v">${v}</span>${s?`<span class="s">${s}</span>`:""}</div>`;
+const pill=(c,t)=>`<div class="pill ${c}">${t}</div>`;
+const LS={get(k,d){try{const v=localStorage.getItem("ehi_"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("ehi_"+k,JSON.stringify(v))}catch(e){}}};
+let P={};
+function readPac(){try{return JSON.parse(localStorage.getItem("pac")||"{}")||{}}catch(e){return{}}}
+function setPac(p){p=p||readPac();P={kg:p.kg>0?p.kg:null,eg:p.eg>0?p.eg:null,dias:(p.dias!=null&&isFinite(p.dias))?p.dias:null};all()}
+window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setPac(e.data.pac)});
+window.addEventListener("storage",e=>{if(e.key==="pac")setPac()});
+const toLocal=d=>{const z=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`};
+const hm=ms=>{const s=Math.max(0,Math.round(ms/60000));return `${Math.floor(s/60)} h ${String(s%60).padStart(2,"0")} min`};
+const hora=d=>d.toLocaleString("es-AR",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+
+/* ---------- reloj ---------- */
+function reloj(){
+  const v=$("nac").value; if(!v){$("reloj").innerHTML=pill("info","Cargá la hora de nacimiento para ver cuánto queda de la ventana de 6 h.");return}
+  const t=new Date(v), now=new Date(), age=now-t, left=6*3600e3-age;
+  const c=left<=0?"crit":left<2*3600e3?"warn":"ok";
+  $("reloj").innerHTML=`<div class="tiles">${tile("Horas de vida",hm(age),"",true)}${tile(left>0?"Quedan para 6 h":"Ventana",left>0?hm(left):"cerrada",`límite ${hora(new Date(t.getTime()+6*3600e3))}`)}</div>`+
+    (left<=0?pill("crit","Pasaron las 6 h de vida: la hipotermia ya no está dentro de la ventana recomendada. Consultá con el centro de referencia."):left<2*3600e3?pill("warn","Quedan menos de 2 h de ventana: activar el código de hipotermia sin demora."):"");
+}
+$("nac").value=LS.get("nac","");
+$("nac").oninput=()=>{LS.set("nac",$("nac").value);reloj()};
+$("nacNow").onclick=()=>{$("nac").value=toLocal(new Date());LS.set("nac",$("nac").value);reloj()};
+$("nacClr").onclick=()=>{$("nac").value="";LS.set("nac","");reloj()};
+setInterval(reloj,30000);
+
+/* ---------- criterios ---------- */
+["apgar","ph","eb","lac"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);crit()})});
+$("vpp").checked=LS.get("vpp",false);$("vpp").onchange=()=>{LS.set("vpp",$("vpp").checked);crit()};
+function elig(){
+  const out=[];
+  if(P.eg==null)out.push(pill("info","Cargá la EG en la barra superior."));
+  else out.push(P.eg>=35?pill("ok",`EG ${f(P.eg,1)} sem: cumple ≥ 35 semanas.`):pill("crit",`EG ${f(P.eg,1)} sem: el algoritmo es para RN ≥ 35 semanas.`));
+  if(P.kg==null)out.push(pill("info","Cargá el peso (de nacimiento) en la barra superior."));
+  else out.push(P.kg*1000>=1800?pill("ok",`Peso ${f(P.kg*1000,0)} g: cumple ≥ 1800 g.`):pill("crit",`Peso ${f(P.kg*1000,0)} g: con PN &lt; 1800 g no se recomienda la hipotermia terapéutica. Seguir con los cuidados habituales.`));
+  $("elig").innerHTML=out.join("")+`<p class="hint">El criterio es el peso de nacimiento: la app usa el peso cargado arriba.</p>`;
+}
+function crit(){
+  const a=num("apgar"),ph=num("ph"),eb=num("eb"),lac=num("lac"),v=$("vpp").checked;
+  $("vppL").classList.toggle("on",v);
+  const hits=[];
+  if(a<5)hits.push(`Apgar ${a} al 5′`);
+  if(ph<=7)hits.push(`pH ${f(ph,2)}`);
+  if(isFinite(eb)){if(eb<=-12)hits.push(`EB ${f(eb,1)}`);else if(eb>=12)hits.push(`déficit de base ${f(eb,1)}`)}
+  if(lac>=9.5)hits.push(`láctico ${f(lac,1)}`);
+  if(v)hits.push("soporte ventilatorio ≥ 10 min");
+  let h=hits.length?pill("crit",`<b>Cumple ${hits.length===1?"una condición":hits.length+" condiciones"}:</b> ${hits.join(" · ")}. Evaluar la clínica neurológica (Sarnat).`):pill("info","Cargá los datos: con al menos una condición, se evalúa la clínica neurológica.");
+  if(isFinite(eb)&&eb>0&&eb<12)h+=pill("warn","Si cargaste el déficit de base en positivo, el umbral es 12 o más (equivale a EB ≤ −12).");
+  $("critRes").innerHTML=h;
+}
+
+/* ---------- Sarnat ---------- */
+const SN=[
+  ["Nivel de alerta",["Normal","Hiperalerta","Letargia","Estupor o coma"]],
+  ["Actividad espontánea",["Normal","Normal","Disminuida","Ausente"]],
+  ["Postura",["Normal","Flexión distal leve","Brazos flexionados y piernas extendidas","Brazos y piernas extendidos"]],
+  ["Tono",["Normal","Normal","Hipotónico","Flácido"]],
+  ["Reflejos primitivos",["Normales","Succión débil, Moro aumentado","Succión débil, Moro incompleto","Succión y Moro ausentes"]],
+  ["Autonómico (FC, respiración, pupilas)",["Normal","Taquicardia, respiración normal, midriasis reactiva","Bradicardia, respiración periódica, miosis","FC variable, apnea, midriasis no reactiva"]],
+  ["Convulsiones",["Ausentes","Ausentes","Ausentes o presentes","Presentes"]]];
+const LV=["Normal","Leve","Moderado","Grave"];
+let SS=LS.get("sn",Array(7).fill(null));
+function sarnat(){
+  $("sarnat").innerHTML=SN.map(([t,o],i)=>`<div class="sn"><div class="t">${i+1}. ${t}</div><div class="opts">${o.map((x,l)=>`<button data-i="${i}" data-l="${l}" aria-pressed="${SS[i]===l}"><b>${LV[l]}</b>${x}</button>`).join("")}</div></div>`).join("");
+  document.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{const i=+b.dataset.i,l=+b.dataset.l;SS[i]=SS[i]===l?null:l;LS.set("sn",SS);sarnat()});
+  $("sRes").innerHTML=sres().html;
+}
+function sres(){
+  const done=SS.filter(x=>x!=null).length, mg=SS.filter(x=>x>=2).length, g=SS.filter(x=>x===3).length, lv=SS.filter(x=>x===1).length;
+  if(!done)return{html:`<div class="res na">Sin examen cargado</div>`,txt:""};
+  let cls,txt,sub;
+  if(mg>=3){cls="mg";txt=g>=3?"MODERADO-GRAVE (predominio grave)":"MODERADO-GRAVE";sub=`${mg} ítems en moderado o grave. Llamar y activar el código de hipotermia · comunicarse con la familia con precisión y claridad.`}
+  else if(mg+lv>=1){cls="lv";txt="LEVE";sub=`${mg} ítems moderados o graves (se necesitan 3). Si tiene dudas, comunicarse con el centro de referencia. Observar y reclasificar con Sarnat durante 12 h: si empeora, activar el código de hipotermia.`}
+  else{cls="no";txt="Sin signos de encefalopatía";sub="Reevaluar si cambia la clínica."}
+  const conv=SS[6]===3?pill("crit","Convulsiones presentes: ver tratamiento abajo."):"";
+  return{html:`<div class="res ${cls}">${txt}<small>${sub}${done<7?` · ${7-done} signos sin cargar`:""}</small></div>${conv}`,txt,cls};
+}
+$("sSave").onclick=()=>{const r=sres();if(!r.txt)return;const H=LS.get("hist",[]);H.unshift({t:Date.now(),r:r.txt,s:SS.slice()});LS.set("hist",H.slice(0,20));hist()};
+$("sClr").onclick=()=>{SS=Array(7).fill(null);LS.set("sn",SS);sarnat()};
+function hist(){const H=LS.get("hist",[]),nac=$("nac").value?new Date($("nac").value):null;
+  $("sHist").innerHTML=H.length?H.map(h=>`<div><span>${hora(new Date(h.t))}${nac?` · ${hm(h.t-nac)} de vida`:""}</span><b>${h.r}</b></div>`).join("")+`<button class="btn sec sm" id="hClr" style="margin-top:6px">Borrar historial</button>`:`<p class="hint">Guardá cada examen para seguir la evolución en las primeras 12 h.</p>`;
+  const c=$("hClr");if(c)c.onclick=()=>{LS.set("hist",[]);hist()}}
+
+/* ---------- convulsiones ---------- */
+function conv(){const kg=P.kg;
+  const d=(x)=>kg?`<span class="calc">${f(x*kg,1)} mg</span>`:"<span class='hint'>(cargá el peso)</span>";
+  $("conv").innerHTML=`<div class="tiles">${tile("1.ª línea · Fenobarbital","20 mg/kg EV",kg?`${f(20*kg,1)} mg por dosis · total máx. 40 mg/kg (${f(40*kg,1)} mg)`:"hasta un total de 40 mg/kg",true)}${tile("2.ª línea · Levetiracetam","20 mg/kg EV",kg?`${f(20*kg,1)} mg por dosis · total máx. 40 mg/kg (${f(40*kg,1)} mg)`:"hasta un total de 40 mg/kg")}</div>`;
+}
+
+/* ---------- estabilización ---------- */
+function est(){const kg=P.kg, mg=x=>kg?` → <span class="calc">${f(x*kg,1)}</span>`:"";
+  const S=(n,t,body)=>`<div class="step"><div class="n">${n}</div><div><b>${t}</b>${body}</div></div>`;
+  $("est").innerHTML=[
+   S(1,"Mantener la temperatura constante",`<ul><li>Servocontrol de la incubadora sobre la piel con objetivo 35 °C.</li><li>Sin servocontrol: mantener al RN entre 36 y 36,5 °C.</li><li>Evitar la hipertermia. No usar medios físicos de enfriamiento pasivo durante el traslado.</li></ul>`),
+   S(2,"Función respiratoria",`<ul><li>Apnea o dificultad respiratoria grave: considerar intubación y ARM.</li><li>Monitorear SpO₂, FR y mecánica. Evitar hiperoxia e hiperventilación.</li><li>Objetivos: <b>PaO₂ 50–70 mmHg · PCO₂ 45–55 mmHg</b>. SpO₂ 92–95 % (término) o 89–94 % (pretérmino) con oxigenoterapia.</li><li>EAB coordinado con el centro receptor.</li><li>En VPP inicial, empezar con FiO₂ 0,21 y encender el cronómetro.</li></ul>`),
+   S(3,"Función cardiovascular",`<ul><li>Acceso vascular seguro. Objetivos: FC 110–160 lpm; TA media 40–60 mmHg según EG.</li><li>Inestabilidad: FC &gt; 180, relleno capilar &gt; 3 s, pulsos débiles, hipotensión.</li><li>Hipovolemia: SF 10 mL/kg en 20 min${mg(10)}${kg?" mL":""}. Evitar expansiones salvo hipovolemia o desprendimiento de placenta normoinserta.</li><li>Sostén inotrópico (si es posible, con ecocardiograma previo): dobutamina 5–10 mcg/kg/min${kg?` (${f(5*kg,1)}–${f(10*kg,1)} mcg/min)`:""}; adrenalina 0,03–0,05 mcg/kg/min${kg?` (${f(.03*kg,3)}–${f(.05*kg,3)} mcg/min)`:""}. Velocidad en mL/h: pestaña Infusiones.</li><li>No corregir con bicarbonato.</li></ul>`),
+   S(4,"Eventos convulsivos clínicos y eléctricos",`<ul><li>Descartar hipoglucemia e hipocalcemia.</li><li>Fenobarbital 20 mg/kg/dosis${mg(20)}${kg?" mg":""} hasta 40 mg/kg; luego levetiracetam 20 mg/kg/dosis${mg(20)}${kg?" mg":""} hasta 40 mg/kg.</li></ul>`),
+   S(5,"Medio interno y laboratorio",`<ul><li>Glucemia &gt; 47 mg/dL, control cada 3 h (calculadora abajo).</li><li>Líquidos 40–60 mL/kg/día como máximo, con flujo de glucosa mínimo de 4 mg/kg/min.</li><li>Laboratorio: hemograma, hepatograma, coagulograma, CPK total y MB, troponina, ácido láctico, calcio iónico, creatinina, ionograma.</li></ul>`),
+   S(6,"Infectología",`<ul><li>Sospecha de sepsis temprana: hemocultivo e indicar ATB EV, con la primera dosis antes del traslado (pestaña Antimicrobianos).</li></ul>`),
+   S(7,"Traslado",`<ul><li>Todo el equipamiento de traslado neonatal, con mezcla de gases (fundamental).</li><li>Control continuo de la temperatura (prioritario). No usar medios físicos de enfriamiento pasivo.</li><li>Signos vitales antes, durante y al llegar. Idealmente con especialista en pediatría o neonatología y enfermería.</li></ul>`),
+   S(8,"Comunicación con la familia",`<ul><li>Explicar los objetivos del tratamiento, la evolución clínica y la respuesta al tratamiento, con precisión y claridad.</li></ul>`)
+  ].join("");
+}
+
+/* ---------- glucosa ---------- */
+["glu","liq","dex"].forEach(k=>$(k).addEventListener("input",glu));
+function glu(){const g=num("glu"),l=num("liq"),d=num("dex"),kg=P.kg;let h="";
+  if(isFinite(g)){h+=g>47?pill("ok",`Glucemia ${f(g,0)} mg/dL: en objetivo. Control cada 3 h.`):g>=35?pill("warn",`Glucemia ${f(g,0)} mg/dL (35–47): aumentar el flujo de glucosa 1,5 a 2 puntos y controlar en 30 min.`):pill("crit",`Glucemia ${f(g,0)} mg/dL (&lt; 35): corrección de glucosa EV y luego aumentar el flujo 1,5 a 2 puntos; control en 30 min.`)}
+  if(isFinite(l)&&isFinite(d)){const gir=l*d/144;
+    h+=`<div class="tiles">${tile("Flujo de glucosa",f(gir,1)+" mg/kg/min","",true)}${kg?tile("Volumen",f(l*kg,0)+" mL/día",f(l*kg/24,1)+" mL/h"):""}${tile("Dextrosa para 4 mg/kg/min",f(4*144/l,1)+" %",`con ${f(l,0)} mL/kg/día`)}</div>`;
+    if(gir<4)h+=pill("warn","Flujo de glucosa menor de 4 mg/kg/min: subir la concentración de dextrosa.");
+    if(l>60)h+=pill("warn","El aporte supera 60 mL/kg/día (máximo del algoritmo).");
+    if(isFinite(g)&&g<=47){const up=[gir+1.5,gir+2];h+=pill("info",`Nuevo flujo sugerido: ${f(up[0],1)}–${f(up[1],1)} mg/kg/min → dextrosa ${f(up[0]*144/l,1)}–${f(up[1]*144/l,1)} % con el mismo volumen.`)}}
+  $("gluRes").innerHTML=h||pill("info","Cargá glucemia, aporte y concentración de dextrosa.");
+}
+
+/* ---------- hipotermia ---------- */
+["htIni","htT","htH"].forEach(k=>{const s=LS.get(k,null);if(s!=null)$(k).value=s;$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ht()})});
+function ht(){const v=$("htIni").value;if(!v){$("htRes").innerHTML=pill("info","Cargá el inicio del enfriamiento.");return}
+  const t0=new Date(v),T=num("htT"),H=num("htH");if(!(H>0)||!isFinite(T)){$("htRes").innerHTML="";return}
+  const fin=new Date(t0.getTime()+H*3600e3),rh=Math.max(0,(36.5-T)/0.5),fin2=new Date(fin.getTime()+rh*3600e3),now=new Date();
+  const el=now-t0,pct=Math.min(100,Math.max(0,el/(H*3600e3)*100));
+  const nac=$("nac").value?new Date($("nac").value):null;
+  let h=`<div class="tiles">${tile("Inicio",hora(t0),nac?`a las ${hm(t0-nac)} de vida`:"")}${tile("Fin del enfriamiento",hora(fin),`${f(H,0)} h a ${f(T,1)} °C`,true)}${tile("Normotermia (36,5 °C)",hora(fin2),`recalentar ${f(rh,0)} h a 0,5 °C/h`)}</div>`;
+  if(el>0&&el<H*3600e3)h+=pill("info",`En hipotermia: ${hm(el)} transcurridas (${f(pct,0)} %). Faltan ${hm(H*3600e3-el)} para iniciar el recalentamiento.`);
+  else if(el>=H*3600e3&&now<fin2){const tt=T+((now-fin)/3600e3)*0.5;h+=pill("warn",`Recalentando: temperatura objetivo ahora ≈ ${f(Math.min(36.5,tt),1)} °C.`)}
+  else if(now>=fin2)h+=pill("ok","Cronograma completo.");
+  if(nac&&t0-nac>6*3600e3)h+=pill("crit","El enfriamiento empezó después de las 6 h de vida.");
+  const rows=[];for(let k=0;k<=rh;k++)rows.push(`<tr><td>${hora(new Date(fin.getTime()+k*3600e3))}</td><td>${f(Math.min(36.5,T+k*0.5),1)} °C</td></tr>`);
+  h+=`<details><summary style="cursor:pointer;font-weight:600;font-size:.88rem">Ver escalones del recalentamiento</summary><table><thead><tr><th>Hora</th><th>Temperatura objetivo</th></tr></thead><tbody>${rows.join("")}</tbody></table></details>`;
+  $("htRes").innerHTML=h;
+}
+
+/* ---------- centro de referencia ---------- */
+["refH","refC"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ref()})});
+function ref(){const c=$("refC").value.trim(),tel=c.replace(/[^\d+]/g,"");$("refTel").innerHTML=tel.length>=6?`<a class="btn sec sm" style="text-decoration:none;align-self:flex-start;display:inline-block" href="tel:${tel}">Llamar ${c}</a>`:""}
+
+function all(){elig();crit();sarnat();conv();est();glu();ht();hist();reloj()}
+setPac();ref();
+</script>
+</body>
+</html>
