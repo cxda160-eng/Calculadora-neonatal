@@ -197,6 +197,16 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <!-- RESPIRATORIO -->
   <section class="card" id="s-resp">
     <h2>Respiratorio</h2>
+    <h3>Presión media en la vía aérea (MAP) desde el respirador</h3>
+    <div class="grid">
+      <label for="pip">PIP <span class="u">cmH₂O</span><input id="pip" inputmode="decimal" autocomplete="off" placeholder="20"></label>
+      <label for="peep">PEEP <span class="u">cmH₂O</span><input id="peep" inputmode="decimal" autocomplete="off" placeholder="5"></label>
+      <label for="ti">Ti <span class="u">segundos</span><input id="ti" inputmode="decimal" autocomplete="off" placeholder="0,35"></label>
+      <label for="fr">FR <span class="u">resp/min</span><input id="fr" inputmode="decimal" autocomplete="off" placeholder="40"></label>
+    </div>
+    <div class="res" id="rMAP"></div>
+    <p class="hint">MAP = (PIP − PEEP) × Ti ÷ (Ti + Te) + PEEP, con Te = 60 ÷ FR − Ti. Supone onda de presión cuadrada (ventilación limitada por presión). Con flujo desacelerado o en volumen la MAP real es algo menor: si el respirador muestra la MAP medida, usá esa. En VAFO la MAP se programa: cargala directo abajo.</p>
+    <h3>Índice de oxigenación</h3>
     <div class="grid">
       <label for="map">Presión media (MAP) <span class="u">cmH₂O</span><input id="map" inputmode="decimal" autocomplete="off" placeholder="12"></label>
       <label for="fio2">FiO₂ <span class="u">%</span><input id="fio2" inputmode="decimal" autocomplete="off" placeholder="60"></label>
@@ -382,6 +392,23 @@ function calc(){
     const i = fe < 2.5 ? 'Compatible con causa <b>prerrenal</b> (RN de término).' : fe <= 3 ? 'Zona intermedia.' : 'Sugiere daño renal intrínseco (RN de término).';
     set('rFENa', tiles(tile('FENa', f(fe,2)+' %', '', true)) + pill('info', i) + pill('warn','En prematuros &lt; 32 semanas la FENa basal es alta (puede superar 5 %): interpretar con cautela.'));
   } else set('rFENa', empty('Na urinario, creatinina urinaria, Na plasmático y creatinina plasmática'));
+
+  // MAP desde parámetros del respirador
+  { const pip=v('pip'), peep=v('peep'), ti=v('ti'), fr=v('fr');
+    if (ok(pip, peep, ti, fr) && fr > 0 && ti > 0){
+      const tt = 60/fr, te = tt - ti;
+      if (pip <= peep) set('rMAP', pill('warn','La PIP tiene que ser mayor que la PEEP.'));
+      else if (te <= 0) set('rMAP', pill('crit',`Con FR ${f(fr,0)} el ciclo dura ${f(tt,2)} s: el Ti no puede ser ≥ ${f(tt,2)} s.`));
+      else { const mapc = (pip-peep)*ti/tt + peep, ie = te/ti;
+        let m = '';
+        if (ti > te) m += pill('warn','Relación I:E invertida (Ti mayor que Te): riesgo de atrapamiento aéreo.');
+        else if (te < 0.25) m += pill('warn','Te menor de 0,25 s: puede no alcanzar para exhalar (atrapamiento, PEEP inadvertida).');
+        set('rMAP', tiles(tile('MAP calculada', f(mapc,1) + ' cmH₂O', '', true), tile('Te', f(te,2) + ' s'), tile('I:E', '1:' + f(ie,1)), tile('Ciclo', f(tt,2) + ' s')) + m +
+          `<button type="button" class="btn" id="useMap" style="margin-top:8px">Usar ${f(mapc,1)} como MAP en el IO</button>`);
+        $('useMap').onclick = () => { $('map').value = fmtIn(Math.round(mapc*10)/10); calc(); $('map').scrollIntoView({behavior:'smooth', block:'center'}); };
+      }
+    } else set('rMAP', empty('PIP, PEEP, Ti y FR'));
+  }
 
   // IO y OSI
   const map=v('map'), fio2=v('fio2'), pao2=u('pao2'), spo2=v('spo2');
