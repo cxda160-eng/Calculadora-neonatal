@@ -135,6 +135,16 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     </div>
   </section>
 
+  <section class="card" id="s-ren">
+    <h2>Función renal (Schwartz)</h2>
+    <div class="grid">
+      <label for="crCr">Creatinina <span class="u">mg/dL</span><input id="crCr" inputmode="decimal" autocomplete="off" placeholder="0,6"></label>
+      <label for="crT">Talla <span class="u">cm</span><input id="crT" inputmode="decimal" autocomplete="off" placeholder="45"></label>
+    </div>
+    <div id="crRes"></div>
+    <div class="hint">Clearance = k × talla ÷ creatinina, con k 0,33 en prematuros (EG al nacer &lt; 37 sem) y 0,45 en término. Con el valor, buscá el ajuste «Insuf. renal» en las observaciones de cada fármaco. Con oliguria (&lt; 1 mL/kg/h) o creatinina en ascenso, el clearance estimado sobrestima la función real.</div>
+  </section>
+
   <section class="card" id="s-src">
     <h2>Fuente</h2>
     <div class="seg" role="group" aria-label="Fuente de dosis">
@@ -184,7 +194,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </footer>
 </div>
 
-<script src="taketomo.js?v=v60"></script>
+<script src="taketomo.js?v=v62"></script>
 <script>
 // Tabla de dosis de antimicrobianos en neonatología – Versión 2026 (octubre) (Hospital de Pediatría J. P. Garrahan).
 // Columnas: c0 <1200 g 0–4 sem · c1 1200–2000 g 0–7 d · c2 1200–2000 g >7 d · c3 >2000 g 0–7 d · c4 >2000 g >7 d · c5 RNPT >45 sem EG o RNT >1 mes
@@ -359,6 +369,19 @@ const $ = id => document.getElementById(id);
 const num = id => { const s = String($(id).value).trim().replace(',', '.'); if (!s) return NaN; const n = parseFloat(s); return isFinite(n) ? n : NaN; };
 const f = (n, d = 2) => isFinite(n) ? n.toLocaleString('es-AR', {maximumFractionDigits: d}) : '–';
 let manualCol = null;
+
+
+/* ---------- Schwartz ---------- */
+function renal(){const n=id=>{const v=parseFloat(String(document.getElementById(id).value).replace(",","."));return isFinite(v)?v:NaN};
+  const cr=n("crCr"),t=n("crT");let eg=NaN;try{eg=(JSON.parse(localStorage.getItem("pac")||"{}")||{}).eg}catch(e){}
+  const el=document.getElementById("crRes");if(!(cr>0&&t>0)){el.innerHTML="";return}
+  const k=isFinite(eg)&&eg>0&&eg<37?0.33:0.45,cl=k*t/cr,fm=(x,d)=>x.toLocaleString("es-AR",{maximumFractionDigits:d});
+  const band=cl<10?"< 10":cl<25?"10–24":cl<=50?"25–50":"> 50";
+  el.innerHTML=`<div class="tiles"><div class="tile"><span class="k">Clearance estimado</span><span class="v">${fm(cl,0)} mL/min/1,73 m²</span></div><div class="tile"><span class="k">Rango para ajustar</span><span class="v">${band}</span></div></div><div class="hint">k = ${fm(k,2)} (${isFinite(eg)&&eg>0?(eg<37?"prematuro":"término"):"sin EG cargada: se usa término"}).</div>`;
+  try{localStorage.setItem("atb_ren",JSON.stringify({cr:document.getElementById("crCr").value,t:document.getElementById("crT").value}))}catch(e){}}
+try{const r=JSON.parse(localStorage.getItem("atb_ren")||"{}");if(r.cr)document.getElementById("crCr").value=r.cr;if(r.t)document.getElementById("crT").value=r.t}catch(e){}
+["crCr","crT"].forEach(i=>document.getElementById(i).addEventListener("input",renal));renal();
+window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setTimeout(renal,0)});
 
 function patient(){
   const w = num('pPeso'), d = num('pDias'), eg = num('pEG');
@@ -589,6 +612,6 @@ $('onlyDif').addEventListener('change', render);
 $('q').addEventListener('input', render);
 render();
 </script>
-<script src="paciente.js?v=v60"></script>
+<script src="paciente.js?v=v62"></script>
 </body>
 </html>

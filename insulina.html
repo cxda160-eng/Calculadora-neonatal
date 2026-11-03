@@ -195,6 +195,7 @@ function calc(){
   if (isFinite(dosis) && dosis > 0.2) pill('dosisMsg','crit','⛔ Dosis por encima del máximo del protocolo (0,2 U/kg/h).');
   else if (isFinite(dosis) && dosis > 0 && dosis < 0.01) pill('dosisMsg','warn','⚠️ Dosis por debajo del mínimo del protocolo (0,01 U/kg/h).');
   else pill('dosisMsg');
+  {const di=document.getElementById('dosis');if(di){di.style.outline=isFinite(dosis)&&dosis>0.2?'3px solid #c0392b':isFinite(dosis)&&dosis>0&&dosis<0.01?'3px solid #e0a21b':'';di.style.outlineOffset='1px'}}
 
   const pasos = [0.01,0.02,0.03,0.05,0.07,0.1,0.15,0.2];
   $('tablaDosis').querySelector('tbody').innerHTML = pasos.map(p =>
@@ -238,6 +239,6 @@ $('modo').querySelectorAll('button').forEach(b => b.onclick = () => {
 document.querySelectorAll('input').forEach(i => i.addEventListener('input', calc));
 calc();
 </script>
-<script src="paciente.js?v=v60"></script>
+<script src="paciente.js?v=v62"></script>
 </body>
 </html>

@@ -58,6 +58,7 @@ td:first-child{font-weight:700;white-space:nowrap}
       <li>Las dosis y tablas se transcribieron o resumieron a mano desde las fuentes citadas. No tuvieron revisión independiente por farmacia ni por un comité: puede haber errores.</li>
       <li>No reemplaza el criterio clínico, el protocolo de cada unidad, la ficha técnica del producto ni el doble chequeo antes de preparar y administrar.</li>
       <li>Ante cualquier discrepancia, vale la fuente original.</li>
+      <li>Alertas de dosis: ⚠️ amarillo = por debajo del rango habitual; ⛔ rojo = por encima del máximo. Antes de cada versión se corre un set de pruebas automáticas con resultados conocidos (carpeta tests del repositorio).</li>
     </ul>
   </div>
 
@@ -121,6 +122,7 @@ td:first-child{font-weight:700;white-space:nowrap}
   <section class="card" id="nut">
     <h3>Nutrición</h3>
     <ul class="src">
+      <li><span class="t t6">Fórmula</span><span>Prescripción de NP: volúmenes calculados a partir de metas por kg y de las concentraciones de las soluciones (editables). Osmolaridad y relación Ca:P orientativas; verificar con farmacia.</span></li>
       <li><span class="t t2">Protocolo</span><span>Parenteral: composición de las bolsas Fresenius Kabi según su etiqueta.</span></li>
       <li><span class="t t2">Protocolo</span><span>Enteral: planilla «Cálculo de aportes nutricionales 2025» de la unidad (fórmulas y fortificador), con correcciones.</span></li>
       <li><span class="t t1">Guía / consenso</span><span>Metas de aporte: ESPGHAN 2022 para prematuros &lt; 1800 g en crecimiento estable.</span></li>
@@ -173,7 +175,7 @@ td:first-child{font-weight:700;white-space:nowrap}
 
   <section class="card" id="nfx">
     <h3>NeoFax</h3>
-    <ul class="src"><li><span class="t t3">Compendio</span><span>Micromedex NeoFax, edición noviembre 2024 (Merative). 49 fármacos resumidos en castellano con palabras propias, con la página para verificar; el resto figura solo como índice.</span></li></ul>
+    <ul class="src"><li><span class="t t3">Compendio</span><span>Micromedex NeoFax, edición noviembre 2024 (Merative). 63 fármacos resumidos en castellano con palabras propias, con la página para verificar; el resto figura solo como índice.</span></li></ul>
     <div class="lim"><b>Límites:</b> es un resumen, no la monografía completa. Las tablas de dosis se cargaron a mano. Verificar en la página indicada antes de indicar.</div>
   </section>
 
@@ -200,6 +202,7 @@ td:first-child{font-weight:700;white-space:nowrap}
   <section class="card" id="ver">
     <h2>Registro de versiones (noviembre 2026)</h2>
     <table><tbody>
+      <tr><td>v62</td><td>Varios pacientes por cama; pestañas que cargan al abrirse; modo noche y letra grande; resumen completo del paciente; alertas de dosis en dos niveles (amarillo bajo el rango, rojo sobre el máximo); pruebas automáticas de cálculo; quitar datos repetidos en NeoFax, Insulina, Cardiología y Crecimiento; clearance de Schwartz en Antimicrobianos; registro de convulsiones en EHI; prescripción de NP; NeoFax: 14 fármacos nuevos (63 en total).</td></tr>
       <tr><td>v61</td><td>Barra del paciente con EG corregida (EG al nacer + días de vida); Antimicrobianos sin peso ni EG corregida repetidos.</td></tr>
       <tr><td>v60</td><td>Sedoanalgesia: peso y EG solo en la barra del paciente; «Supuestos de conversión» pasa a llamarse «Factores de conversión entre opioides», con explicación.</td></tr>
       <tr><td>v59</td><td>EHI: sección «Durante la hipotermia» (metas, cronograma de laboratorio, fármacos y seguimiento), exclusiones y recalentamiento 0,2–0,5 °C/h según el consenso CEFEN 2017.</td></tr>

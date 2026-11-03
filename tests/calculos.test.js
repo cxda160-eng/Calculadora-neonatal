@@ -1,0 +1,30 @@
+// Pruebas de cálculo de la Calculadora Neonatal.
+// Uso: servir la carpeta (python3 -m http.server 8765) y correr: node tests/calculos.test.js
+// Cada caso carga una pestaña con un paciente conocido y compara el resultado con el valor esperado.
+const {chromium}=require('playwright');
+const BASE=process.env.BASE||'http://localhost:8765/';
+const pac=(kg,eg,dias)=>JSON.stringify({kg,eg,dias});
+const has=(t,s)=>t.replace(/\s+/g,' ').includes(s);
+const CASOS=[
+ ['Infusiones · adrenalina 0,1 mcg/kg/min, 1500 g, 1 mL/h → 9 mcg/mL','infusiones.html',pac(1.5),async f=>{await f.selectOption('#drugSel','adrenalina');return f.$eval('#pump',e=>e.innerText)},t=>has(t,'Conc. 9 mcg/mL')],
+ ['Infusiones · dopamina 5 mcg/kg/min, 1 kg → 300 mcg/mL y 0,36 mL de ampolla','infusiones.html',pac(1),async f=>{await f.selectOption('#drugSel','dopamina');return f.evaluate(()=>document.body.innerText)},t=>has(t,'Conc. 300 mcg/mL')&&has(t,'Cargar 0,36 mL')],
+ ['Infusiones · vasopresina 0,0003 U/kg/min, 1 kg → 0,018 U/mL','infusiones.html',pac(1),async f=>{await f.selectOption('#drugSel','vasopresina');return f.$eval('#pump',e=>e.innerText)},t=>has(t,'0,018 U/mL')],
+ ['Infusiones · dexmedetomidina 1 kg → sugiere dilución intermedia de 10 mcg/mL','infusiones.html',pac(1),async f=>{await f.selectOption('#drugSel','dexmedetomidina');await f.waitForTimeout(300);return f.evaluate(()=>document.body.innerText)},t=>has(t,'Para medir mejor: preparar 1 mL de ampolla (100 mcg) + 9 mL de SF = 10 mcg/mL')],
+ ['Balance · 1500 g, 24 h → 150,0 / +66,7 / 0,56 / 3,33','balance.html',pac(1.5),async f=>{for(const [k,v] of [['i_pn','180'],['i_ent','45'],['e_diu','120'],['e_sog','5']])await f.fill('#'+k,v);return f.evaluate(()=>['vI','vB','vR','vD'].map(i=>document.getElementById(i).textContent).join('|'))},t=>t==='150,0|+66,7|0,56|3,33'],
+ ['Balance · 12 h → proyección de diuresis 160 mL','balance.html',pac(1.5),async f=>{await f.click('#hs button[data-h="12"]');await f.fill('#i_pn','90');await f.fill('#e_diu','80');return f.$eval('#bP',e=>e.innerText)},t=>has(t,'160 mL')],
+ ['Laboratorio · MAP con PIP 20, PEEP 5, Ti 0,35, FR 40 → 8,5','laboratorio.html',pac(1.5),async f=>{for(const [k,v] of [['pip','20'],['peep','5'],['ti','0,35'],['fr','40']])await f.fill('#'+k,v);return f.$eval('#rMAP',e=>e.innerText)},t=>has(t,'8,5')],
+ ['EHI · 60 mL/kg/día con dextrosa 10 % → 4,2 mg/kg/min','ehi.html',pac(3.2,39,0),async f=>{await f.fill('#liq','60');await f.fill('#dex','10');return f.$eval('#gluRes',e=>e.innerText)},t=>has(t,'4,2 mg/kg/min')],
+ ['EHI · EB −14 cumple criterio','ehi.html',pac(3.2,39,0),async f=>{await f.fill('#eb','14');await f.click('#ebSign');return f.$eval('#critRes',e=>e.innerText)},t=>has(t,'EB -14')],
+ ['Antimicrobianos · vancomicina sepsis 1500 g, 10 días (1200–2000 g > 7 d) → 10 mg/kg c/8 h = 15 mg','antimicrobianos.html',pac(1.5,30,10),async f=>{await f.waitForTimeout(300);return f.evaluate(()=>document.body.innerText)},t=>{const m=t.replace(/\s+/g,' ');const i=m.indexOf('Vancomicina');return i>=0&&/Sepsis 10 mg\/kg c\/8 h 15 mg/.test(m.slice(i,i+120))}],
+ ['NeoFax · digoxina IV, 1200 g, EPM 31 → 30 mcg de digitalización','neofax.html',pac(1.2,30,10),async f=>{await f.click('[data-d="digoxina"]');return f.evaluate(()=>document.body.innerText)},t=>has(t,'30 mcg/día')],
+ ['NeoFax · amiodarona 1200 g → 0,336–0,72 mL/h','neofax.html',pac(1.2,30,10),async f=>{await f.click('[data-d="amiodarona"]');return f.evaluate(()=>document.body.innerText)},t=>has(t,'0,336–0,72 mL/h')],
+ ['NeoFax · piperacilina-tazobactam EPM 31, 10 días → c/12 h','neofax.html',pac(1.2,30,10),async f=>{await f.click('[data-d="piptazo"]');return f.evaluate(()=>document.body.innerText)},t=>has(t,'120 mg c/12 h')],
+
+ ['Nutrición · NP 1500 g, 6 mg/kg/min → 25,92 mL de dextrosa 50 % y glucosa 7,9 %','nutricion.html',pac(1.5),async f=>{await f.click('#modulo [data-v="pr"]');for(const [k,v] of [['prL','120'],['prG','6'],['prA','3'],['prLi','2'],['prNa','3'],['prK','2'],['prCa','3'],['prP','1,5'],['prMg','0,3']])await f.fill('#'+k,v);await f.waitForTimeout(200);return f.$eval('#modPR',e=>e.innerText)},t=>has(t,'25,92')&&has(t,'7,9 %')],
+ ['Antimicrobianos · Schwartz prematuro, Cr 0,8, talla 40 → 17 mL/min','antimicrobianos.html',pac(1.5,30,10),async f=>{await f.fill('#crCr','0,8');await f.fill('#crT','40');return f.$eval('#crRes',e=>e.innerText)},t=>has(t,'17 mL/min')],
+];
+(async()=>{const b=await chromium.launch();let ok=0,bad=0;
+ for(const [n,url,p,run,check] of CASOS){const ctx=await b.newContext();await ctx.addInitScript(p=>{try{if(!sessionStorage.getItem('t')){localStorage.clear();localStorage.setItem('pac',p);sessionStorage.setItem('t','1')}}catch(e){}},p);
+  const pg=await ctx.newPage();let t='';try{await pg.goto(BASE+url);await pg.waitForTimeout(600);t=await run(pg)}catch(e){t='ERROR '+e.message}
+  const pass=(()=>{try{return check(t)}catch(e){return false}})();pass?ok++:bad++;console.log((pass?'✔ ':'✘ ')+n+(pass?'':'\n    obtenido: '+String(t).replace(/\s+/g,' ').slice(0,200)));await ctx.close()}
+ console.log(`\n${ok} correctas, ${bad} con error`);await b.close();process.exit(bad?1:0)})();

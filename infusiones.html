@@ -480,7 +480,9 @@ function update(src){
   // alertas
   const A=[];
   if(!(S.w>=0.3&&S.w<=15)) A.push(["bad","Revisá el peso: está fuera del rango esperable para un neonato."]);
-  if(S.dose<d.range[0]||S.dose>d.range[1]) A.push(["bad",`Dosis fuera del rango orientativo (${fmt(d.range[0],dpOf(d))}–${fmt(d.range[1],dpOf(d))} ${doseU(d)}).`]);
+  if(S.dose>d.range[1]) A.push(["bad",`⛔ Dosis por encima del máximo del rango (${fmt(d.range[1],dpOf(d))} ${doseU(d)}). Verificá antes de indicar.`]);
+  else if(S.dose<d.range[0]) A.push(["",`⚠️ Dosis por debajo del rango habitual (${fmt(d.range[0],dpOf(d))}–${fmt(d.range[1],dpOf(d))} ${doseU(d)}).`]);
+  {const di=$("dose");if(di){di.style.outline=S.dose>d.range[1]?"3px solid #c0392b":S.dose<d.range[0]?"3px solid #e0a21b":"";di.style.outlineOffset="1px"}}
   if(d.maxC&&c>d.maxC) A.push(["bad",`Concentración por encima del máximo recomendado (${d.maxTxt}). Aumentá el volumen o reducí la cantidad.`]);
   if(d.minC&&c<d.minC) A.push(["bad",`Concentración menor de ${d.minTxt}: la solución es inestable. Bajá la velocidad de referencia (p. ej. 0,5 mL/h), usá una jeringa más chica o aumentá la cantidad.`]);
   if(d.periph&&c>d.periph&&!(d.maxC&&c>d.maxC)) A.push(["",`Concentración mayor de ${cTxt(d.periph,d)}: solo por vía central.`]);
@@ -615,6 +617,6 @@ show(location.hash==="#vademecum"?"vademecum":"calcular");
 </script>
 
 
-<script src="paciente.js?v=v60"></script>
+<script src="paciente.js?v=v62"></script>
 </body>
 </html>

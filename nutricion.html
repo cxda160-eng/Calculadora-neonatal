@@ -131,6 +131,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <div class="modsel" id="modulo" role="group" aria-label="Tipo de nutrición">
     <button type="button" data-v="np" aria-pressed="true">Parenteral</button>
     <button type="button" data-v="en" aria-pressed="false">Enteral</button>
+    <button type="button" data-v="pr" aria-pressed="false">Prescribir NP</button>
   </div>
 
   <div class="mod" id="modNP">
@@ -211,6 +212,30 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </section>
 
   </div><!-- /modNP -->
+
+  <div class="mod" id="modPR" hidden>
+  <section class="card">
+    <h2>Metas de la NP (por kg y por día)</h2>
+    <div class="grid">
+      <label for="prL">Líquidos totales <span class="u">mL/kg/día</span><input id="prL" inputmode="decimal" autocomplete="off" placeholder="120"></label><label for="prG">Flujo de glucosa <span class="u">mg/kg/min</span><input id="prG" inputmode="decimal" autocomplete="off" placeholder="6"></label><label for="prA">Aminoácidos <span class="u">g/kg/día</span><input id="prA" inputmode="decimal" autocomplete="off" placeholder="3"></label><label for="prLi">Lípidos <span class="u">g/kg/día</span><input id="prLi" inputmode="decimal" autocomplete="off" placeholder="2"></label><label for="prNa">Sodio <span class="u">mEq/kg/día</span><input id="prNa" inputmode="decimal" autocomplete="off" placeholder="3"></label><label for="prK">Potasio <span class="u">mEq/kg/día</span><input id="prK" inputmode="decimal" autocomplete="off" placeholder="2"></label><label for="prCa">Calcio <span class="u">mEq/kg/día</span><input id="prCa" inputmode="decimal" autocomplete="off" placeholder="2"></label><label for="prP">Fósforo <span class="u">mmol/kg/día</span><input id="prP" inputmode="decimal" autocomplete="off" placeholder="1,5"></label><label for="prMg">Magnesio <span class="u">mEq/kg/día</span><input id="prMg" inputmode="decimal" autocomplete="off" placeholder="0,3"></label><label for="prH">Horas de infusión <span class="u">h</span><input id="prH" inputmode="decimal" autocomplete="off" placeholder="24"></label>
+    </div>
+    <label class="check" for="prLipIn"><input type="checkbox" id="prLipIn" checked> Los lípidos cuentan dentro de los líquidos totales</label>
+  </section>
+  <section class="card">
+    <h2>Soluciones que usa la farmacia (editables)</h2>
+    <div class="grid">
+      <label for="csD">Dextrosa <span class="u">%</span><input id="csD" inputmode="decimal" autocomplete="off" placeholder="50"></label><label for="csA">Aminoácidos <span class="u">%</span><input id="csA" inputmode="decimal" autocomplete="off" placeholder="10"></label><label for="csLi">Lípidos <span class="u">%</span><input id="csLi" inputmode="decimal" autocomplete="off" placeholder="20"></label><label for="csNa">ClNa <span class="u">mEq/mL</span><input id="csNa" inputmode="decimal" autocomplete="off" placeholder="3,4"></label><label for="csK">ClK <span class="u">mEq/mL</span><input id="csK" inputmode="decimal" autocomplete="off" placeholder="3"></label><label for="csCa">Gluconato de Ca 10 % <span class="u">mEq/mL</span><input id="csCa" inputmode="decimal" autocomplete="off" placeholder="0,465"></label><label for="csP">Fosfato (glicerofosfato de Na) <span class="u">mmol P/mL</span><input id="csP" inputmode="decimal" autocomplete="off" placeholder="1"></label><label for="csPNa">Na que aporta el fosfato <span class="u">mEq/mL</span><input id="csPNa" inputmode="decimal" autocomplete="off" placeholder="2"></label><label for="csMg">Sulfato de Mg <span class="u">mEq/mL</span><input id="csMg" inputmode="decimal" autocomplete="off" placeholder="2"></label>
+    </div>
+    <p class="hint">Los valores por defecto son concentraciones habituales; cambialos por los de tu farmacia. Se guardan en este dispositivo.</p>
+  </section>
+  <section class="card">
+    <h2>Prescripción calculada</h2>
+    <div class="tiles" id="prTiles"></div>
+    <div class="tablewrap"><table id="prTab"></table></div>
+    <div class="alerts" id="prAl"></div>
+    <p class="hint">Orientativo: verificar con farmacia y con el protocolo de la unidad (compatibilidad calcio-fósforo, orden de mezclado y sobrellenado de la bolsa). La osmolaridad es una estimación.</p>
+  </section>
+  </div><!-- /modPR -->
 
   <div class="mod" id="modEN" hidden>
   <section class="card">
@@ -512,8 +537,41 @@ $("naOn").addEventListener("change",calcEN);
 ["modOn","sumNP"].forEach(id=>$(id).addEventListener("change",calcEN));
 $("modulo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   $("modulo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  $("modNP").hidden=b.dataset.v!=="np";$("modEN").hidden=b.dataset.v!=="en";
+  $("modNP").hidden=b.dataset.v!=="np";$("modEN").hidden=b.dataset.v!=="en";$("modPR").hidden=b.dataset.v!=="pr";
   try{localStorage.setItem("nut_mod",b.dataset.v)}catch(e){}calc();});
+
+
+/* ---------- Prescribir NP ---------- */
+const PRI=["prL","prG","prA","prLi","prNa","prK","prCa","prP","prMg","prH"],PRC=["csD","csA","csLi","csNa","csK","csCa","csP","csPNa","csMg"];
+const PRDEF={prH:"24",csD:"50",csA:"10",csLi:"20",csNa:"3,4",csK:"3",csCa:"0,465",csP:"1",csPNa:"2",csMg:"2"};
+(function(){let st={};try{st=JSON.parse(localStorage.getItem("np_presc")||"{}")||{}}catch(e){}let cs={};try{cs=JSON.parse(localStorage.getItem("np_stock")||"{}")||{}}catch(e){}
+  PRI.forEach(i=>{$(i).value=st[i]!=null?st[i]:(PRDEF[i]||"")});PRC.forEach(i=>{$(i).value=cs[i]!=null?cs[i]:PRDEF[i]});if(st.lipIn===false)$("prLipIn").checked=false})();
+function calcPR(){const n=i=>{const v=parseFloat(String($(i).value).replace(",","."));return isFinite(v)?v:0};
+  const st={lipIn:$("prLipIn").checked};PRI.forEach(i=>st[i]=$(i).value);const cs={};PRC.forEach(i=>cs[i]=$(i).value);
+  try{localStorage.setItem("np_presc",JSON.stringify(st));localStorage.setItem("np_stock",JSON.stringify(cs))}catch(e){}
+  const kg=pesoKg(),H=n("prH")||24,f1=(x,d=1)=>isFinite(x)?x.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
+  if(!(kg>0)){$("prTiles").innerHTML="";$("prTab").innerHTML="";$("prAl").innerHTML='<div class="pill info">Cargá el peso en la barra del paciente.</div>';return}
+  const Vt=n("prL")*kg,gDex=n("prG")*kg*1440/1000,cD=n("csD")/100,cA=n("csA")/100,cL=n("csLi")/100;
+  const V={dex:cD?gDex/cD:0,aa:cA?n("prA")*kg/cA:0,lip:cL?n("prLi")*kg/cL:0,p:n("csP")?n("prP")*kg/n("csP"):0};
+  const naP=V.p*n("csPNa"),naNeed=n("prNa")*kg-naP;V.na=n("csNa")?Math.max(0,naNeed)/n("csNa"):0;V.k=n("csK")?n("prK")*kg/n("csK"):0;V.ca=n("csCa")?n("prCa")*kg/n("csCa"):0;V.mg=n("csMg")?n("prMg")*kg/n("csMg"):0;
+  const Vaq=$("prLipIn").checked?Vt-V.lip:Vt,used=V.dex+V.aa+V.na+V.k+V.ca+V.p+V.mg,agua=Vaq-used;
+  const glc=Vaq>0?gDex/Vaq*100:NaN,kcal=(gDex*3.4+n("prA")*kg*4+V.lip*(cL?cL*10:2))/kg;
+  const L=Vaq/1000,osm=L>0?(gDex/L*5.05+n("prA")*kg/L*10+(n("prNa")+n("prK"))*kg/L*2+n("prCa")*kg/L*1.4+n("prMg")*kg/L*1):NaN;
+  const caMg=n("prCa")*20,pMg=n("prP")*31,ratio=pMg?caMg/pMg:NaN;
+  $("prTiles").innerHTML=[["Bolsa acuosa",f1(Vaq,0)+" mL",f1(Vaq/H,2)+" mL/h"],["Lípidos (aparte)",f1(V.lip,1)+" mL",f1(V.lip/H,2)+" mL/h"],["Glucosa final",f1(glc,1)+" %",""],["Calorías",f1(kcal,0)+" kcal/kg/día",""],["Osmolaridad est.",f1(osm,0)+" mOsm/L",""],["Ca:P (mg)",f1(ratio,2)+" : 1",""]].map(([k,v,s])=>`<div class="tile"><span class="k">${k}</span><span class="v" style="font-size:1.15rem">${v}</span>${s?`<span class="k" style="text-transform:none">${s}</span>`:""}</div>`).join("");
+  const rows=[["Dextrosa "+$("csD").value+" %",V.dex],["Aminoácidos "+$("csA").value+" %",V.aa],["ClNa ("+$("csNa").value+" mEq/mL)",V.na],["ClK ("+$("csK").value+" mEq/mL)",V.k],["Gluconato de calcio 10 %",V.ca],["Fosfato ("+$("csP").value+" mmol/mL)",V.p],["Sulfato de magnesio",V.mg],["Agua destilada (completar)",agua]];
+  $("prTab").innerHTML=`<thead><tr><th>Bolsa acuosa</th><th>mL/día</th><th>mL/kg/día</th></tr></thead><tbody>${rows.map(([a,v])=>`<tr><td>${a}</td><td>${f1(v,2)}</td><td>${f1(v/kg,2)}</td></tr>`).join("")}<tr><td><b>Total bolsa acuosa</b></td><td><b>${f1(Vaq,1)}</b></td><td><b>${f1(Vaq/kg,1)}</b></td></tr><tr><td>Lípidos ${$("csLi").value} % (por separado)</td><td>${f1(V.lip,2)}</td><td>${f1(V.lip/kg,2)}</td></tr></tbody>`;
+  const A=[];if(agua<0)A.push(["crit",`Los componentes superan el volumen disponible en ${f1(-agua,1)} mL: subí los líquidos o bajá algún aporte.`]);
+  if(naNeed<0)A.push(["warn",`El fosfato ya aporta ${f1(naP/kg,2)} mEq/kg/día de sodio, más que la meta de Na.`]);
+  if(glc>12.5)A.push(["warn",`Glucosa ${f1(glc,1)} %: por encima de 12,5 % requiere vía central.`]);
+  if(osm>900)A.push(["warn",`Osmolaridad estimada ${f1(osm,0)} mOsm/L: por encima de ~900 requiere vía central.`]);
+  if(n("prG")>12)A.push(["warn","Flujo de glucosa mayor de 12 mg/kg/min."]);
+  if(isFinite(ratio)&&(ratio<1.3||ratio>2))A.push(["info",`Relación Ca:P en mg ${f1(ratio,2)}: lo habitual es 1,3–1,7 : 1. Consultar compatibilidad con farmacia.`]);
+  $("prAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}">${t}</div>`).join("");
+  window._prSummary=`Prescripción de NP · ${f1(kg*1000,0)} g\nMetas: líquidos ${$("prL").value} mL/kg/día, glucosa ${$("prG").value} mg/kg/min, AA ${$("prA").value} g/kg, lípidos ${$("prLi").value} g/kg, Na ${$("prNa").value}, K ${$("prK").value}, Ca ${$("prCa").value} mEq/kg, P ${$("prP").value} mmol/kg, Mg ${$("prMg").value} mEq/kg\n`+rows.map(([a,v])=>`${a}: ${f1(v,2)} mL`).join("\n")+`\nBolsa acuosa ${f1(Vaq,1)} mL a ${f1(Vaq/H,2)} mL/h · glucosa ${f1(glc,1)} % · ${f1(kcal,0)} kcal/kg/día\nLípidos ${f1(V.lip,2)} mL a ${f1(V.lip/H,2)} mL/h`;}
+[...PRI,...PRC].forEach(i=>$(i).addEventListener("input",calcPR));$("prLipIn").addEventListener("change",calcPR);$("peso").addEventListener("input",calcPR);
+window.customSummary=()=>{const m=document.querySelector('#modulo [aria-pressed="true"]');return m&&m.dataset.v==="pr"?window._prSummary||"":""};
+setTimeout(calcPR,0);
 
 const estado=(v,[lo,hi],extra)=>{if(!isFinite(v)||v===0)return["","—"];
   if(v<lo)return["warn","Bajo"];if(v<=hi)return["ok","En meta"];
@@ -581,9 +639,9 @@ $("enCopy").onclick=()=>{const done=()=>{$("enCopy").textContent="Copiado";setTi
   if(navigator.clipboard)navigator.clipboard.writeText(enResumen).then(done,fb);else fb()};
 
 drawComp();drawRows();
-try{if(localStorage.getItem("nut_mod")==="en")$("modulo").querySelector('[data-v="en"]').click();}catch(e){}
+try{const mm=localStorage.getItem("nut_mod");if(mm==="en"||mm==="pr")$("modulo").querySelector(`[data-v="${mm}"]`).click();}catch(e){}
 calc();
 </script>
-<script src="paciente.js?v=v60"></script>
+<script src="paciente.js?v=v62"></script>
 </body>
 </html>

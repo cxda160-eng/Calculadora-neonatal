@@ -201,6 +201,15 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     <div class="pill warn">Siempre descartar alteraciones metabólicas: evaluar glucemia e hipocalcemia antes de tratar.</div>
     <div id="conv"></div>
     <p class="hint">Dosis del algoritmo. NeoFax usa para levetiracetam una carga de 40 mg/kg (ver pestaña NeoFax).</p>
+    <h3>Registro de convulsiones y tratamiento</h3>
+    <div class="grid">
+      <label>Evento<select id="cvT"><option value="clin">Crisis clínica</option><option value="elec">Crisis en aEEG</option><option value="trat">Solo tratamiento</option></select></label>
+      <label>Fármaco<select id="cvF"><option value="">Ninguno</option><option value="pb">Fenobarbital</option><option value="lev">Levetiracetam</option><option value="mdz">Midazolam</option><option value="otro">Otro</option></select></label>
+      <label>Dosis (mg/kg)<input id="cvD" inputmode="decimal" placeholder="20"></label>
+    </div>
+    <div class="row"><button class="btn" id="cvAdd">Registrar ahora</button></div>
+    <div id="cvRes"></div>
+    <div class="hist" id="cvHist"></div>
   </section>
 
   <section class="card" id="s-ref">
@@ -431,6 +440,20 @@ function ht(){const v=$("htIni").value;if(!v){$("htRes").innerHTML=pill("info","
 }
 
 
+
+/* ---------- registro de convulsiones ---------- */
+const CVN={pb:"Fenobarbital",lev:"Levetiracetam",mdz:"Midazolam",otro:"Otro"},CVT={clin:"Crisis clínica",elec:"Crisis en aEEG",trat:"Tratamiento"};
+$("cvF").onchange=()=>{const v=$("cvF").value;$("cvD").placeholder=v==="mdz"?"0,15":v?"20":""};
+$("cvAdd").onclick=()=>{const L=LS.get("cv",[]),d=num("cvD"),F=$("cvF").value;L.unshift({t:Date.now(),e:$("cvT").value,f:F,d:F&&isFinite(d)?d:null});LS.set("cv",L.slice(0,60));$("cvD").value="";cv()};
+function cv(){const L=LS.get("cv",[]),nac=$("nac").value?new Date($("nac").value):null,kg=P.kg;
+  const tot=k=>L.filter(x=>x.f===k&&x.d).reduce((a,x)=>a+x.d,0),pb=tot("pb"),lev=tot("lev"),n=L.filter(x=>x.e!=="trat").length;
+  let h="";if(L.length){h+=`<div class="tiles">${tile("Crisis registradas",n,L.length?"última: "+hora(new Date(L.find(x=>x.e!=="trat")?.t||L[0].t)):"")}${tile("Fenobarbital acumulado",f(pb,1)+" mg/kg",kg?f(pb*kg,1)+" mg · máx. 40 mg/kg":"máx. 40 mg/kg",pb>=40)}${tile("Levetiracetam acumulado",f(lev,1)+" mg/kg",kg?f(lev*kg,1)+" mg · máx. 40 mg/kg (algoritmo)":"")}</div>`;
+    if(pb>40)h+=pill("crit","Fenobarbital por encima de 40 mg/kg acumulados: pasar a segunda línea.");else if(pb>=40)h+=pill("warn","Fenobarbital en 40 mg/kg: dosis máxima de carga alcanzada; si persisten las crisis, segunda línea.");
+    if(lev>40)h+=pill("warn","Levetiracetam por encima de 40 mg/kg acumulados.");}
+  $("cvRes").innerHTML=h;
+  $("cvHist").innerHTML=L.length?L.map(x=>`<div><span>${hora(new Date(x.t))}${nac?` · ${hm(x.t-nac)} de vida`:""}</span><b>${CVT[x.e]}${x.f?` · ${CVN[x.f]}${x.d?` ${f(x.d,2)} mg/kg${kg?` (${f(x.d*kg,1)} mg)`:""}`:""}`:""}</b></div>`).join("")+`<button class="btn sec sm" id="cvClr" style="margin-top:6px">Borrar registro</button>`:`<p class="hint">Registrá cada crisis y cada dosis con la hora: la app suma las dosis de carga acumuladas.</p>`;
+  const c=$("cvClr");if(c)c.onclick=()=>{if(confirm("¿Borrar el registro de convulsiones?")){LS.set("cv",[]);cv()}}}
+
 /* ---------- durante la hipotermia ---------- */
 const METAS=[["T° central 33–34 °C (sonda rectal 5–6 cm o esofágica) + control no invasivo","temp"],["Líquidos 40–50 mL/kg/día · balance estricto (riesgo de SIHAD e insuficiencia renal)","liq"],["Glucemia 70–120 mg/dL · sin insulina en la fase de mantenimiento","glu"],["Ca total > 8,5 mg/dL (iónico > 1 mmol/L) · Mg > 1,9 mg/dL","ca"],["Na 135–145 mEq/L · K 3,5–4,5 mEq/L (cuidado con el aporte de K: hiperpotasemia de rebote al recalentar)","na"],["SatO₂ preductal 90–95 % · evitar hiperoxia","sat"],["pCO₂ ≥ 35 mmHg si está ventilado · avisar al laboratorio la T° del paciente (la pCO₂ baja ~4 % por °C)","co2"],["PAM en rango normal · ecocardiograma","pam"],["aEEG continuo desde el ingreso, con impedancia < 10","aeeg"],["Información a los padres","pad"]];
 function metas(){const M=LS.get("metas",{});
@@ -453,7 +476,7 @@ function lab(){const v=$("tIng").value||$("htIni").value,t0=v?new Date(v):null,n
 /* ---------- centro de referencia ---------- */
 ["refH","refC","tCall","tArr","tIng"].forEach(k=>{$(k).value=LS.get(k,"");$(k).addEventListener("input",()=>{LS.set(k,$(k).value);ref();lab()})});
 $("arrNow").onclick=()=>{$("tArr").value=toLocal(new Date());LS.set("tArr",$("tArr").value);ref()};
-$("refClr").onclick=()=>{["refH","refC","tCall","tArr","tIng","nac","apgar","ph","eb","lac","htIni"].forEach(k=>{$(k).value="";LS.set(k,"")});$("vpp").checked=false;LS.set("vpp",false);LS.set("ver",{});SS=Array(7).fill(null);LS.set("sn",SS);LS.set("hist",[]);LS.set("metas",{});LS.set("lab",{});all();ref()};
+$("refClr").onclick=()=>{["refH","refC","tCall","tArr","tIng","nac","apgar","ph","eb","lac","htIni"].forEach(k=>{$(k).value="";LS.set(k,"")});$("vpp").checked=false;LS.set("vpp",false);LS.set("ver",{});SS=Array(7).fill(null);LS.set("sn",SS);LS.set("hist",[]);LS.set("metas",{});LS.set("lab",{});LS.set("cv",[]);all();ref()};
 function ref(){const c=$("refC").value.trim(),tel=c.replace(/[^\d+]/g,"");$("refTel").innerHTML=tel.length>=6?`<a class="btn sec sm" style="text-decoration:none;align-self:flex-start;display:inline-block" href="tel:${tel}">Llamar ${c}</a>`:"";
   const nac=$("nac").value?new Date($("nac").value):null,call=$("tCall").value?new Date($("tCall").value):null,arr=$("tArr").value?new Date($("tArr").value):null,T=num("tIng");
   const t=[],m=[];
@@ -573,7 +596,14 @@ function aHist(){const H=LS.get("ahist",[]),nac=$("nac").value?new Date($("nac")
   $("aHist").innerHTML=H.length?H.map(h=>`<div><span>${hora(new Date(h.t))}${nac?` · ${hm(h.t-nac)} de vida`:""}</span><b>${h.r}</b></div>`).join("")+`<button class="btn sec sm" id="ahClr" style="margin-top:6px">Borrar lecturas</button>`:`<p class="hint">Guardá una lectura al ingreso y luego a las 6, 24, 48 y 72 h y en el recalentamiento.</p>`;
   const c=$("ahClr");if(c)c.onclick=()=>{LS.set("ahist",[]);aHist()}}
 
-function all(){metas();lab();aAtlas();aRes();aHist();elig();crit();sarnat();conv();est();glu();ht();hist();reloj();ref()}
+
+/* resumen para copiar */
+window.CalcNeo={hasSummary:()=>true,buildSummary:()=>{const t=id=>{const e=document.getElementById(id);return e?e.innerText.replace(/\n{2,}/g,"\n").trim():""};
+  const p=[];const r=t("reloj");if(r)p.push("■ Ventana terapéutica\n"+r);const c=t("critRes");if(c)p.push("■ Criterios\n"+c);const sr=t("sRes");if(sr&&!/Sin examen/.test(sr))p.push("■ Sarnat\n"+sr);
+  const a=LS.get("ahist",[]);if(a.length)p.push("■ Última lectura de aEEG\n"+hora(new Date(a[0].t))+": "+a[0].r);const h=document.querySelector("#htRes .tiles");if(h)p.push("■ Hipotermia\n"+h.innerText.replace(/\n{2,}/g,"\n"));const cvl=LS.get("cv",[]);if(cvl.length)p.push("■ Convulsiones\n"+cvl.slice(0,8).map(x=>hora(new Date(x.t))+": "+CVT[x.e]+(x.f?" · "+CVN[x.f]+(x.d?" "+f(x.d,2)+" mg/kg":""):"")).join("\n"));
+  return "Calculadora Neonatal · Encefalopatía · "+new Date().toLocaleString("es-AR")+"\n\n"+p.join("\n\n")+"\n\n(Herramienta de apoyo: verificar con protocolo y doble chequeo.)"}};
+
+function all(){cv();metas();lab();aAtlas();aRes();aHist();elig();crit();sarnat();conv();est();glu();ht();hist();reloj();ref()}
 setPac();ref();
 </script>
 </body>

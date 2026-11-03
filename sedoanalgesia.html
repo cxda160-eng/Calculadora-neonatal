@@ -465,7 +465,9 @@ function calc(){
         ${m.admin?`<b>Administración</b><span>${m.admin}</span>`:''}
       </div></div>`;
   }
-  if(dose<lo-1e-9 || dose>hi+1e-9) warn += `<div class="note danger">Dosis fuera del rango del protocolo (${lo===hi?lo:lo+'–'+hi} ${m.u}/kg).</div>`;
+  if(dose>hi+1e-9) warn += `<div class="note danger">⛔ Dosis por encima del máximo del protocolo (${hi} ${m.u}/kg). Verificá antes de indicar.</div>`;
+  else if(dose<lo-1e-9) warn += `<div class="note warn">⚠️ Dosis por debajo del rango del protocolo (${lo===hi?lo:lo+'–'+hi} ${m.u}/kg).</div>`;
+  {const di=document.getElementById('dose');if(di){di.style.outline=dose>hi+1e-9?'3px solid #c0392b':dose<lo-1e-9?'3px solid #e0a21b':'';di.style.outlineOffset='1px'}}
   if(m.warn) warn += `<div class="note warn">${m.warn}</div>`;
   if(m.warnFn && m.warnFn()) warn += `<div class="note warn">${m.warnFn()}</div>`;
   $('calcOut').innerHTML = out+warn;
@@ -837,6 +839,6 @@ $('eg').addEventListener('input',refreshAll);
 
 fillDrugs(); fillProcs(); renderDil(); egInfo(); renderModes(); updOpLbl(); renderNP(); renderFN(); renderFNLog(); renderWAT(); renderWATLog(); refreshAll();
 </script>
-<script src="paciente.js?v=v60"></script>
+<script src="paciente.js?v=v62"></script>
 </body>
 </html>

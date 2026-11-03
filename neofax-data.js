@@ -485,6 +485,111 @@
       { t: "Beractant (Survanta®)", via: "Intratraqueal, 4 alícuotas", u: "mL/kg", kind: "once", d: [4], note: "= 100 mg/kg de fosfolípidos (NeoFax pág. 135). Hasta 4 dosis en las primeras 48 h, no antes de c/6 h." }],
     adm: ["Preferir CPAP desde el nacimiento y surfactante selectivo. Considerar rescate en falla respiratoria por déficit secundario (meconio, sepsis/neumonía)."],
     prep: ["Curosurf® 80 mg/mL (viales 1,5 y 3 mL); Survanta® 25 mg/mL (4 y 8 mL). Entibiar a temperatura ambiente sin calor artificial; no agitar."],
-    mon: ["Saturación, FiO₂ y ventilación inmediatamente después (bajar parámetros según respuesta)."] }
+    mon: ["Saturación, FiO₂ y ventilación inmediatamente después (bajar parámetros según respuesta)."] },
+
+  /* ================= TANDA 3 (v62) ================= */
+  { id: "cefazolina", n: "Cefazolina", en: "CeFAZolin", pg: 198, cat: "Antimicrobianos",
+    regs: [{ t: "Dosis habitual", via: "IV o IM", u: "mg/kg/dosis", d: [25], rows: PMA_STD(6), note: "Uso neonatal: profilaxis perioperatoria e infecciones urinarias o de piel por gérmenes sensibles." }],
+    adm: [], prep: ["Vial 500 mg + 2 mL de agua = 225 mg/mL; 1 g + 2,5 mL = 330 mg/mL. Estable 24 h a temperatura ambiente o 10 días en heladera."],
+    mon: ["Función renal en tratamientos prolongados."] },
+
+  { id: "ceftriaxona", n: "Ceftriaxona", en: "CefTRIAXone", pg: 225, cat: "Antimicrobianos",
+    regs: [
+      { t: "Sepsis", via: "IV", u: "mg/kg/dosis", d: [50], int: "c/24 h" },
+      { t: "Meningitis: carga", via: "IV", u: "mg/kg", kind: "once", d: [100], note: "Luego 80 mg/kg c/24 h." },
+      { t: "Meningitis: mantenimiento", via: "IV", u: "mg/kg/dosis", d: [80], int: "c/24 h" },
+      { t: "Oftalmía gonocócica o hijo de madre con gonorrea no tratada", via: "IV o IM", u: "mg/kg", kind: "once", d: [25, 50], note: "Dosis única, máx. 250 mg." }],
+    adm: ["Precaución en neonatos por riesgo de kernicterus (desplaza bilirrubina). No administrar junto con soluciones con calcio."],
+    prep: ["Polvo de 250 mg a 2 g: reconstituir a 100 mg/mL (estable 2 días a temperatura ambiente, 10 días en heladera). IM: 250 mg + 0,9 mL de lidocaína 1 % = 250 mg/mL."],
+    mon: ["Bilirrubina en RN ictéricos; hemograma y función hepática."] },
+
+  { id: "penicilinag", n: "Penicilina G sódica/potásica", en: "Penicillin G", pg: 736, cat: "Antimicrobianos",
+    regs: [
+      { t: "Sífilis congénita", via: "IV en 15 min", u: "U/kg/dosis", d: [50000], rows: [{ pna: [0, 7], i: 12 }, { pna: [8, 9999], i: 8 }], note: "10 días en total." },
+      { t: "Bacteriemia por SGB (sin foco)", via: "IV", u: "U/kg/dosis", d: [50000], rows: [{ pna: [0, 7], i: 12 }, { pna: [8, 9999], i: 8 }], note: "10 días." },
+      { t: "Meningitis por SGB", via: "IV", u: "U/kg/dosis", rows: [{ pna: [0, 7], d: [150000], i: 8 }, { pna: [8, 9999], d: [125000], i: 6 }], note: "14 días en la meningitis no complicada." },
+      { t: "Otros gérmenes sensibles: bacteriemia", via: "IV en 15 min o IM", u: "U/kg/dosis", d: [25000, 50000], rows: PMA_STD(6) }],
+    adm: ["Por vía IV solo la penicilina G cristalina acuosa (nunca benzatínica ni procaínica)."],
+    prep: ["La potásica aporta 1,68 mEq de K por millón de U; la sódica, 1,68 mEq de Na por millón de U."],
+    mon: ["Sodio o potasio séricos con dosis altas."] },
+
+  { id: "indometacina", n: "Indometacina", en: "Indomethacin", pg: 504, cat: "Cardiovascular",
+    regs: [
+      { t: "Cierre del ductus: 1.ª dosis", via: "IV", u: "mg/kg", kind: "once", d: [0.2] },
+      { t: "Cierre del ductus: 2.ª y 3.ª dosis", via: "IV, c/12–24 h", u: "mg/kg/dosis", rows: [{ pna: [0, 1], d: [0.1], txt: "edad < 48 h en la 1.ª dosis" }, { pna: [2, 7], d: [0.2], txt: "2–7 días" }, { pna: [8, 9999], d: [0.25], txt: "> 7 días" }],
+        note: "Máximo 2 ciclos. Si hay anuria u oliguria grave, postergar la dosis siguiente. Alternativa: 0,2 mg/kg c/24 h por 5–7 días." },
+      { t: "Profilaxis de HIV/DAP en prematuros", via: "IV", u: "mg/kg/dosis", d: [0.1, 0.2], int: "c/12–24 h × 3 dosis, desde las 6–24 h de vida" }],
+    adm: ["La edad para elegir la dosis es la del inicio del tratamiento. No usar junto con corticoides posnatales."],
+    prep: ["Vial 1 mg: reconstituir con 1–2 mL de SF o agua sin conservantes. No en infusión continua."],
+    mon: ["Diuresis, creatinina, plaquetas y signos de sangrado o ECN."] },
+
+  { id: "vitaminak", n: "Vitamina K1 (fitomenadiona)", en: "Vitamin K1", pg: 927, cat: "Otros",
+    regs: [
+      { t: "Profilaxis al nacer: ≤ 1500 g", via: "IM, dentro de las 6 h", u: "mg/kg", kind: "once", d: [0.3, 0.5] },
+      { t: "Profilaxis al nacer: > 1500 g", via: "IM, dentro de las 6 h", u: "mg", note: "1 mg IM, dosis fija (no por kilo)." },
+      { t: "Tratamiento de la enfermedad hemorrágica", via: "SC (preferida), IM o IV lenta", u: "mg", note: "1 mg; puede requerir más si la madre recibía anticoagulantes orales. IV a ≤ 1 mg/min. Evitar IM con coagulopatía." },
+      { t: "Requerimiento en NP: prematuros", via: "IV en la NP", u: "mcg/kg/día", kind: "day", d: [10], txt: "en la NP (término: 200 mcg/día)" }],
+    adm: ["Vía IM preferida para la profilaxis; la VO solo si la familia rechaza la IM."],
+    prep: ["Ampollas 2 mg/mL (0,5 mL) y 10 mg/mL; contienen alcohol bencílico. Proteger de la luz."],
+    mon: ["Coagulograma si se trata un sangrado."] },
+  { id: "eritropoyetina", n: "Eritropoyetina (epoetina alfa)", en: "Epoetin alfa", pg: 348, cat: "Otros",
+    regs: [
+      { t: "Esquema habitual", via: "SC o IV", u: "U/kg/dosis", d: [200, 400], int: "3–5 veces por semana, 2–6 semanas", note: "Total semanal 600–1400 U/kg. Iniciar hierro al mismo tiempo." },
+      { t: "Curso corto", via: "SC o IV", u: "U/kg/dosis", d: [300], int: "c/24 h × 10 días" }],
+    adm: ["Anemia del prematuro: los metaanálisis no muestran beneficio clínico relevante en transfusiones; NeoFax no la recomienda para ese fin."],
+    prep: ["Viales sin conservantes de 2000–10 000 U/mL (heladera, no agitar). IV: diluir en solución con ≥ 0,05 % de proteína y pasar en 4 h."],
+    mon: ["Hematocrito, reticulocitos, ferritina; presión arterial."] },
+
+  { id: "lorazepam", n: "Lorazepam", en: "LORazepam", pg: 578, cat: "Neurología",
+    regs: [{ t: "Convulsiones refractarias", via: "IV lenta", u: "mg/kg", kind: "once", d: [0.05, 0.1], note: "Repetir según respuesta clínica." }],
+    adm: ["No superar 2 mg/min. Evitar inyección intraarterial y extravasación."],
+    prep: ["Ampolla 2 y 4 mg/mL (puede tener alcohol bencílico y propilenglicol). Para neonatos: 1 mL de 4 mg/mL + 9 mL de agua estéril = 0,4 mg/mL."],
+    mon: ["FR, saturación y presión arterial."] },
+
+  { id: "fosfenitoina", n: "Fosfenitoína", en: "Fosphenytoin", pg: 424, cat: "Neurología",
+    regs: [
+      { t: "Estado de mal convulsivo: carga", via: "IV, ≤ 2 mg EF/kg/min", u: "mg EF/kg", kind: "once", d: [15, 20], note: "EF = equivalentes de fenitoína (1 mg EF = 1 mg de fenitoína sódica). 20 mg EF/kg es la carga más usada en los protocolos neonatales." },
+      { t: "Mantenimiento", via: "IV, 1–2 mg EF/kg/min", u: "mg EF/kg/dosis", d: [2, 4], int: "c/12 h", note: "En protocolos neonatales: 5–10 mg EF/kg/día." }],
+    adm: ["Preferir IV sobre IM. Diluir en SF o SG 5% a 1,5–25 mg EF/mL."],
+    prep: ["Cerebyx® 50 mg EF/mL; conservar en heladera (48 h a temperatura ambiente)."],
+    mon: ["Niveles de fenitoína, ECG y presión arterial durante la carga."] },
+
+  { id: "oxidonitrico", n: "Óxido nítrico inhalado", en: "Nitric Oxide", pg: 682, cat: "Respiratorio",
+    regs: [{ t: "Falla respiratoria hipoxémica con hipertensión pulmonar (> 34 sem)", via: "Inhalatoria", u: "ppm", note: "Iniciar 20 ppm (máximo). Si en 4 h la PaO₂ llega a ≥ 60 mmHg, bajar a 5 ppm. Con FiO₂ < 0,6, descender de a 1 ppm c/4 h; suspender tras 4 h estable en 1 ppm. Si no se puede retirar en 4 días, buscar otras causas." }],
+    adm: ["Indicado con índice de oxigenación > 25 en término y casi término: reduce la necesidad de ECMO. No se recomienda para prevenir DBP en prematuros."],
+    prep: ["Cilindros de 800 ppm; requiere sistema de administración y personal entrenado."],
+    mon: ["Metahemoglobina y NO₂ inhalado; oxigenación y presión arterial."] },
+
+  { id: "captopril", n: "Captopril", en: "Captopril", pg: 186, cat: "Cardiovascular",
+    regs: [
+      { t: "Dosis inicial", via: "VO, 1 h antes de la toma", u: "mg/kg/dosis", d: [0.01], int: "c/12 h", note: "Aumentar de forma progresiva según respuesta." },
+      { t: "Hipertensión", via: "VO", u: "mg/kg/dosis", d: [0.1, 0.4], int: "c/6–24 h" },
+      { t: "Insuficiencia cardíaca", via: "VO", u: "mg/kg/día", kind: "day", d: [0.4, 1.6], txt: "dividido c/8 h" }],
+    adm: ["Gran caída del clearance de creatinina en neonatos con cardiopatía: extremar el cuidado en término y cuestionado en prematuros."],
+    prep: ["Comprimidos de 12,5–100 mg; solución magistral 1 mg/mL con ácido ascórbico (56 días en heladera)."],
+    mon: ["Presión arterial, creatinina y potasio."] },
+  { id: "enalapril", n: "Enalapril (VO)", en: "Enalapril maleate", pg: 328, cat: "Cardiovascular",
+    regs: [{ t: "Hipertensión e insuficiencia cardíaca", via: "VO", u: "mg/kg/dosis", d: [0.04], int: "c/24 h para empezar", note: "Titular dosis e intervalo según respuesta; máximo habitual 0,15 mg/kg/dosis, hasta c/6 h." }],
+    adm: [], prep: ["Solución oral 1 mg/mL (60 días reconstituida); comprimidos de 2,5–20 mg."],
+    mon: ["Presión arterial, creatinina y potasio."] },
+
+  { id: "esmolol", n: "Esmolol", en: "Esmolol", pg: 358, cat: "Cardiovascular",
+    regs: [
+      { t: "TSV: carga", via: "IV en 1 min", u: "mcg/kg", kind: "once", d: [100, 500] },
+      { t: "TSV: mantenimiento", via: "IV continua", kind: "inf", u: "mcg/kg/min", d: [25, 100], conc: 10000, cu: "mcg/mL", note: "Titular de a 25–50 mcg/kg/min hasta 500 mcg/kg/min." },
+      { t: "Hipertensión posoperatoria cardiovascular", via: "IV", u: "mcg/kg", kind: "once", d: [125, 500], note: "Bolo y luego la misma cifra en mcg/kg/min en infusión (125, 250 o 500): sin diferencias de eficacia entre esquemas." }],
+    adm: ["Soluciones iso-osmolares de 10 y 20 mg/mL."],
+    prep: ["Vial 10 mg/mL; bolsas listas 2500 mg/250 mL y 2000 mg/100 mL."],
+    mon: ["ECG continuo, FC y presión arterial; glucemia."] },
+
+  { id: "omeprazol", n: "Omeprazol", en: "Omeprazole", pg: 700, cat: "Otros",
+    regs: [{ t: "ERGE con esofagitis", via: "VO o por sonda", u: "mg/kg/dosis", d: [0.5, 1.5], int: "c/24 h", note: "Tratar 4–8 semanas y reevaluar. No usar para llanto, irritabilidad ni regurgitación en lactantes sanos; en prematuros, los riesgos superan los beneficios en el reflujo." }],
+    adm: [], prep: ["Zegerid® 20 mg en 10 mL de agua = 2 mg/mL (45 días en heladera); por sonda, lavar con agua o SF."],
+    mon: ["Reevaluar la necesidad periódicamente (riesgo de infecciones y ECN)."] },
+
+  { id: "ursodiol", n: "Ácido ursodesoxicólico", en: "Ursodiol", pg: 890, cat: "Otros",
+    regs: [{ t: "Colestasis (asociada a NP, atresia biliar, fibrosis quística)", via: "VO", u: "mg/kg/dosis", d: [10, 15], int: "c/12 h" }],
+    adm: [], prep: ["Comprimidos de 250 y 500 mg, cápsulas de 300 mg; suspensión magistral 20 mg/mL (91 días en heladera)."],
+    mon: ["Bilirrubina directa y hepatograma."] }
   ];
 })();

@@ -104,6 +104,21 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 .mas .st[aria-pressed="true"]{color:#d99a12}
 .mas-f{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:10px;margin-top:6px;font-size:.8rem;color:var(--muted)}
 .mas-f button{font:inherit;font-weight:700;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+.chiprow{display:flex;gap:6px;max-width:1100px;width:100%;margin:0 auto}
+.chiprow .chip{flex:1;min-width:0;margin:0}
+.cama{flex:none;display:flex;align-items:center;gap:5px;max-width:42%;min-height:42px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:700;font-size:.82rem;cursor:pointer}
+.cama span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.camas .row{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 12px;min-height:56px}
+.camas .row[aria-current="true"]{border-color:var(--neo);background:var(--neo-soft)}
+.camas .go{flex:1;min-width:0;text-align:left;border:0;background:none;color:var(--fg);font:inherit;cursor:pointer;padding:4px 0}
+.camas .go b{display:block;font-size:.95rem}.camas .go small{color:var(--muted);font-size:.78rem}
+.camas .sm{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:10px;font:inherit;font-size:.78rem;font-weight:700;padding:8px 10px;cursor:pointer;min-height:40px}
+.camas .add{border:1.5px dashed var(--line);background:none;color:var(--fg);border-radius:14px;font:inherit;font-weight:700;min-height:50px;cursor:pointer}
+.opt-r{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 12px;font-weight:700;font-size:.88rem;min-height:50px;margin-top:6px}
+.opt-r input{width:22px;height:22px;accent-color:var(--neo)}
+.segm{display:flex;background:var(--bg);border-radius:10px;padding:3px;gap:2px}
+.segm button{border:0;background:none;color:var(--muted);font:inherit;font-size:.78rem;font-weight:700;padding:8px 9px;border-radius:8px;cursor:pointer}
+.segm button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 [hidden]{display:none!important}
 .nacb{border:1px solid var(--line,#ddd);background:var(--surface,#fff);color:inherit;border-radius:9px;padding:6px 7px;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;min-width:34px}
 .nacb.on{background:var(--neo-soft);border-color:var(--neo);color:var(--neo)}
@@ -149,7 +164,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button type="button" class="ib" id="nhCopy" aria-label="Copiar resumen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
     </div>
   </div>
-  <button type="button" class="chip" id="pChip" aria-expanded="false" aria-controls="pacRow"><span id="pSum">Cargar paciente</span><b id="pChipL">Editar</b></button>
+  <div class="chiprow"><button type="button" class="cama" id="pCama" aria-label="Cambiar de paciente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-8v5"/><circle cx="7" cy="11" r="2"/></svg><span id="pCamaN">Paciente 1</span></button><button type="button" class="chip" id="pChip" aria-expanded="false" aria-controls="pacRow"><span id="pSum">Cargar paciente</span><b id="pChipL">Editar</b></button></div>
 </header>
 <header class="bar">
   <div class="in">
@@ -200,33 +215,53 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 </div>
 <div class="toast" id="toast" hidden></div>
 <div class="views">
-  <iframe id="vInf" src="infusiones.html" title="Calculadora de infusiones"></iframe>
-  <iframe id="vEle" src="electrolitos.html" title="Calculadora de electrolitos" hidden></iframe>
-  <iframe id="vSed" src="sedoanalgesia.html" title="Sedoanalgesia neonatal" hidden></iframe>
-  <iframe id="vNut" src="nutricion.html" title="Nutrición parenteral" hidden></iframe>
-  <iframe id="vIns" src="insulina.html" title="Infusión de insulina" hidden></iframe>
-  <iframe id="vLab" src="laboratorio.html" title="Laboratorio: valores corregidos" hidden></iframe>
-  <iframe id="vEcg" src="cardio.html" title="Cardiología" hidden></iframe>
-  <iframe id="vAtb" src="antimicrobianos.html" title="Antimicrobianos neonatales" hidden></iframe>
-  <iframe id="vNeo" src="neo.html" title="Reanimación, bilirrubina y transfusiones" hidden></iframe>
-  <iframe id="vCre" src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
-  <iframe id="vNfx" src="neofax.html" title="NeoFax" hidden></iframe>
-  <iframe id="vEhi" src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
-  <iframe id="vBal" src="balance.html" title="Balance hídrico" hidden></iframe>
-  <iframe id="vFue" src="fuentes.html" title="Fuentes y alcance" hidden></iframe>
+  <iframe id="vInf" data-src="infusiones.html" title="Calculadora de infusiones"></iframe>
+  <iframe id="vEle" data-src="electrolitos.html" title="Calculadora de electrolitos" hidden></iframe>
+  <iframe id="vSed" data-src="sedoanalgesia.html" title="Sedoanalgesia neonatal" hidden></iframe>
+  <iframe id="vNut" data-src="nutricion.html" title="Nutrición parenteral" hidden></iframe>
+  <iframe id="vIns" data-src="insulina.html" title="Infusión de insulina" hidden></iframe>
+  <iframe id="vLab" data-src="laboratorio.html" title="Laboratorio: valores corregidos" hidden></iframe>
+  <iframe id="vEcg" data-src="cardio.html" title="Cardiología" hidden></iframe>
+  <iframe id="vAtb" data-src="antimicrobianos.html" title="Antimicrobianos neonatales" hidden></iframe>
+  <iframe id="vNeo" data-src="neo.html" title="Reanimación, bilirrubina y transfusiones" hidden></iframe>
+  <iframe id="vCre" data-src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
+  <iframe id="vNfx" data-src="neofax.html" title="NeoFax" hidden></iframe>
+  <iframe id="vEhi" data-src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
+  <iframe id="vBal" data-src="balance.html" title="Balance hídrico" hidden></iframe>
+  <iframe id="vFue" data-src="fuentes.html" title="Fuentes y alcance" hidden></iframe>
 </div>
 <nav class="bn" id="bn" aria-label="Pestañas favoritas"></nav>
+<div class="mas" id="camas" hidden role="dialog" aria-label="Pacientes">
+  <div class="mas-in camas">
+    <div class="mas-h"><h2>Pacientes</h2><button type="button" class="ib" id="camX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="mas-p">Cada paciente guarda sus propios datos: peso, EG, balance, EHI, escalas y crecimiento. Tocá uno para pasar a él.</p>
+    <div id="camL" style="display:flex;flex-direction:column;gap:8px"></div>
+    <button type="button" class="add" id="camAdd">+ Agregar paciente</button>
+  </div>
+</div>
+<div class="mas" id="resm" hidden role="dialog" aria-label="Resumen del paciente">
+  <div class="mas-in">
+    <div class="mas-h"><h2>Resumen del paciente</h2><button type="button" class="ib" id="resX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="mas-p">Junta lo que calculaste en las pestañas que abriste para este paciente. Revisalo antes de pegarlo en la historia clínica o en el pase.</p>
+    <textarea id="resT" style="width:100%;min-height:52vh;font:13px/1.45 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface);color:var(--fg)"></textarea>
+    <div style="display:flex;gap:8px"><button type="button" class="add" id="resC" style="flex:1">Copiar</button><button type="button" class="add" id="resS" style="flex:1">Compartir</button></div>
+  </div>
+</div>
 <div class="mas" id="mas" hidden role="dialog" aria-label="Todas las pestañas">
   <div class="mas-in">
     <div class="mas-h"><h2>Todas las pestañas</h2><button type="button" class="ib" id="masX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <p class="mas-p">Tocá la estrella para fijar hasta 4 pestañas en la barra de abajo.</p>
     <div id="masG"></div>
+    <button type="button" class="add" id="resAll" style="margin-top:8px">Resumen completo del paciente</button>
+    <div class="opt-r"><span>Tema</span><div class="segm" id="thSeg"><button type="button" data-t="auto">Automático</button><button type="button" data-t="light">Claro</button><button type="button" data-t="dark">Oscuro</button></div></div>
+    <label class="opt-r"><span>Letra más grande</span><input type="checkbox" id="bigTx"></label>
     <div class="mas-f"><span>Versión instalada: <b id="masV">—</b></span><button type="button" id="masUp">Buscar actualización</button></div>
   </div>
 </div>
 <script>
 const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"],ehi:["vEhi","bEhi"],bal:["vBal","bBal"],fue:["vFue","bFue"]};
-const show=k=>{for(const [key,[v,b]] of Object.entries(TABS)){const on=key===k;
+const loadTab=k=>{const f=document.getElementById(TABS[k][0]);if(f&&!f.getAttribute("src")&&f.dataset.src)f.setAttribute("src",f.dataset.src)};
+const show=k=>{loadTab(k);for(const [key,[v,b]] of Object.entries(TABS)){const on=key===k;
   document.getElementById(v).hidden=!on;document.getElementById(b).setAttribute("aria-selected",on)}if(window.onTab)window.onTab(k);};
 document.getElementById("bInf").onclick=()=>show("inf");
 document.getElementById("bEle").onclick=()=>show("ele");
@@ -256,6 +291,7 @@ if(location.hash==="#ehi"||location.hash==="#encefalopatia")show("ehi");
 if(location.hash==="#balance")show("bal");
 if(location.hash==="#fuentes")show("fue");
 try{const t=localStorage.getItem("tab");if(!location.hash&&t&&TABS[t])show(t);}catch(e){}
+if(!document.querySelector(".views iframe[src]"))show("inf");
 for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click",()=>{try{localStorage.setItem("tab",k)}catch(e){}});
 
 /* ---- Paciente compartido ---- */
@@ -348,7 +384,73 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   $("nhCopy").onclick=async()=>{let t="";try{const w=$(TABS[cur][0]).contentWindow;if(w.CalcNeo&&w.CalcNeo.hasSummary&&w.CalcNeo.hasSummary())t=w.CalcNeo.buildSummary()}catch(e){}
     if(!t){toast("Esta pestaña no tiene resumen para copiar");return}
     toast(await clip(t)?"Resumen copiado":"No se pudo copiar")};
-  sum();let k0="inf";for(const k in TABS)if(!$(TABS[k][0]).hidden)k0=k;window.onTab(k0);
+  window.paciSum=sum;sum();let k0="inf";for(const k in TABS)if(!$(TABS[k][0]).hidden)k0=k;window.onTab(k0);
+})();
+
+/* ---- Varios pacientes (camas) ---- */
+(function(){
+  const $=id=>document.getElementById(id);
+  const PK=/^(pac|balance|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc)$/;
+  const get=()=>{try{return JSON.parse(localStorage.getItem("camas")||"null")}catch(e){return null}};
+  const put=c=>{try{localStorage.setItem("camas",JSON.stringify(c))}catch(e){toast("No hay espacio para guardar más pacientes")}};
+  let C=get();
+  if(!C||!Array.isArray(C.l)||!C.l.length){C={a:"c1",n:2,l:[{id:"c1",nom:"Paciente 1",snap:null}]};put(C)}
+  const snapNow=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(PK.test(k))o[k]=localStorage.getItem(k)}return o};
+  const clearNow=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(PK.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
+  const cur=()=>C.l.find(x=>x.id===C.a)||C.l[0];
+  function resumen(snap){try{const p=JSON.parse((snap||{}).pac||"{}");const a=[];if(p.kg)a.push(Math.round(p.kg*1000)+" g");if(p.eg)a.push(String(p.eg).replace(".",",")+" sem");let d=p.dias;if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(h>=0)d=h/24}if(d!=null&&isFinite(d))a.push(Math.floor(d)+" días");return a.join(" · ")||"Sin datos cargados"}catch(e){return ""}}
+  function paintName(){$("pCamaN").textContent=cur().nom}
+  function reloadViews(){document.querySelectorAll(".views iframe[src]").forEach(f=>{f.setAttribute("src",f.dataset.src)});const P=window.CalcPac;if(P)P.paint(P.read());if(window.paciSum)window.paciSum()}
+  function go(id){if(id===C.a){close();return}const c=cur();c.snap=snapNow();clearNow();const t=C.l.find(x=>x.id===id);if(t&&t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){}
+    C.a=id;put(C);paintName();reloadViews();close();toast("Paciente: "+cur().nom)}
+  function list(){const live=snapNow();$("camL").innerHTML=C.l.map(x=>`<div class="row" aria-current="${x.id===C.a}"><button type="button" class="go" data-g="${x.id}"><b>${x.nom.replace(/</g,"&lt;")}</b><small>${resumen(x.id===C.a?live:x.snap)}</small></button><button type="button" class="sm" data-r="${x.id}">Nombre</button>${C.l.length>1?`<button type="button" class="sm" data-d="${x.id}" aria-label="Borrar ${x.nom.replace(/"/g,"")}">Borrar</button>`:""}</div>`).join("");
+    $("camL").querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>go(b.dataset.g));
+    $("camL").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const x=C.l.find(y=>y.id===b.dataset.r);const n=prompt("Nombre o cama (ej.: Cama 3 · RN Pérez)",x.nom);if(n&&n.trim()){x.nom=n.trim().slice(0,40);put(C);paintName();list()}});
+    $("camL").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const x=C.l.find(y=>y.id===b.dataset.d);if(!confirm(`¿Borrar ${x.nom} y todos sus datos?`))return;
+      if(x.id===C.a){clearNow();C.l=C.l.filter(y=>y.id!==x.id);C.a=C.l[0].id;const t=C.l[0];if(t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){};put(C);paintName();reloadViews()}else{C.l=C.l.filter(y=>y.id!==x.id);put(C)}list()})}
+  function open(){list();$("camas").hidden=false}
+  function close(){$("camas").hidden=true}
+  $("pCama").onclick=open;$("camX").onclick=close;$("camas").addEventListener("click",e=>{if(e.target.id==="camas")close()});
+  $("camAdd").onclick=()=>{const id="c"+(C.n++);const nom="Paciente "+(C.l.length+1);C.l.push({id,nom,snap:{}});put(C);go(id);setTimeout(()=>{if(window.paciSum)window.paciSum();const r=$("pacRow");if(r&&r.hidden)$("pChip").click()},300)};
+  paintName();
+})();
+
+/* ---- Tema y tamaño de letra ---- */
+(function(){
+  const $=id=>document.getElementById(id);
+  const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+  const ORIG=new WeakMap();
+  function themeDoc(d,t,big,top){if(!d||!d.documentElement)return;
+    for(const sh of d.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
+      for(const r of rules){if(r.media&&/prefers-color-scheme:\s*dark/.test(ORIG.get(r)||r.media.mediaText)){if(!ORIG.has(r))ORIG.set(r,r.media.mediaText);r.media.mediaText=t==="dark"?"all":t==="light"?"not all":ORIG.get(r)}}}
+    if(t==="auto")d.documentElement.removeAttribute("data-theme");else d.documentElement.setAttribute("data-theme",t);
+    if(!top)d.documentElement.style.zoom=big?"1.12":"";}
+  function apply(){const t=get("theme")||"auto",big=get("bigtext")==="1";themeDoc(document,t,big,true);
+    document.querySelectorAll(".views iframe").forEach(f=>{try{themeDoc(f.contentDocument,t,big)}catch(e){}});
+    $("thSeg").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));$("bigTx").checked=big}
+  document.querySelectorAll(".views iframe").forEach(f=>f.addEventListener("load",apply));
+  $("thSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{try{localStorage.setItem("theme",b.dataset.t)}catch(e){}apply()});
+  $("bigTx").onchange=()=>{try{localStorage.setItem("bigtext",$("bigTx").checked?"1":"0")}catch(e){}apply()};
+  window.applyTheme=apply;apply();
+})();
+
+/* ---- Resumen completo ---- */
+(function(){
+  const $=id=>document.getElementById(id);
+  const ORD=["inf","sed","atb","ins","ele","nut","lab","bal","ehi","neo","ecg","cre","nfx"];
+  function build(){const parts=[];let pac="";
+    for(const k of ORD){const f=$(TABS[k][0]);if(!f.getAttribute("src"))continue;let w;try{w=f.contentWindow}catch(e){continue}
+      if(!w||!w.CalcNeo||!w.CalcNeo.hasSummary||!w.CalcNeo.hasSummary())continue;let t="";const wasH=f.hidden;if(wasH){f.style.visibility="hidden";f.hidden=false}try{t=w.CalcNeo.buildSummary()}catch(e){}if(wasH){f.hidden=true;f.style.visibility=""}if(!t)continue;
+      const lines=t.split("\n");const head=lines[0].split(" · ");const title=head[1]||k;
+      const pl=lines.find(l=>/^Paciente:/.test(l));if(pl&&!pac)pac=pl;
+      let body=t.slice(t.indexOf("\n\n")+2).replace(/\n\n\(Herramienta de apoyo[^)]*\)\s*$/,"").trim();if(/^Paciente:/.test(body))body=body.split("\n").slice(1).join("\n").trim();
+      if(body)parts.push("━━ "+title.toUpperCase()+" ━━\n"+body)}
+    const cama=($("pCamaN")||{}).textContent||"";
+    return `Resumen · ${cama} · ${new Date().toLocaleString("es-AR",{day:"numeric",month:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"})}\n${pac||("Paciente: "+$("pSum").innerText.replace(/\s+/g," "))}\n\n`+(parts.join("\n\n")||"Todavía no abriste pestañas con cálculos para este paciente.")+"\n\n(Calculadora Neonatal · herramienta de apoyo: verificar con protocolo y doble chequeo.)"}
+  $("resAll").onclick=()=>{$("mas").hidden=true;$("resT").value=build();$("resm").hidden=false};
+  $("resX").onclick=()=>$("resm").hidden=true;
+  $("resC").onclick=async()=>{const t=$("resT").value;try{await navigator.clipboard.writeText(t);toast("Resumen copiado")}catch(e){$("resT").select();try{document.execCommand("copy");toast("Resumen copiado")}catch(_){toast("No se pudo copiar")}}};
+  $("resS").onclick=async()=>{const t=$("resT").value;if(navigator.share){try{await navigator.share({title:"Resumen del paciente",text:t})}catch(e){}}else{$("resC").click()}};
 })();
 
 /* ---- Buscador ---- */
@@ -385,7 +487,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     if(!hits.length){R.innerHTML=`<p>Sin resultados para «${$("busQ").value.replace(/</g,"&lt;")}».</p>`;return}
     R.innerHTML="";hits.forEach(({r})=>{const b=document.createElement("button");b.type="button";b.setAttribute("style",NAMES[r.k].st);
       b.innerHTML=`<span class="tg">${NAMES[r.k].n}</span><span class="tx">${r.txt.replace(/</g,"&lt;")}<small>${{tab:"Pestaña",sec:"Sección",opt:"Opción de lista",btn:"Botón",row:"Fila de tabla"}[r.kind]}</small></span>`;b.onclick=()=>go(r);R.appendChild(b)})}
-  function open(){IDX=null;$("bus").hidden=false;$("busQ").value="";run();setTimeout(()=>$("busQ").focus(),30);verPaint()}
+  function open(){IDX=null;let pend=0;for(const k in TABS){const f=$(TABS[k][0]);if(!f.getAttribute("src")){pend++;f.addEventListener("load",()=>{IDX=null;if($("busQ").value)run()},{once:true});loadTab(k)}}$("bus").hidden=false;$("busQ").value="";run();setTimeout(()=>$("busQ").focus(),30);verPaint()}
   function close(){$("bus").hidden=true}
   $("bBus").onclick=open;$("busX").onclick=close;$("bus").addEventListener("click",e=>{if(e.target.id==="bus")close()});
   $("busQ").addEventListener("input",run);$("busQ").addEventListener("keydown",e=>{if(e.key==="Enter"){const f=$("busR").querySelector("button");if(f)f.click()}if(e.key==="Escape")close()});
