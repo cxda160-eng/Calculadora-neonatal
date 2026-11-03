@@ -165,7 +165,8 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <option value="morIVc">Morfina IV continua</option>
       <option value="metVO">Metadona VO</option>
     </select>
-    <h3>Supuestos de conversión</h3>
+    <h3>Factores de conversión entre opioides</h3>
+    <div class="small" style="margin-bottom:6px">Las equivalencias entre opioides en neonatos no son exactas: estas son las razones que usa la calculadora para pasar de un opioide o vía al otro. Dejá las que trae por defecto o elegí la de tu protocolo; el resultado se recalcula.</div>
     <label>Fentanilo IV : Morfina IV</label>
     <select id="rFM">
       <option value="20" selected>1 : 20 — usado en estudios neonatales / guía neonatal CAHS (más conservador)</option>
@@ -836,6 +837,6 @@ $('eg').addEventListener('input',refreshAll);
 
 fillDrugs(); fillProcs(); renderDil(); egInfo(); renderModes(); updOpLbl(); renderNP(); renderFN(); renderFNLog(); renderWAT(); renderWATLog(); refreshAll();
 </script>
-<script src="paciente.js?v=v56"></script>
+<script src="paciente.js?v=v60"></script>
 </body>
 </html>

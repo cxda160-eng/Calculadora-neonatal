@@ -10,7 +10,7 @@
   var FIELDS = {
     infusiones: [["#peso", "peso", "g"]],
     electrolitos: [["#peso", "peso", "g"]],
-    sedoanalgesia: [["#peso", "peso", "g"]],
+    sedoanalgesia: [["#peso", "peso", "g"], ["#eg", "eg"]],
     insulina: [["#peso", "peso", "g"]],
     nutricion: [["#peso", "peso", "g"]],
     antimicrobianos: [["#pPeso", "peso", "g"], ["#pEG", "eg"], ["#pDias", "dias"]],
@@ -205,6 +205,7 @@
       if (box) { var lb = box.previousElementSibling; if (lb && lb.classList.contains("lbl")) lb.style.display = "none"; box.style.display = "none"; }
     }
     // Antimicrobianos, Nutrición y RCP: se ocultan peso, EG y días (y el bloque si queda vacío)
+    if (page === "sedoanalgesia") { var r0 = document.querySelector("#peso"); if (r0 && r0.closest(".row")) r0.closest(".row").style.display = "none"; }
     if (/^(antimicrobianos|nutricion|neo)$/.test(page)) {
       var hide = function (n) { if (n) n.style.display = "none"; };
       var vis = function (n) { return n.style.display !== "none" && getComputedStyle(n).display !== "none" && (n.textContent.trim() || n.querySelector("input,select,button,svg,canvas")); };
