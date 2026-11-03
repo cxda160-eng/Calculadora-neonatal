@@ -62,7 +62,9 @@ footer{font-size:.75rem;color:var(--muted);text-align:center}
 .nbs-sx{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted)}
 .nbs-it{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px}
 .nbs-it .t{font-weight:700;font-size:.9rem;display:flex;justify-content:space-between}
-.nbs-o{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:5px}
+.nbs-o{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:5px}
+.nbs-o button svg{color:var(--fg)}
+.nbs-o button[aria-pressed="true"] svg{color:#fff}
 .nbs-o button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:6px 5px;font:inherit;font-size:.74rem;line-height:1.2;cursor:pointer;min-height:48px;text-align:center}
 .nbs-o button b{display:block;font-size:.8rem;margin-bottom:2px}
 .nbs-o button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -335,11 +337,43 @@ const FIS=[["Piel",[[-1,"Pegajosa, friable, transparente"],[0,"Gelatinosa, roja,
  ["Genitales",null]];
 const GM=[[-1,"Escroto plano, liso"],[0,"Escroto vacío, rugosidad tenue"],[1,"Testículos en canal superior, pliegues raros"],[2,"Testículos descendiendo, pocos pliegues"],[3,"Testículos descendidos, buenos pliegues"],[4,"Testículos péndulos, pliegues profundos"]];
 const GF=[[-1,"Clítoris prominente, labios planos"],[0,"Clítoris prominente, labios menores pequeños"],[1,"Clítoris prominente, labios menores agrandados"],[2,"Labios mayores y menores igual de prominentes"],[3,"Labios mayores grandes, menores pequeños"],[4,"Labios mayores cubren clítoris y menores"]];
+
+const R=Math.PI/180,P=(x,y)=>`${x.toFixed(1)},${y.toFixed(1)}`;
+function arcTxt(cx,cy,r,a0,a1,lbl){const x0=cx+r*Math.cos(a0*R),y0=cy-r*Math.sin(a0*R),x1=cx+r*Math.cos(a1*R),y1=cy-r*Math.sin(a1*R),lg=Math.abs(a1-a0)>180?1:0,sw=a1>a0?0:1,am=(a0+a1)/2;
+  return `<path d="M${P(x0,y0)} A${r},${r} 0 ${lg} ${sw} ${P(x1,y1)}" fill="none" stroke="#e0a21b" stroke-width="2"/>`+(lbl?`<text x="${(cx+(r+11)*Math.cos(am*R)).toFixed(1)}" y="${(cy-(r+11)*Math.sin(am*R)+4).toFixed(1)}" font-size="10" text-anchor="middle" fill="currentColor">${lbl}</text>`:"")}
+const seg=(x1,y1,x2,y2,w=5)=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="currentColor" stroke-width="${w}" stroke-linecap="round"/>`;
+function fig(k,v){let g="";const W=110,H=70;
+ if(k===0){ // postura: decúbito dorsal visto de arriba (cabeza a la izquierda)
+  g+=`<circle cx="15" cy="35" r="10" fill="none" stroke="currentColor" stroke-width="3"/>`+seg(26,35,62,35,10);
+  const LEG=[[[82,4],[102,5]],[[80,8],[98,7]],[[77,13],[92,9]],[[75,22],[86,11]],[[60,20],[72,10]]][v],ARM=[[[44,11],[58,12]],[[44,11],[58,12]],[[44,11],[58,12]],[[42,16],[48,24]],[[38,19],[27,15]]][v];
+  for(const sg of [1,-1]){const hp=[62,35+sg*4],kn=[LEG[0][0],35+sg*LEG[0][1]],ft=[LEG[1][0],35+sg*LEG[1][1]];g+=seg(hp[0],hp[1],kn[0],kn[1],4.5)+seg(kn[0],kn[1],ft[0],ft[1],4);
+    const sh=[30,35+sg*6],el=[ARM[0][0],35+sg*ARM[0][1]],hd=[ARM[1][0],35+sg*ARM[1][1]];g+=seg(sh[0],sh[1],el[0],el[1],3.5)+seg(el[0],el[1],hd[0],hd[1],3.5)}
+ } else if(k===1){ // ventana cuadrada: antebrazo y mano (mano más clara)
+  const ang=[110,90,60,45,30,0][v+1];const wx=66,wy=54;g+=seg(10,wy,wx,wy,8);const t=(180-ang),hx=wx+34*Math.cos(t*R),hy=wy-34*Math.sin(t*R);
+  g+=`<line x1="${wx}" y1="${wy}" x2="${hx.toFixed(1)}" y2="${(ang===0?wy-7:hy).toFixed(1)}" stroke="#7b8cff" stroke-width="7" stroke-linecap="round"/>`+(ang>0?arcTxt(wx,wy,15,180-ang,180,""):"")+`<text x="104" y="14" font-size="11" font-weight="700" text-anchor="end" fill="currentColor">${ang}°</text>`;
+ } else if(k===2){ // rebote del brazo
+  const ang=[180,160,125,100,80][v];const ex=58,ey=50;g+=seg(10,ey,ex,ey,6);const t=180-ang,hx=ex+40*Math.cos(t*R),hy=ey-40*Math.sin(t*R);g+=seg(ex,ey,hx,hy,6)+(ang<180?arcTxt(ex,ey,14,t,180,ang+"°"):`<text x="${ex}" y="${ey-12}" font-size="10" text-anchor="middle" fill="currentColor">180°</text>`);
+ } else if(k===3){ // ángulo poplíteo: muslo contra el abdomen, pierna que se extiende
+  const ang=[180,160,140,120,100,90,75][v+1];const hx=74,hy=64,kx=56,ky=42;g+=seg(8,66,104,66,3)+seg(hx,hy,kx,ky,7);
+  const th=Math.atan2(hy-ky,kx-hx)/R,base=th-180,t=base+ang;const fx=kx+28*Math.cos(t*R),fy=ky-28*Math.sin(t*R);
+  g+=`<line x1="${kx}" y1="${ky}" x2="${fx.toFixed(1)}" y2="${fy.toFixed(1)}" stroke="#7b8cff" stroke-width="6" stroke-linecap="round"/>`+arcTxt(kx,ky,12,Math.min(base,t),Math.max(base,t),"")+`<text x="104" y="14" font-size="11" font-weight="700" text-anchor="end" fill="currentColor">${ang<90?"<90":ang}°</text>`;
+ } else if(k===4){ // signo de la bufanda
+  g+=`<rect x="25" y="8" width="60" height="58" rx="18" fill="none" stroke="currentColor" stroke-width="3"/>`;
+  [[55,"LM"],[32,"Ax"],[78,"Ax"]].forEach(([x,l])=>g+=`<line x1="${x}" y1="10" x2="${x}" y2="64" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3" opacity=".6"/><text x="${x}" y="70" font-size="7" text-anchor="middle" fill="currentColor" opacity=".7">${l}</text>`);
+  const ex=[20,32,44,55,66,78][v+1];g+=seg(82,16,ex,40,5)+`<line x1="${ex}" y1="40" x2="${(ex-12).toFixed(1)}" y2="22" stroke="#7b8cff" stroke-width="4.5" stroke-linecap="round"/>`+`<circle cx="${ex}" cy="40" r="4.5" fill="#e0a21b"/>`;
+ } else if(k===5){ // talón-oreja
+  g+=`<circle cx="16" cy="40" r="9" fill="none" stroke="currentColor" stroke-width="3"/>`+seg(25,42,70,44,9);
+  const a=[172,150,125,100,75,55][v+1],hip=[70,44],kneeBend=[0,0,15,30,45,60][v+1];const L1=28,L2=24;
+  const kx=hip[0]+L1*Math.cos(a*R),ky=hip[1]-L1*Math.sin(a*R),b=a-kneeBend,fx=kx+L2*Math.cos(b*R),fy=ky-L2*Math.sin(b*R);
+  g+=seg(hip[0],hip[1],kx,ky,5)+seg(kx,ky,fx,fy,5)+`<circle cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" r="4" fill="#e0a21b"/>`;
+ }
+ return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="58" aria-hidden="true" style="display:block;margin:0 auto 4px">${g}</svg>`}
+
 const L=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}},S=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let st=L("nbs")||{n:{},f:{},sex:"m",t:null};
 const fm=(x,d=1)=>x.toLocaleString("es-AR",{maximumFractionDigits:d});
 function rows(list,key){return list.map(([t,o],i)=>{const opts=o||(st.sex==="f"?GF:GM);const v=st[key][i];
-  return `<div class="nbs-it"><div class="t"><span>${t}${!o?(st.sex==="f"?" (femeninos)":" (masculinos)"):""}</span><span>${v!=null?(v>0?"+":"")+v:"—"}</span></div><div class="nbs-o">${opts.map(([p,d])=>`<button type="button" data-k="${key}" data-i="${i}" data-p="${p}" aria-pressed="${v===p}"><b>${p}</b>${d}</button>`).join("")}</div></div>`}).join("")}
+  return `<div class="nbs-it"><div class="t"><span>${t}${!o?(st.sex==="f"?" (femeninos)":" (masculinos)"):""}</span><span>${v!=null?(v>0?"+":"")+v:"—"}</span></div><div class="nbs-o">${opts.map(([p,d])=>`<button type="button" data-k="${key}" data-i="${i}" data-p="${p}" aria-pressed="${v===p}">${key==="n"?fig(i,p):""}<b>${p}</b>${d}</button>`).join("")}</div></div>`}).join("")}
 function hours(){const p=L("pac")||{};if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(h>=0)return h}if(p.dias!=null&&isFinite(p.dias))return p.dias*24;return null}
 function paint(){$("nbsN").innerHTML=rows(NEU,"n");$("nbsF").innerHTML=rows(FIS,"f");
   $("nbsSex").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===st.sex));
