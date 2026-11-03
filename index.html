@@ -77,6 +77,10 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 .chip{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:42px;padding:7px 12px;border-radius:12px;border:1px solid var(--neo-soft);background:var(--neo-soft);color:var(--fg);font:inherit;text-align:left;cursor:pointer;max-width:1100px;width:100%;margin:0 auto}
 .chip>span{display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;font-size:.9rem}.chip span b{font-size:1rem}
 .chip>b{font-size:.8rem;color:var(--neo)}
+.chip .egc{font-weight:700;color:var(--neo)}
+.egcl{font-size:.78rem;font-weight:700;color:var(--neo);white-space:nowrap}
+.egcl:empty{display:none}
+@media (max-width:640px){.egcl{display:none}}
 .chip.empty{background:#fff4ec;border-color:#e0743c}.chip.empty>b{color:#b0471b}
 .pac{border-bottom:1px solid var(--line)}
 .bn{background:var(--surface);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:6px max(8px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px))}
@@ -179,6 +183,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <span class="u" id="gU"><span class="gfix">g</span></span>
     <label for="gEG">EG <input id="gEG" inputmode="decimal" autocomplete="off" placeholder="sem"></label>
     <label for="gDias">Vida <input id="gDias" inputmode="numeric" autocomplete="off" placeholder="días"></label>
+    <span class="egcl" id="gEGc"></span>
     <button type="button" class="nacb" id="gNac" title="Fecha y hora de nacimiento" aria-label="Fecha y hora de nacimiento">🕐</button>
     <button type="button" class="clr" id="gClr" title="Nuevo paciente: borrar peso, EG y días" aria-label="Nuevo paciente"><span class="t">Nuevo</span><span class="x">✕</span></button>
   </div>
@@ -328,7 +333,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   const fmt=(n,d)=>String(+n.toFixed(d)).replace(".",",");
   function sum(){let p={};try{p=JSON.parse(localStorage.getItem("pac")||"{}")||{}}catch(e){}
     let h=null,d=p.dias;if(p.nac){h=(Date.now()-Date.parse(p.nac))/36e5;if(h>=0)d=h/24}
-    const a=[];if(p.kg)a.push(`<b>${fmt(p.kg*1000,0)} g</b>`);if(p.eg)a.push(`<span>${fmt(p.eg,1)} sem</span>`);if(d!=null&&isFinite(d))a.push(`<span>${Math.floor(d+1e-9)} días</span>`);if(h!=null&&h>=0)a.push(`<span>${Math.floor(h)} h</span>`);
+    const a=[];if(p.kg)a.push(`<b>${fmt(p.kg*1000,0)} g</b>`);if(p.eg)a.push(`<span>${fmt(p.eg,1)} sem</span>`);if(d!=null&&isFinite(d))a.push(`<span>${Math.floor(d+1e-9)} días</span>`);if(p.eg&&d!=null&&isFinite(d)){const c=p.eg+d/7,w=Math.floor(c+1e-9),dd=Math.round((c-w)*7);a.push(`<span class="egc">EGc ${dd===7?w+1:w}+${dd===7?0:dd}</span>`);$("gEGc").textContent=`EG corregida: ${dd===7?w+1:w}+${dd===7?0:dd} sem`}else $("gEGc").textContent="";if(h!=null&&h>=0)a.push(`<span>${Math.floor(h)} h</span>`);
     $("pSum").innerHTML=a.length?a.join(""):"Cargar peso, EG y días de vida";$("pChip").classList.toggle("empty",!p.kg)}
   function togglePac(open){const r=$("pacRow"),o=open!=null?open:r.hidden;r.hidden=!o;$("pChip").setAttribute("aria-expanded",o);$("pChipL").textContent=o?"Listo":"Editar";if(o)setTimeout(()=>{const g=$("gPeso");if(!g.value)g.focus()},30);sum()}
   $("pChip").onclick=()=>togglePac();

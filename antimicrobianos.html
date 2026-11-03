@@ -424,7 +424,7 @@ function render(){
   // paciente
   let h = '';
   if (isFinite(P.w) && isFinite(P.d)) {
-    h += `<div class="tiles"><div class="tile"><span class="k">Peso</span><span class="v">${f(P.w / 1000, 3)} kg</span></div>${isFinite(P.pma) ? `<div class="tile"><span class="k">EG corregida</span><span class="v">${f(P.pma, 1)} sem</span></div>` : ''}<div class="tile main"><span class="k">Columna</span><span class="v" style="font-size:.9rem">${COLS[P.col].n}</span></div></div>`;
+    h += `<div class="tiles">${window.parent !== window ? '' : `<div class="tile"><span class="k">Peso</span><span class="v">${f(P.w / 1000, 3)} kg</span></div>${isFinite(P.pma) ? `<div class="tile"><span class="k">EG corregida</span><span class="v">${f(P.pma, 1)} sem</span></div>` : ''}`}<div class="tile main"><span class="k">Columna</span><span class="v" style="font-size:.9rem">${COLS[P.col].n}</span></div></div>`;
     if (P.why && manualCol === null) h += `<div class="pill info">${P.why}: se usa la última columna.</div>`;
     if (manualCol !== null && manualCol !== P.auto) h += `<div class="pill warn">Columna elegida a mano (la automática sería: ${COLS[P.auto].n}).</div>`;
     if (P.col === 0 && P.d > 28) h += `<div class="pill warn">La columna de &lt; 1200 g cubre de 0 a 4 semanas: con ${f(P.d, 0)} días el paciente queda fuera de lo que define la tabla. Consultar con Infectología.</div>`;
