@@ -426,6 +426,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     if(t==="auto")d.documentElement.removeAttribute("data-theme");else d.documentElement.setAttribute("data-theme",t);
     if(!top)d.documentElement.style.zoom=big?"1.12":"";}
   function apply(){const t=get("theme")||"auto",big=get("bigtext")==="1";themeDoc(document,t,big,true);
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{if(!m.dataset.orig)m.dataset.orig=m.getAttribute("media")||"";if(t==="auto"){if(m.dataset.orig)m.setAttribute("media",m.dataset.orig)}else{const dark=/dark/.test(m.dataset.orig);m.setAttribute("media",(t==="dark")===dark?"all":"not all")}});
     document.querySelectorAll(".views iframe").forEach(f=>{try{themeDoc(f.contentDocument,t,big)}catch(e){}});
     $("thSeg").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));$("bigTx").checked=big}
   document.querySelectorAll(".views iframe").forEach(f=>f.addEventListener("load",apply));
