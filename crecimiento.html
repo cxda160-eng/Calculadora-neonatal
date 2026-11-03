@@ -58,6 +58,19 @@ th{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mu
 td{font-family:var(--mono)} td small{color:var(--muted);font-size:.72rem}
 td .x{border:0;background:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:2px 6px}
 footer{font-size:.75rem;color:var(--muted);text-align:center}
+.nbs-h{margin:14px 0 6px;font-size:.85rem;color:var(--accent)}
+.nbs-sx{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--muted)}
+.nbs-it{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px}
+.nbs-it .t{font-weight:700;font-size:.9rem;display:flex;justify-content:space-between}
+.nbs-o{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:5px}
+.nbs-o button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:6px 5px;font:inherit;font-size:.74rem;line-height:1.2;cursor:pointer;min-height:48px;text-align:center}
+.nbs-o button b{display:block;font-size:.8rem;margin-bottom:2px}
+.nbs-o button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.nbs-big{display:flex;gap:10px;flex-wrap:wrap}
+.nbs-big div{background:var(--sunk);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:2px;flex:1;min-width:110px}
+.nbs-big .k{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.nbs-big .v{font-family:var(--mono);font-size:1.35rem;font-weight:700}
+.nbs-p{padding:9px 12px;border-radius:10px;font-size:.85rem;margin-top:6px}
+.nbs-p.ok{background:#dcf2ec;color:#1d5a50}.nbs-p.warn{background:#fff1cf;color:#86590a}.nbs-p.crit{background:#ffe1e6;color:#a12d40}.nbs-p.info{background:#e6f0fb;color:#2f5f93}
 </style>
 </head>
 <body>
@@ -86,6 +99,19 @@ footer{font-size:.75rem;color:var(--muted);text-align:center}
       <label for="cPC">Perímetro cefálico <span class="u">cm</span><input id="cPC" inputmode="decimal" autocomplete="off" placeholder="27,5"></label>
     </div>
     <p class="hint" id="ageTxt"></p>
+  </section>
+
+  <section class="card" id="s-nbs">
+    <h2>Edad gestacional · New Ballard Score (1991)</h2>
+    <div id="nbsRes"></div>
+    <div id="nbsAl"></div>
+    <details id="nbsDet"><summary style="cursor:pointer;font-weight:600;font-size:.9rem">Evaluar signo por signo</summary>
+      <div class="nbs-sx" style="margin-top:10px"><span>Sexo para los genitales:</span><div class="seg" id="nbsSex"><button type="button" data-v="m" aria-pressed="true">Varón</button><button type="button" data-v="f" aria-pressed="false">Mujer</button></div></div>
+      <h3 class="nbs-h">Madurez neuromuscular</h3><div id="nbsN"></div>
+      <h3 class="nbs-h">Madurez física</h3><div id="nbsF"></div>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="btn primary" id="nbsUse">Usar como EG del paciente</button><button type="button" class="btn" id="nbsClr">Nuevo examen</button></div>
+    </details>
+    <p class="hint">EG (semanas) = 24 + 0,4 × puntaje (de −10 = 20 sem a 50 = 44 sem). Error de ± 2 semanas. Válido hasta las 96 h de vida; en &lt; 26 semanas, examinar antes de las 12 h. Ballard JL y col., J Pediatr 1991;119:417-23.</p>
   </section>
 
   <section class="card">
@@ -290,5 +316,55 @@ $('clrH').onclick = () => { H = []; saveH(); calc(); };
 ['cEGw','cEGd','cDias','cPeso','cTalla','cPC'].forEach(id => $(id).addEventListener('input', calc));
 segSet('sSex', sex); calc();
 </script>
-<script src="paciente.js?v=v62"></script>
+<script src="paciente.js?v=v63"></script>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const NEU=[["Postura",[[0,"Brazos y piernas extendidos"],[1,"Leve flexión de caderas y rodillas"],[2,"Flexión moderada de piernas; brazos extendidos"],[3,"Piernas flexionadas y abducidas; brazos algo flexionados"],[4,"Flexión completa de brazos y piernas"]]],
+ ["Ventana cuadrada (muñeca)",[[-1,"> 90°"],[0,"90°"],[1,"60°"],[2,"45°"],[3,"30°"],[4,"0°"]]],
+ ["Rebote del brazo",[[0,"180°"],[1,"140–180°"],[2,"110–140°"],[3,"90–110°"],[4,"< 90°"]]],
+ ["Ángulo poplíteo",[[-1,"180°"],[0,"160°"],[1,"140°"],[2,"120°"],[3,"100°"],[4,"90°"],[5,"< 90°"]]],
+ ["Signo de la bufanda",[[-1,"El codo pasa la línea axilar contralateral"],[0,"Llega a la línea axilar contralateral"],[1,"Entre la axilar contralateral y la línea media"],[2,"Llega a la línea media"],[3,"No llega a la línea media"],[4,"No sale de la línea axilar homolateral"]]],
+ ["Talón-oreja",[[-1,"El talón llega a la oreja sin resistencia"],[0,"Casi llega a la oreja"],[1,"Llega a la altura de la cabeza"],[2,"Resistencia moderada, a mitad de camino"],[3,"Mucha resistencia; poca flexión de cadera"],[4,"No se puede flexionar la cadera"]]]];
+const FIS=[["Piel",[[-1,"Pegajosa, friable, transparente"],[0,"Gelatinosa, roja, translúcida"],[1,"Lisa, rosada, venas visibles"],[2,"Descamación superficial o rash; pocas venas"],[3,"Agrietada, áreas pálidas, venas raras"],[4,"Apergaminada, grietas profundas, sin vasos"],[5,"Correosa, agrietada, arrugada"]]],
+ ["Lanugo",[[-1,"Ninguno"],[0,"Escaso"],[1,"Abundante"],[2,"Adelgazado"],[3,"Áreas lampiñas"],[4,"Mayormente lampiño"]]],
+ ["Superficie plantar",[[-2,"Talón-dedo < 40 mm"],[-1,"Talón-dedo 40–50 mm"],[0,"> 50 mm, sin pliegues"],[1,"Marcas rojas tenues"],[2,"Solo pliegue transversal anterior"],[3,"Pliegues en los 2/3 anteriores"],[4,"Pliegues en toda la planta"]]],
+ ["Mama",[[-1,"Imperceptible"],[0,"Apenas perceptible"],[1,"Areola plana, sin botón"],[2,"Areola punteada, botón 1–2 mm"],[3,"Areola elevada, botón 3–4 mm"],[4,"Areola completa, botón 5–10 mm"]]],
+ ["Ojo / oreja",[[-2,"Párpados fusionados firmemente"],[-1,"Párpados fusionados laxamente"],[0,"Párpados abiertos; pabellón plano, queda plegado"],[1,"Pabellón algo curvado, blando, recupera lento"],[2,"Bien curvado, blando pero recupera rápido"],[3,"Formado y firme, recupera al instante"],[4,"Cartílago grueso, oreja rígida"]]],
+ ["Genitales",null]];
+const GM=[[-1,"Escroto plano, liso"],[0,"Escroto vacío, rugosidad tenue"],[1,"Testículos en canal superior, pliegues raros"],[2,"Testículos descendiendo, pocos pliegues"],[3,"Testículos descendidos, buenos pliegues"],[4,"Testículos péndulos, pliegues profundos"]];
+const GF=[[-1,"Clítoris prominente, labios planos"],[0,"Clítoris prominente, labios menores pequeños"],[1,"Clítoris prominente, labios menores agrandados"],[2,"Labios mayores y menores igual de prominentes"],[3,"Labios mayores grandes, menores pequeños"],[4,"Labios mayores cubren clítoris y menores"]];
+const L=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}},S=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let st=L("nbs")||{n:{},f:{},sex:"m",t:null};
+const fm=(x,d=1)=>x.toLocaleString("es-AR",{maximumFractionDigits:d});
+function rows(list,key){return list.map(([t,o],i)=>{const opts=o||(st.sex==="f"?GF:GM);const v=st[key][i];
+  return `<div class="nbs-it"><div class="t"><span>${t}${!o?(st.sex==="f"?" (femeninos)":" (masculinos)"):""}</span><span>${v!=null?(v>0?"+":"")+v:"—"}</span></div><div class="nbs-o">${opts.map(([p,d])=>`<button type="button" data-k="${key}" data-i="${i}" data-p="${p}" aria-pressed="${v===p}"><b>${p}</b>${d}</button>`).join("")}</div></div>`}).join("")}
+function hours(){const p=L("pac")||{};if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(h>=0)return h}if(p.dias!=null&&isFinite(p.dias))return p.dias*24;return null}
+function paint(){$("nbsN").innerHTML=rows(NEU,"n");$("nbsF").innerHTML=rows(FIS,"f");
+  $("nbsSex").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===st.sex));
+  document.querySelectorAll("#s-nbs .nbs-o button").forEach(b=>b.onclick=()=>{const k=b.dataset.k,i=+b.dataset.i,p=+b.dataset.p;st[k][i]=st[k][i]===p?null:p;if(!st.t)st.t=Date.now();S("nbs",st);paint()});
+  const nv=Object.values(st.n).filter(x=>x!=null),fv=Object.values(st.f).filter(x=>x!=null),done=nv.length+fv.length,sc=[...nv,...fv].reduce((a,b)=>a+b,0);
+  const eg=24+0.4*sc,w=Math.floor(eg+1e-9),d=Math.round((eg-w)*7);
+  $("nbsRes").innerHTML=done?`<div class="nbs-big"><div><span class="k">Puntaje</span><span class="v">${sc}</span><span class="k" style="text-transform:none">${done}/12 signos · neuro ${nv.reduce((a,b)=>a+b,0)} · físico ${fv.reduce((a,b)=>a+b,0)}</span></div><div><span class="k">EG estimada</span><span class="v">${fm(eg,1)} sem</span><span class="k" style="text-transform:none">${d===7?w+1:w}+${d===7?0:d} · rango ${fm(eg-2,1)}–${fm(eg+2,1)}</span></div></div>`:`<p class="hint">Tocá «Evaluar signo por signo» y marcá el hallazgo de cada uno de los 12 signos.</p>`;
+  const A=[],h=hours();
+  if(done&&done<12)A.push(["warn",`Faltan ${12-done} signos: el puntaje todavía no es válido.`]);
+  if(h==null)A.push(["info","Cargá la hora de nacimiento o los días de vida en la barra del paciente para evaluar el momento del examen."]);
+  else{const hs=h<48?`${fm(h,0)} h de vida`:`${fm(h/24,1)} días de vida`;
+    if(h>96)A.push(["crit",`Examen a las ${hs}: fuera de la ventana validada (hasta 96 h). La maduración posnatal y la evolución clínica modifican los signos; el resultado no es confiable para fijar la EG.`]);
+    else if(done&&eg<26&&h>12)A.push(["crit",`Examen a las ${hs} con EG estimada &lt; 26 sem: en el prematuro extremo el New Ballard es preciso solo antes de las 12 h; después tiende a sobreestimar la EG.`]);
+    else if(h>=48)A.push(["warn",`Examen a las ${hs}: dentro de las 96 h, pero la precisión baja después de las 48 h.`]);
+    else if(h<12&&!(done&&eg<26))A.push(["info",`Examen a las ${hs}. En las primeras horas el tono puede estar alterado por el parto, la anestesia materna o la depresión neonatal: si es así, reevaluar los signos neuromusculares a las 12–20 h.`]);
+    else A.push(["ok",`Examen a las ${hs}: dentro del momento óptimo.`]);}
+  if(done&&eg<28)A.push(["warn","Por debajo de las 28 semanas el New Ballard tiende a sobreestimar la EG (alrededor de 1–2 semanas)."]);
+  if(done)A.push(["info","Margen de error de ± 2 semanas. Si hay ecografía del primer trimestre o FUM confiable, priorizarlas. Sedación, relajantes, asfixia o hipotonía alteran los signos neuromusculares."]);
+  $("nbsAl").innerHTML=A.map(([c,t])=>`<div class="nbs-p ${c}">${t}</div>`).join("");
+  $("nbsUse").disabled=done<12;window._nbsEG=done===12?eg:null}
+$("nbsSex").querySelectorAll("button").forEach(b=>b.onclick=()=>{st.sex=b.dataset.v;S("nbs",st);paint()});
+$("nbsClr").onclick=()=>{st={n:{},f:{},sex:st.sex,t:null};S("nbs",st);paint()};
+$("nbsUse").onclick=()=>{const eg=window._nbsEG;if(eg==null)return;const p=L("pac")||{};p.eg=Math.round(eg*10)/10;S("pac",p);if(window.parent!==window)window.parent.postMessage({type:"pac-set",pac:p},"*");$("nbsUse").textContent="✓ EG cargada en la barra";setTimeout(()=>$("nbsUse").textContent="Usar como EG del paciente",1800)};
+window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setTimeout(paint,0)});setInterval(paint,60000);
+paint();
+})();
+</script>
 </body></html>

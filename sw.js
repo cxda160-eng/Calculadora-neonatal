@@ -1,6 +1,6 @@
 // Calculadora Neonatal - funcionamiento sin conexión
 // Cambiá VERSION cada vez que actualices index.html para que los celulares bajen la versión nueva.
-const VERSION = "v62";
+const VERSION = "v63";
 const CACHE = "calc-neonatal-" + VERSION;
 const CORE = ["./", "./index.html", "./infusiones.html", "./electrolitos.html", "./sedoanalgesia.html", "./nutricion.html", "./insulina.html", "./laboratorio.html", "./cardio.html", "./antimicrobianos.html", "./neo.html", "./crecimiento.html", "./neofax.html", "./ehi.html", "./fuentes.html", "./balance.html", "./neofax-data.js", "./neofax-index.js", "./paciente.js", "./taketomo.js", "./sim3d.js", "./lib/three.module.min.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png", "./icons/icon-maskable-512.png"];

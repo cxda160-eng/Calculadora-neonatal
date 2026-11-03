@@ -22,6 +22,8 @@ const CASOS=[
 
  ['Nutrición · NP 1500 g, 6 mg/kg/min → 25,92 mL de dextrosa 50 % y glucosa 7,9 %','nutricion.html',pac(1.5),async f=>{await f.click('#modulo [data-v="pr"]');for(const [k,v] of [['prL','120'],['prG','6'],['prA','3'],['prLi','2'],['prNa','3'],['prK','2'],['prCa','3'],['prP','1,5'],['prMg','0,3']])await f.fill('#'+k,v);await f.waitForTimeout(200);return f.$eval('#modPR',e=>e.innerText)},t=>has(t,'25,92')&&has(t,'7,9 %')],
  ['Antimicrobianos · Schwartz prematuro, Cr 0,8, talla 40 → 17 mL/min','antimicrobianos.html',pac(1.5,30,10),async f=>{await f.fill('#crCr','0,8');await f.fill('#crT','40');return f.$eval('#crRes',e=>e.innerText)},t=>has(t,'17 mL/min')],
+
+ ['Crecimiento · New Ballard puntaje 4 → 25,6 sem y alerta por > 12 h en < 26 sem','crecimiento.html',JSON.stringify({kg:0.8,nac:new Date(Date.now()-20*3600e3).toISOString()}),async f=>{await f.click('#nbsDet summary');for(const [k,i,v] of [['n',0,1],['n',1,0],['n',2,1],['n',3,1],['n',4,0],['n',5,0],['f',0,0],['f',1,1],['f',2,0],['f',3,0],['f',4,0],['f',5,0]])await f.click(`#s-nbs button[data-k="${k}"][data-i="${i}"][data-p="${v}"]`);return f.$eval('#s-nbs',e=>e.innerText)},t=>has(t,'25,6 sem')&&has(t,'preciso solo antes de las 12 h')],
 ];
 (async()=>{const b=await chromium.launch();let ok=0,bad=0;
  for(const [n,url,p,run,check] of CASOS){const ctx=await b.newContext();await ctx.addInitScript(p=>{try{if(!sessionStorage.getItem('t')){localStorage.clear();localStorage.setItem('pac',p);sessionStorage.setItem('t','1')}}catch(e){}},p);
