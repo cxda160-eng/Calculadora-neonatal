@@ -24,6 +24,9 @@ const CASOS=[
  ['Antimicrobianos · Schwartz prematuro, Cr 0,8, talla 40 → 17 mL/min','antimicrobianos.html',pac(1.5,30,10),async f=>{await f.fill('#crCr','0,8');await f.fill('#crT','40');return f.$eval('#crRes',e=>e.innerText)},t=>has(t,'17 mL/min')],
 
  ['Crecimiento · New Ballard puntaje 4 → 25,6 sem y alerta por > 12 h en < 26 sem','crecimiento.html',JSON.stringify({kg:0.8,nac:new Date(Date.now()-20*3600e3).toISOString()}),async f=>{await f.click('#nbsDet summary');for(const [k,i,v] of [['n',0,1],['n',1,0],['n',2,1],['n',3,1],['n',4,0],['n',5,0],['f',0,0],['f',1,1],['f',2,0],['f',3,0],['f',4,0],['f',5,0]])await f.click(`#s-nbs button[data-k="${k}"][data-i="${i}"][data-p="${v}"]`);return f.$eval('#s-nbs',e=>e.innerText)},t=>has(t,'25,6 sem')&&has(t,'preciso solo antes de las 12 h')],
+
+ ['RCP · 1100 g, 28 sem → tubo 2,5, profundidad 6,5 cm, FiO₂ ≥ 30 %','neo.html',pac(1.1,28,0),async f=>f.$eval('#rAir',e=>e.innerText),t=>has(t,'2,5')&&has(t,'6,5')&&has(t,'≥ 30 %')],
+ ['RCP · 2000 g, 33 sem → tubo 3,0 y FiO₂ 21–30 %','neo.html',pac(2,33,0),async f=>f.$eval('#rAir',e=>e.innerText),t=>has(t,'3,0')&&has(t,'21–30 %')&&has(t,'7,5')],
 ];
 (async()=>{const b=await chromium.launch();let ok=0,bad=0;
  for(const [n,url,p,run,check] of CASOS){const ctx=await b.newContext();await ctx.addInitScript(p=>{try{if(!sessionStorage.getItem('t')){localStorage.clear();localStorage.setItem('pac',p);sessionStorage.setItem('t','1')}}catch(e){}},p);
