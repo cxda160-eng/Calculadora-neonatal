@@ -10,7 +10,7 @@ function pac(){
   let kg = num('zPeso') / 1000; if (!(kg > 0)) kg = +p.kg;
   const h = num('zTalla');
   let sc = NaN; if (kg > 0) sc = h > 0 ? 0.024265 * Math.pow(kg, 0.5378) * Math.pow(h, 0.3964) : (4 * kg + 7) / (kg + 90);
-  return { kg, sc, dias: +p.dias };
+  return { kg, sc, dias: +p.dias, eg: +p.eg };
 }
 const segPick = (id, obj, key, cb) => $(id).querySelectorAll('button').forEach(b => b.onclick = () => {
   obj[key] = obj[key] === b.dataset.v ? '' : b.dataset.v;
@@ -45,10 +45,10 @@ function poAcc(){
   const A = [
     ['Registro auricular con los cables epicárdicos', `<ul><li>Conectá los dos cables auriculares a los electrodos de los brazos (blanco y negro) del electrocardiógrafo; las piernas, como siempre.</li><li>En DI queda un registro bipolar con una onda auricular grande y el QRS pequeño; DII y DIII muestran la aurícula con un QRS mayor.</li><li>Sin cables auriculares: electrodo bipolar transesofágico (sirve también para estimular la aurícula).</li></ul>`],
     ['Sobreestimulación auricular (reentradas)', `<ul><li>Marcapasos externo a los cables auriculares (o transesofágico).</li><li>Frecuencia 10–20 % mayor que la frecuencia auricular de la taquicardia, durante 3–5 s.</li><li>Si no corta, aumentar progresivamente frecuencia y duración en los intentos siguientes.</li><li>Riesgo: fibrilación auricular (tener el desfibrilador listo). No sirve en la FA ni en arritmias automáticas.</li></ul>`],
-    ['JET posoperatoria: manejo escalonado', `<ul><li><b>Meta:</b> FC &lt; 180 lpm en lactantes y &lt; 150 lpm en niños mayores; luego recuperar la sincronía AV.</li><li><b>1.</b> Reducir catecolaminas exógenas y endógenas (dolor, fiebre, anemia); optimizar sedoanalgesia; suspender vagolíticos (pancuronio, meperidina). Corregir el Mg.</li><li><b>2.</b> Hipotermia moderada 33–35 °C (requiere intubación y relajación; riesgo de FV y acidosis si se profundiza).</li><li><b>3.</b> Amiodarona: carga 5 mg/kg${mg(5)} en alícuotas de 1 mg/kg cada 5 min o 2 bolos de 2,5 mg/kg, y luego infusión continua 48–72 h. Alternativas: esmolol, digoxina. Dexmedetomidina con buenos resultados comunicados.</li><li><b>4.</b> Con FC más baja: marcapaseo auricular por encima de la JET, o AV sensando el QRS, para recuperar la sincronía.</li><li><b>5.</b> Refractaria con inestabilidad: marcapaseo ventricular apareado (especialista), ECMO o ablación del nodo AV.</li></ul>`],
-    ['Bloqueo AV posquirúrgico', `<ul><li>Riesgo en cirugías cerca del nodo AV: CIV, canal AV, Fallot, Ebstein, L-TGA con CIV, Ross, Konno, miectomía.</li><li>Agudo con mala tolerancia: marcapaseo AV con los cables epicárdicos temporales (umbral con margen de al menos el doble).</li><li>El 50–60 % es transitorio y casi todos revierten en los primeros 10 días.</li><li>Marcapasos definitivo: el libro lo indica si el BAV de 3.er grado o el Mobitz II persiste 10–14 días. ⚠️ Las guías ACC/AHA/HRS y PACES lo indican si persiste ≥ 7 días.</li><li>Si el BAV completo ya existía antes de la cirugía, conviene implantar el marcapasos antes de operar.</li><li>BAV de 1.er grado, bloqueos de rama o bifasciculares aislados no requieren marcapasos.</li></ul>`],
+    ['JET posoperatoria: manejo escalonado', `<ul><li><b>Meta:</b> FC &lt; 180 lpm en lactantes y &lt; 150 lpm en niños mayores; luego recuperar la sincronía AV.</li><li><b>1.</b> Reducir catecolaminas exógenas y endógenas (dolor, fiebre, anemia); optimizar sedoanalgesia; suspender vagolíticos (pancuronio, meperidina). Corregir el Mg.</li><li><b>2.</b> Hipotermia moderada 33–35 °C (requiere intubación y relajación; riesgo de FV y acidosis si se profundiza).</li><li><b>3.</b> Amiodarona: carga 5 mg/kg${mg(5)} en 20–60 min (se puede repetir hasta 15 mg/kg/día) y luego infusión 7–15 µg/kg/min durante 48–72 h (PALS, NeoFax; el libro la da en alícuotas de 1 mg/kg cada 5 min). Alternativas: esmolol, digoxina. Dexmedetomidina con buenos resultados comunicados.</li><li><b>4.</b> Con FC más baja: marcapaseo auricular por encima de la JET, o AV sensando el QRS, para recuperar la sincronía.</li><li><b>5.</b> Refractaria con inestabilidad: marcapaseo ventricular apareado (especialista), ECMO o ablación del nodo AV.</li></ul>`],
+    ['Bloqueo AV posquirúrgico', `<ul><li>Riesgo en cirugías cerca del nodo AV: CIV, canal AV, Fallot, Ebstein, L-TGA con CIV, Ross, Konno, miectomía.</li><li>Agudo con mala tolerancia: marcapaseo AV con los cables epicárdicos temporales (umbral con margen de al menos el doble).</li><li>El 50–60 % es transitorio y casi todos revierten en los primeros 10 días.</li><li><b>Marcapasos definitivo si el BAV avanzado o completo persiste ≥ 7 días</b> o no se espera que resuelva (ACC/AHA/HRS 2008; PACES/HRS 2021). El libro espera 10–14 días.</li><li>Si el BAV completo ya existía antes de la cirugía, conviene implantar el marcapasos antes de operar.</li><li>BAV de 1.er grado, bloqueos de rama o bifasciculares aislados no requieren marcapasos.</li></ul>`],
     ['Disfunción sinusal en el PO', `<ul><li>Tras Mustard, Senning, Fontan, CIA seno venoso, canulación de la VCS; también en heterotaxia con isomerismo izquierdo.</li><li>Descartar causas secundarias: antiarrítmicos, hipoxia, acidosis, hipercalcemia, hipotiroidismo.</li><li>Agudo: marcapaseo auricular con los cables epicárdicos (o transesofágico). Alternativa: isoproterenol.</li><li>Si es sintomática, con dilatación progresiva o taqui-bradi: marcapasos definitivo.</li></ul>`],
-    ['TV, torsades y FV en el PO', `<ul><li>Prevención: K y Mg en rango alto-normal, inotrópicos al mínimo necesario.</li><li>TV inestable: cardioversión sincronizada; FV: RCP y desfibrilación 2 J/kg${jk(2)}.</li><li>Lidocaína 1 mg/kg${mg(1)} en bolo, luego 20–50 µg/kg/min.</li><li>Torsades: sulfato de magnesio 25 mg/kg${mg(25, 0)} en 5–15 min; evitar amiodarona y procainamida; marcapaseo a frecuencia algo alta o isoproterenol acortan el QT.</li><li>Extrasístoles aisladas o bigeminismo: observar y corregir la causa metabólica. Ectopia repetitiva que persiste días: Holter o EEF.</li></ul>`]
+    ['TV, torsades y FV en el PO', `<ul><li>Prevención: K y Mg en rango alto-normal, inotrópicos al mínimo necesario.</li><li>TV con pulso inestable: cardioversión sincronizada 0,5–1 J/kg${jk(0.5)}–${k > 0 ? f(k, 1) + ' J' : ''}, luego 2 J/kg. FV o TV sin pulso: RCP y desfibrilación 2 J/kg${jk(2)}, luego 4 J/kg${jk(4)} (PALS).</li><li>Lidocaína 1 mg/kg${mg(1)} en bolo, luego 20–50 µg/kg/min.</li><li>Torsades: sulfato de magnesio 25–50 mg/kg${k > 0 ? ` (${f(25 * k, 0)}–${f(Math.min(50 * k, 2000), 0)} mg)` : ''} en 10–20 min, máx. 2 g (PALS); evitar amiodarona y procainamida; marcapaseo a frecuencia algo alta o isoproterenol acortan el QT.</li><li>Extrasístoles aisladas o bigeminismo: observar y corregir la causa metabólica. Ectopia repetitiva que persiste días: Holter o EEF.</li></ul>`]
   ];
   $('poAcc').innerHTML = A.map(([t, b]) => `<details class="ac"><summary>${t}</summary><div class="abody">${b}</div></details>`).join('');
 }
@@ -96,34 +96,35 @@ function feCalc(){
 /* ---------- Antiarrítmicos ---------- */
 // u: 'kg' (mg/kg), 'mcg' (µg/kg), 'm2' (mg/m²), 'inf' (µg/kg/min, sin cálculo)
 const AA = [
-  {n:'Adenosina', v:'IV', d:[[100,150,'mcg']], txt:'bolo rápido + lavado; duplicar hasta 300 µg/kg (máx. 12 mg)', w:''},
-  {n:'Amiodarona', v:'IV', d:[[5,5,'kg']], txt:'carga en alícuotas de 1 mg/kg cada 5 min o 2 bolos de 2,5 mg/kg; en D5 %', w:'⚠️ Otras fuentes la indican en 20–60 min. Hipotensión con infusión rápida.'},
-  {n:'Amiodarona', v:'VO', d:[[10,15,'kgd']], txt:'carga; mantenimiento 2–5 mg/kg/día en 1 toma', w:'Con digoxina: bajar la digoxina 30–50 %. Control de tiroides, hígado y ojos.'},
-  {n:'Lidocaína', v:'IV', d:[[1,1,'kg']], txt:'bolo, repetible; infusión 20–50 µg/kg/min (menos con bajo gasto)', w:''},
-  {n:'Procainamida', v:'IV', d:[[7,15,'kg']], txt:'carga lenta con control de TA', w:'Hipotensión. Prueba de la vía accesoria: 10 mg/kg en 5 min.'},
-  {n:'Esmolol', v:'IV', d:[[500,500,'mcg']], txt:'carga en 1–2 min; luego 50–200 µg/kg/min', w:'Hipotensión en el bolo, sobre todo en lactantes.'},
-  {n:'Propranolol', v:'VO', d:[[1,2,'kgd']], txt:'cada 6 h (lactantes) u 8 h', w:''},
-  {n:'Propranolol', v:'IV', d:[[0.1,0.2,'kg']], txt:'dosis lenta, titulando', w:'⚠️ NeoFax indica 0,01 mg/kg en 10 min en neonatos: usar la dosis menor.'},
-  {n:'Atenolol', v:'VO', d:[[1,2,'kgd']], txt:'en 1–2 tomas (hasta 3 mg/kg/día)', w:''},
-  {n:'Flecainida', v:'VO', d:[[80,110,'m2']], txt:'cada 12 h (lactantes 80–90; mayores 100–110)', w:'Iniciar internado. Evitar en corazones con cardiopatía. Los lácteos cambian la absorción.'},
-  {n:'Propafenona', v:'VO', d:[[150,200,'m2']], txt:'cada 8 h', w:'Evitar en cardiopatía estructural.'},
-  {n:'Sotalol', v:'VO', d:[[90,200,'m2']], txt:'en 2–3 tomas (inicio 90)', w:'Controlar el QTc; evitar con hipopotasemia o hipomagnesemia.'},
-  {n:'Digoxina', v:'IV', d:[[30,50,'mcg']], txt:'carga total (prematuros 20–25 µg/kg): 50 % y luego 2 × 25 %', w:'Evitar en WPW. Ajustar a la función renal.'},
-  {n:'Mexiletina', v:'VO', d:[[2,5,'kg']], txt:'por dosis cada 8 h (lactantes hasta 7–8 mg/kg)', w:''},
-  {n:'Sulfato de magnesio', v:'IV', d:[[25,25,'kg']], txt:'en 5–15 min (torsades)', w:''}
+  {n:'Adenosina', v:'IV', d:[[100,100,'mcg']], txt:'1.ª dosis (máx. 6 mg) en bolo rápido + lavado; 2.ª: 0,2 mg/kg (máx. 12 mg)', src:'PALS', w:'Libro: 100–150 µg/kg, duplicando hasta 300 µg/kg.'},
+  {n:'Amiodarona', v:'IV', d:[[5,5,'kg']], txt:'carga en 20–60 min con pulso (en bolo solo en paro); máx. 300 mg; se puede repetir hasta 15 mg/kg/día. Infusión 7–15 µg/kg/min', src:'PALS · NeoFax', w:'Libro: en alícuotas de 1 mg/kg cada 5 min. Hipotensión con la infusión rápida.'},
+  {n:'Amiodarona', v:'VO', d:[[5,10,'kg']], txt:'por dosis cada 12 h', src:'NeoFax', w:'Libro: carga 10–15 mg/kg/día y mantenimiento 2–5 mg/kg/día. Con digoxina: bajarla 30–50 %. Control de tiroides, hígado y ojos.'},
+  {n:'Lidocaína', v:'IV', d:[[1,1,'kg']], txt:'bolo, repetible; infusión 20–50 µg/kg/min (menos con bajo gasto)', src:'PALS · libro', w:''},
+  {n:'Procainamida', v:'IV', d:[[15,15,'kg']], txt:'carga en 30–60 min con control de TA y ECG', src:'PALS', w:'Libro: 7–15 mg/kg. No asociar a amiodarona sin consulta.'},
+  {n:'Esmolol', v:'IV', d:[[500,500,'mcg']], txt:'carga en 1–2 min; luego 50–200 µg/kg/min', src:'Libro', w:'Hipotensión en el bolo, sobre todo en lactantes.'},
+  {n:'Propranolol', v:'VO', d:[[0.25,1,'kg']], txt:'por dosis cada 6 h (hasta 3,5 mg/kg/dosis)', src:'NeoFax', w:'Libro: 1–2 mg/kg/día cada 6–8 h.'},
+  {n:'Propranolol', v:'IV', d:[[0.01,0.01,'kg']], txt:'en 10 min cada 6 h; aumentar hasta 0,15 mg/kg/dosis', src:'NeoFax', w:'Libro: 0,1–0,2 mg/kg (más alta que NeoFax).'},
+  {n:'Atenolol', v:'VO', d:[[1,2,'kgd']], txt:'en 1–2 tomas (hasta 3 mg/kg/día)', src:'Libro', w:''},
+  {n:'Flecainida', v:'VO', d:[[80,110,'m2']], txt:'cada 12 h (lactantes 80–90; mayores 100–110)', src:'Libro', w:'Iniciar internado. Evitar en cardiopatía estructural. Los lácteos cambian la absorción.'},
+  {n:'Propafenona', v:'VO', d:[[150,200,'m2']], txt:'cada 8 h', src:'Libro', w:'Evitar en cardiopatía estructural.'},
+  {n:'Sotalol', v:'VO', d:[[90,200,'m2']], txt:'en 2–3 tomas (inicio 90)', src:'Libro', w:'Controlar el QTc; evitar con hipopotasemia o hipomagnesemia.'},
+  {n:'Digoxina', v:'IV', d:[[0,0,'dig']], txt:'dosis total de digitalización según EPM, dividida en 3 dosis en 24 h (VO: 25 % más)', src:'NeoFax', w:'Libro: 30–50 µg/kg (prematuros 20–25). Evitar en WPW. Ajustar a la función renal.'},
+  {n:'Mexiletina', v:'VO', d:[[2,5,'kg']], txt:'por dosis cada 8 h (lactantes hasta 7–8 mg/kg)', src:'Libro', w:''},
+  {n:'Sulfato de magnesio', v:'IV', d:[[25,50,'kg']], txt:'en 10–20 min (torsades); máx. 2 g', src:'PALS', w:'Libro: 25 mg/kg en 5–15 min.'}
 ];
 function aar(){
   const P = pac();
   $('aarPac').innerHTML = P.kg > 0 ? `Peso ${f(P.kg * 1000)} g · superficie ${f(P.sc, 3)} m²${num('zTalla') > 0 ? ' (Haycock)' : ' (Costeff, sin talla)'}.` : 'Cargá el peso del paciente en la barra superior para calcular las dosis.';
   const calc = ([a, b, u]) => {
+    if (u === 'dig') { const pma = P.eg > 0 ? P.eg + (P.dias || 0) / 7 : NaN; const d = !isFinite(pma) ? NaN : pma < 30 ? 20 : pma < 37 ? 25 : pma < 49 ? 40 : 50; return P.kg > 0 && isFinite(d) ? `${f(d)} µg/kg = ${f(d * P.kg / 1000, 3)} mg` : 'falta EG'; }
     if (u === 'kgd') return P.kg > 0 ? `${f(a * P.kg, 2)}${b !== a ? '–' + f(b * P.kg, 2) : ''} mg/día` : '—';
-    if (u === 'kg') return P.kg > 0 ? `${f(a * P.kg, 2)}${b !== a ? '–' + f(b * P.kg, 2) : ''} mg` : '—';
+    if (u === 'kg') { const dd = a * P.kg < 0.1 ? 3 : 2; return P.kg > 0 ? `${f(a * P.kg, dd)}${b !== a ? '–' + f(b * P.kg, dd) : ''} mg` : '—'; }
     if (u === 'mcg') return P.kg > 0 ? `${f(a * P.kg / 1000, 3)}${b !== a ? '–' + f(b * P.kg / 1000, 3) : ''} mg` : '—';
     if (u === 'm2') return P.sc > 0 ? `${f(a * P.sc, 1)}${b !== a ? '–' + f(b * P.sc, 1) : ''} mg/día` : '—';
     return '—';
   };
-  const lab = ([a, b, u]) => `${f(a, 2)}${b !== a ? '–' + f(b, 2) : ''} ${u === 'kg' ? 'mg/kg' : u === 'kgd' ? 'mg/kg/día' : u === 'mcg' ? 'µg/kg' : 'mg/m²/día'}`;
-  $('aarTab').outerHTML = `<div id="aarTab" class="aarl">${AA.map(a => `<div class="aar"><div class="aar-h"><b>${a.n}</b> <span class="aar-v">${a.v}</span></div><div class="aar-d"><span>${lab(a.d[0])}</span><b>${calc(a.d[0])}</b></div><div class="aar-t">${a.txt}</div>${a.w ? `<div class="aar-w">${a.w}</div>` : ''}</div>`).join('')}</div>`;
+  const lab = ([a, b, u]) => u === 'dig' ? '20–50 µg/kg' : `${f(a, 2)}${b !== a ? '–' + f(b, 2) : ''} ${u === 'kg' ? 'mg/kg' : u === 'kgd' ? 'mg/kg/día' : u === 'mcg' ? 'µg/kg' : 'mg/m²/día'}`;
+  $('aarTab').outerHTML = `<div id="aarTab" class="aarl">${AA.map(a => `<div class="aar"><div class="aar-h"><b>${a.n}</b> <span class="aar-v">${a.v}</span> <span class="aar-v">${a.src}</span></div><div class="aar-d"><span>${lab(a.d[0])}</span><b>${calc(a.d[0])}</b></div><div class="aar-t">${a.txt}</div>${a.w ? `<div class="aar-w">${a.w}</div>` : ''}</div>`).join('')}</div>`;
   $('rAar').innerHTML = pill('warn', 'Verapamilo contraindicado en menores de 1 año. Antes de asociar antiarrítmicos revisá interacciones: la amiodarona aumenta los niveles de digoxina, flecainida, procainamida y fenitoína y potencia la warfarina.');
 }
 
