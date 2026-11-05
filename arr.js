@@ -106,7 +106,61 @@ function mp(){
   $('rMp').innerHTML = h;
 }
 
+
+// Score de Shanghai (síndrome de Brugada)
+const BRU = [
+  {k:'ecg', n:'ECG (12 derivaciones o Holter) · obligatorio', it:[
+    ['esp',3.5,'Patrón tipo 1 espontáneo, en derivaciones estándar o altas'],
+    ['fie',3,'Patrón tipo 1 inducido por fiebre'],
+    ['dro',2,'Patrón tipo 2 o 3 que pasa a tipo 1 con bloqueante de sodio (ajmalina, flecainida, procainamida)']]},
+  {k:'cli', n:'Antecedentes clínicos', it:[
+    ['pcr',3,'Paro cardíaco inexplicado o FV / TV polimorfa documentada'],
+    ['agn',2,'Respiración agónica nocturna'],
+    ['sar',2,'Síncope de probable causa arrítmica'],
+    ['sin',1,'Síncope de mecanismo poco claro'],
+    ['fa',0.5,'Aleteo o FA antes de los 30 años sin otra causa']]},
+  {k:'fam', n:'Antecedentes familiares (1.er o 2.º grado)', it:[
+    ['def',2,'Familiar con síndrome de Brugada definido'],
+    ['sos',1,'Muerte súbita sospechosa (con fiebre, nocturna o con fármacos que agravan el Brugada)'],
+    ['ms45',0.5,'Muerte súbita inexplicada antes de los 45 años con autopsia negativa']]},
+  {k:'gen', n:'Genética', it:[['var',0.5,'Variante probablemente patogénica en un gen de Brugada (SCN5A u otro)']]}
+];
+const bruSel = {ecg:'', cli:'', fam:'', gen:''};
+let bruPed = true;
+function bru(){
+  let tot = 0;
+  BRU.forEach(c => { const it = c.it.find(x => x[0] === bruSel[c.k]); if (it) tot += it[1]; });
+  $('bruV').textContent = f(tot, 1);
+  const ecg = bruSel.ecg;
+  let h = '', txt;
+  if (!ecg) { txt = 'Falta el hallazgo de ECG'; h += pill('info', 'Sin un patrón de ECG el puntaje no es diagnóstico, aunque sume por los otros criterios. Un ECG con las precordiales altas (V1–V2 en el 2.º y 3.er espacio) aumenta la detección del tipo 1.'); }
+  else if (tot >= 3.5) { txt = 'Brugada probable o definido'; h += pill('crit', `<b>${f(tot,1)} puntos: síndrome de Brugada probable o definido.</b>`); }
+  else if (tot >= 2) { txt = 'Brugada posible'; h += pill('warn', `<b>${f(tot,1)} puntos: síndrome de Brugada posible.</b> Completar estudio (ECG con precordiales altas y con fiebre, antecedentes familiares, genética).`); }
+  else { txt = 'No diagnóstico'; h += pill('ok', `<b>${f(tot,1)} puntos: no diagnóstico.</b>`); }
+  $('bruTxt').textContent = txt;
+  if (ecg) {
+    const escDx = ecg === 'esp' || ((ecg === 'fie' || ecg === 'dro') && (['pcr','agn','sar'].includes(bruSel.cli) || bruSel.fam === 'def' || bruSel.fam === 'ms45'));
+    h += pill('info', `<b>Criterio ESC 2022:</b> ${ecg === 'esp' ? 'tipo 1 espontáneo → diagnóstico de síndrome de Brugada.' : escDx ? 'tipo 1 inducido (fiebre o fármaco) más síncope arrítmico, respiración agónica nocturna, paro/FV, familiar con Brugada o muerte súbita < 45 años con autopsia negativa → diagnóstico.' : 'tipo 1 inducido sin síncope arrítmico, respiración agónica, paro ni antecedentes familiares de Brugada o muerte súbita < 45 años → no alcanza para el diagnóstico.'} Ambos criterios pueden diferir: en niños la ESC diagnostica algo más que Shanghai.`);
+  }
+  if (bruSel.cli === 'pcr') h += pill('crit', 'Paro recuperado o FV / TV polimorfa: indicación de cardiodesfibrilador implantable (prevención secundaria).');
+  if (bruSel.cli === 'sar' && ecg === 'esp') h += pill('warn', 'Tipo 1 espontáneo con síncope arrítmico: grupo de alto riesgo; evaluar cardiodesfibrilador con electrofisiología.');
+  h += pill('info', '<b>En niños:</b> la fiebre es el principal desencadenante: tratarla en forma temprana y enérgica y hacer ECG durante los cuadros febriles. La prueba con bloqueante de sodio, en general, solo después de la pubertad. Evitar los fármacos de <a href="https://www.brugadadrugs.org" target="_blank" rel="noopener">brugadadrugs.org</a>. Tormenta arrítmica: isoproterenol.');
+  $('rBru').innerHTML = h;
+}
+function bruInit(){
+  if (!$('bruList')) return;
+  $('bruList').innerHTML = BRU.map(c => `<div class="crit-g">${c.n}</div>` + c.it.map(([k, p, t]) => `<label class="ck"><input type="checkbox" data-g="${c.k}" data-k="${k}"><span class="t">${t}</span><span class="p">${f(p,1)}</span></label>`).join('')).join('');
+  $('bruList').querySelectorAll('input').forEach(i => i.addEventListener('change', () => {
+    const g = i.dataset.g;
+    if (i.checked) { $('bruList').querySelectorAll(`input[data-g="${g}"]`).forEach(o => { if (o !== i) o.checked = false; }); bruSel[g] = i.dataset.k; }
+    else bruSel[g] = '';
+    bru();
+  }));
+  bru();
+}
+
 function init(){
+  bruInit();
   if (!$('s-taq')) return;
   $('tqTab').innerHTML = FC.map(r => `<tr><td>${r[0]}</td><td>${r[1]}–${r[2]}</td></tr>`).join('');
   for (const [id, key] of Object.entries(segs)) $(id).querySelectorAll('button').forEach(b => b.onclick = () => {

@@ -393,7 +393,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </div>
   <div id="viewEcg" class="view" hidden>
   <nav class="jump" aria-label="Ir a sección">
-    <a href="#s-eje">Eje</a><a href="#s-norm">Normales por edad</a><a href="#s-atlas">Bloqueos y arritmias</a><a href="#s-taq">Taquicardia</a><a href="#s-mp">Marcapasos</a><a href="#s-qtc">QTc</a><a href="#s-int">Interpretación</a><a href="#s-sch">Schwartz</a><a href="#s-med">Cómo medir</a>
+    <a href="#s-eje">Eje</a><a href="#s-norm">Normales por edad</a><a href="#s-atlas">Bloqueos y arritmias</a><a href="#s-taq">Taquicardia</a><a href="#s-mp">Marcapasos</a><a href="#s-qtc">QTc</a><a href="#s-int">Interpretación</a><a href="#s-sch">Schwartz</a><a href="#s-bru">Brugada</a><a href="#s-med">Cómo medir</a>
   </nav>
 
   <!-- EJE -->
@@ -510,6 +510,15 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <div class="score"><div><b>Puntaje</b><div class="hint" id="schTxt"></div></div><div class="v" id="schV">0</div></div>
     <div class="res" id="rSch"></div>
     <p class="hint">Puntuar en ausencia de fármacos o trastornos que alteren el QT. El QTc del score es el de Bazett. Un mismo familiar no puede sumar en los dos criterios de antecedentes familiares.</p>
+  </section>
+
+  <section class="card" id="s-bru">
+    <h2>Score de Shanghai · síndrome de Brugada</h2>
+    <p class="hint">Elegí un ítem por categoría (se suma solo el de mayor valor). Tiene que haber al menos un hallazgo de ECG. Tipo 1: ST elevado ≥ 2 mm en forma de cúpula ("coved") con T negativa en V1–V2, en posición estándar o alta (2.º–3.er espacio).</p>
+    <div id="bruList"></div>
+    <div class="score"><div><b>Puntaje</b><div class="hint" id="bruTxt"></div></div><div class="v" id="bruV">0</div></div>
+    <div class="res" id="rBru"></div>
+    <p class="hint">Shanghai Score System: consenso HRS/EHRA/APHRS/SOLAECE de síndromes de onda J 2016 (Antzelevitch y col.); validación de Kawada y col., JACC EP 2018. Criterio ESC 2022: tipo 1 espontáneo es diagnóstico; inducido por fármacos solo con hallazgos clínicos o familiares. Pediatría: consenso holandés (Peltenburg y col., Neth Heart J 2023).</p>
   </section>
 
   <!-- CÓMO MEDIR -->
@@ -2594,7 +2603,7 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 </script>
 <script src="paciente.js?v=v63"></script>
 <script src="eco.js?v=v67"></script>
-<script src="arr.js?v=v68"></script>
+<script src="arr.js?v=v71"></script>
 <script type="module" src="sim3d.js"></script>
 </body>
 </html>
