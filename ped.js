@@ -101,29 +101,39 @@ const AA = [
   {n:'Amiodarona', v:'VO', d:[[5,10,'kg']], txt:'por dosis cada 12 h', src:'NeoFax', w:'Libro: carga 10–15 mg/kg/día y mantenimiento 2–5 mg/kg/día. Con digoxina: bajarla 30–50 %. Control de tiroides, hígado y ojos.'},
   {n:'Lidocaína', v:'IV', d:[[1,1,'kg']], txt:'bolo, repetible; infusión 20–50 µg/kg/min (menos con bajo gasto)', src:'PALS · libro', w:''},
   {n:'Procainamida', v:'IV', d:[[15,15,'kg']], txt:'carga en 30–60 min con control de TA y ECG', src:'PALS', w:'Libro: 7–15 mg/kg. No asociar a amiodarona sin consulta.'},
-  {n:'Esmolol', v:'IV', d:[[500,500,'mcg']], txt:'carga en 1–2 min; luego 50–200 µg/kg/min', src:'Libro', w:'Hipotensión en el bolo, sobre todo en lactantes.'},
+  {n:'Esmolol', v:'IV', d:[[100,500,'mcg']], txt:'carga en 1 min (opcional; omitir si está inestable); infusión inicial 25–100 µg/kg/min, subir 25–50 cada 5 min; habitual hasta 200–500 µg/kg/min', src:'Lexicomp · ANMF', w:'Hipotensión, sobre todo con el bolo y en lactantes. Libro: 500 µg/kg y 50–200 µg/kg/min.'},
   {n:'Propranolol', v:'VO', d:[[0.25,1,'kg']], txt:'por dosis cada 6 h (hasta 3,5 mg/kg/dosis)', src:'NeoFax', w:'Libro: 1–2 mg/kg/día cada 6–8 h.'},
   {n:'Propranolol', v:'IV', d:[[0.01,0.01,'kg']], txt:'en 10 min cada 6 h; aumentar hasta 0,15 mg/kg/dosis', src:'NeoFax', w:'Libro: 0,1–0,2 mg/kg (más alta que NeoFax).'},
-  {n:'Atenolol', v:'VO', d:[[1,2,'kgd']], txt:'en 1–2 tomas (hasta 3 mg/kg/día)', src:'Libro', w:''},
-  {n:'Flecainida', v:'VO', d:[[80,110,'m2']], txt:'cada 12 h (lactantes 80–90; mayores 100–110)', src:'Libro', w:'Iniciar internado. Evitar en cardiopatía estructural. Los lácteos cambian la absorción.'},
-  {n:'Propafenona', v:'VO', d:[[150,200,'m2']], txt:'cada 8 h', src:'Libro', w:'Evitar en cardiopatía estructural.'},
-  {n:'Sotalol', v:'VO', d:[[90,200,'m2']], txt:'en 2–3 tomas (inicio 90)', src:'Libro', w:'Controlar el QTc; evitar con hipopotasemia o hipomagnesemia.'},
+  {n:'Atenolol', v:'VO', d:[[0.5,1,'kgd']], txt:'en 1–2 tomas; máx. 2 mg/kg/día (100 mg/día). Ajustar con FG &lt; 50', src:'Lexicomp', w:'Libro: 1–3 mg/kg/día.'},
+  {n:'Flecainida', v:'VO', d:[[0,0,'fle']], txt:'dosis inicial en 2–3 tomas: 50 mg/m²/día antes de los 6 meses, 100 mg/m²/día después; subir cada 4 días; máx. 200 mg/m²/día. Sin carga', src:'Ficha FDA', w:'Iniciar internado con ECG (QRS). Nivel valle 200–500 ng/mL. Con amiodarona: bajar 50 %. Los lácteos reducen la absorción. Evitar en cardiopatía estructural.'},
+  {n:'Propafenona', v:'VO', d:[[200,300,'m2']], txt:'cada 8 h; máx. 600 mg/m²/día', src:'Lexicomp · AHFS', w:'Uso fuera de ficha en pediatría. Evitar en cardiopatía estructural. Libro: 150–200 mg/m²/día.'},
+  {n:'Sotalol', v:'VO', d:[[0,0,'sot']], txt:'30 mg/m² cada 8 h (90 mg/m²/día) × factor de edad en menores de 2 años; titular cada ≥ 36 h hasta 60 mg/m² cada 8 h', src:'Ficha FDA', w:'Iniciar internado con ECG. QTc ≥ 500 ms: bajar o suspender. Evitar con K o Mg bajos; alargar intervalo con FG bajo. Libro: 90–200 mg/m²/día.'},
   {n:'Digoxina', v:'IV', d:[[0,0,'dig']], txt:'dosis total de digitalización según EPM, dividida en 3 dosis en 24 h (VO: 25 % más)', src:'NeoFax', w:'Libro: 30–50 µg/kg (prematuros 20–25). Evitar en WPW. Ajustar a la función renal.'},
-  {n:'Mexiletina', v:'VO', d:[[2,5,'kg']], txt:'por dosis cada 8 h (lactantes hasta 7–8 mg/kg)', src:'Libro', w:''},
+  {n:'Mexiletina', v:'VO', d:[[6,8,'kgd']], txt:'inicio en 2–3 tomas por 2–3 días; luego 2–5 mg/kg/dosis cada 8–12 h; máx. 15 mg/kg/día (1200 mg/día)', src:'Lexicomp', w:'Datos pediátricos limitados (QT largo tipo 3, TV). Libro: 2–5 mg/kg/dosis cada 8 h.'},
   {n:'Sulfato de magnesio', v:'IV', d:[[25,50,'kg']], txt:'en 10–20 min (torsades); máx. 2 g', src:'PALS', w:'Libro: 25 mg/kg en 5–15 min.'}
 ];
+// Factor de edad del sotalol (< 2 años), aproximado del nomograma de la ficha FDA: 1 semana 0,3; 1 mes 0,68; 20 meses 0,97; ≥ 24 meses 1
+function sotFactor(dias){
+  if (!isFinite(dias)) return 1;
+  const m = Math.max(dias, 1) / 30.4, P = [[0.23,0.3],[1,0.68],[20,0.97],[24,1]];
+  if (m >= 24) return 1; if (m <= P[0][0]) return 0.3;
+  for (let i = 0; i < P.length - 1; i++) { const [x1,y1] = P[i], [x2,y2] = P[i+1]; if (m <= x2) { const t = (Math.log(m) - Math.log(x1)) / (Math.log(x2) - Math.log(x1)); return y1 + t * (y2 - y1); } }
+  return 1;
+}
 function aar(){
   const P = pac();
   $('aarPac').innerHTML = P.kg > 0 ? `Peso ${f(P.kg * 1000)} g · superficie ${f(P.sc, 3)} m²${num('zTalla') > 0 ? ' (Haycock)' : ' (Costeff, sin talla)'}.` : 'Cargá el peso del paciente en la barra superior para calcular las dosis.';
   const calc = ([a, b, u]) => {
     if (u === 'dig') { const pma = P.eg > 0 ? P.eg + (P.dias || 0) / 7 : NaN; const d = !isFinite(pma) ? NaN : pma < 30 ? 20 : pma < 37 ? 25 : pma < 49 ? 40 : 50; return P.kg > 0 && isFinite(d) ? `${f(d)} µg/kg = ${f(d * P.kg / 1000, 3)} mg` : 'falta EG'; }
+    if (u === 'fle') { if (!(P.sc > 0)) return '—'; const m = (P.dias || 0) < 183 ? 50 : 100; return `${m} mg/m²/día = ${f(m * P.sc, 1)} mg/día (máx. ${f(200 * P.sc, 1)})`; }
+    if (u === 'sot') { if (!(P.sc > 0)) return '—'; const fa = sotFactor(P.dias); return `${f(30 * fa, 1)} mg/m² = ${f(30 * fa * P.sc, 1)} mg cada 8 h${fa < 1 ? ` (factor ${f(fa, 2)})` : ''}`; }
     if (u === 'kgd') return P.kg > 0 ? `${f(a * P.kg, 2)}${b !== a ? '–' + f(b * P.kg, 2) : ''} mg/día` : '—';
     if (u === 'kg') { const dd = a * P.kg < 0.1 ? 3 : 2; return P.kg > 0 ? `${f(a * P.kg, dd)}${b !== a ? '–' + f(b * P.kg, dd) : ''} mg` : '—'; }
     if (u === 'mcg') return P.kg > 0 ? `${f(a * P.kg / 1000, 3)}${b !== a ? '–' + f(b * P.kg / 1000, 3) : ''} mg` : '—';
     if (u === 'm2') return P.sc > 0 ? `${f(a * P.sc, 1)}${b !== a ? '–' + f(b * P.sc, 1) : ''} mg/día` : '—';
     return '—';
   };
-  const lab = ([a, b, u]) => u === 'dig' ? '20–50 µg/kg' : `${f(a, 2)}${b !== a ? '–' + f(b, 2) : ''} ${u === 'kg' ? 'mg/kg' : u === 'kgd' ? 'mg/kg/día' : u === 'mcg' ? 'µg/kg' : 'mg/m²/día'}`;
+  const lab = ([a, b, u]) => u === 'dig' ? '20–50 µg/kg' : u === 'fle' ? '50–100 mg/m²/día' : u === 'sot' ? '30 mg/m²/dosis' : `${f(a, 2)}${b !== a ? '–' + f(b, 2) : ''} ${u === 'kg' ? 'mg/kg' : u === 'kgd' ? 'mg/kg/día' : u === 'mcg' ? 'µg/kg' : 'mg/m²/día'}`;
   $('aarTab').outerHTML = `<div id="aarTab" class="aarl">${AA.map(a => `<div class="aar"><div class="aar-h"><b>${a.n}</b> <span class="aar-v">${a.v}</span> <span class="aar-v">${a.src}</span></div><div class="aar-d"><span>${lab(a.d[0])}</span><b>${calc(a.d[0])}</b></div><div class="aar-t">${a.txt}</div>${a.w ? `<div class="aar-w">${a.w}</div>` : ''}</div>`).join('')}</div>`;
   $('rAar').innerHTML = pill('warn', 'Verapamilo contraindicado en menores de 1 año. Antes de asociar antiarrítmicos revisá interacciones: la amiodarona aumenta los niveles de digoxina, flecainida, procainamida y fenitoína y potencia la warfarina.');
 }
