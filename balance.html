@@ -53,6 +53,32 @@ h1{font-size:1.25rem;margin:0}
 .note{font-size:.78rem;color:var(--muted);margin:0}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:.85rem;opacity:0;transition:.2s;pointer-events:none}
 .toast.on{opacity:1}
+.lg-top{display:grid;grid-template-columns:1.5fr 1fr;gap:8px}
+.lg-top label{display:flex;flex-direction:column;gap:3px;font-size:.78rem;color:var(--muted)}
+.lg-top input{font:600 .9rem var(--mono);color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:8px;width:100%;min-width:0}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--sunk);padding:3px;border-radius:10px}
+.seg2 button{border:0;background:transparent;color:var(--fg);font:600 .85rem var(--font);padding:7px 0;border-radius:8px}
+.seg2 button[aria-pressed=true]{background:var(--surface);box-shadow:0 1px 3px #0002}
+.tw{overflow-x:auto;margin:0 -4px}
+table.lg{width:100%;border-collapse:collapse;font-size:.76rem}
+.lg tbody tr{cursor:pointer}
+.lg th{font-size:.62rem;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:right;padding:5px 3px;border-bottom:1px solid var(--line);font-weight:700;white-space:nowrap}
+.lg td{padding:6px 3px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono);white-space:nowrap}
+.lg th:first-child,.lg td:first-child{text-align:left}
+.lg td:first-child{font-family:var(--font);white-space:normal;max-width:120px}
+.lg td small{display:block;color:var(--muted);font-size:.7rem;font-family:var(--font)}
+.lg tr.sel td{background:var(--soft)}
+.lg input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.lg .x{border:0;background:none;color:var(--muted);font:600 .7rem var(--font);padding:2px 0;text-decoration:underline}
+.rdok{color:var(--ok)}.rdbad{color:var(--bad)}.rdwarn{color:var(--warn)}
+.cmp{display:flex;flex-direction:column;gap:2px;background:var(--soft);border-radius:12px;padding:10px}
+.cmp .h{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.cmp div.r{display:grid;grid-template-columns:1fr 1fr 1fr .8fr;gap:4px;font-size:.8rem;align-items:baseline}
+.cmp div.r2{display:grid;grid-template-columns:1fr auto auto;gap:10px;font-size:.82rem}
+.cmp div.r2 b{font-family:var(--mono);text-align:right;font-weight:600}
+.cmp div.r b{font-family:var(--mono);text-align:right;font-weight:600}
+.cmp div.r b.up{color:var(--in)}.cmp div.r b.dn{color:var(--out)}
+#lgChart svg{display:block;width:100%}
 </style>
 </head>
 <body>
@@ -107,6 +133,18 @@ h1{font-size:1.25rem;margin:0}
     </div>
     <div class="btns"><button id="borrar">Borrar</button><button class="p" id="copiar">Copiar resumen</button></div>
     <p class="note">Ingresos y egresos = total ÷ peso (kg). Balance = ingresos − egresos (mL/kg). Relación E/I = egresos ÷ ingresos. Ritmo diurético = diuresis (mL/kg) ÷ horas del balance (débito, drenajes y otros cuentan solo en el total de egresos): &lt; 1 mL/kg/h oliguria; 1–4 habitual; &gt; 4 poliuria (orientativo, interpretar según edad, EG y clínica). No incluye pérdidas insensibles salvo que las cargues aparte. KDIGO neonatal modificado por diuresis (Jetton y Askenazi 2012): estadio 1 &gt; 0,5–1; estadio 2 &gt; 0,3–0,5; estadio 3 ≤ 0,3 mL/kg/h, sostenido 24 h.</p>
+  </section>
+
+  <section class="card" id="bitacora">
+    <h2>Bitácora de balances</h2>
+    <p class="note" style="margin:0">Guardá cada balance al cerrarlo para ver la evolución del paciente y comparar períodos distintos (por ejemplo, 6 h con 12 h). Se guarda en este dispositivo, separado por paciente.</p>
+    <div class="lg-top">
+      <label>Cierre del balance<input type="datetime-local" id="lgTs"></label>
+      <label>Nota<input id="lgNota" maxlength="40" placeholder="opcional"></label>
+    </div>
+    <div class="btns"><button class="p" id="lgSave">Guardar en la bitácora</button></div>
+    <div id="lgMsg"></div>
+    <div id="lgBody"></div>
   </section>
 </div>
 <div class="toast" id="toast">Copiado</div>
@@ -173,13 +211,104 @@ function balText(){const r=calc();const kg=r.kg;
   ...r.W.map(([a,b])=>`Peso ${a.toLowerCase()}: ${b}`),
   H<24&&kg?`Proyección 24 h: ingresos ${f1(r.Ik*24/H)} mL/kg, egresos ${f1(r.Ek*24/H)} mL/kg, balance ${(r.Bk>0?"+":"")+f1(r.Bk*24/H)} mL/kg${r.diu?`, diuresis ${f0(r.diu*24/H)} mL (${f1(r.diu/kg*24/H)} mL/kg)`:""}`:""].filter(Boolean).join("\n");
   return t}
-window.customSummary=()=>{const r=calc();return (r.I||r.E)?balText():""};
+window.customSummary=()=>{const r=calc();const t=(r.I||r.E)?balText():"";const l=(typeof lgText==="function")?lgText():"";return [t,l].filter(Boolean).join("\n\n")};
 $("copiar").onclick=async()=>{const t=balText();
   try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
   $("toast").classList.add("on");setTimeout(()=>$("toast").classList.remove("on"),1200)};
 const s=store.get();ids.forEach(i=>{if(s[i])$(i).value=s[i]});
 if(s.H){const b=[...$("hs").children].find(x=>+x.dataset.h===s.H);if(b)b.click()}
 calc();
+
+// ---------- Bitácora ----------
+const LG={get(){try{return JSON.parse(localStorage.getItem("balLog")||"[]")}catch(e){return[]}},set(a){try{localStorage.setItem("balLog",JSON.stringify(a))}catch(e){}}};
+let lgMode="per", lgSel=[];
+const pad=n=>String(n).padStart(2,"0");
+const nowLocal=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const fdt=ts=>{const d=new Date(ts);return `${pad(d.getDate())}/${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const sg=x=>(x>0?"+":"")+f1(x);
+$("lgTs").value=nowLocal();
+function lgMsg(cls,t){$("lgMsg").innerHTML=t?`<div class="k ${cls}" style="padding:9px 12px"><div class="d" style="margin:0">${t}</div></div>`:"";if(t)setTimeout(()=>{$("lgMsg").innerHTML=""},3500)}
+$("lgSave").onclick=()=>{
+  const r=calc(); if(!r.kg){lgMsg("bad","Falta el peso del paciente.");return}
+  if(!r.I&&!r.E){lgMsg("bad","El balance está vacío.");return}
+  const comp={};ids.slice(4).forEach(i=>{const v=num($(i).value);if(v)comp[i]=v});
+  const ts=$("lgTs").value?new Date($("lgTs").value).getTime():Date.now();
+  const e={id:Date.now(),ts,H,g:Math.round(r.kg*1000),I:r.I,E:r.E,diu:r.diu,ins:r.pi||0,c:comp,nota:$("lgNota").value.trim()};
+  const a=LG.get(); a.push(e); a.sort((x,y)=>x.ts-y.ts); LG.set(a);
+  $("lgNota").value=""; $("lgTs").value=nowLocal(); lgSel=[]; lgRender();
+  lgMsg("ok",`Guardado: balance de ${H} h cerrado el ${fdt(ts)}.`);
+};
+function met(e){const kg=e.g/1000,m=lgMode==="24"?24/e.H:1;
+  return {Ik:e.I/kg*m,Ek:e.E/kg*m,Bk:(e.I-e.E)/kg*m,ei:e.I?e.E/e.I:NaN,rd:e.diu?e.diu/kg/e.H:NaN,diu:e.diu/kg*m}}
+const rdCls=rd=>!isFinite(rd)?"":rd<1?"rdbad":rd>4?"rdwarn":"rdok";
+function lgRender(){
+  const a=LG.get(); const B=$("lgBody");
+  if(!a.length){B.innerHTML='<p class="note">Todavía no hay balances guardados para este paciente.</p>';return}
+  const u=lgMode==="24"?"mL/kg/24 h":"mL/kg del período";
+  let h=`<div class="seg2" id="lgMode"><button data-m="per" aria-pressed="${lgMode==="per"}">Valores del período</button><button data-m="24" aria-pressed="${lgMode==="24"}">Llevados a 24 h</button></div>`;
+  h+=`<p class="note">Ingresos, egresos y balance en ${u}. El ritmo diurético (mL/kg/h) y la relación E/I ya son comparables entre períodos distintos. Tocá dos filas para compararlas.</p>`;
+  h+=`<div id="lgChart">${chart(a)}</div>`;
+  h+=`<div class="tw"><table class="lg"><thead><tr><th>Cierre</th><th>Ingr.</th><th>Egr.</th><th>Bal.</th><th>E/I</th><th>RD</th></tr></thead><tbody>`;
+  [...a].reverse().forEach(e=>{const m=met(e);
+    h+=`<tr data-c="${e.id}" class="${lgSel.includes(e.id)?"sel":""}"><td>${lgSel.includes(e.id)?"✓ ":""}${fdt(e.ts)}<small>${e.H} h · ${f0(e.g)} g${e.nota?" · "+e.nota.replace(/</g,"&lt;"):""}</small><button class="x" data-d="${e.id}">borrar</button></td><td>${f1(m.Ik)}</td><td>${f1(m.Ek)}</td><td>${sg(m.Bk)}</td><td>${isFinite(m.ei)?f2(m.ei):"—"}</td><td class="${rdCls(m.rd)}">${isFinite(m.rd)?f2(m.rd):"—"}</td></tr>`});
+  h+=`</tbody></table></div>`;
+  h+=cmpBox(a)+dayBox(a);
+  h+=`<div class="btns"><button id="lgClr">Borrar bitácora</button><button id="lgCopy">Copiar bitácora</button></div>`;
+  B.innerHTML=h;
+  $("lgMode").onclick=ev=>{const b=ev.target.closest("button");if(!b)return;lgMode=b.dataset.m;lgRender()};
+  B.querySelectorAll("tr[data-c]").forEach(c=>c.onclick=ev=>{if(ev.target.closest(".x"))return;const id=+c.dataset.c;if(lgSel.includes(id))lgSel=lgSel.filter(x=>x!==id);else{lgSel.push(id);if(lgSel.length>2)lgSel.shift()}lgRender()});
+  B.querySelectorAll("[data-d]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();if(b.dataset.ok){LG.set(LG.get().filter(e=>e.id!==+b.dataset.d));lgSel=lgSel.filter(x=>x!==+b.dataset.d);lgRender()}else{b.dataset.ok=1;b.textContent="¿seguro? tocá de nuevo";setTimeout(()=>{if(b.isConnected){delete b.dataset.ok;b.textContent="borrar"}},2500)}});
+  $("lgClr").onclick=ev=>{const b=ev.target;if(b.dataset.ok){LG.set([]);lgSel=[];lgRender()}else{b.dataset.ok=1;b.textContent="Tocá de nuevo para borrar todo";setTimeout(()=>{if(b.isConnected){delete b.dataset.ok;b.textContent="Borrar bitácora"}},3000)}};
+  $("lgCopy").onclick=async()=>{const t=lgText();try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(_){}x.remove()}$("toast").classList.add("on");setTimeout(()=>$("toast").classList.remove("on"),1200)};
+}
+function cmpBox(a){
+  let pair=lgSel.map(id=>a.find(e=>e.id===id)).filter(Boolean);
+  if(pair.length<2&&a.length>=2) pair=a.slice(-2);
+  if(pair.length<2) return "";
+  pair.sort((x,y)=>x.ts-y.ts); const [A,Bb]=pair, mA=met(A), mB=met(Bb);
+  const fx=(v,d)=>d===2?f2(v):d===0?f0(v):f1(v);
+  const row=(n,x,y,d=1,inv)=>{if(!isFinite(x)||!isFinite(y))return `<div class="r"><span>${n}</span><b>${isFinite(x)?fx(x,d):"—"}</b><b>${isFinite(y)?fx(y,d):"—"}</b><b></b></div>`;
+    const dd=y-x;return `<div class="r"><span>${n}</span><b>${fx(x,d)}</b><b>${fx(y,d)}</b><b class="${dd>0?"up":dd<0?"dn":""}">${dd>0?"+":""}${fx(dd,d)}</b></div>`};
+  let h=`<div class="cmp"><div class="h">Comparación ${lgSel.length===2?"elegida":"de los dos últimos"} · ${lgMode==="24"?"llevado a 24 h":"valores del período"}</div>`;
+  h+=`<div class="r" style="color:var(--muted);font-size:.7rem"><span></span><b>${fdt(A.ts)}<br>${A.H} h</b><b>${fdt(Bb.ts)}<br>${Bb.H} h</b><b>Cambio</b></div>`;
+  h+=row("Ingresos",mA.Ik,mB.Ik)+row("Egresos",mA.Ek,mB.Ek)+row("Balance",mA.Bk,mB.Bk)+row("E/I",mA.ei,mB.ei,2)+row("RD",mA.rd,mB.rd,2)+row("Peso (g)",A.g,Bb.g,0)+`<div class="u" style="font-size:.72rem;color:var(--muted)">Ingresos, egresos y balance en mL/kg; RD en mL/kg/h.</div>`;
+  if(A.H!==Bb.H&&lgMode==="per") h+=`<div class="u" style="margin-top:4px;font-size:.75rem;color:var(--warn)">Períodos distintos: para comparar ingresos, egresos y balance usá «Llevados a 24 h».</div>`;
+  if(isFinite(mA.rd)&&isFinite(mB.rd)){const t=mB.rd-mA.rd;h+=`<div class="u" style="margin-top:4px;font-size:.78rem">Ritmo diurético ${Math.abs(t)<0.2?"estable":t>0?"en aumento":"en descenso"} (${t>0?"+":""}${f2(t)} mL/kg/h).</div>`}
+  return h+`</div>`;
+}
+function dayBox(a){
+  const last=a[a.length-1], from=last.ts-24*3600e3;
+  const inn=a.filter(e=>e.ts>from&&e.ts<=last.ts); if(inn.length<2) return "";
+  const hs=inn.reduce((s,e)=>s+e.H,0), kg=last.g/1000;
+  const I=inn.reduce((s,e)=>s+e.I,0),E=inn.reduce((s,e)=>s+e.E,0),D=inn.reduce((s,e)=>s+e.diu,0);
+  let h=`<div class="cmp"><div class="h">Acumulado de las últimas 24 h · ${inn.length} balances, ${hs} h cubiertas</div>`;
+  h+=`<div class="r2"><span>Ingresos</span><b>${f0(I)} mL</b><b>${f1(I/kg)} mL/kg</b></div><div class="r2"><span>Egresos</span><b>${f0(E)} mL</b><b>${f1(E/kg)} mL/kg</b></div><div class="r2"><span>Balance</span><b>${(I-E>0?"+":"")+f0(I-E)} mL</b><b>${sg((I-E)/kg)} mL/kg</b></div>`;
+  if(D) h+=`<div class="r2"><span>Diuresis</span><b>${f0(D)} mL</b><b>RD ${f2(D/kg/hs)} mL/kg/h</b></div>`;
+  if(hs>24) h+=`<div class="u" style="margin-top:4px;font-size:.75rem;color:var(--warn)">Los períodos suman más de 24 h: puede haber balances superpuestos.</div>`;
+  else if(hs<24) h+=`<div class="u" style="margin-top:4px;font-size:.75rem;color:var(--muted)">Faltan ${24-hs} h para completar el día. Se usa el peso del último balance.</div>`;
+  return h+`</div>`;
+}
+function chart(a){
+  const pts=a.map(e=>({t:e.ts,rd:e.diu?e.diu/(e.g/1000)/e.H:NaN,b:(e.I-e.E)/(e.g/1000)*24/e.H})).filter(p=>isFinite(p.rd));
+  if(pts.length<2) return "";
+  const W=380,Hh=130,l=26,r=8,tp=16,bt=24,t0=pts[0].t,t1=pts[pts.length-1].t||t0+1,mx=Math.max(5,...pts.map(p=>p.rd))*1.1;
+  const X=t=>l+(t1>t0?(t-t0)/(t1-t0):0.5)*(W-l-r), Y=v=>tp+(1-v/mx)*(Hh-tp-bt);
+  let s=`<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Evolución del ritmo diurético">`;
+  s+=`<rect x="${l}" y="${Y(4)}" width="${W-l-r}" height="${Y(1)-Y(4)}" fill="var(--okb)"/>`;
+  [0,1,4].forEach(v=>s+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${l-5}" y="${Y(v)+4}" font-size="11" text-anchor="end" fill="var(--muted)">${v}</text>`);
+  s+=`<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="${pts.map(p=>X(p.t).toFixed(1)+","+Y(p.rd).toFixed(1)).join(" ")}"/>`;
+  pts.forEach(p=>s+=`<circle cx="${X(p.t).toFixed(1)}" cy="${Y(p.rd).toFixed(1)}" r="4" fill="${p.rd<1?"var(--bad)":p.rd>4?"var(--warn)":"var(--accent)"}"/>`);
+  s+=`<text x="${l}" y="${Hh-8}" font-size="11" fill="var(--muted)">${fdt(t0)}</text><text x="${W-r}" y="${Hh-8}" font-size="11" text-anchor="end" fill="var(--muted)">${fdt(t1)}</text>`;
+  s+=`<text x="${l+4}" y="${tp+2}" font-size="11" fill="var(--muted)">Ritmo diurético (mL/kg/h) · franja verde 1–4</text></svg>`;
+  return s;
+}
+function lgText(){
+  const a=LG.get(); if(!a.length) return "";
+  return "Bitácora de balances\n"+a.map(e=>{const kg=e.g/1000,rd=e.diu?e.diu/kg/e.H:NaN;
+    return `${fdt(e.ts)} · ${e.H} h · ${f0(e.g)} g: I ${f1(e.I/kg)} / E ${f1(e.E/kg)} mL/kg, balance ${sg((e.I-e.E)/kg)} mL/kg${e.I?`, E/I ${f2(e.E/e.I)}`:""}${isFinite(rd)?`, RD ${f2(rd)} mL/kg/h`:""}${e.nota?` (${e.nota})`:""}`}).join("\n");
+}
+window.addEventListener("storage",ev=>{if(ev.key==="balLog")lgRender()});
+lgRender();
 </script>
 <script src="paciente.js?v=v63"></script>
 </body>

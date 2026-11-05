@@ -390,7 +390,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Varios pacientes (camas) ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const PK=/^(pac|balance|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs)$/;
+  const PK=/^(pac|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs)$/;
   const get=()=>{try{return JSON.parse(localStorage.getItem("camas")||"null")}catch(e){return null}};
   const put=c=>{try{localStorage.setItem("camas",JSON.stringify(c))}catch(e){toast("No hay espacio para guardar más pacientes")}};
   let C=get();
