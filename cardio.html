@@ -131,7 +131,15 @@ a.ego{color:var(--accent)}
 #viewEco .tile.main .v{font-size:1.7rem}
 #viewEco .tile .v small{white-space:nowrap}
 #eSep button{font-size:.8rem}
-#tqP,#tqAde{flex-wrap:wrap}
+#tqP,#tqAde,#feVA{flex-wrap:wrap}
+#feVA button{flex:1 1 30%;font-size:.8rem}
+.aarl{display:flex;flex-direction:column}
+.aar{padding:9px 2px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.aar-v{font-size:.72rem;color:var(--muted);background:var(--sunk);padding:1px 7px;border-radius:999px;margin-left:4px}
+.aar-d{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.9rem}
+.aar-d b{color:var(--accent)}
+.aar-t{font-size:.8rem;color:var(--muted)}
+.aar-w{font-size:.78rem;color:var(--peach-fg)}
 #tqP button,#tqAde button{flex:1 1 30%;font-size:.8rem}
 footer{font-size:.75rem;color:var(--muted)}
 footer a{color:var(--accent)}
@@ -393,7 +401,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </div>
   <div id="viewEcg" class="view" hidden>
   <nav class="jump" aria-label="Ir a sección">
-    <a href="#s-eje">Eje</a><a href="#s-norm">Normales por edad</a><a href="#s-atlas">Bloqueos y arritmias</a><a href="#s-taq">Taquicardia</a><a href="#s-mp">Marcapasos</a><a href="#s-qtc">QTc</a><a href="#s-int">Interpretación</a><a href="#s-sch">Schwartz</a><a href="#s-bru">Brugada</a><a href="#s-med">Cómo medir</a>
+    <a href="#s-eje">Eje</a><a href="#s-norm">Normales por edad</a><a href="#s-atlas">Bloqueos y arritmias</a><a href="#s-taq">Taquicardia</a><a href="#s-mp">Marcapasos</a><a href="#s-po">Posoperatorio</a><a href="#s-fet">Fetales</a><a href="#s-aar">Antiarrítmicos</a><a href="#s-qtc">QTc</a><a href="#s-int">Interpretación</a><a href="#s-sch">Schwartz</a><a href="#s-bru">Brugada</a><a href="#s-med">Cómo medir</a>
   </nav>
 
   <!-- EJE -->
@@ -459,6 +467,47 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <p class="hint">Marcá lo que tenga el paciente. Criterios de la guía ACC/AHA/HRS 2008 tal como los resume el Moss &amp; Adams (10.ª ed., cap. 22). Existe un consenso pediátrico más reciente (PACES/HRS 2021): confirmá con él y con electrofisiología.</p>
     <div class="crit-list" id="mpList"></div>
     <div class="res" id="rMp"></div>
+  </section>
+
+  <section class="card" id="s-po">
+    <h2>Arritmias en el posoperatorio cardiovascular</h2>
+    <p class="hint">Primero descartá causas corregibles: K, Mg, Ca, acidosis, hipoxia, fiebre, dolor, catecolaminas altas, catéteres en las cavidades. Tené a mano un ECG previo a la cirugía para comparar.</p>
+    <span class="lbl hint">Inicio</span>
+    <div class="seg" id="poIni" role="group" aria-label="Inicio"><button data-v="b" aria-pressed="false">Brusco</button><button data-v="g" aria-pressed="false">Gradual (calentamiento)</button></div>
+    <span class="lbl hint">Relación aurícula : ventrículo (ver con cables epicárdicos)</span>
+    <div class="seg" id="poAV" role="group" aria-label="Relación AV"><button data-v="11" aria-pressed="false">1:1</button><button data-v="am" aria-pressed="false">Más A que V</button><button data-v="vm" aria-pressed="false">Más V que A</button></div>
+    <span class="lbl hint">QRS</span>
+    <div class="seg" id="poQ" role="group" aria-label="QRS"><button data-v="e" aria-pressed="false">Estrecho (= sinusal)</button><button data-v="a" aria-pressed="false">Ancho</button></div>
+    <span class="lbl hint">Respuesta a adenosina, sobreestimulación o cardioversión</span>
+    <div class="seg" id="poR" role="group" aria-label="Respuesta"><button data-v="t" aria-pressed="false">Termina</button><button data-v="n" aria-pressed="false">No termina</button></div>
+    <div class="res" id="rPo"></div>
+    <table class="zt"><thead><tr><th>Mecanismo</th><th>Inicio</th><th>Ritmo</th><th>Adenosina / CVE / sobreestim.</th></tr></thead><tbody>
+      <tr><td>Reentrada (aleteo, TRIA, vía accesoria, TRNAV)</td><td>Brusco</td><td>Regular</td><td>Responde</td></tr>
+      <tr><td>Automática (JET, TA ectópica)</td><td>Gradual</td><td>Variable</td><td>No responde</td></tr></tbody></table>
+    <div class="atlas" id="poAcc"></div>
+  </section>
+
+  <section class="card" id="s-fet">
+    <h2>Arritmias fetales</h2>
+    <p class="hint">Ritmo fetal normal: regular, 100–180 lpm, conducción AV 1:1. El mecanismo se infiere por eco (modo M aurícula-ventrículo, Doppler simultáneo entrada-salida del VI o VCS-aorta, Doppler tisular).</p>
+    <div class="grid">
+      <label for="feFc">FC ventricular fetal <span class="u">lpm</span><input id="feFc" inputmode="decimal" autocomplete="off" placeholder="240"></label>
+      <label for="feEg">Edad gestacional <span class="u">semanas</span><input id="feEg" inputmode="decimal" autocomplete="off" placeholder="30"></label>
+    </div>
+    <span class="lbl hint">Relación VA (en taquicardia) o patrón (en bradicardia)</span>
+    <div class="seg" id="feVA" role="group" aria-label="Patrón"><button data-v="vac" aria-pressed="false">VA corto</button><button data-v="val" aria-pressed="false">VA largo</button><button data-v="al" aria-pressed="false">A > V (aleteo)</button><button data-v="bav" aria-pressed="false">BAV completo</button><button data-v="big" aria-pressed="false">Bigeminia bloq.</button></div>
+    <div class="res" id="rFe"></div>
+    <h3>Puntaje de perfil cardiovascular fetal (10 puntos)</h3>
+    <div id="cvpList"></div>
+    <div class="score"><div><b>Perfil cardiovascular</b><div class="hint" id="cvpTxt"></div></div><div class="v" id="cvpV">10</div></div>
+  </section>
+
+  <section class="card" id="s-aar">
+    <h2>Antiarrítmicos pediátricos</h2>
+    <p class="hint" id="aarPac"></p>
+    <div id="aarTab"></div>
+    <div class="res" id="rAar"></div>
+    <p class="hint">Dosis del libro «Arritmias en Pediatría» (Scaglione y col.), resumidas y calculadas con el peso de la barra. Confirmá con NeoFax y la farmacia de tu hospital antes de indicar; donde la referencia difiere de otras fuentes se marca con ⚠️.</p>
   </section>
 
 
@@ -1806,10 +1855,11 @@ def({id:"aleteo",group:"Supraventriculares",name:"Aleteo auricular neonatal",mec
  show:["flutter","fl-av","av","his-r","his-l"],lm:["av","his"],
  ecg:["Ondas F en dientes de sierra a ~375/min, sin línea isoeléctrica.","Conducción 2:1 (FC ventricular ~187); con adenosina el bloqueo aumenta y se ven mejor las F."],
  fisio:["Macrorreentrada que gira dentro de la aurícula derecha alrededor del anillo tricuspídeo.","El nodo AV filtra los impulsos (2:1) por su período refractario.","En el neonato sin cardiopatía no queda sustrato permanente: tras revertirlo casi no recurre."],
- tip:"La adenosina no lo termina pero desenmascara las ondas F. La cardioversión sí lo corta.",
+ tip:"La adenosina no lo termina pero desenmascara las ondas F. La cardioversión (0,5–1 J/kg) o la sobreestimulación auricular sí lo cortan.",
  actions:[
   {label:"Adenosina", run(){sim.st.adenoUntil=sim.t+1600; event(sim.t,"Adenosina");}},
   {label:"Cardioversión sincronizada", run(){ const st=sim.st; if(st.mode!=="fl")return; spike(sim.t); event(sim.t,"CVE"); st.mode="sinus"; st.flEnd=sim.t; sim.next=sim.t+600; }},
+  {label:"Sobreestimulación auricular", run(){ const st=sim.st; if(st.mode!=="fl")return; for(let i=0;i<8;i++) spike(sim.t+i*130); event(sim.t,"Sobreestimulación 10–20 % > FA"); st.mode="sinus"; st.flEnd=sim.t+1040; sim.next=sim.t+1500; }},
   {label:"Volver a aleteo", run(){ startFlutter(); }}
  ],
  init(){ startFlutter(); },
@@ -2603,7 +2653,8 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 </script>
 <script src="paciente.js?v=v63"></script>
 <script src="eco.js?v=v67"></script>
-<script src="arr.js?v=v71"></script>
+<script src="arr.js?v=v72"></script>
+<script src="ped.js?v=v72"></script>
 <script type="module" src="sim3d.js"></script>
 </body>
 </html>

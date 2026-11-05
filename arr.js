@@ -19,7 +19,9 @@ function taq(){
   if (!(fc > 0)) { $('rTaq').innerHTML = '<div class="empty">Cargá al menos la frecuencia cardíaca.</div>'; return; }
   let h = '';
   const fcmax = 220 - años;
-  if (fc <= hi) h += pill('ok', `FC dentro de lo normal en reposo para ${ed} (${lo}–${hi} lpm).`);
+  const brLim = años < 3 ? 100 : años < 9 ? 60 : 50;
+  if (fc < brLim) h += pill('warn', `FC de ${f(fc)} lpm: bradicardia para la edad (umbral &lt; ${brLim} lpm: &lt; 100 hasta los 3 años, &lt; 60 de 3 a 9, &lt; 50 de 9 a 16). Esta herramienta es para taquicardias; ver «Bloqueo AV y bradicardia».`);
+  else if (fc <= hi) h += pill('ok', `FC dentro de lo normal en reposo para ${ed} (${lo}–${hi} lpm).`);
   else if (fc > 220) h += pill('crit', `FC de ${f(fc)} lpm: por encima de 220 lpm es muy improbable que sea sinusal.`);
   else if (fc > fcmax - 10) h += pill('warn', `FC de ${f(fc)} lpm, cerca del máximo sinusal esperable (≈ ${f(fcmax)} lpm).`);
   else h += pill('info', `FC alta para la edad (normal en reposo ${lo}–${hi} lpm). Puede ser sinusal (fiebre, dolor, llanto, hipovolemia) o una arritmia.`);
@@ -73,6 +75,7 @@ function taq(){
   if (!wide && isFinite(qrs) && sel.reg === 'reg') {
     h += pill('info', `<b>Paciente estable con QRS estrecho:</b> maniobras vagales (bolsa con hielo y agua sobre toda la cara 10–15 s; evitar la compresión ocular y el masaje carotídeo) y luego adenosina${kg > 0 ? ` 0,1 mg/kg = <b>${f(0.1 * kg, 2)} mg</b>; si no responde, 0,2 mg/kg = <b>${f(Math.min(0.2 * kg, 12), 2)} mg</b> (máx. 12 mg)` : ' 0,1 mg/kg, luego 0,2 mg/kg (máx. 12 mg)'}, en bolo rápido por una vía cercana al corazón, con lavado inmediato y registro continuo del ECG. Con trasplante cardíaco, usar ¼ a ½ de la dosis.`);
   }
+  if (sel.ini === 'ince') h += pill('warn', `<b>Riesgo de taquicardiomiopatía:</b> cualquier taquicardia incesante puede deprimir la función ventricular, sobre todo si está presente más del 10–15 % del día en el Holter o la FC supera el 150 % de la esperada para la edad${fc > 1.5 * (lo + hi) / 2 ? ' (este paciente la supera)' : ''}. Las típicas son la TA ectópica, la JET y la PJRT. Pedir ecocardiograma; la función suele recuperarse al controlar la arritmia.`);
   h += pill('info', 'Verapamilo contraindicado en menores de 1 año (colapso cardiovascular) y en el WPW. Amiodarona: hipotiroidismo en más del 50 % de los lactantes.');
   $('rTaq').innerHTML = h;
 }
