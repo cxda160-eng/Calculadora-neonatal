@@ -116,6 +116,21 @@ details.ac[open] summary::after{content:"−"}
 .score{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--accent-soft);border-radius:12px;padding:12px 14px}
 .score .v{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--accent)}
 ul.tips{margin:0;padding-left:18px;font-size:.88rem;display:flex;flex-direction:column;gap:4px}
+/* Eco funcional */
+.evw .eimg{background:#0b0b10;border-radius:12px;min-height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.evw .eimg img{width:100%;height:auto;display:block}
+.eimg-empty{display:flex;flex-direction:column;gap:4px;text-align:center;color:#c9c9d6;font-size:.82rem;padding:18px}
+.eimg-empty b{color:#fff;font-size:.9rem}
+.eact{display:flex;gap:8px;flex-wrap:wrap}
+.ebtn{flex-direction:row;color:var(--accent);font-weight:600;border-color:var(--accent-soft)}
+.esonda{margin:0;font-size:.88rem}
+.ecols{display:grid;grid-template-columns:1fr;gap:6px}
+@media (min-width:560px){.ecols{grid-template-columns:1fr 1fr}}
+a.ego{color:var(--accent)}
+#viewEco .tiles{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+#viewEco .tile.main .v{font-size:1.7rem}
+#viewEco .tile .v small{white-space:nowrap}
+#eSep button{font-size:.8rem}
 footer{font-size:.75rem;color:var(--muted)}
 footer a{color:var(--accent)}
 </style>
@@ -174,13 +189,13 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <header>
     <div>
       <h1>Cardiología</h1>
-      <p>Calculadoras (VIS, z-scores, coronarias, Qp:Qs, anticoagulación, Doppler) y ECG (eje, normales por edad, bloqueos y arritmias, QTc, Schwartz). Simulador animado de arritmias.</p>
+      <p>Calculadoras (VIS, z-scores, coronarias, Qp:Qs, anticoagulación, Doppler) y ECG (eje, normales por edad, bloqueos y arritmias, QTc, Schwartz). Eco funcional (ventanas, función ventricular, gasto, presiones, fluidos). Simulador animado de arritmias.</p>
     </div>
     <div class="btns"><button type="button" class="btn" id="ej">Ejemplo</button><button type="button" class="btn" id="clr">Limpiar</button></div>
   </header>
 
   <div class="seg big" id="sView" role="tablist" aria-label="Sección">
-    <button data-v="tools" aria-pressed="true">Calculadoras</button><button data-v="ecg" aria-pressed="false">ECG</button><button data-v="sim" aria-pressed="false">Simulador</button>
+    <button data-v="tools" aria-pressed="true">Calculadoras</button><button data-v="ecg" aria-pressed="false">ECG</button><button data-v="eco" aria-pressed="false">Eco</button><button data-v="sim" aria-pressed="false">Simulador</button>
   </div>
   <div id="viewTools" class="view">
   <nav class="jump" aria-label="Ir a sección">
@@ -486,6 +501,129 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 
   </div>
 
+  <div id="viewEco" class="view" hidden>
+  <nav class="jump" aria-label="Ir a sección">
+    <a href="#e-vw">Ventanas</a><a href="#e-vi">VI sistólica</a><a href="#e-gc">Gasto</a><a href="#e-dia">Diastólica</a><a href="#e-vd">VD</a><a href="#e-pre">Presiones</a><a href="#e-flu">Fluidos</a><a href="#e-tei">Tei</a><a href="#e-der">Derrame</a>
+  </nav>
+
+  <section class="card" id="e-vw">
+    <h2>Ventanas ecocardiográficas</h2>
+    <p class="hint">Cada corte con la posición de la sonda, lo que se ve y lo que se mide (tocá una medida para ir a su calculadora). Podés cargar una imagen propia por corte: queda guardada solo en este dispositivo y no se publica.</p>
+    <div class="atlas" id="eVW"></div>
+  </section>
+
+  <section class="card" id="e-vi">
+    <h2>Función sistólica del VI</h2>
+    <p class="hint">Modo M en PEL (o PEC) a la altura de las puntas de la mitral, perpendicular al septo.</p>
+    <div class="grid">
+      <label for="eDd">DdVI <span class="u">mm · telediástole</span><input id="eDd" inputmode="decimal" autocomplete="off" placeholder="18"></label>
+      <label for="eDs">DsVI <span class="u">mm · telesístole</span><input id="eDs" inputmode="decimal" autocomplete="off" placeholder="12"></label>
+      <label for="eMap">MAPSE <span class="u">mm · opc.</span><input id="eMap" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eDpT">dP/dt: tiempo 1→3 m/s <span class="u">ms · opc.</span><input id="eDpT" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rEvi"></div>
+    <p class="hint">FA = (DdVI − DsVI) ÷ DdVI × 100. Teichholz: V = [7 ÷ (2,4 + D)] × D³ (D en cm); FE = (VTD − VTS) ÷ VTD × 100. dP/dt = 32 ÷ T (s), en el jet de insuficiencia mitral. MAPSE: modo M en el anillo mitral lateral (A4C).</p>
+  </section>
+
+  <section class="card" id="e-gc">
+    <h2>Gasto cardíaco por Doppler</h2>
+    <p class="hint">Diámetro del TSVI en PEL (mesosístole, en la inserción de las valvas). IVT con Doppler pulsado justo debajo de la válvula aórtica en A5C.</p>
+    <div class="grid">
+      <label for="eTs">Diámetro TSVI <span class="u">mm</span><input id="eTs" inputmode="decimal" autocomplete="off" placeholder="6"></label>
+      <label for="eIvt">IVT del TSVI <span class="u">cm</span><input id="eIvt" inputmode="decimal" autocomplete="off" placeholder="12"></label>
+      <label for="eFc">FC <span class="u">lpm</span><input id="eFc" inputmode="decimal" autocomplete="off" placeholder="140"></label>
+    </div>
+    <div class="res" id="rEgc"></div>
+    <p class="hint">VS = 0,785 × D² × IVT. GC = FC × VS. IC = GC ÷ SC. El peso y la superficie salen de la barra del paciente (y de la talla de z-scores, si está).</p>
+  </section>
+
+  <section class="card" id="e-dia">
+    <h2>Función diastólica del VI</h2>
+    <p class="hint">Doppler pulsado en las puntas de la mitral (A4C). E′ con Doppler tisular en el anillo mitral lateral.</p>
+    <div class="grid">
+      <label for="eE">Onda E <span class="u">m/s</span><input id="eE" inputmode="decimal" autocomplete="off" placeholder="0,6"></label>
+      <label for="eA">Onda A <span class="u">m/s</span><input id="eA" inputmode="decimal" autocomplete="off" placeholder="0,7"></label>
+      <label for="eEp">E′ lateral <span class="u">cm/s · opc.</span><input id="eEp" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eTd">TD onda E <span class="u">ms · opc.</span><input id="eTd" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rEdia"></div>
+    <p class="hint">Valores del documento (pediátricos): E 0,9 ± 0,15 m/s; A 0,4 ± 0,1 m/s; E/A &gt; 1 y &lt; 2 (niños 2,3 ± 0,6). E/E′ &lt; 8 presión de AI normal; &gt; 12 elevada.</p>
+  </section>
+
+  <section class="card" id="e-vd">
+    <h2>Ventrículo derecho</h2>
+    <span class="lbl hint">Posición del septo (PEC, papilares)</span>
+    <div class="seg" id="eSep" role="group" aria-label="Posición del septo">
+      <button data-v="I" aria-pressed="false">Tipo I</button><button data-v="II" aria-pressed="false">Tipo II</button><button data-v="III" aria-pressed="false">Tipo III</button><button data-v="P" aria-pressed="false">Paradójico</button>
+    </div>
+    <div class="grid">
+      <label for="eAvd">Área VD <span class="u">cm² · A4C</span><input id="eAvd" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eAvi">Área VI <span class="u">cm² · A4C</span><input id="eAvi" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eD1">D1 VI <span class="u">mm · ant-inf</span><input id="eD1" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eD2">D2 VI <span class="u">mm · septo-pared</span><input id="eD2" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eTap">TAPSE <span class="u">mm</span><input id="eTap" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eTsv">TAPSV <span class="u">cm/s · DTI</span><input id="eTsv" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rEvd"></div>
+    <p class="hint">Relación de áreas VD/VI en A4C: normal &lt; 0,6; dilatación moderada 0,6–0,9; grave &gt; 0,9. Índice de excentricidad = D1 ÷ D2 en telediástole (PEC). La PAPs por insuficiencia tricuspídea está en <a href="#s-dop" class="ego" id="eGoDop">Calculadoras → Doppler</a> (normal &lt; 30 mmHg; hipertensión pulmonar &gt; 40). En las primeras 72 h de vida la presión pulmonar todavía está en transición.</p>
+  </section>
+
+  <section class="card" id="e-pre">
+    <h2>Presiones de llenado</h2>
+    <h3 style="border:0;padding-top:0">Presión de AD por la VCI (subcostal de cavas)</h3>
+    <div class="grid">
+      <label for="eVmx">VCI máx. en espiración <span class="u">mm</span><input id="eVmx" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eVmn">VCI mín. en inspiración <span class="u">mm</span><input id="eVmn" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <label class="ck"><input type="checkbox" id="eVd"><span class="t">VCI dilatada sin variación inspiratoria</span></label>
+    <h3>Presión de AI a través de foramen oval o CIA (S4C)</h3>
+    <div class="grid">
+      <label for="eGcia">Gradiente medio trans-CIA <span class="u">mmHg</span><input id="eGcia" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="ePvc">PVC / presión de AD <span class="u">mmHg</span><input id="ePvc" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <h3>Signos indirectos de presión de AI elevada</h3>
+    <div class="crit-list" id="ePAI"></div>
+    <div class="res" id="rEpre"></div>
+    <p class="hint">Colapsabilidad = (Dmáx esp − Dmín insp) ÷ Dmáx esp × 100. &gt; 50 % → PAD &lt; 10 mmHg; &lt; 50 % → PAD &gt; 10 mmHg; dilatada sin variación → PAD &gt; 20 mmHg. Medir distal a la desembocadura de la suprahepática media.</p>
+  </section>
+
+  <section class="card" id="e-flu">
+    <h2>Precarga y respuesta a fluidos</h2>
+    <div class="grid">
+      <label for="eVpx">V pico aórtica máx. <span class="u">m/s · A5C</span><input id="eVpx" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eVpn">V pico aórtica mín. <span class="u">m/s</span><input id="eVpn" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eDi">VCI en inspiración <span class="u">mm · ventilado</span><input id="eDi" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eDe">VCI en espiración <span class="u">mm · ventilado</span><input id="eDe" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eSe">VCS en espiración <span class="u">mm</span><input id="eSe" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eSi">VCS en inspiración <span class="u">mm</span><input id="eSi" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eAt">Área telediastólica VI <span class="u">cm² · A4C</span><input id="eAt" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <label class="ck"><input type="checkbox" id="eKw"><span class="t">Colapso sistólico del VI ("kissing walls") en PEC</span></label>
+    <div class="res" id="rEflu"></div>
+    <p class="hint">VVPs = (Vmáx − Vmín) ÷ promedio × 100; sirve con ventilación o en respiración espontánea. Distensibilidad VCI = (insp − esp) ÷ insp × 100. Colapsabilidad VCS = (esp − insp) ÷ esp × 100. La elevación pasiva de piernas tiene baja sensibilidad en pediatría.</p>
+  </section>
+
+  <section class="card" id="e-tei">
+    <h2>Índice de Tei (función global)</h2>
+    <p class="hint">a = cierre a apertura de la válvula AV (Doppler en la mitral, A5C, o en la tricúspide, PEC). b = tiempo de eyección (TSVI o TSVD).</p>
+    <div class="grid">
+      <label for="eTa">a: tiempo total <span class="u">ms</span><input id="eTa" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+      <label for="eTb">b: tiempo de eyección <span class="u">ms</span><input id="eTb" inputmode="decimal" autocomplete="off" placeholder="—"></label>
+    </div>
+    <div class="res" id="rEtei"></div>
+    <p class="hint">Tei = (TCIV + TRIV) ÷ TEy = (a − b) ÷ b. Normal: niños 0,36 ± 0,07; adultos 0,39 ± 0,05.</p>
+  </section>
+
+  <section class="card" id="e-der">
+    <h2>Derrame pericárdico y taponamiento</h2>
+    <div class="grid"><label for="eDmm">Derrame en telediástole <span class="u">mm · PEL modo M</span><input id="eDmm" inputmode="decimal" autocomplete="off" placeholder="—"></label></div>
+    <div class="crit-list" id="eDER"></div>
+    <div class="res" id="rEder"></div>
+    <p class="hint">Mejores planos: S4C, A4C y PEL. El líquido se acumula primero en las zonas inferiores y posteriores. El colapso empieza en la AD y luego el VD en espiración; cuanto más grave, más se extiende a la sístole.</p>
+  </section>
+
+  <p class="hint">Fuente: Grupo de Trabajo de Ecografía de la SECIP. Ecocardiografía funcional en el paciente pediátrico crítico (Ramos Casado, Granados Ruiz, Menéndez Suso). Resumen propio. Varios puntos de corte son pediátricos o de adultos: se indica cuando no están validados en neonatos.</p>
+  </div>
   <div id="viewSim" class="view" hidden>
   <div class="pill warn"><span>Herramienta didáctica: tiempos y morfologías aproximados. No reemplaza el ECG real ni las guías.</span></div>
   <div id="sm-sel"></div>
@@ -1279,7 +1417,7 @@ function buildAtlas(){
 }
 
 // Vistas
-$('sView').querySelectorAll('button').forEach(b => b.onclick = () => { const v = b.dataset.v; $('sView').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('viewEcg').hidden = v !== 'ecg'; $('viewTools').hidden = v !== 'tools'; $('viewSim').hidden = v !== 'sim'; try { localStorage.setItem('cardio_view', v); } catch (err) {} });
+$('sView').querySelectorAll('button').forEach(b => b.onclick = () => { const v = b.dataset.v; $('sView').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('viewEcg').hidden = v !== 'ecg'; $('viewTools').hidden = v !== 'tools'; $('viewSim').hidden = v !== 'sim'; $('viewEco').hidden = v !== 'eco'; if (v === 'eco' && window.EcoFuncional) window.EcoFuncional.recalc(); try { localStorage.setItem('cardio_view', v); } catch (err) {} });
 
 // ---------- Ejemplo y limpiar ----------
 $('ej').onclick = () => { $('zPeso').value = '3200'; $('zTalla').value = '50'; if ($('z_p_ann')) { $('z_p_ann').value = '5'; $('z_p_lad').value = '1,4'; } zcalc(); cor(); $('vDopa').value = '5'; $('vAdre').value = '0,05'; $('vMil').value = '0,5'; vis(); S.age = 'neo'; S.sex = 'm'; S.unit = 'ms'; S.hr = 'fc'; syncSeg(); $('qt').value = '300'; $('fc').value = '150'; $('rr').value = ''; $('qrs').value = '60'; manualQTc = false; calc(); };
@@ -1288,9 +1426,9 @@ $('clr').onclick = () => { VIS_IN.forEach(([id]) => $(id).value = ''); vis(); ['
 $('sVer').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { manualQTc = false; buildCrit(); calc(); }));
 $('sSex').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { manualQTc = false; autoQTc(); score(); }));
 
-$('goSim').onclick = () => { $('sView').querySelectorAll('button')[2].click(); window.scrollTo(0,0); };
+$('goSim').onclick = () => { $('sView').querySelector('[data-v=sim]').click(); window.scrollTo(0,0); };
 syncSeg(); buildCrit(); calc(); vis(); buildZ(); zcalc(); cor(); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); norm(); eje(); buildAtlas();
-try { const cv0 = localStorage.getItem('cardio_view'); if (location.hash === '#simulador' || cv0 === 'sim') $('sView').querySelectorAll('button')[2].click(); else if (cv0 === 'ecg' || location.hash === '#ecg') $('sView').querySelectorAll('button')[1].click(); } catch (err) {}
+try { const cv0 = localStorage.getItem('cardio_view'), sb = k => $('sView').querySelector('[data-v=' + k + ']'); if (location.hash === '#simulador' || cv0 === 'sim') sb('sim').click(); else if (cv0 === 'ecg' || location.hash === '#ecg') sb('ecg').click(); else if (cv0 === 'eco' || location.hash === '#eco') sb('eco').click(); } catch (err) {}
 </script>
 <script>
 
@@ -2189,6 +2327,7 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 
 </script>
 <script src="paciente.js?v=v63"></script>
+<script src="eco.js?v=v67"></script>
 <script type="module" src="sim3d.js"></script>
 </body>
 </html>

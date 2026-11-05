@@ -27,6 +27,8 @@ const CASOS=[
 
  ['RCP · 1100 g, 28 sem → tubo 2,5, profundidad 6,5 cm, FiO₂ ≥ 30 %','neo.html',pac(1.1,28,0),async f=>f.$eval('#rAir',e=>e.innerText),t=>has(t,'2,5')&&has(t,'6,5')&&has(t,'≥ 30 %')],
  ['RCP · 2000 g, 33 sem → tubo 3,0 y FiO₂ 21–30 %','neo.html',pac(2,33,0),async f=>f.$eval('#rAir',e=>e.innerText),t=>has(t,'3,0')&&has(t,'21–30 %')&&has(t,'7,5')],
+ ['Eco · DdVI 18 / DsVI 12 mm → FA 33 %, FE Teichholz 65 %','cardio.html',pac(3.2,39,3),async f=>{await f.click('#sView [data-v=eco]');await f.fill('#eDd','18');await f.fill('#eDs','12');return f.$eval('#rEvi',e=>e.innerText)},t=>has(t,'FA 33%')&&has(t,'65%')],
+ ['Eco · TSVI 6 mm, IVT 15, FC 140, 3,2 kg → 185 mL/kg/min; VCI 5→2 mm = 60 %','cardio.html',pac(3.2,39,3),async f=>{await f.click('#sView [data-v=eco]');await f.fill('#eTs','6');await f.fill('#eIvt','15');await f.fill('#eFc','140');await f.fill('#eVmx','5');await f.fill('#eVmn','2');return (await f.$eval('#rEgc',e=>e.innerText))+' | '+(await f.$eval('#rEpre',e=>e.innerText))},t=>has(t,'185 mL/kg/min')&&has(t,'VCI 60%')],
 ];
 (async()=>{const b=await chromium.launch();let ok=0,bad=0;
  for(const [n,url,p,run,check] of CASOS){const ctx=await b.newContext();await ctx.addInitScript(p=>{try{if(!sessionStorage.getItem('t')){localStorage.clear();localStorage.setItem('pac',p);sessionStorage.setItem('t','1')}}catch(e){}},p);
