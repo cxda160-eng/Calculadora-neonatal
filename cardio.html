@@ -1371,7 +1371,7 @@ const ATLAS = [
   {id:'tdp', sim:'lqts', n:'Torsades de pointes', strips:[{lead:'DII', build:({add})=>{ add(t=> t<250? 0 : Math.sin(2*Math.PI*(t-250)/230)*(0.15+0.75*Math.abs(Math.sin(2*Math.PI*(t-250)/1900)))); }}],
    crit:['TV polimorfa con QRS que rotan alrededor de la línea de base (amplitud creciente y decreciente).','Desencadenada por QT largo; a menudo tras una secuencia pausa larga – latido corto.'],
    notas:'Tratamiento: sulfato de magnesio, corregir K y Ca, suspender fármacos que prolongan el QT, estimulación o isoproterenol si es dependiente de pausas, desfibrilación si es sostenida. Ver la calculadora de QTc.'},
-  {id:'fv', n:'Fibrilación ventricular', strips:[{lead:'DII', build:({add})=>{ const r=ECG.rnd(11); const ph=[...Array(5)].map(()=>[r()*6, 0.12+r()*0.2, 0.025+r()*0.02]); add(t=>ph.reduce((s,[p,a,f])=>s+a*Math.sin(f*t+p),0)); }}],
+  {id:'fv', sim:'fv', n:'Fibrilación ventricular', strips:[{lead:'DII', build:({add})=>{ const r=ECG.rnd(11); const ph=[...Array(5)].map(()=>[r()*6, 0.12+r()*0.2, 0.025+r()*0.02]); add(t=>ph.reduce((s,[p,a,f])=>s+a*Math.sin(f*t+p),0)); }}],
    crit:['Actividad eléctrica caótica, sin QRS identificables.','Sin pulso: paro cardíaco.'],
    notas:'Desfibrilación 2 J/kg, luego 4 J/kg (hasta 10 J/kg); RCP de alta calidad; adrenalina; amiodarona 5 mg/kg o lidocaína en la FV refractaria (PALS).'}
 ];
@@ -2389,7 +2389,33 @@ def({id:"brasin",group:AVG,name:"Bradicardia y disfunción sinusal",mech:"co",
   if(st.i%3===0){ block(98,72,t,600); const e=t+1050; anim("his-r",e,55); anim("his-l",e,55); flash("rv",e+15); flash("lv",e+15); QRS(e,"narrow",{mark:"escape"}); T(e+250,{amp:.3,w:38}); mark(t+200,"pausa","#ffd27a"); sim.next=e+800; return; }
   sinus(t); sim.next=t+(st.ex?820:960); }});
 
-const LEADS_EXTRA = {eabl:["DII","V1"], evp:["DII","V1"], riva:["DII"], tvlact:["DII","V1"], tac:["DII"], iart:["DII","V1"], antid:["DII","V1"], arrsin:["DII"], brasin:["DII"]};
+/* Fibrilación ventricular */
+def({id:"fv",group:"Ventriculares",name:"Fibrilación ventricular",mech:"re",
+ show:["lv-r","lv-l","rv-l","rv-r","sa-ra","sa-la","av","his-r","his-l"],lm:["lvf","rvf"],
+ ecg:["Actividad eléctrica caótica, sin QRS ni ondas T identificables.","Al inicio es de ondas gruesas; si no se trata se vuelve fina y termina en asistolia."],
+ fisio:["Múltiples frentes de onda que reentran al azar en el miocardio ventricular: no hay contracción organizada ni pulso.","Causas en pediatría: canalopatías (QT largo, TVPC, Brugada), miocardiopatías, miocarditis, WPW con FA preexcitada, cardiopatía operada, trastornos electrolíticos, hipotermia.","Es un paro cardíaco: RCP de alta calidad y desfibrilación sin sincronizar lo antes posible."],
+ tip:"Iniciá RCP y desfibrilá con 2 J/kg; si persiste, 4 J/kg (descarga no sincronizada).",
+ actions:[
+  {label:"RCP", run(){ const st=sim.st; st.cpr=!st.cpr; event(sim.t,st.cpr?"RCP":"sin RCP"); }},
+  {label:"Desfibrilar 2 J/kg", run(){ const st=sim.st; if(st.mode!=="fv")return; spike(sim.t); event(sim.t,"2 J/kg"); st.shocks++; if(st.shocks>=2){ st.mode="sinus"; st.fvEnd=sim.t; sim.next=sim.t+700; } }},
+  {label:"Desfibrilar 4 J/kg", run(){ const st=sim.st; if(st.mode!=="fv")return; spike(sim.t); event(sim.t,"4 J/kg"); st.mode="sinus"; st.fvEnd=sim.t; sim.next=sim.t+700; }},
+  {label:"Volver a FV", run(){ fvStart(); }}
+ ],
+ init(){ sim.st.mode=""; fvStart(); },
+ step(){ const st=sim.st;
+  if(st.mode==="fv"){
+    if(sim.t>=st.na){ const a=["lv-r","lv-l","rv-l","rv-r"][Math.floor(Math.random()*4)]; anim(a,sim.t,60+Math.random()*60); flash(Math.random()<.5?"lv":"rv",sim.t+20); st.na=sim.t+70+Math.random()*60; }
+    if(st.cpr && sim.t>=st.nc){ addWave(sim.t,[[0,.35,40]],[0,1,0]); mark(sim.t,"comp.","#9fd8ff"); st.nc=sim.t+500; }
+  } else if(sim.t>=sim.next){ sinus(sim.next); sim.next+=480; }
+ }});
+function fvStart(){
+  const st=sim.st; if(st.mode==="fv")return;
+  st.mode="fv"; st.shocks=0; st.cpr=false; st.na=sim.t; st.nc=sim.t; st.fvEnd=Infinity;
+  const t0=sim.t, ph=[Math.random()*6,Math.random()*6,Math.random()*6,Math.random()*6];
+  addBase(t0,1e12,x=>{ if(x<t0||x>st.fvEnd) return 0; const amp=Math.max(.25,1-(x-t0)/40000); return amp*(.38*Math.sin(x/31+ph[0])+.27*Math.sin(x/19+ph[1])+.2*Math.sin(x/47+ph[2])+.12*Math.sin(x/13+ph[3])); },[.3,.9,.3]);
+}
+
+const LEADS_EXTRA = {fv:["DII","V1"], eabl:["DII","V1"], evp:["DII","V1"], riva:["DII"], tvlact:["DII","V1"], tac:["DII"], iart:["DII","V1"], antid:["DII","V1"], arrsin:["DII"], brasin:["DII"]};
 
 /* ---------- Derivaciones por escenario ---------- */
 const LEADS = {
