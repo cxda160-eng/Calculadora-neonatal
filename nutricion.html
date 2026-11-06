@@ -380,12 +380,21 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <div class="row">
         <label for="caPrep">Calcio: preparación
           <select id="caPrep">
-            <option value="9.3">Gluconato de calcio 10 %</option>
+            <option value="105|sello" selected>Sellos de 500 mg (105 mg de Ca elemental)</option>
+            <option value="9.3|ml">Gluconato de calcio 10 % (9,3 mg/ml)</option>
             <option value="otra">Otra (editable)</option>
           </select>
         </label>
-        <label for="caConc">Ca elemental <span style="font-family:var(--mono);font-size:.7rem">mg/ml</span>
-          <input id="caConc" type="number" inputmode="decimal" step="any" value="9.3" readonly>
+        <label for="caConc">Ca elemental <span style="font-family:var(--mono);font-size:.7rem" id="caCU">mg por sello</span>
+          <input id="caConc" type="number" inputmode="decimal" step="any" value="105" readonly>
+        </label>
+      </div>
+      <div class="row">
+        <label for="caUnit">Viene en
+          <select id="caUnit" disabled><option value="sello" selected>Sellos / comprimidos</option><option value="ml">Solución (por ml)</option></select>
+        </label>
+        <label for="caDil" id="caDilL">Disolver 1 sello en <span style="font-family:var(--mono);font-size:.7rem">ml de agua</span>
+          <input id="caDil" type="number" inputmode="decimal" step="any" placeholder="10">
         </label>
       </div>
       <div class="row">
@@ -398,24 +407,31 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <div class="row">
         <label for="phPrep">Fósforo: preparación
           <select id="phPrep">
-            <option value="31|2">Glicerofosfato de sodio (1 mmol/ml)</option>
+            <option value="9|0|0.6" selected>Fosfato monopotásico (9 mg P/ml · 0,6 mEq K/ml)</option>
+            <option value="31|2|0">Glicerofosfato de sodio (31 mg P/ml · 2 mEq Na/ml)</option>
             <option value="otra">Otra / fórmula magistral (editable)</option>
           </select>
         </label>
         <label for="phConc">P elemental <span style="font-family:var(--mono);font-size:.7rem">mg/ml</span>
-          <input id="phConc" type="number" inputmode="decimal" step="any" value="31" readonly>
+          <input id="phConc" type="number" inputmode="decimal" step="any" value="9" readonly>
         </label>
       </div>
       <div class="row">
         <label for="phNaC">Na que aporta <span style="font-family:var(--mono);font-size:.7rem">mEq/ml</span>
-          <input id="phNaC" type="number" inputmode="decimal" step="any" value="2" readonly>
+          <input id="phNaC" type="number" inputmode="decimal" step="any" value="0" readonly>
         </label>
+        <label for="phKC">K que aporta <span style="font-family:var(--mono);font-size:.7rem">mEq/ml</span>
+          <input id="phKC" type="number" inputmode="decimal" step="any" value="0.6" readonly>
+        </label>
+      </div>
+      <div class="row">
         <label for="phVal">Fósforo VO <span style="font-family:var(--mono);font-size:.7rem">mg/kg/día</span>
           <input id="phVal" type="number" inputmode="decimal" step="any" placeholder="0">
         </label>
+        <div></div>
       </div>
       <p class="hint" id="phEq"></p>
-      <p class="hint">Se reparten en las tomas, diluidos en la leche, y se suman a los aportes enterales y a Totales; su volumen no se suma a los líquidos. 1 mmol de P = 31 mg; gluconato de Ca 10 % = 9,3 mg de Ca elemental/ml. Si la farmacia prepara una solución magistral, elegí «Otra» y cargá su concentración.</p>
+      <p class="hint">Se reparten en las tomas, diluidos en la leche, y se suman a los aportes enterales y a Totales; su volumen no se suma a los líquidos. 1 mmol de P = 31 mg. El Na o K del fosfato se suma a los electrolitos enterales. Si la farmacia cambia la presentación, elegí «Otra» y cargá su concentración.</p>
     </div>
   </section>
 
@@ -672,10 +688,18 @@ $("naModo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   $("naModo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));calcEN();});
 ["naOn","naConc","naVal"].forEach(id=>$(id).addEventListener("input",calcEN));
 // Suplemento de Ca y P VO
-$("caPrep").addEventListener("change",()=>{const v=$("caPrep").value;$("caConc").readOnly=v!=="otra";if(v!=="otra")$("caConc").value=v;calcEN();});
-$("phPrep").addEventListener("change",()=>{const v=$("phPrep").value,o=v==="otra";$("phConc").readOnly=o?false:true;$("phNaC").readOnly=!o;if(!o){const [a,b]=v.split("|");$("phConc").value=a;$("phNaC").value=b;}calcEN();});
-["cpOn","caConc","caVal","phConc","phNaC","phVal"].forEach(id=>$(id).addEventListener("input",calcEN));$("cpOn").addEventListener("change",calcEN);
-(function(){let c={};try{c=JSON.parse(localStorage.getItem("en_cap")||"{}")||{}}catch(e){}if(c.on)$("cpOn").checked=true;["caPrep","caConc","caVal","phPrep","phConc","phNaC","phVal"].forEach(i=>{if(c[i]!=null)$(i).value=c[i]});$("caConc").readOnly=$("caPrep").value!=="otra";$("phConc").readOnly=$("phNaC").readOnly=$("phPrep").value!=="otra";})();
+function caSync(){const v=$("caPrep").value,o=v==="otra";$("caConc").readOnly=!o;$("caUnit").disabled=!o;if(!o){const [a,u]=v.split("|");$("caConc").value=a;$("caUnit").value=u;}
+  const se=$("caUnit").value==="sello";$("caCU").textContent=se?"mg por sello":"mg/ml";$("caDilL").style.visibility=se?"visible":"hidden";}
+function phSync(){const v=$("phPrep").value,o=v==="otra";["phConc","phNaC","phKC"].forEach(i=>$(i).readOnly=!o);if(!o){const [a,b,c]=v.split("|");$("phConc").value=a;$("phNaC").value=b;$("phKC").value=c;}}
+$("caPrep").addEventListener("change",()=>{caSync();calcEN();});$("caUnit").addEventListener("change",()=>{caSync();calcEN();});
+$("phPrep").addEventListener("change",()=>{phSync();calcEN();});
+["cpOn","caConc","caVal","caDil","phConc","phNaC","phKC","phVal"].forEach(id=>$(id).addEventListener("input",calcEN));$("cpOn").addEventListener("change",calcEN);
+(function(){let c={};try{c=JSON.parse(localStorage.getItem("en_cap")||"{}")||{}}catch(e){}if(c.on)$("cpOn").checked=true;
+  const okOpt=(id,v)=>[...$(id).options].some(o=>o.value===v);
+  if(c.v===2){if(okOpt("caPrep",c.caPrep))$("caPrep").value=c.caPrep;if(okOpt("phPrep",c.phPrep))$("phPrep").value=c.phPrep;["caUnit","caConc","phConc","phNaC","phKC"].forEach(i=>{if(c[i]!=null&&$("caPrep").value==="otra"&&i.startsWith("ca"))$(i).value=c[i];if(c[i]!=null&&$("phPrep").value==="otra"&&i.startsWith("ph"))$(i).value=c[i];});}
+  ["caVal","caDil","phVal"].forEach(i=>{if(c[i]!=null)$(i).value=c[i]});caSync();phSync();
+  if(c.v===2&&$("caPrep").value==="otra"){if(c.caUnit)$("caUnit").value=c.caUnit;if(c.caConc)$("caConc").value=c.caConc;caSync();}
+  if(c.v===2&&$("phPrep").value==="otra"){["phConc","phNaC","phKC"].forEach(i=>{if(c[i]!=null)$(i).value=c[i]});}})();
 $("naOn").addEventListener("change",calcEN);
 ["tomas","modOn","sobres","sumNP"].forEach(id=>$(id).addEventListener("input",calcEN));
 ["modOn","sumNP"].forEach(id=>$(id).addEventListener("change",calcEN));
@@ -738,7 +762,7 @@ function calcTOT(){
     ["Proteínas","g/kg/día",v(P,"aa"),v(E,"p"),2],
     ["Lípidos","g/kg/día",v(P,"lip"),null,2],
     ["Sodio","mEq/kg/día",v(P,"na"),v(E,"na"),2],
-    ["Potasio","mEq/kg/día",v(P,"k"),null,2],
+    ["Potasio","mEq/kg/día",v(P,"k"),v(E,"k")>0?v(E,"k"):null,2],
     ["Calcio","mg/kg/día",v(P,"ca"),v(E,"ca"),0],
     ["Fósforo","mg/kg/día",v(P,"p"),v(E,"ph"),0],
     ["Magnesio","mEq/kg/día",v(P,"mg"),null,2]];
@@ -752,7 +776,7 @@ function calcTOT(){
   if(incP&&!S.d)A.push(["info","No hay parenteral cargada."]);
   if(incP&&v(P,"otros")>0)A.push(["info",`Los líquidos parenterales incluyen ${f(v(P,"otros"),0)} mL/kg/día de otras infusiones.`]);
   if(incE&&!v(E,"vol")&&!v(E,"na"))A.push(["info","No hay aporte enteral cargado (pestaña Enteral)."]);
-  if(incE&&v(E,"vol"))A.push(["info","s/d: las leches no informan lípidos, potasio ni magnesio en esta app; el total de esas filas es solo parenteral."]);
+  if(incE&&v(E,"vol"))A.push(["info",v(E,"k")>0?"s/d: las leches no informan lípidos ni magnesio en esta app. El potasio enteral es solo el del suplemento de fosfato (sin el de la leche).":"s/d: las leches no informan lípidos, potasio ni magnesio en esta app; el total de esas filas es solo parenteral."]);
   if(S.lab.startsWith("NP")&&!npPk&&window.NP&&+$("ent").value)A.push(["warn","En Parenteral hay un valor en «Enteral (solo volumen)»: acá no se usa; el enteral sale de la pestaña Enteral para no contarlo dos veces."]);
   if(tot(R[0])>180)A.push(["warn",`Líquidos totales ${f(tot(R[0]),0)} mL/kg/día: por encima de 180.`]);
   if(tot(R[2])>4.5)A.push(["warn",`Proteínas totales ${f(tot(R[2]),2)} g/kg/día: por encima de 4,5.`]);
@@ -876,14 +900,15 @@ function calcEN(){
     det.push([`Suplemento de Na VO (${pn})`,{vol:0,kcal:0,p:0,na:meqkg,ca:0,ph:0}]);
     $("naEq").innerHTML=kg&&c&&v?`<b>${f(meqkg,2)} mEq/kg/día</b> = ${f(meqd,2)} mEq/día = <b>${f(mld,2)} ml/día</b>${t?` → ${f(mld/t,2)} ml por toma (${f(meqd/t,2)} mEq) × ${t} tomas`:""}`:(kg?"":"Cargá el peso del paciente.");}
   const cpOn=$("cpOn").checked;$("cpBox").style.display=cpOn?"flex":"none";let cpSup=null;
-  try{const c={on:cpOn};["caPrep","caConc","caVal","phPrep","phConc","phNaC","phVal"].forEach(i=>c[i]=$(i).value);localStorage.setItem("en_cap",JSON.stringify(c))}catch(e){}
-  if(cpOn){const cc=+$("caConc").value||0,ca=+$("caVal").value||0,pc=+$("phConc").value||0,ph=+$("phVal").value||0,pna=+$("phNaC").value||0;
-    const caml=cc&&kg?ca*kg/cc:0,phml=pc&&kg?ph*kg/pc:0,naP=kg?phml*pna/kg:0;
-    tot.ca+=ca;tot.ph+=ph;tot.na+=naP;cpSup={ca,ph,caml,phml,naP};
+  try{const c={on:cpOn,v:2};["caPrep","caUnit","caConc","caVal","caDil","phPrep","phConc","phNaC","phKC","phVal"].forEach(i=>c[i]=$(i).value);localStorage.setItem("en_cap",JSON.stringify(c))}catch(e){}
+  if(cpOn){const cc=+$("caConc").value||0,ca=+$("caVal").value||0,pc=+$("phConc").value||0,ph=+$("phVal").value||0,pna=+$("phNaC").value||0,pkc=+$("phKC").value||0;
+    const se=$("caUnit").value==="sello",dil=+$("caDil").value||0;
+    const caml=cc&&kg?ca*kg/cc:0,phml=pc&&kg?ph*kg/pc:0,naP=kg?phml*pna/kg:0,kP=kg?phml*pkc/kg:0;
+    tot.ca+=ca;tot.ph+=ph;tot.na+=naP;tot.k=(tot.k||0)+kP;cpSup={ca,ph,caml,phml,naP,kP,se,dil};
     if(ca)det.push([`Calcio VO (${$("caPrep").selectedOptions[0].text})`,{vol:0,kcal:0,p:0,na:0,ca,ph:0}]);
     if(ph)det.push([`Fósforo VO (${$("phPrep").selectedOptions[0].text})`,{vol:0,kcal:0,p:0,na:naP,ca:0,ph}]);
-    $("caEq").innerHTML=kg&&ca&&cc?`<b>${f(ca,0)} mg/kg/día</b> = ${f(ca*kg,0)} mg/día = <b>${f(caml,2)} ml/día</b>${t?` → ${f(caml/t,2)} ml por toma × ${t}`:""}`:"";
-    $("phEq").innerHTML=kg&&ph&&pc?`<b>${f(ph,0)} mg/kg/día</b> (${f(ph/31,2)} mmol/kg/día) = <b>${f(phml,2)} ml/día</b>${t?` → ${f(phml/t,2)} ml por toma × ${t}`:""}${naP?` · aporta ${f(naP,2)} mEq/kg/día de Na`:""}`:"";}
+    $("caEq").innerHTML=!(kg&&ca&&cc)?"":se?`<b>${f(ca,0)} mg/kg/día</b> = ${f(ca*kg,0)} mg/día = <b>${f(caml,2)} sellos/día</b>${t?` (${f(caml/t,3)} sello por toma × ${t})`:""}${dil?`<br>Disolviendo 1 sello en ${f(dil,0)} ml (${f(cc/dil,1)} mg/ml): <b>${f(caml*dil,1)} ml/día</b>${t?` → <b>${f(caml*dil/t,2)} ml por toma</b>`:""}`:""}`:`<b>${f(ca,0)} mg/kg/día</b> = ${f(ca*kg,0)} mg/día = <b>${f(caml,2)} ml/día</b>${t?` → ${f(caml/t,2)} ml por toma × ${t}`:""}`;
+    $("phEq").innerHTML=kg&&ph&&pc?`<b>${f(ph,0)} mg/kg/día</b> (${f(ph/31,2)} mmol/kg/día) = <b>${f(phml,2)} ml/día</b>${t?` → ${f(phml/t,2)} ml por toma × ${t}`:""}${naP?` · aporta ${f(naP,2)} mEq/kg/día de Na`:""}${kP?` · aporta ${f(kP,2)} mEq/kg/día de K`:""}`:"";}
   window.ENT=Object.assign({},tot);
   const pe=tot.kcal?tot.p/tot.kcal*100:NaN, cap=tot.ph?tot.ca/tot.ph:NaN;
 
@@ -919,7 +944,7 @@ function calcEN(){
      `<tr class="sub"><td colspan="4" style="white-space:normal;text-align:left;font-family:var(--body)">GIR de la NP: ${f(N.glu*1000/1440,1)} mg/kg/min (sin contar la lactosa enteral)</td></tr></tbody>`;}
 
   enResumen=`Enteral · peso ${f(kg,3)} kg · ${t} tomas/día
-${det.filter(([,a])=>a.vol).map(([n,a])=>`${n}: ${f(a.vol,0)} ml/kg/d (${f(t?a.vol*kg/t:0,1)} ml/toma)`).join("\n")}${modOn?`\nMódulo proteico: ${f(+$("sobres").value||0,1)} sobres/día`:""}${naSup?`\nSuplemento de Na VO: ${f(naSup.meqkg,2)} mEq/kg/día = ${f(naSup.mld,2)} ml/día${t?` (${f(naSup.mld/t,2)} ml por toma)`:""} de ${$("naPrep").selectedOptions[0].text} (${f(naSup.c,2)} mEq/ml)`:""}${cpSup&&cpSup.ca?`\nCalcio VO: ${f(cpSup.ca,0)} mg/kg/día = ${f(cpSup.caml,2)} ml/día de ${$("caPrep").selectedOptions[0].text}`:""}${cpSup&&cpSup.ph?`\nFósforo VO: ${f(cpSup.ph,0)} mg/kg/día = ${f(cpSup.phml,2)} ml/día de ${$("phPrep").selectedOptions[0].text}`:""}
+${det.filter(([,a])=>a.vol).map(([n,a])=>`${n}: ${f(a.vol,0)} ml/kg/d (${f(t?a.vol*kg/t:0,1)} ml/toma)`).join("\n")}${modOn?`\nMódulo proteico: ${f(+$("sobres").value||0,1)} sobres/día`:""}${naSup?`\nSuplemento de Na VO: ${f(naSup.meqkg,2)} mEq/kg/día = ${f(naSup.mld,2)} ml/día${t?` (${f(naSup.mld/t,2)} ml por toma)`:""} de ${$("naPrep").selectedOptions[0].text} (${f(naSup.c,2)} mEq/ml)`:""}${cpSup&&cpSup.ca?`\nCalcio VO: ${f(cpSup.ca,0)} mg/kg/día = ${f(cpSup.caml,2)} ${cpSup.se?"sellos":"ml"}/día de ${$("caPrep").selectedOptions[0].text}${cpSup.se&&cpSup.dil?` (1 sello en ${f(cpSup.dil,0)} ml: ${f(cpSup.caml*cpSup.dil,1)} ml/día)`:""}`:""}${cpSup&&cpSup.ph?`\nFósforo VO: ${f(cpSup.ph,0)} mg/kg/día = ${f(cpSup.phml,2)} ml/día de ${$("phPrep").selectedOptions[0].text}${cpSup.kP?` (K ${f(cpSup.kP,2)} mEq/kg/día)`:""}`:""}
 Volumen ${f(tot.vol,0)} ml/kg/d · Kcal ${f(tot.kcal,0)}/kg/d · Prot ${f(tot.p,2)} g/kg/d (P/E ${f(pe,2)} g/100 kcal)
 Na ${f(tot.na,2)} mEq/kg/d · Ca ${f(tot.ca,0)} mg/kg/d · P ${f(tot.ph,0)} mg/kg/d · Ca:P ${isFinite(cap)?f(cap,2):"—"}`;
 }
