@@ -72,6 +72,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{ou
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 /* Tabla de z-scores */
 table.zt{width:100%;border-collapse:collapse;font-size:.85rem}
+.taTag{display:inline-block;font-size:.7rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:4px;white-space:nowrap}.taTag.ok{background:#e3f4e8;color:#1e6b38}.taTag.warn{background:#fdf0d5;color:#8a5a00}.taTag.crit{background:#fde2e0;color:#a61b12}
 .zt th{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
 .zt th:first-child,.zt td:first-child{text-align:left}
 .zt td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -209,7 +210,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </div>
   <div id="viewTools" class="view">
   <nav class="jump" aria-label="Ir a sección">
-    <a href="#s-vis">VIS</a><a href="#s-z">Z-scores</a><a href="#s-cor">Coronarias</a><a href="#s-qp">Qp:Qs</a><a href="#s-ac">Anticoagulación</a><a href="#s-dop">Doppler</a>
+    <a href="#s-vis">VIS</a><a href="#s-ta">TA</a><a href="#s-z">Z-scores</a><a href="#s-cor">Coronarias</a><a href="#s-qp">Qp:Qs</a><a href="#s-ac">Anticoagulación</a><a href="#s-dop">Doppler</a>
   </nav>
 
   <!-- VIS -->
@@ -232,6 +233,21 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     </div>
     <div class="res" id="rVIS"></div>
     <p class="hint">VIS = dopamina + dobutamina + 100 × adrenalina + 100 × noradrenalina + 10 × milrinona + 10 000 × vasopresina (U/kg/min). La app la pide en U/kg/min (ej. 0,0005). IS (score inotrópico de Wernovsky) = dopamina + dobutamina + 100 × adrenalina. El valor pronóstico es el VIS máximo del período: cargá la combinación de dosis más alta.</p>
+  </section>
+
+  <!-- TENSIÓN ARTERIAL NEONATAL -->
+  <section class="card" id="s-ta">
+    <h2>Tensión arterial neonatal</h2>
+    <p class="hint">Percentil según la edad posmenstrual (Dionne 2012, desde las 2 semanas de vida), estadio de hipertensión (Harer y Kent 2019) y referencias de las primeras 72 h.</p>
+    <div class="grid">
+      <label for="taEG">EG al nacer <span class="u">semanas</span><input id="taEG" inputmode="decimal" autocomplete="off" placeholder="30"></label>
+      <label for="taDias">Días de vida<input id="taDias" inputmode="numeric" autocomplete="off" placeholder="28"></label>
+      <label for="taS">Sistólica <span class="u">mmHg</span><input id="taS" inputmode="numeric" autocomplete="off" placeholder="—"></label>
+      <label for="taD">Diastólica <span class="u">mmHg</span><input id="taD" inputmode="numeric" autocomplete="off" placeholder="—"></label>
+      <label for="taM">Media <span class="u">mmHg · opc.</span><input id="taM" inputmode="numeric" autocomplete="off" placeholder="calculada"></label>
+    </div>
+    <div class="res" id="rTA"></div>
+    <p class="hint">Medir con manguito de ancho ≈ 40–50 % de la circunferencia del brazo (relación ancho/circunferencia ≈ 0,45), brazo derecho, en decúbito, 1,5 h después de la toma o de un procedimiento, dormido o tranquilo; tomar 3 mediciones con 2 min de intervalo y usar el promedio. Dormido, la sistólica puede ser ~5 mmHg menor. Para descartar coartación, comparar brazo derecho y pierna.</p>
   </section>
 
   <!-- SUPERFICIE CORPORAL Y Z-SCORES -->
@@ -934,6 +950,51 @@ function vis(){
   $('rVIS').innerHTML = h;
 }
 VIS_IN.forEach(([id]) => $(id).addEventListener('input', vis));
+// ---------- Tensión arterial neonatal (Dionne 2012; Harer y Kent 2019; Zubrow 1995; Kent 2007; Vesoulis 2016; Batton 2014) ----------
+// EPM: [p50 S,D,M], [p95 S,D,M], [p99 S,D,M] — valores después de las 2 semanas de vida
+const TA_DIONNE = [
+  [26,[55,30,38],[72,50,57],[77,56,63]],[28,[60,38,45],[75,50,58],[80,54,63]],[30,[65,40,48],[80,55,63],[85,60,68]],
+  [32,[68,40,49],[83,55,64],[88,60,69]],[34,[70,40,50],[85,55,65],[90,60,70]],[36,[72,50,57],[87,65,72],[92,70,77]],
+  [38,[77,50,59],[92,65,74],[97,70,79]],[40,[80,50,60],[95,65,75],[100,70,80]],[42,[85,50,62],[98,65,76],[102,70,81]],
+  [44,[88,50,63],[105,68,80],[110,73,85]]];
+function taRef(epm){
+  const e = Math.min(44, Math.max(26, epm)); let i = TA_DIONNE.findIndex(r => r[0] >= e); if (i <= 0) return TA_DIONNE[0].slice(1);
+  const a = TA_DIONNE[i-1], b = TA_DIONNE[i], t = (e - a[0]) / (b[0] - a[0]);
+  return [1,2,3].map(k => a[k].map((x, j) => x + (b[k][j] - x) * t));
+}
+function ta(){
+  const eg = v('taEG'), d = v('taDias'), S = v('taS'), D = v('taD'); let M = v('taM'); const mCalc = !isFinite(M) && isFinite(S) && isFinite(D);
+  if (mCalc) M = (S + 2 * D) / 3;
+  if (!isFinite(eg)) { $('rTA').innerHTML = '<div class="empty">Cargá la EG al nacer y los días de vida (se toman de la barra del paciente).</div>'; return; }
+  const dias = isFinite(d) ? d : 0, epm = eg + dias / 7, R = taRef(epm);
+  const out = epm < 26 || epm > 44;
+  let h = `<div class="tiles">${tile('Edad posmenstrual', f(epm, 1) + ' sem', `EG ${f(eg, 1)} + ${f(dias, 0)} días`, true)}${isFinite(S)||isFinite(D)?tile('TA medida', `${isFinite(S)?f(S):'–'}/${isFinite(D)?f(D):'–'}`, `media ${f(M, 0)}${mCalc?' (calculada)':''}`):''}</div>`;
+  const val = [S, D, M], nm = ['Sistólica', 'Diastólica', 'Media'];
+  const cls = (x, k) => { if (!isFinite(x)) return ['', '']; const p95 = R[1][k], p99 = R[2][k];
+    if (x > p99 + 5) return ['crit', 'Estadio 2']; if (x >= p95) return ['warn', 'Estadio 1']; if (x >= R[0][k]) return ['ok', 'p50–p95']; return ['ok', '< p50']; };
+  let worst = 0;
+  h += `<div class="tablewrap" style="overflow-x:auto"><table class="zt"><thead><tr><th></th><th>p50</th><th>p95</th><th>p99</th><th>Medida</th></tr></thead><tbody>` +
+    nm.map((n, k) => { const [c, t] = cls(val[k], k); if (c === 'crit') worst = 2; else if (c === 'warn' && worst < 1) worst = 1;
+      return `<tr><td>${n}</td><td>${f(R[0][k])}</td><td>${f(R[1][k])}</td><td>${f(R[2][k])}</td><td>${isFinite(val[k]) ? `<b>${f(val[k])}</b> <span class="taTag ${c}">${t}</span>` : '–'}</td></tr>`; }).join('') +
+    `</tbody></table></div>`;
+  if (out) h += pill('info', `La tabla de Dionne cubre 26–44 semanas de EPM; se muestran los valores del extremo más cercano.`);
+  if (dias < 14) h += pill('info', `<b>Menos de 2 semanas de vida:</b> la tabla de Dionne se construyó para después de las 2 semanas y acá es solo orientativa. En los primeros 5 días la TA sube sola unos 2,2–2,7 mmHg/día la sistólica y 1,6–2 mmHg/día la diastólica (Zubrow 1995); repetir antes de rotular hipertensión.`);
+  if (worst === 2) h += pill('crit', `<b>Hipertensión estadio 2</b> (&gt; p99 + 5 mmHg). Confirmar con mediciones repetidas y buscar causa (trombosis de arteria renal por catéter umbilical, enfermedad renal, DBP, coartación, fármacos como corticoides o cafeína, dolor, sobrecarga de volumen). Evaluar daño de órgano blanco (eco: hipertrofia del VI; función renal; neurológico). Suele requerir tratamiento.`);
+  else if (worst === 1) h += pill('warn', `<b>Hipertensión estadio 1</b> (p95 a p99 + 5 mmHg). Repetir con técnica correcta y vigilar; si persiste o hay daño de órgano blanco, estudiar y considerar tratamiento.`);
+  else if (val.some(isFinite)) h += pill('ok', 'Por debajo del percentil 95 para la edad posmenstrual.');
+  // Primeras 72 h: hipotensión y referencias
+  if (dias <= 3) {
+    if (isFinite(M) && M < eg) h += pill('warn', `<b>Media ${f(M, 0)} mmHg &lt; EG en semanas (${f(eg, 0)}).</b> La regla «media ≥ EG» es práctica pero no está validada: en 23–26 semanas, dos tercios de los pacientes tienen alguna media ≤ EG (Batton 2014). Decidir por perfusión, lactato, diuresis, FC y eco funcional, no por el número aislado.`);
+    let ref = '';
+    if (eg < 28) ref = `<b>Referencia &lt; 28 semanas, primeras 72 h (Vesoulis 2016, catéter umbilical):</b> media ≈ 33 mmHg al nacer, sube ≈ 1 mmHg/día; sistólica ≈ 44 mmHg al nacer, sube ≈ 2,2 mmHg/día. En 23–26 semanas la TA baja las primeras 4 h (nadir a las 4–5 h, media 30 ± 8 mmHg) y luego sube ≈ 0,2 mmHg/h (Batton 2014).`;
+    else if (eg >= 37) ref = `<b>Referencia en término sano (Kent 2007, oscilométrica):</b> mediana del día 1: 65/45 (48) mmHg; día 4: 70/46 (54) mmHg.`;
+    else ref = `<b>Prematuro de 28–36 semanas, primeros días:</b> la TA se correlaciona con la EG y el peso al nacer y sube ≈ 2,2–2,7 mmHg/día la sistólica y 1,6–2 mmHg/día la diastólica durante los primeros 5 días (Zubrow 1995).`;
+    h += pill('info', ref);
+  }
+  $('rTA').innerHTML = h;
+}
+['taEG', 'taDias', 'taS', 'taD', 'taM'].forEach(id => $(id).addEventListener('input', ta));
+
 
 // ---------- Superficie corporal y z-scores (Detroit, Pettersen 2008) ----------
 const DET = [
@@ -1550,7 +1611,7 @@ $('sView').querySelectorAll('button').forEach(b => b.onclick = () => { const v =
 
 // ---------- Ejemplo y limpiar ----------
 $('ej').onclick = () => { $('zPeso').value = '3200'; $('zTalla').value = '50'; if ($('z_p_ann')) { $('z_p_ann').value = '5'; $('z_p_lad').value = '1,4'; } zcalc(); cor(); $('vDopa').value = '5'; $('vAdre').value = '0,05'; $('vMil').value = '0,5'; vis(); S.age = 'neo'; S.sex = 'm'; S.unit = 'ms'; S.hr = 'fc'; syncSeg(); $('qt').value = '300'; $('fc').value = '150'; $('rr').value = ''; $('qrs').value = '60'; manualQTc = false; calc(); };
-$('clr').onclick = () => { VIS_IN.forEach(([id]) => $(id).value = ''); vis(); ['eI','eF','zPeso','zTalla','cZ','cMm','qAo','qVm','qVp','qAp','aPeso','hRate','hLab','eDose','eXa','dV','dTA','dIT','dCIV','dDA','dIPp','dIPf','cLvot','cVtiL','cVtiV','cBsa','pdaPeso','pdaDias','dpD','dpV','daD','daV','dFC','dPeso'].forEach(id => $(id).value = ''); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); eje(); NROWS.forEach(([k]) => $('n_' + k).value = ''); ['nTV1','nQR','nStrain','nQ6'].forEach(id => $(id).checked = false); normEval(); zRows().filter(d => !d.g).forEach(d => $('z_' + d.id).value = ''); zcalc(); cor(); ['qt','fc','rr','qrs'].forEach(id => $(id).value = ''); manualQTc = false; $('crit').innerHTML = ''; buildCrit(); calc(); };
+$('clr').onclick = () => { VIS_IN.forEach(([id]) => $(id).value = ''); vis(); ['taS','taD','taM'].forEach(id => $(id).value = ''); ta(); ['eI','eF','zPeso','zTalla','cZ','cMm','qAo','qVm','qVp','qAp','aPeso','hRate','hLab','eDose','eXa','dV','dTA','dIT','dCIV','dDA','dIPp','dIPf','cLvot','cVtiL','cVtiV','cBsa','pdaPeso','pdaDias','dpD','dpV','daD','daV','dFC','dPeso'].forEach(id => $(id).value = ''); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); eje(); NROWS.forEach(([k]) => $('n_' + k).value = ''); ['nTV1','nQR','nStrain','nQ6'].forEach(id => $(id).checked = false); normEval(); zRows().filter(d => !d.g).forEach(d => $('z_' + d.id).value = ''); zcalc(); cor(); ['qt','fc','rr','qrs'].forEach(id => $(id).value = ''); manualQTc = false; $('crit').innerHTML = ''; buildCrit(); calc(); };
 ['qt','fc','rr','qrs','vel'].forEach(id => $(id).addEventListener('input', () => { manualQTc = false; calc(); }));
 $('sVer').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { manualQTc = false; buildCrit(); calc(); }));
 $('sSex').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { manualQTc = false; autoQTc(); score(); }));
@@ -1558,7 +1619,7 @@ $('sSex').querySelectorAll('button').forEach(b => b.addEventListener('click', ()
 function goSimArr(id){ $('sView').querySelector('[data-v=sim]').click(); const sel = document.getElementById('sm-arrsel'); if (sel && id) { sel.value = id; sel.dispatchEvent(new Event('change')); } window.scrollTo(0,0); }
 window.goSimArr = goSimArr;
 $('goSim').onclick = () => { $('sView').querySelector('[data-v=sim]').click(); window.scrollTo(0,0); };
-syncSeg(); buildCrit(); calc(); vis(); buildZ(); zcalc(); cor(); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); norm(); eje(); buildAtlas();
+syncSeg(); buildCrit(); calc(); vis(); ta(); buildZ(); zcalc(); cor(); qp(); qpd(); ac(); dop(); papm(); cont(); pda(); norm(); eje(); buildAtlas();
 try { const cv0 = localStorage.getItem('cardio_view'), sb = k => $('sView').querySelector('[data-v=' + k + ']'); if (location.hash === '#simulador' || cv0 === 'sim') sb('sim').click(); else if (cv0 === 'ecg' || location.hash === '#ecg') sb('ecg').click(); else if (cv0 === 'eco' || location.hash === '#eco') sb('eco').click(); } catch (err) {}
 </script>
 <script>
@@ -2651,7 +2712,7 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 })();
 
 </script>
-<script src="paciente.js?v=v63"></script>
+<script src="paciente.js?v=v83"></script>
 <script src="eco.js?v=v67"></script>
 <script src="arr.js?v=v72"></script>
 <script src="ped.js?v=v74"></script>
