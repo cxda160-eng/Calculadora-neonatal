@@ -217,8 +217,50 @@
       });
     }
   }
+
+  /* Botón «Vaciar» en cada tarjeta con datos para cargar (no toca peso, EG ni días) */
+  function addVac() {
+    if (/^(fuentes|neofax|index)$/.test(page)) return;
+    var pacSel = (FIELDS[page] || []).map(function (f) { return f[0]; });
+    var st = document.createElement("style");
+    st.textContent = ".vacBtn{float:right;margin:-4px 0 0 8px;border:1px solid currentColor;background:transparent;color:inherit;opacity:.75;border-radius:999px;padding:3px 10px;font:600 .72rem/1.4 inherit;font-family:inherit;letter-spacing:.02em;text-transform:none;cursor:pointer;min-height:28px}.vacBtn:hover{opacity:1}" +
+      ".vacToast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#2d3142;color:#fff;border-radius:12px;padding:10px 14px;font:500 .9rem/1.3 system-ui,sans-serif;display:flex;gap:14px;align-items:center;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.25)}.vacToast button{background:none;border:0;color:#ffd27a;font:700 .9rem system-ui,sans-serif;cursor:pointer;padding:4px}";
+    document.head.appendChild(st);
+    var OK = /^(text|number|search|tel|date|time|datetime-local|)$/;
+    function fields(card) {
+      return [].filter.call(card.querySelectorAll("input,textarea"), function (el) {
+        if (el.readOnly || el.disabled || el.closest("[data-novac]")) return false;
+        if (el.tagName === "INPUT" && !OK.test(el.type || "")) return false;
+        return !pacSel.some(function (sel) { return el.matches(sel); });
+      });
+    }
+    var toastEl = null, tm = null;
+    function toast(msg, undo) {
+      if (toastEl) toastEl.remove(); clearTimeout(tm);
+      toastEl = document.createElement("div"); toastEl.className = "vacToast"; toastEl.setAttribute("role", "status");
+      toastEl.innerHTML = "<span>" + msg + "</span>";
+      if (undo) { var b = document.createElement("button"); b.type = "button"; b.textContent = "Deshacer"; b.onclick = function () { undo(); toastEl.remove(); }; toastEl.appendChild(b); }
+      document.body.appendChild(toastEl); tm = setTimeout(function () { if (toastEl) toastEl.remove(); }, 6000);
+    }
+    function fire(el) { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); }
+    document.querySelectorAll("section.card,section.panel,div.card").forEach(function (card) {
+      if (card.parentElement && card.parentElement.closest("section.card,section.panel,div.card")) return;
+      var h = card.querySelector(":scope > h2, :scope > .lbl"); if (!h || !fields(card).length || h.querySelector(".vacBtn")) return;
+      var b = document.createElement("button"); b.type = "button"; b.className = "vacBtn"; b.textContent = "Vaciar";
+      b.title = "Borrar los datos cargados en esta tarjeta"; b.setAttribute("aria-label", "Vaciar " + h.textContent.trim());
+      b.onclick = function (e) {
+        e.stopPropagation();
+        var list = fields(card).filter(function (el) { return el.value !== ""; });
+        if (!list.length) { toast("No hay datos para vaciar en esta tarjeta"); return; }
+        var old = list.map(function (el) { return el.value; });
+        list.forEach(function (el) { el.value = ""; fire(el); });
+        toast("Tarjeta vaciada", function () { list.forEach(function (el, i) { el.value = old[i]; fire(el); }); });
+      };
+      h.appendChild(b);
+    });
+  }
   window.CalcNeo = window.CalcNeo || {};
-  function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); }
+  function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); try { addVac(); } catch (e) {} }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
   else setTimeout(init, 0);
 })();

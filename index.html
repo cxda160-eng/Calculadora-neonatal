@@ -108,6 +108,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 .chiprow .chip{flex:1;min-width:0;margin:0}
 .cama{flex:none;display:flex;align-items:center;gap:5px;max-width:42%;min-height:42px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:700;font-size:.82rem;cursor:pointer}
 .cama span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vacb{color:var(--muted)}.vacOp{width:100%;text-align:left;cursor:pointer}.vacOp span{display:flex;flex-direction:column;gap:2px}.vacOp small{color:var(--muted);font-size:.78rem;font-weight:400}#vacAll b{color:#b3261e}
+@media (max-width:420px){.vacb span{display:none}.vacb{padding:0 12px}}
 .camas .row{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 12px;min-height:56px}
 .camas .row[aria-current="true"]{border-color:var(--neo);background:var(--neo-soft)}
 .camas .go{flex:1;min-width:0;text-align:left;border:0;background:none;color:var(--fg);font:inherit;cursor:pointer;padding:4px 0}
@@ -142,6 +144,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 .bus-r p{color:var(--muted,#777);font-size:.85rem;margin:10px 6px}
 .bus-f{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line,#ddd);font-size:.78rem;color:var(--muted,#777)}
 .bus-f button{flex:none;font-size:.78rem;padding:6px 10px}
+.toast .tUndo{background:none;border:0;color:#ffd27a;font:inherit;font-weight:700;cursor:pointer;padding:2px 0 2px 8px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:70;background:#2e3147;color:#fff;padding:9px 16px;border-radius:999px;font-size:.85rem;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
 </style>
 <style id="tema-vivo">
@@ -164,7 +167,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button type="button" class="ib" id="nhCopy" aria-label="Copiar resumen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
     </div>
   </div>
-  <div class="chiprow"><button type="button" class="cama" id="pCama" aria-label="Cambiar de paciente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-8v5"/><circle cx="7" cy="11" r="2"/></svg><span id="pCamaN">Paciente 1</span></button><button type="button" class="chip" id="pChip" aria-expanded="false" aria-controls="pacRow"><span id="pSum">Cargar paciente</span><b id="pChipL">Editar</b></button></div>
+  <div class="chiprow"><button type="button" class="cama" id="pCama" aria-label="Cambiar de paciente"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18V7M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-8v5"/><circle cx="7" cy="11" r="2"/></svg><span id="pCamaN">Paciente 1</span></button><button type="button" class="chip" id="pChip" aria-expanded="false" aria-controls="pacRow"><span id="pSum">Cargar paciente</span><b id="pChipL">Editar</b></button><button type="button" class="cama vacb" id="pVac" aria-label="Vaciar datos del paciente" title="Vaciar datos"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg><span>Vaciar</span></button></div>
 </header>
 <header class="bar">
   <div class="in">
@@ -237,6 +240,15 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <p class="mas-p">Cada paciente guarda sus propios datos: peso, EG, balance, EHI, escalas y crecimiento. Tocá uno para pasar a él.</p>
     <div id="camL" style="display:flex;flex-direction:column;gap:8px"></div>
     <button type="button" class="add" id="camAdd">+ Agregar paciente</button>
+  </div>
+</div>
+<div class="mas" id="vacM" hidden role="dialog" aria-label="Vaciar datos">
+  <div class="mas-in camas">
+    <div class="mas-h"><h2>Vaciar datos</h2><button type="button" class="ib" id="vacX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="mas-p" id="vacP">Se borra solo en este dispositivo y solo del paciente actual. Durante unos segundos podés deshacerlo.</p>
+    <button type="button" class="row go vacOp" id="vacPac"><span><b>Peso, EG y días</b><small>Datos de la barra del paciente y la hora de nacimiento</small></span></button>
+    <button type="button" class="row go vacOp" id="vacAll"><span><b>Todo lo de este paciente</b><small>Barra del paciente, balances y bitácora, EHI y escalas, crecimiento, prescripciones de NP e hidratación, y lo escrito en las calculadoras</small></span></button>
+    <p class="mas-p">Para borrar solo una calculadora, usá el botón «Vaciar» de esa tarjeta.</p>
   </div>
 </div>
 <div class="mas" id="resm" hidden role="dialog" aria-label="Resumen del paciente">
@@ -390,7 +402,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Varios pacientes (camas) ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const PK=/^(pac|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs)$/;
+  const PK=/^(pac|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap)$/;
   const get=()=>{try{return JSON.parse(localStorage.getItem("camas")||"null")}catch(e){return null}};
   const put=c=>{try{localStorage.setItem("camas",JSON.stringify(c))}catch(e){toast("No hay espacio para guardar más pacientes")}};
   let C=get();
@@ -413,6 +425,15 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   $("pCama").onclick=open;$("camX").onclick=close;$("camas").addEventListener("click",e=>{if(e.target.id==="camas")close()});
   $("camAdd").onclick=()=>{const id="c"+(C.n++);const nom="Paciente "+(C.l.length+1);C.l.push({id,nom,snap:{}});put(C);go(id);setTimeout(()=>{if(window.paciSum)window.paciSum();const r=$("pacRow");if(r&&r.hidden)$("pChip").click()},300)};
   paintName();
+  // Vaciar datos del paciente actual (con deshacer)
+  function vacClose(){$("vacM").hidden=true}
+  $("pVac").onclick=()=>{$("vacM").hidden=false};$("vacX").onclick=vacClose;$("vacM").addEventListener("click",e=>{if(e.target.id==="vacM")vacClose()});
+  function undoToast(msg,snap){toast(msg);const e=document.getElementById("toast");const b=document.createElement("button");b.type="button";b.textContent="Deshacer";b.className="tUndo";
+    b.onclick=()=>{clearNow();for(const k in snap)try{localStorage.setItem(k,snap[k])}catch(_){}reloadViews();e.hidden=true;toast("Datos restaurados")};e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)}
+  $("vacPac").onclick=()=>{const old=localStorage.getItem("pac");vacClose();document.getElementById("gClr").click();
+    toast("Peso, EG y días borrados");const e=document.getElementById("toast");const b=document.createElement("button");b.type="button";b.textContent="Deshacer";b.className="tUndo";
+    b.onclick=()=>{try{if(old)localStorage.setItem("pac",old)}catch(_){}reloadViews();e.hidden=true};e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)};
+  $("vacAll").onclick=()=>{const snap=snapNow();vacClose();clearNow();reloadViews();undoToast("Se vaciaron todos los datos de "+cur().nom+".",snap)};
 })();
 
 /* ---- Tema y tamaño de letra ---- */
