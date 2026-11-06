@@ -66,10 +66,20 @@ textarea{position:absolute;left:-9999px}
 #prep{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
 #prep h3{margin:0;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
 #prep table td{padding:5px 4px}
+.phStep{display:flex;align-items:center;gap:8px;margin:18px 0 6px;font-size:.95rem;flex-wrap:wrap}
+.phStep:first-of-type{margin-top:4px}
+.phN{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--surface);font-weight:700;font-size:.8rem;flex:none}
+.phSug{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:.85rem;color:var(--muted)}
+.phSug button{border:1px solid var(--accent);background:var(--surface);color:var(--accent);border-radius:999px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer;min-height:36px}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.phMore{margin-top:18px;border-top:1px solid var(--line);padding-top:8px}
+.phMore summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.9rem;padding:8px 0}
+.phRx{background:var(--sunk);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:1.02rem;line-height:1.55;margin-bottom:12px}
+.phH3{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:16px 0 4px}
+#parTipo button,#phGm button{white-space:normal;min-height:44px}
 .seg button:disabled{opacity:.45;cursor:not-allowed}
 .modsel{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
-.modsel{flex-wrap:wrap}
-.modsel button{flex:1 1 40%;border:0;background:transparent;font:inherit;font-weight:600;font-size:.95rem;color:var(--muted);padding:10px 8px;border-radius:10px;cursor:pointer;min-height:44px}
+.modsel button{flex:1;border:0;background:transparent;font:inherit;font-weight:600;font-size:.95rem;color:var(--muted);padding:10px 8px;border-radius:10px;cursor:pointer;min-height:44px}
 .modsel button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
 .mod{display:flex;flex-direction:column;gap:16px}
 .mod[hidden]{display:none}
@@ -110,7 +120,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 <div class="wrap">
   <header>
     <h1>Nutrición</h1>
-    <p>Parenteral: aporte real desde la etiqueta de la bolsa. Enteral: leches, mezclas, módulo proteico y suplemento de sodio VO, con metas ESPGHAN. Hidratación: plan de dextrosa y electrolitos para quien no recibe NP.</p>
+    <p>Parenteral: aporte real de la NP desde la etiqueta de la bolsa, o plan de hidratación si no recibe NP. Enteral: leches, mezclas, módulo proteico y suplemento de sodio VO, con metas ESPGHAN.</p>
   </header>
 
   <section class="card">
@@ -133,10 +143,17 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <button type="button" data-v="np" aria-pressed="true">Parenteral</button>
     <button type="button" data-v="en" aria-pressed="false">Enteral</button>
     <button type="button" data-v="pr" aria-pressed="false">Prescribir NP</button>
-    <button type="button" data-v="ph" aria-pressed="false">Hidratación</button>
   </div>
 
   <div class="mod" id="modNP">
+  <section class="card">
+    <h2>¿Qué recibe por vía parenteral?</h2>
+    <div class="seg" id="parTipo">
+      <button type="button" data-v="np" aria-pressed="true">Nutrición parenteral</button>
+      <button type="button" data-v="ph" aria-pressed="false">Hidratación (sin NP)</button>
+    </div>
+  </section>
+  <div id="npBody">
   <section class="card">
     <h2>Infusión de la NP</h2>
     <div class="seg" id="modo">
@@ -213,6 +230,52 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <div class="tablewrap"><table id="tabla"></table></div>
   </section>
 
+  </div><!-- /npBody -->
+  <div id="phBody" hidden>
+  <section class="card">
+    <h2>Plan de hidratación parenteral</h2>
+    <div class="phStep"><span class="phN">1</span><b>Volumen</b></div>
+    <label for="phV">Líquidos parenterales <span class="u">mL/kg/día</span><input id="phV" type="number" inputmode="decimal" step="any" placeholder="80"></label>
+    <div id="phSug" class="phSug"></div>
+    <div class="phStep"><span class="phN">2</span><b>Glucosa</b></div>
+    <div class="seg" id="phGm">
+      <button type="button" data-v="fg" aria-pressed="true">Indico flujo (mg/kg/min)</button>
+      <button type="button" data-v="pc" aria-pressed="false">Indico dextrosa (%)</button>
+    </div>
+    <label for="phG"><span id="phGl">Flujo de glucosa <span class="u">mg/kg/min</span></span><input id="phG" type="number" inputmode="decimal" step="any" placeholder="5"></label>
+    <p class="hint" id="phGeq"></p>
+    <div class="phStep"><span class="phN">3</span><b>Electrolitos</b> <span class="u">mEq/kg/día · 0 si no lleva</span></div>
+    <div class="row3">
+      <label for="phNa">Sodio<input id="phNa" type="number" inputmode="decimal" step="any" placeholder="0"></label>
+      <label for="phK">Potasio<input id="phK" type="number" inputmode="decimal" step="any" placeholder="0"></label>
+      <label for="phCa">Calcio<input id="phCa" type="number" inputmode="decimal" step="any" placeholder="0"></label>
+    </div>
+    <details class="phMore"><summary>Opcional: descontar enteral, horas y dextrosas a mezclar</summary>
+      <div class="row">
+        <label for="phEn">Enteral a descontar <span class="u">mL/kg/día</span><input id="phEn" type="number" inputmode="decimal" step="any" placeholder="0"></label>
+        <label for="phOt">Otros (drogas, lavados) <span class="u">mL/día</span><input id="phOt" type="number" inputmode="decimal" step="any" placeholder="0"></label>
+      </div>
+      <div class="row">
+        <label for="phH">Horas de infusión<input id="phH" type="number" inputmode="decimal" step="any" placeholder="24"></label>
+        <span></span>
+      </div>
+      <div class="row">
+        <label for="phDa">Dextrosa baja<select id="phDa"><option value="0">Agua destilada</option><option value="5" selected>Dextrosa 5 %</option><option value="10">Dextrosa 10 %</option></select></label>
+        <label for="phDb">Dextrosa alta<select id="phDb"><option value="10">Dextrosa 10 %</option><option value="25" selected>Dextrosa 25 %</option><option value="50">Dextrosa 50 %</option></select></label>
+      </div>
+      <p class="hint">Si los líquidos totales incluyen la leche, cargá aquí lo enteral y el plan parenteral se reduce. ClNa, ClK y gluconato de Ca usan las concentraciones de «Prescribir NP → Soluciones de la farmacia».</p>
+    </details>
+  </section>
+  <section class="card">
+    <h2>Indicación</h2>
+    <div class="phRx" id="phRx"></div>
+    <div class="tiles" id="phTiles"></div>
+    <h3 class="phH3">Preparación</h3>
+    <div class="tablewrap"><table id="phTab"></table></div>
+    <div class="alerts" id="phAl"></div>
+    <p class="hint">Volúmenes sugeridos: ESPGHAN/ESPEN/ESPR/CSPEN 2018, líquidos y electrolitos en neonatos. Ajustar por diuresis, peso, natremia, fototerapia, servocuna y cardiopatía. Orientativo: verificar con el protocolo de la unidad.</p>
+  </section>
+  </div><!-- /phBody -->
   </div><!-- /modNP -->
 
   <div class="mod" id="modPR" hidden>
@@ -238,36 +301,6 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <p class="hint">Orientativo: verificar con farmacia y con el protocolo de la unidad (compatibilidad calcio-fósforo, orden de mezclado y sobrellenado de la bolsa). La osmolaridad es una estimación.</p>
   </section>
   </div><!-- /modPR -->
-
-  <div class="mod" id="modPH" hidden>
-  <section class="card">
-    <h2>Plan de hidratación parenteral</h2>
-    <p class="hint">Para el paciente que no recibe NP: dextrosa con electrolitos. El volumen sugerido sale del peso y los días de vida de la barra del paciente.</p>
-    <div class="alerts" id="phSug"></div>
-    <div class="grid">
-      <label for="phV">Líquidos totales <span class="u">mL/kg/día</span><input id="phV" inputmode="decimal" autocomplete="off" placeholder="80"></label>
-      <label for="phEn">Enteral a descontar <span class="u">mL/kg/día</span><input id="phEn" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-      <label for="phOt">Otros volúmenes a descontar <span class="u">mL/día (drogas, lavados)</span><input id="phOt" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-      <label for="phG">Flujo de glucosa <span class="u">mg/kg/min</span><input id="phG" inputmode="decimal" autocomplete="off" placeholder="5"></label>
-      <label for="phNa">Sodio <span class="u">mEq/kg/día</span><input id="phNa" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-      <label for="phK">Potasio <span class="u">mEq/kg/día</span><input id="phK" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-      <label for="phCa">Calcio <span class="u">mEq/kg/día</span><input id="phCa" inputmode="decimal" autocomplete="off" placeholder="2"></label>
-      <label for="phH">Horas <span class="u">h</span><input id="phH" inputmode="decimal" autocomplete="off" placeholder="24"></label>
-    </div>
-    <div class="grid">
-      <label for="phDa">Dextrosa baja<select id="phDa"><option value="0">Agua destilada</option><option value="5" selected>Dextrosa 5 %</option><option value="10">Dextrosa 10 %</option></select></label>
-      <label for="phDb">Dextrosa alta<select id="phDb"><option value="10">Dextrosa 10 %</option><option value="25" selected>Dextrosa 25 %</option><option value="50">Dextrosa 50 %</option></select></label>
-    </div>
-    <p class="hint">ClNa, ClK y gluconato de calcio usan las concentraciones cargadas en «Prescribir NP → Soluciones de la farmacia».</p>
-  </section>
-  <section class="card">
-    <h2>Plan calculado <button type="button" class="btn primary" id="phCopy">Copiar plan</button></h2>
-    <div class="tiles" id="phTiles"></div>
-    <div class="tablewrap"><table id="phTab"></table></div>
-    <div class="alerts" id="phAl"></div>
-    <p class="hint">Volúmenes sugeridos: guía ESPGHAN/ESPEN/ESPR/CSPEN 2018 de líquidos y electrolitos en neonatos (Jochum y col.). Ajustar por diuresis, cambio de peso, natremia, fototerapia, servocuna y cardiopatía. Orientativo: verificar con el protocolo de la unidad.</p>
-  </section>
-  </div><!-- /modPH -->
 
   <div class="mod" id="modEN" hidden>
   <section class="card">
@@ -569,7 +602,7 @@ $("naOn").addEventListener("change",calcEN);
 ["modOn","sumNP"].forEach(id=>$(id).addEventListener("change",calcEN));
 $("modulo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
   $("modulo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  $("modNP").hidden=b.dataset.v!=="np";$("modEN").hidden=b.dataset.v!=="en";$("modPR").hidden=b.dataset.v!=="pr";$("modPH").hidden=b.dataset.v!=="ph";if(b.dataset.v==="ph")setTimeout(calcPH,0);
+  $("modNP").hidden=b.dataset.v!=="np";$("modEN").hidden=b.dataset.v!=="en";$("modPR").hidden=b.dataset.v!=="pr";
   try{localStorage.setItem("nut_mod",b.dataset.v)}catch(e){}calc();});
 
 
@@ -602,63 +635,76 @@ function calcPR(){const n=i=>{const v=parseFloat(String($(i).value).replace(",",
   $("prAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}">${t}</div>`).join("");
   window._prSummary=`Prescripción de NP · ${f1(kg*1000,0)} g\nMetas: líquidos ${$("prL").value} mL/kg/día, glucosa ${$("prG").value} mg/kg/min, AA ${$("prA").value} g/kg, lípidos ${$("prLi").value} g/kg, Na ${$("prNa").value}, K ${$("prK").value}, Ca ${$("prCa").value} mEq/kg, P ${$("prP").value} mmol/kg, Mg ${$("prMg").value} mEq/kg\n`+rows.map(([a,v])=>`${a}: ${f1(v,2)} mL`).join("\n")+`\nBolsa acuosa ${f1(Vaq,1)} mL a ${f1(Vaq/H,2)} mL/h · glucosa ${f1(glc,1)} % · ${f1(kcal,0)} kcal/kg/día\nLípidos ${f1(V.lip,2)} mL a ${f1(V.lip/H,2)} mL/h`;}
 [...PRI,...PRC].forEach(i=>$(i).addEventListener("input",calcPR));$("prLipIn").addEventListener("change",calcPR);$("peso").addEventListener("input",calcPR);
-window.customSummary=()=>{const m=document.querySelector('#modulo [aria-pressed="true"]');if(!m)return "";return m.dataset.v==="pr"?window._prSummary||"":m.dataset.v==="ph"?window._phSummary||"":""};
+window.customSummary=()=>{const m=document.querySelector('#modulo [aria-pressed="true"]');if(!m)return "";if(m.dataset.v==="pr")return window._prSummary||"";if(m.dataset.v==="np"&&!$("phBody").hidden)return window._phSummary||"";return ""};
 setTimeout(calcPR,0);
 
-/* ---------- Plan de hidratación parenteral ---------- */
-// Líquidos parenterales sugeridos (mL/kg/día), ESPGHAN 2018: día 1..5 y desde el día 6 (estabilización)
+/* ---------- Plan de hidratación parenteral (dentro de Parenteral) ---------- */
+// Líquidos parenterales sugeridos (mL/kg/día), ESPGHAN 2018: día 1..5 y desde el día 6
 const PHV={term:[[40,60],[50,70],[60,80],[60,100],[100,140],[140,170]],g1500:[[60,80],[80,100],[100,120],[120,140],[140,160],[140,160]],g1000:[[70,90],[90,110],[110,130],[130,150],[160,180],[140,160]],m1000:[[80,100],[100,120],[120,140],[140,160],[160,180],[140,160]]};
 const PHI=["phV","phEn","phOt","phG","phNa","phK","phCa","phH"];
-(function(){let st={};try{st=JSON.parse(localStorage.getItem("php")||"{}")||{}}catch(e){}PHI.forEach(i=>{if(st[i]!=null)$(i).value=st[i]});["phDa","phDb"].forEach(i=>{if(st[i]!=null)$(i).value=st[i]});if(!$("phH").value)$("phH").value="24";})();
+let phGm="fg";
+function phSetTipo(v){$("parTipo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===v)));$("npBody").hidden=v!=="np";$("phBody").hidden=v!=="ph";try{localStorage.setItem("par_tipo",v)}catch(e){}if(v==="ph")calcPH();}
+$("parTipo").addEventListener("click",e=>{const b=e.target.closest("button");if(b)phSetTipo(b.dataset.v)});
+function phSetGm(v){phGm=v;$("phGm").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v===v)));$("phGl").innerHTML=v==="fg"?'Flujo de glucosa <span class="u">mg/kg/min</span>':'Concentración de dextrosa <span class="u">%</span>';$("phG").placeholder=v==="fg"?"5":"10";}
+$("phGm").addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.dataset.v===phGm)return;
+  // convierte el valor actual al otro modo para no perder lo indicado
+  const c=window._phConv;if(c&&isFinite(c[b.dataset.v]))$("phG").value=String(Math.round(c[b.dataset.v]*10)/10);
+  phSetGm(b.dataset.v);calcPH();});
+(function(){let st={};try{st=JSON.parse(localStorage.getItem("php")||"{}")||{}}catch(e){}PHI.forEach(i=>{if(st[i]!=null)$(i).value=st[i]});["phDa","phDb"].forEach(i=>{if(st[i]!=null)$(i).value=st[i]});if(st.gm)phSetGm(st.gm);if(!$("phH").value)$("phH").value="24";
+  if(+st.phEn||+st.phOt||(st.phH&&st.phH!=="24"))$("phBody").querySelector("details").open=true;})();
 function phPac(){let p={};try{p=JSON.parse(localStorage.getItem("pac")||"{}")}catch(e){}return{dias:+p.dias,eg:+p.eg}}
 function calcPH(){
   const n=i=>{const v=parseFloat(String($(i).value).replace(",","."));return isFinite(v)?v:0};
-  const st={};PHI.forEach(i=>st[i]=$(i).value);st.phDa=$("phDa").value;st.phDb=$("phDb").value;try{localStorage.setItem("php",JSON.stringify(st))}catch(e){}
+  const st={gm:phGm};PHI.forEach(i=>st[i]=$(i).value);st.phDa=$("phDa").value;st.phDb=$("phDb").value;try{localStorage.setItem("php",JSON.stringify(st))}catch(e){}
   const f1=(x,d=1)=>isFinite(x)?x.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
   const kg=pesoKg(),P=phPac(),H=n("phH")||24;
-  // sugerencia de volumen
   let sug="";
   if(kg>0){const grp=P.eg>=37&&kg>=2.5?"term":kg>=1.5?"g1500":kg>=1?"g1000":"m1000";
-    const d=isFinite(P.dias)?Math.max(0,Math.floor(P.dias)):NaN, idx=isFinite(d)?Math.min(d,5):NaN;
-    const lab={term:"RN de término",g1500:"pretérmino ≥ 1500 g",g1000:"pretérmino 1000–1500 g",m1000:"pretérmino < 1000 g"}[grp];
-    if(isFinite(idx)){const [a,b]=PHV[grp][idx];sug=`<div class="pill info"><span>Volumen sugerido para ${lab}, ${d<5?`día ${d+1} de vida`:"desde el día 6"}: <b>${a}–${b} mL/kg/día</b>. Sodio y potasio habitualmente desde el día 2–3, con diuresis establecida y descenso de peso (Na 0–2 mEq/kg/día en la transición, luego 2–3; en < 1500 g pueden necesitar hasta 3–5 mEq/kg/día).</span></div>`;}
-    else sug=`<div class="pill info">Cargá los días de vida en la barra del paciente para ver el volumen sugerido (${lab}).</div>`;}
+    const d=isFinite(P.dias)?Math.max(0,Math.floor(P.dias)):NaN;
+    const lab={term:"término",g1500:"≥ 1500 g",g1000:"1000–1500 g",m1000:"< 1000 g"}[grp];
+    if(isFinite(d)){const [a,b]=PHV[grp][Math.min(d,5)];sug=`<span>Sugerido (${lab}, ${d<5?`día ${d+1}`:"desde día 6"}):</span><button type="button" data-v="${a}">${a}</button><button type="button" data-v="${b}">${b}</button><span>mL/kg/día</span>`;}
+    else sug=`<span>Cargá los días de vida en la barra del paciente para ver el volumen sugerido.</span>`;}
   $("phSug").innerHTML=sug;
-  if(!(kg>0)){$("phTiles").innerHTML="";$("phTab").innerHTML="";$("phAl").innerHTML='<div class="pill info">Cargá el peso del paciente.</div>';return}
+  if(!(kg>0)){$("phRx").innerHTML="Cargá el peso del paciente.";$("phTiles").innerHTML="";$("phTab").innerHTML="";$("phAl").innerHTML="";$("phGeq").textContent="";return}
   const Vtot=n("phV")*kg, Vph=Vtot-n("phEn")*kg-n("phOt");
-  const cNa=parseFloat(String($("csNa").value).replace(",","."))||3.4, cK=parseFloat(String($("csK").value).replace(",","."))||3, cCa=parseFloat(String($("csCa").value).replace(",","."))||0.465;
+  let G,FG,PC; // g glucosa/día, mg/kg/min, %
+  if(phGm==="fg"){FG=n("phG");G=FG*kg*1440/1000;PC=Vph>0?G/Vph*100:NaN;$("phGeq").textContent=Vph>0&&FG>0?`Equivale a dextrosa ${f1(PC,1)} % en el plan.`:"";}
+  else{PC=n("phG");G=PC/100*Math.max(Vph,0);FG=G*1000/(kg*1440);$("phGeq").textContent=PC>0&&Vph>0?`Equivale a un flujo de glucosa de ${f1(FG,1)} mg/kg/min.`:"";}
+  window._phConv={fg:FG,pc:PC};
+  const num=i=>parseFloat(String($(i).value||$(i).placeholder).replace(",","."));
+  const cNa=num("csNa")||3.4,cK=num("csK")||3,cCa=num("csCa")||0.465;
   const vNa=n("phNa")*kg/cNa, vK=n("phK")*kg/cK, vCa=n("phCa")*kg/cCa;
-  const free=Vph-vNa-vK-vCa, G=n("phG")*kg*1440/1000; // g de glucosa/día
-  const ca=+$("phDa").value/100, cb=+$("phDb").value/100;
-  let va=NaN,vb=NaN; const A=[];
-  if(free<=0){A.push(["crit","Los electrolitos superan el volumen disponible: revisá líquidos y descuentos."])}
-  else{
-    const target=G/free;
-    if(target<=ca){va=ca>0?G/ca:0; vb=0; const w=free-va; if(w>0.05)A.push(["info",`La concentración necesaria (${f1(target*100,1)} %) es menor que la dextrosa baja: completar con ${f1(w,1)} mL de agua destilada.`]); vb=w>0?w:0;}
-    else if(target>cb){A.push(["crit",`Se necesita glucosa al ${f1(target*100,1)} %, más que la dextrosa alta elegida: elegí una más concentrada o bajá el flujo.`])}
-    else{vb=(G-free*ca)/(cb-ca); va=free-vb;}
+  const free=Vph-vNa-vK-vCa, ca=+$("phDa").value/100, cb=+$("phDb").value/100;
+  const A=[];let rows=[];
+  if(!(Vph>0)){A.push(["crit","Indicá el volumen de líquidos."]);}
+  else if(free<=0){A.push(["crit","Los electrolitos superan el volumen disponible: revisá líquidos y descuentos."])}
+  else{const t=G/free;
+    if(t<=ca){const va=ca>0?G/ca:0,w=free-va;rows=ca>0?[[`Dextrosa ${$("phDa").value} %`,va],["Agua destilada",w]]:[["Agua destilada",w]];}
+    else if(t>cb){A.push(["crit",`Se necesita glucosa al ${f1(t*100,1)} % en la mezcla, más que la dextrosa alta elegida: elegí una más concentrada (Opcional) o bajá la glucosa.`])}
+    else{const vb=(G-free*ca)/(cb-ca);rows=[[ca>0?`Dextrosa ${$("phDa").value} %`:"Agua destilada",free-vb],[`Dextrosa ${$("phDb").value} %`,vb]];}
+    rows=rows.filter(r=>r[1]>0.049);
   }
-  const ok=isFinite(va)&&isFinite(vb);
-  const glc=Vph>0?G/Vph*100:NaN, kcal=G*3.4/kg, rate=Vph/H;
-  const osm=Vph>0?(G/(Vph/1000)*5.05+(n("phNa")+n("phK"))*kg/(Vph/1000)*2+n("phCa")*kg/(Vph/1000)*1.4):NaN;
-  $("phTiles").innerHTML=[["Plan parenteral",f1(Vph,0)+" mL/día",f1(Vph/kg,1)+" mL/kg/día"],["Ritmo",f1(rate,1)+" mL/h",H+" h"],["Glucosa final",f1(glc,1)+" %",f1(n("phG"),1)+" mg/kg/min"],["Calorías",f1(kcal,0)+" kcal/kg/día","solo glucosa"],["Osmolaridad est.",f1(osm,0)+" mOsm/L",""]].map(([k,v,sx])=>`<div class="tile"><span class="k">${k}</span><span class="v" style="font-size:1.15rem">${v}</span>${sx?`<span class="k" style="text-transform:none">${sx}</span>`:""}</div>`).join("");
-  const nmA=ca>0?`Dextrosa ${$("phDa").value} %`:"Agua destilada", lowIsWater=ok&&vb>0&&G/free<=ca&&ca>0;
-  const rows=ok?(lowIsWater?[[nmA,va],["Agua destilada",vb]]:[[nmA,va],[`Dextrosa ${$("phDb").value} %`,vb]]):[];
-  rows.push([`ClNa (${$("csNa").value||"3,4"} mEq/mL)`,vNa],[`ClK (${$("csK").value||"3"} mEq/mL)`,vK],["Gluconato de calcio 10 %",vCa]);
-  $("phTab").innerHTML=`<thead><tr><th>Componente</th><th>mL/día</th><th>mL/h</th></tr></thead><tbody>${rows.map(([a,v])=>`<tr><td>${a}</td><td>${f1(v,1)}</td><td>${f1(v/H,2)}</td></tr>`).join("")}<tr><td><b>Total</b></td><td><b>${f1(Vph,1)}</b></td><td><b>${f1(rate,2)}</b></td></tr></tbody>`;
-  if(n("phEn")>0||n("phOt")>0)A.push(["info",`Líquidos totales ${f1(Vtot,0)} mL/día: se descontaron ${f1(n("phEn")*kg,0)} mL de enteral y ${f1(n("phOt"),0)} mL de otros aportes.`]);
-  if(glc>12.5)A.push(["warn",`Glucosa ${f1(glc,1)} %: por encima de 12,5 % requiere vía central.`]);
-  if(n("phG")>0&&n("phG")<4)A.push(["warn","Flujo de glucosa menor de 4 mg/kg/min: riesgo de hipoglucemia."]);
-  if(n("phG")>8)A.push(["info","Flujo mayor de 8 mg/kg/min: controlar glucemia (riesgo de hiperglucemia, sobre todo en prematuros)."]);
+  const el=[[`ClNa (${f1(cNa,1)} mEq/mL)`,vNa],[`ClK (${f1(cK,0)} mEq/mL)`,vK],["Gluconato de Ca 10 %",vCa]].filter(r=>r[1]>0);
+  rows=rows.concat(el);
+  const rate=Vph/H, kcal=G*3.4/kg, osm=Vph>0?(G*5.05+(n("phNa")+n("phK"))*kg*2+n("phCa")*kg*1.4)/(Vph/1000):NaN;
+  const elTxt=[["Na",n("phNa")],["K",n("phK")],["Ca",n("phCa")]].filter(x=>x[1]>0).map(x=>`${x[0]} ${f1(x[1],1)}`).join(" · ");
+  $("phRx").innerHTML=Vph>0?`<b>PHP ${f1(Vph/kg,0)} mL/kg/día a ${f1(rate,1)} mL/h</b><br>Dextrosa ${f1(PC,1)} % · FG ${f1(FG,1)} mg/kg/min${elTxt?`<br>${elTxt} mEq/kg/día`:"<br>Sin electrolitos"}`:"—";
+  $("phTiles").innerHTML=[["Volumen",f1(Vph,0)+" mL/día"],["Calorías",f1(kcal,0)+" kcal/kg/día"],["Osmolaridad est.",f1(osm,0)+" mOsm/L"]].map(([k,v])=>`<div class="tile"><span class="k">${k}</span><span class="v" style="font-size:1.1rem">${v}</span></div>`).join("");
+  $("phTab").innerHTML=rows.length?`<thead><tr><th>Componente</th><th>mL/día</th><th>mL/h</th></tr></thead><tbody>${rows.map(([a,v])=>`<tr><td>${a}</td><td>${f1(v,1)}</td><td>${f1(v/H,2)}</td></tr>`).join("")}<tr><td><b>Total</b></td><td><b>${f1(Vph,1)}</b></td><td><b>${f1(rate,2)}</b></td></tr></tbody>`:"";
+  if(n("phEn")>0||n("phOt")>0)A.push(["info",`De ${f1(Vtot,0)} mL/día totales se descontaron ${f1(n("phEn")*kg+n("phOt"),0)} mL (enteral y otros).`]);
+  if(PC>12.5)A.push(["warn",`Dextrosa ${f1(PC,1)} %: por encima de 12,5 % requiere vía central.`]);
+  if(FG>0&&FG<4)A.push(["warn","Flujo de glucosa menor de 4 mg/kg/min: riesgo de hipoglucemia."]);
+  if(FG>8)A.push(["info","Flujo mayor de 8 mg/kg/min: controlar glucemia (riesgo de hiperglucemia en prematuros)."]);
   if(isFinite(P.dias)&&P.dias<1&&(n("phNa")>0||n("phK")>0))A.push(["warn","Primer día de vida: en general no se agrega Na ni K hasta establecer diuresis y descenso de peso."]);
-  if(n("phK")>0)A.push(["info","Potasio: agregarlo con diuresis comprobada y K sérico normal; no administrar en bolo."]);
-  if(n("phCa")>0&&glc>0)A.push(["info","Calcio por vía periférica: riesgo de necrosis por extravasación; vigilar el sitio de punción."]);
-  $("phAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}">${t}</div>`).join("");
-  window._phSummary=`Plan de hidratación parenteral · ${f1(kg*1000,0)} g\nLíquidos ${$("phV").value||0} mL/kg/día${n("phEn")?` (enteral ${$("phEn").value} mL/kg/día descontado)`:""} · FG ${$("phG").value||0} mg/kg/min · Na ${$("phNa").value||0} · K ${$("phK").value||0} · Ca ${$("phCa").value||0} mEq/kg/día\n`+rows.map(([a,v])=>`${a}: ${f1(v,1)} mL`).join("\n")+`\nTotal ${f1(Vph,1)} mL a ${f1(rate,2)} mL/h · glucosa ${f1(glc,1)} % · ${f1(kcal,0)} kcal/kg/día`;
+  if(n("phK")>0)A.push(["info","Potasio con diuresis comprobada y K sérico normal; nunca en bolo."]);
+  if(n("phCa")>0)A.push(["info","Calcio por vía periférica: riesgo de necrosis por extravasación."]);
+  $("phAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}"><span>${t}</span></div>`).join("");
+  window._phSummary=`Plan de hidratación parenteral · ${f1(kg*1000,0)} g\n${$("phRx").innerText}\nPreparación (${H} h):\n`+rows.map(([a,v])=>`${a}: ${f1(v,1)} mL`).join("\n")+`\nTotal ${f1(Vph,1)} mL`;
 }
-[...PHI,"phDa","phDb","csNa","csK","csCa","peso"].forEach(i=>$(i).addEventListener("input",calcPH));["phDa","phDb"].forEach(i=>$(i).addEventListener("change",calcPH));
-$("phCopy").onclick=async()=>{calcPH();const t=window._phSummary||"";try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement("textarea");x.value=t;document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(_){}x.remove()}$("phCopy").textContent="Copiado";setTimeout(()=>$("phCopy").textContent="Copiar plan",1200)};
+$("phSug").addEventListener("click",e=>{const b=e.target.closest("button");if(b){$("phV").value=b.dataset.v;calcPH();}});
+[...PHI,"csNa","csK","csCa","peso"].forEach(i=>$(i).addEventListener("input",calcPH));["phDa","phDb"].forEach(i=>$(i).addEventListener("change",calcPH));
 window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setTimeout(calcPH,60)});
+try{if(localStorage.getItem("par_tipo")==="ph")phSetTipo("ph");}catch(e){}
 setTimeout(calcPH,0);
 
 const estado=(v,[lo,hi],extra)=>{if(!isFinite(v)||v===0)return["","—"];
@@ -727,7 +773,7 @@ $("enCopy").onclick=()=>{const done=()=>{$("enCopy").textContent="Copiado";setTi
   if(navigator.clipboard)navigator.clipboard.writeText(enResumen).then(done,fb);else fb()};
 
 drawComp();drawRows();
-try{const mm=localStorage.getItem("nut_mod");if(mm==="en"||mm==="pr"||mm==="ph")$("modulo").querySelector(`[data-v="${mm}"]`).click();}catch(e){}
+try{const mm=localStorage.getItem("nut_mod");if(mm==="en"||mm==="pr")$("modulo").querySelector(`[data-v="${mm}"]`).click();}catch(e){}
 calc();
 </script>
 <script src="paciente.js?v=v63"></script>
