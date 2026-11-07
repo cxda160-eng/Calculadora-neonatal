@@ -1,6 +1,6 @@
 // Simulador de Ventilación Neonatal - funcionamiento sin conexión
 // Cambiá VERSION en cada actualización para que los celulares bajen la nueva.
-const VERSION = "s1";
+const VERSION = "s2";
 const CACHE = "simvent-" + VERSION;
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./icons/apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
