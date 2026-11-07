@@ -1,7 +1,7 @@
 {
   "name": "Calculadora Neonatal",
   "short_name": "Calc Neonatal",
-  "description": "Calculadoras para UCIN: infusiones, electrolitos, sedoanalgesia, nutrición, insulina, laboratorio, cardiología, antimicrobianos, reanimación, bilirrubina y transfusiones",
+  "description": "Calculadoras para UCIN: infusiones, electrolitos, sedoanalgesia, nutrición, insulina, laboratorio, VAFO, cardiología, antimicrobianos, reanimación, bilirrubina y transfusiones",
   "lang": "es",
   "start_url": "./",
   "scope": "./",

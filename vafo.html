@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VAFO · ventilación de alta frecuencia</title>
+<meta name="theme-color" content="#6b52d6">
+<style>
+:root{
+  --bg:#f6f4fb; --card:#ffffff; --ink:#2b2840; --muted:#6d6a85; --line:#e6e2f2;
+  --lav:#b9a7f2; --lav-d:#6b52d6; --mint:#bdeedc; --mint-d:#1d8a63;
+  --peach:#ffd6c2; --peach-d:#c2532a; --sky:#c6e3ff; --sky-d:#2a6fb8;
+  --yel:#fff1b8; --yel-d:#8a6d00; --rose:#ffd0dc; --rose-d:#b5244d;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{background:linear-gradient(135deg,#cfc2ff,#c6e3ff);padding:14px 16px 10px}
+header h1{margin:0;font-size:20px}
+header p{margin:2px 0 0;color:#4a4566;font-size:13px}
+nav{display:flex;gap:6px;padding:10px 12px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+nav button{flex:1;border:0;border-radius:999px;padding:9px 6px;font-weight:600;background:#ebe6fa;color:var(--lav-d);font-size:14px}
+nav button.on{background:var(--lav-d);color:#fff}
+main{max-width:720px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(60,40,120,.08)}
+.card h2{margin:0 0 10px;font-size:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px}
+input,select{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;background:#fcfbff;color:var(--ink)}
+input:focus,select:focus{outline:none;border-color:var(--lav)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{border-radius:14px;padding:10px 12px}
+.kpi .t{font-size:12px;font-weight:600;opacity:.85}
+.kpi .v{font-size:24px;font-weight:700;margin-top:2px}
+.kpi .u{font-size:12px;font-weight:500}
+.kpi .s{font-size:12px;margin-top:2px}
+.lav{background:#ece6ff;color:#3d2c96}.mint{background:var(--mint);color:#0f5a3f}
+.sky{background:var(--sky);color:#174c85}.peach{background:var(--peach);color:#7c3214}
+.yel{background:var(--yel);color:#5e4a00}.rose{background:var(--rose);color:#7d1534}
+.bar{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,#ffd0dc 0 37.5%,#bdeedc 37.5% 75%,#fff1b8 75% 100%);margin:8px 0 2px}
+.bar i{position:absolute;top:-4px;width:4px;height:20px;background:var(--ink);border-radius:2px;transform:translateX(-2px)}
+.barlbl{position:relative;height:14px;font-size:11px;color:var(--muted)}.barlbl span{position:absolute;transform:translateX(-50%)}.barlbl span:first-child{transform:none}.barlbl span:last-child{transform:translateX(-100%)}
+.sug{border-left:4px solid var(--lav-d);background:#f4f1ff;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px;line-height:1.45}
+.sug.warn{border-color:var(--peach-d);background:#fff3ec}
+.sug.ok{border-color:var(--mint-d);background:#eefaf4}
+.sug.alert{border-color:var(--rose-d);background:#fff0f4}
+.sug b{display:block;margin-bottom:2px}
+.muted{color:var(--muted);font-size:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.4;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f4f1ff;font-size:12px;color:var(--lav-d)}
+ul{margin:6px 0;padding-left:20px;line-height:1.5}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:700;background:var(--lav-d);color:#fff;font-size:15px;width:100%}
+.btn.sec{background:#ebe6fa;color:var(--lav-d)}
+input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--lav-d);height:30px}
+.rowv{display:flex;justify-content:space-between;align-items:baseline}
+.rowv b{font-size:18px}
+.big{font-size:40px;font-weight:800;text-align:center;margin:6px 0}
+.hide{display:none}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+.chk label{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);font-weight:500;padding:7px 0;border-bottom:1px solid var(--line)}
+.chk input{width:20px;height:20px;flex:none;margin-top:1px}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#17141f; --card:#211d2c; --ink:#ece8f7; --muted:#a9a3c2; --line:#352f47;
+  --lav:#8f7ae0; --lav-d:#c9b6ff; --mint-d:#8fe0bf; --peach-d:#ffb08c; --rose-d:#ff9fb7; color-scheme:dark}
+  header{background:linear-gradient(135deg,#2e2650,#1f3550)!important}header p{color:#c9c3e3!important}
+  nav button{background:#2c2640!important;color:#c9b6ff!important}nav button.on{background:#c9b6ff!important;color:#17141f!important}
+  input,select{background:#1b1825!important}
+  .lav{background:#2e2752;color:#d8ccff}.mint{background:#183a2e;color:#a9f0d2}.sky{background:#1c3047;color:#b9dcff}
+  .peach{background:#3d2a20;color:#ffd0b8}.yel{background:#3a3218;color:#ffe9a0}.rose{background:#432230;color:#ffc6d4}
+  .sug{background:#28223a}.sug.warn{background:#3a2a22}.sug.ok{background:#1b3329}.sug.alert{background:#3d2029}
+  th{background:#2a2440!important}.btn{color:#17141f}.btn.sec{background:#2c2640;color:#c9b6ff}
+  .bar i{background:#fff}
+}
+@media(max-width:420px){.grid3{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>VAFO Neonatal</h1>
+  <p>DCO₂ · ajuste de CO₂ y oxigenación · índices · guía rápida</p>
+</header>
+<nav>
+  <button data-tab="calc" class="on">Calculadora</button>
+  <button data-tab="sim">Simulador</button>
+  <button data-tab="guia">Guía</button>
+</nav>
+<main>
+
+<!-- ============ CALCULADORA ============ -->
+<section id="calc">
+  <div class="card">
+    <h2>Paciente y respirador</h2>
+    <div class="grid">
+      <div><label for="peso">Peso (g)</label><input id="peso" type="text" inputmode="numeric" autocomplete="off" placeholder="g"></div>
+      <div><label>Modo</label>
+        <select id="modo"><option value="vg">VAFO + volumen garantizado</option><option value="amp">VAFO sin VG (amplitud)</option></select></div>
+      <div><label>MAP (cmH₂O)</label><input id="map" type="text" inputmode="decimal" autocomplete="off" step="0.5" value="10"></div>
+      <div><label>Frecuencia (Hz)</label><input id="f" type="text" inputmode="decimal" autocomplete="off" step="0.5" value="16"></div>
+      <div><label id="vtlbl">VThf (ml/kg)</label><input id="vt" type="text" inputmode="decimal" autocomplete="off" step="0.1" value="1.2"></div>
+      <div><label>Unidad del VT</label>
+        <select id="vtu"><option value="kg">ml/kg</option><option value="tot">ml totales (medido)</option></select></div>
+      <div><label>Amplitud actual (cmH₂O)</label><input id="amp" type="text" inputmode="decimal" autocomplete="off" placeholder="opcional"></div>
+      <div><label>Amplitud máx. programada</label><input id="ampmax" type="text" inputmode="decimal" autocomplete="off" placeholder="opcional"></div>
+      <div><label>I:E</label><select id="ie"><option value="1:1">1:1</option><option value="1:2">1:2</option><option value="1:3">1:3</option></select></div>
+      <div><label>FiO₂ (%)</label><input id="fio2" type="text" inputmode="decimal" autocomplete="off" value="30"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Gases y saturación</h2>
+    <div class="grid3">
+      <div><label>pH</label><input id="ph" type="text" inputmode="decimal" autocomplete="off" step="0.01" placeholder="7.20"></div>
+      <div><label>pCO₂ (mmHg)</label><input id="pco2" type="text" inputmode="decimal" autocomplete="off" placeholder="65"></div>
+      <div><label>PaO₂ (mmHg)</label><input id="pao2" type="text" inputmode="decimal" autocomplete="off" placeholder="arterial"></div>
+      <div><label>SpO₂ (%)</label><input id="spo2" type="text" inputmode="decimal" autocomplete="off" placeholder="92"></div>
+      <div><label>Muestra</label><select id="muestra"><option value="cap">Capilar / venosa</option><option value="art">Arterial</option></select></div>
+      <div><label>Meta pCO₂</label><select id="meta">
+        <option value="45-55">45–55</option><option value="50-60" selected>50–60 (permisiva)</option><option value="55-65">55–65 (DBP establecida)</option><option value="40-50">40–50 (HTPP / término)</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Resultados</h2>
+    <div class="out">
+      <div class="kpi lav"><div class="t">DCO₂ corregido</div><div class="v" id="o-dco2c">–</div><div class="u">ml²/kg²·s · f × (VT/kg)²</div></div>
+      <div class="kpi sky"><div class="t">DCO₂ absoluto</div><div class="v" id="o-dco2a">–</div><div class="u">ml²/s · f × VT²<br>(el que muestra el Dräger)</div></div>
+      <div class="kpi mint"><div class="t">VT total</div><div class="v" id="o-vtt">–</div><div class="u" id="o-vtk">ml</div></div>
+      <div class="kpi peach"><div class="t">Índice de oxigenación</div><div class="v" id="o-oi">–</div><div class="u" id="o-osi">MAP×FiO₂×100 / PaO₂</div></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="muted">DCO₂ corregido · rango orientativo 30–60 en prematuros</div>
+      <div class="bar"><i id="o-bar" style="left:0"></i></div>
+      <div class="barlbl"><span style="left:0">0</span><span style="left:37.5%">30</span><span style="left:75%">60</span><span style="left:100%">80+</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Sugerencias</h2>
+    <div id="sugs"><div class="muted">Cargá los parámetros y la pCO₂ para ver sugerencias.</div></div>
+    <p class="note">Las sugerencias son orientativas y no reemplazan el juicio clínico. La estimación del VT necesario supone que la pCO₂ cambia de forma inversamente proporcional al DCO₂, cosa que solo se cumple en forma aproximada. Hacé cambios graduales y controlá con TcCO₂ o gases a los 15–30 min.</p>
+  </div>
+
+  <button class="btn sec" id="reset">Limpiar gases</button>
+</section>
+
+<!-- ============ SIMULADOR ============ -->
+<section id="sim" class="hide">
+  <div class="card">
+    <h2>¿Qué pasa con el DCO₂ si cambio…?</h2>
+    <p class="muted" style="margin-top:-4px">Partís de los valores de la Calculadora. Mové los controles para comparar.</p>
+    <div class="rowv"><span>Frecuencia</span><b id="s-fv">16 Hz</b></div>
+    <input type="range" id="s-f" min="6" max="20" step="0.5" value="16">
+    <div class="rowv"><span>VThf</span><b id="s-vtv">1.2 ml/kg</b></div>
+    <input type="range" id="s-vt" min="0.8" max="3" step="0.05" value="1.2">
+    <div class="big" id="s-d">23</div>
+    <div style="text-align:center" class="muted">DCO₂ corregido (ml²/kg²·s)</div>
+    <div class="bar"><i id="s-bar" style="left:0"></i></div>
+    <div class="barlbl"><span style="left:0">0</span><span style="left:37.5%">30</span><span style="left:75%">60</span><span style="left:100%">80+</span></div>
+    <div id="s-cmp" class="sug" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <h2>Mismo aumento, distinto efecto</h2>
+    <table id="s-tab"><thead><tr><th>Cambio</th><th>DCO₂ nuevo</th><th>Variación</th></tr></thead><tbody></tbody></table>
+    <p class="note">El VT entra al cuadrado. Subir el VT un 10 % aumenta el DCO₂ un 21 %. Subir la frecuencia un 10 % lo aumenta solo un 10 %, y con VG obliga al equipo a subir la amplitud.</p>
+  </div>
+</section>
+
+<!-- ============ GUÍA ============ -->
+<section id="guia" class="hide">
+  <div class="card">
+    <h2>Programación inicial orientativa</h2>
+    <table>
+      <tr><th>Peso</th><th>Frecuencia</th><th>VThf inicial</th></tr>
+      <tr><td>&lt; 1000 g</td><td>15 Hz (12–17)</td><td>1,5 ml/kg</td></tr>
+      <tr><td>1000–2000 g</td><td>12–13 Hz</td><td>1,5–2 ml/kg</td></tr>
+      <tr><td>2000–3000 g</td><td>10 Hz</td><td>2 ml/kg</td></tr>
+      <tr><td>&gt; 3000 g</td><td>8–10 Hz</td><td>2–2,5 ml/kg</td></tr>
+    </table>
+    <ul>
+      <li><b>MAP:</b> 2–3 cmH₂O por encima de la MAP de la ventilación convencional. Después, reclutar de a 1–2 cmH₂O hasta que baje la FiO₂ (estrategia de volumen pulmonar óptimo).</li>
+      <li><b>I:E:</b> 1:1 entrega más volumen con menos amplitud (Dräger). 1:2 si hay atrapamiento aéreo.</li>
+      <li><b>Amplitud máxima con VG:</b> programarla ~5–10 cmH₂O por encima de la que el equipo necesita, para que tenga margen.</li>
+      <li><b>VThf:</b> en general no conviene pasar de 2,5 ml/kg.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Palancas</h2>
+    <table>
+      <tr><th>Objetivo</th><th>Con VG</th><th>Sin VG</th></tr>
+      <tr><td><b>↓ CO₂</b></td><td>↑ VThf 0,1–0,2 ml/kg<br>↑ frecuencia (si sobra amplitud)</td><td>↑ amplitud<br>↓ frecuencia</td></tr>
+      <tr><td><b>↑ CO₂</b></td><td>↓ VThf<br>↓ frecuencia</td><td>↓ amplitud<br>↑ frecuencia</td></tr>
+      <tr><td><b>↑ Oxigenación</b></td><td colspan="2">↑ MAP 1–2 cmH₂O · ↑ FiO₂</td></tr>
+      <tr><td><b>Sobredistensión</b></td><td colspan="2">↓ MAP 1–2 cmH₂O (Rx con más de 9–10 costillas, diafragmas planos, corazón chico)</td></tr>
+    </table>
+    <p class="note">Ojo: sin VG, bajar la frecuencia sube el volumen y elimina más CO₂. Con VG pasa lo contrario: el volumen queda fijo, así que bajar la frecuencia reduce el DCO₂.</p>
+  </div>
+
+  <div class="card chk">
+    <h2>Hipercapnia que no mejora: revisar</h2>
+    <label><input type="checkbox">Tubo obstruido o con secreciones (aspirar, revisar si hace falta cambiarlo)</label>
+    <label><input type="checkbox">Posición del tubo (Rx): selectivo, alto o acodado</label>
+    <label><input type="checkbox">Fuga grande alrededor del tubo: el VT medido es poco confiable</label>
+    <label><input type="checkbox">El equipo llega a la amplitud máxima y no entrega el VT programado</label>
+    <label><input type="checkbox">Volumen pulmonar: atelectasia o sobredistensión (Rx, FiO₂)</label>
+    <label><input type="checkbox">Neumotórax / enfisema intersticial</label>
+    <label><input type="checkbox">Distensión abdominal que limita el diafragma</label>
+    <label><input type="checkbox">Ductus hemodinámicamente significativo o edema pulmonar</label>
+    <label><input type="checkbox">Sensor de flujo descalibrado / circuito con agua</label>
+    <label><input type="checkbox">Muestra capilar mal tomada (repetir o correlacionar con TcCO₂)</label>
+  </div>
+
+  <div class="card">
+    <h2>Índices de oxigenación</h2>
+    <ul>
+      <li><b>IO</b> = MAP × FiO₂(%) / PaO₂ (arterial). Mayor de 15–20 indica falla grave; mayor de 25–40 lleva a considerar óxido nítrico o derivación a ECMO, según el caso.</li>
+      <li><b>OSI</b> = MAP × FiO₂(%) / SpO₂. Sirve sin gases arteriales. Equivale aproximadamente a la mitad del IO.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Destete y salida de VAFO</h2>
+    <ul>
+      <li>Primero bajá la FiO₂ hasta ≤ 0,30–0,40. Después bajá la MAP de a 0,5–1 cmH₂O.</li>
+      <li>Ajustá VThf o amplitud según la pCO₂. Evitá la hipocapnia (pCO₂ por debajo de 35–40) por el riesgo de leucomalacia y HIV.</li>
+      <li>Considerá pasar a convencional o extubar con MAP ≤ 8 cmH₂O y FiO₂ ≤ 0,30, con gases aceptables.</li>
+    </ul>
+    <p class="note">Rangos orientativos basados en la literatura de VAFO con volumen garantizado en prematuros (González-Pacheco 2016 y otros). Los valores de DCO₂ que se toleran varían entre pacientes. Ajustá según los protocolos de tu unidad.</p>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast">Copiado</div>
+
+<script>
+var restoring=false;
+if(window.parent!==window)document.querySelector('header').style.display='none';
+const $=id=>document.getElementById(id);
+const num=id=>{const v=parseFloat(String($(id).value).replace(',','.'));return isNaN(v)?null:v};
+const fx=(v,d=1)=>v==null||!isFinite(v)?'–':v.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const FIELDS=['modo','map','f','vt','vtu','amp','ampmax','ie','fio2','ph','pco2','pao2','spo2','muestra','meta'];
+
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  ['calc','sim','guia'].forEach(t=>$(t).classList.toggle('hide',t!==b.dataset.tab));
+  if(b.dataset.tab==='sim') initSim();
+  try{localStorage.setItem('vafo_tab',b.dataset.tab)}catch(e){}
+});
+
+function getState(){
+  const kg=(num('peso')||0)/1000;
+  const vtIn=num('vt');
+  let vtk=null,vtt=null;
+  if(vtIn!=null&&kg>0){
+    if($('vtu').value==='kg'){vtk=vtIn;vtt=vtIn*kg}else{vtt=vtIn;vtk=vtIn/kg}
+  }
+  return{kg,vtk,vtt,f:num('f'),map:num('map'),fio2:num('fio2'),ph:num('ph'),pco2:num('pco2'),pao2:num('pao2'),spo2:num('spo2'),
+    amp:num('amp'),ampmax:num('ampmax'),modo:$('modo').value,ie:$('ie').value,muestra:$('muestra').value,meta:$('meta').value.split('-').map(Number)};
+}
+const barPos=d=>Math.max(0,Math.min(100,d/80*100));
+
+function calc(){
+  const s=getState();
+  const dc=(s.f&&s.vtk)?s.f*s.vtk*s.vtk:null;
+  const da=(s.f&&s.vtt)?s.f*s.vtt*s.vtt:null;
+  $('o-dco2c').textContent=fx(dc,0);
+  $('o-dco2a').textContent=fx(da,1);
+  $('o-vtt').textContent=fx(s.vtt,2);
+  $('o-vtk').textContent=s.vtk!=null?`ml · ${fx(s.vtk,2)} ml/kg`:'ml';
+  $('o-bar').style.left=dc!=null?barPos(dc)+'%':'0';
+  let oi=null,osi=null;
+  if(s.map&&s.fio2&&s.pao2&&s.muestra==='art') oi=s.map*s.fio2/s.pao2;
+  if(s.map&&s.fio2&&s.spo2) osi=s.map*s.fio2/s.spo2;
+  $('o-oi').textContent=oi!=null?fx(oi,1):(osi!=null?fx(osi,1):'–');
+  $('o-osi').textContent=oi!=null?`IO · OSI ${fx(osi,1)}`:(osi!=null?'OSI = MAP×FiO₂ / SpO₂':'Cargá PaO₂ arterial o SpO₂');
+  $('vtlbl').textContent=$('modo').value==='vg'?'VThf programado':'VThf medido';
+  sugerir(s,dc,oi,osi);
+  if(!restoring){try{const o={};FIELDS.forEach(k=>o[k]=$(k).value);localStorage.setItem('vafo',JSON.stringify(o))}catch(e){}}
+  return{s,dc,da,oi,osi};
+}
+
+function card(cls,t,body){return `<div class="sug ${cls}"><b>${t}</b>${body}</div>`}
+
+function sugerir(s,dc,oi,osi){
+  const out=[];
+  const [lo,hi]=s.meta;
+  const ampTope=s.amp!=null&&s.ampmax!=null&&s.amp>=s.ampmax-1;
+  const vg=s.modo==='vg';
+
+  if(ampTope && vg) out.push(card('alert','La amplitud está al tope',
+    `El equipo probablemente no entrega el VT programado. Primero subí la amplitud máxima (de a 5 cmH₂O). Si no alcanza, bajá la frecuencia 1–2 Hz para que llegue al volumen. Revisá también el tubo (secreciones, acodamiento).`));
+
+  if(s.pco2!=null && dc!=null){
+    const acid = s.ph!=null && s.ph<7.20;
+    if(s.pco2>hi){
+      const dTarget=dc*s.pco2/((lo+hi)/2);
+      const vtNeed=Math.sqrt(dTarget/s.f);
+      const step=Math.min(0.2,Math.max(0.1,Math.round((vtNeed-s.vtk)*10)/10));
+      const nextVt=s.vtk+step;
+      const nextD=s.f*nextVt*nextVt;
+      if(vg){
+        out.push(card(acid?'alert':'warn',`pCO₂ ${s.pco2} por encima de la meta (${lo}–${hi})${s.ph!=null?' · pH '+fx(s.ph,2):''}`,
+          `<br><b style="display:inline">1. Subir VThf</b> de ${fx(s.vtk,2)} a <b style="display:inline">${fx(nextVt,2)} ml/kg</b> (${fx(nextVt*s.kg,2)} ml totales). El DCO₂ pasa de ${fx(dc,0)} a ${fx(nextD,0)}.
+           <br>VT estimado para llegar a la meta: ~${fx(vtNeed,2)} ml/kg (DCO₂ ~${fx(dTarget,0)}). Llegá de a 0,1–0,2 ml/kg.
+           ${vtNeed>2.5?'<br>⚠️ Supera 2,5 ml/kg: antes de seguir subiendo, revisá el volumen pulmonar, el tubo y la checklist de la Guía.':''}
+           ${!ampTope?`<br><b style="display:inline">2. Alternativa:</b> subir la frecuencia 1–2 Hz (a ${fx(Math.min(s.f+2,20),0)} Hz da un DCO₂ de ${fx(Math.min(s.f+2,20)*s.vtk*s.vtk,0)}), solo si la amplitud tiene margen.`:''}`));
+      }else{
+        out.push(card(acid?'alert':'warn',`pCO₂ ${s.pco2} por encima de la meta (${lo}–${hi})`,
+          `Subí la amplitud de a 2–4 cmH₂O${s.amp?` (de ${s.amp} a ${s.amp+3})`:''}. Si la amplitud ya es alta, bajá la frecuencia 1–2 Hz: sin VG eso aumenta el volumen entregado.`));
+      }
+      if(s.ie!=='1:1' && vg) out.push(card('','I:E',`Pasar de ${s.ie} a 1:1 permite entregar el mismo VT con menos amplitud (si no hay atrapamiento).`));
+    }else if(s.pco2<lo){
+      const dTarget=dc*s.pco2/((lo+hi)/2);
+      const vtNeed=Math.sqrt(dTarget/s.f);
+      out.push(card(s.pco2<35?'alert':'warn',`pCO₂ ${s.pco2} por debajo de la meta (${lo}–${hi})`,
+        vg?`Bajá VThf de a 0,1–0,2 ml/kg (a ${fx(Math.max(s.vtk-0.1,0.5),2)} ml/kg). VT estimado para llegar a la meta: ~${fx(vtNeed,2)} ml/kg. Otra opción es bajar la frecuencia.${s.pco2<35?' <br>La hipocapnia aumenta el riesgo de leucomalacia y HIV: corregí ya.':''}`
+           :`Bajá la amplitud de a 2–4 cmH₂O o subí la frecuencia.`));
+    }else{
+      out.push(card('ok',`pCO₂ ${s.pco2} dentro de la meta (${lo}–${hi})`,`Mantener. Si hace falta subir la MAP por la oxigenación, volvé a controlar la pCO₂.`));
+    }
+  }else if(dc!=null && dc<30 && vg){
+    out.push(card('','DCO₂ bajo para un prematuro',`El DCO₂ corregido (${fx(dc,0)}) está por debajo del rango habitual. Si hay retención de CO₂, empezá subiendo el VThf.`));
+  }
+
+  if(s.fio2!=null && s.map!=null){
+    if(s.fio2>40) out.push(card('warn',`FiO₂ ${s.fio2}%`,`Probable volumen pulmonar subóptimo: subí la MAP de a 1–2 cmH₂O hasta que baje la FiO₂, y controlá la Rx (8–9 costillas). Si la Rx muestra sobredistensión, la causa puede ser hipertensión pulmonar o ductus: ecocardiograma.`));
+    else if(s.fio2<=25 && s.map>8) out.push(card('','Oxigenación holgada',`Con FiO₂ ≤ 25 %, bajá la MAP de a 0,5–1 cmH₂O para evitar sobredistensión. Si llega a ~8 cmH₂O, considerá la salida de VAFO.`));
+  }
+  if(oi!=null && oi>=15) out.push(card(oi>=25?'alert':'warn',`IO ${fx(oi,1)}`,oi>=25?'Falla respiratoria grave: evaluar HTPP con ecocardiograma, óxido nítrico, y según evolución contacto con un centro ECMO.':'Falla respiratoria moderada a grave: optimizar el reclutamiento y evaluar HTPP.'));
+
+  $('sugs').innerHTML=out.length?out.join(''):'<div class="muted">Cargá la pCO₂ (y el pH) para ver sugerencias de ajuste.</div>';
+}
+
+FIELDS.concat(['peso']).forEach(k=>{$(k).addEventListener('input',calc);$(k).addEventListener('change',calc)});
+
+$('reset').onclick=()=>{['ph','pco2','pao2','spo2','amp','ampmax'].forEach(k=>$(k).value='');calc()};
+// Resumen para «Copiar» (botón de la app o del pie si se abre suelta)
+window.customSummary=()=>{const {s,dc,da,oi,osi}=calc();if(!s.f||s.vtk==null)return '';
+  return [`VAFO${s.modo==='vg'?' + VG':''}`,
+    `MAP ${fx(s.map,1)} · ${fx(s.f,1)} Hz · VThf ${fx(s.vtk,2)} ml/kg (${fx(s.vtt,2)} ml) · I:E ${s.ie} · FiO₂ ${s.fio2??'–'} %${s.amp!=null?` · Amp ${fx(s.amp,0)}`:''}`,
+    `DCO₂corr ${fx(dc,0)} ml²/kg²·s · DCO₂ ${fx(da,1)} ml²/s`,
+    s.pco2!=null?`Gases (${s.muestra==='art'?'arterial':'capilar/venosa'}): pH ${s.ph!=null?fx(s.ph,2):'–'} · pCO₂ ${fx(s.pco2,0)} · meta ${s.meta.join('–')}`:'',
+    oi!=null?`IO ${fx(oi,1)}`:(osi!=null?`OSI ${fx(osi,1)}`:'')].filter(Boolean).join('\n')};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600)}
+
+// simulator
+let base=null;
+function initSim(){
+  const s=getState();
+  if(s.f&&s.vtk){base={f:s.f,vt:s.vtk};$('s-f').value=s.f;$('s-vt').value=Math.min(3,Math.max(0.8,s.vtk))}
+  else base={f:15,vt:1.5};
+  sim();
+}
+function sim(){
+  const f=parseFloat($('s-f').value),vt=parseFloat($('s-vt').value);
+  const d=f*vt*vt,d0=base.f*base.vt*base.vt;
+  $('s-fv').textContent=fx(f,1)+' Hz';$('s-vtv').textContent=fx(vt,2)+' ml/kg';
+  $('s-d').textContent=fx(d,0);$('s-bar').style.left=barPos(d)+'%';
+  const pct=(d/d0-1)*100;
+  $('s-cmp').innerHTML=`<b>Respecto a lo actual (${fx(base.f,1)} Hz · ${fx(base.vt,2)} ml/kg → DCO₂ ${fx(d0,0)})</b>DCO₂ ${pct>=0?'+':''}${fx(pct,0)} %. ${d<30?'Queda por debajo del rango habitual.':d>60?'Queda por encima del rango habitual: riesgo de hipocapnia.':'Dentro del rango orientativo.'}`;
+  const rows=[['VT +0,1 ml/kg',base.f,base.vt+0.1],['VT +0,2 ml/kg',base.f,base.vt+0.2],['VT +0,3 ml/kg',base.f,base.vt+0.3],['Frecuencia +1 Hz',base.f+1,base.vt],['Frecuencia +2 Hz',base.f+2,base.vt],['Frecuencia −2 Hz (con VG)',base.f-2,base.vt]];
+  document.querySelector('#s-tab tbody').innerHTML=rows.map(([n,ff,vv])=>{const nd=ff*vv*vv;const p=(nd/d0-1)*100;return `<tr><td>${n}</td><td>${fx(nd,0)}</td><td>${p>=0?'+':''}${fx(p,0)} %</td></tr>`}).join('');
+}
+$('s-f').oninput=sim;$('s-vt').oninput=sim;
+
+// restore (datos de VAFO por paciente; el peso viene de la barra del paciente)
+restoring=true;
+try{const o=JSON.parse(localStorage.getItem('vafo')||'null');if(o)FIELDS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}
+try{const p=JSON.parse(localStorage.getItem('pac')||'{}');if(p&&p.kg>0)$('peso').value=Math.round(p.kg*1000)}catch(e){}
+calc();restoring=false;
+try{const t=localStorage.getItem('vafo_tab');if(t&&t!=='calc')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
+</script>
+<script src="paciente.js?v=v86"></script>
+</body>
+</html>

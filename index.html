@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Calculadora Neonatal</title>
-<meta name="description" content="Calculadoras de infusiones, electrolitos, sedoanalgesia, nutrición, insulina, laboratorio, cardiología, antimicrobianos, NeoFax, reanimación, bilirrubina y transfusiones para UCIN">
+<meta name="description" content="Calculadoras de infusiones, electrolitos, sedoanalgesia, nutrición, insulina, laboratorio, VAFO, cardiología, antimicrobianos, NeoFax, reanimación, bilirrubina y transfusiones para UCIN">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#202436" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -19,15 +19,15 @@
 /* Layout: barra superior fija con el nombre de la app y un selector de dos calculadoras; cada calculadora ocupa el resto de la pantalla */
 :root{
   --bg:#f7f6fc; --surface:#ffffff; --surface-2:#eef3fb; --fg:#2e3147; --muted:#6c7090; --line:#e2e4f1;
-  --inf:#2b7a72; --inf-soft:#dcf2ec; --ele:#5a8fd0; --ele-soft:#e3eefb; --sed:#ad94e4; --sed-soft:#ece6fb; --nut:#f0a37c; --nut-soft:#fde9dc; --ins:#e0679a; --ins-soft:#fde0ec; --lab:#6aa84f; --lab-soft:#dcf1cf; --ecg:#c0392b; --ecg-soft:#fde0e0; --atb:#b26a00; --atb-soft:#ffe6c2; --neo:#0e7490; --neo-soft:#cff1f8; --cre:#4f46e5; --cre-soft:#e0e1ff; --vad:#8d5b3e; --vad-soft:#f3e3d6; --ehi:#5b4fc4; --ehi-soft:#e6e3fb; --fue:#4a5878; --fue-soft:#e3e8f3; --bal:#2b6a8a; --bal-soft:#dcecf5;
+  --inf:#2b7a72; --inf-soft:#dcf2ec; --ele:#5a8fd0; --ele-soft:#e3eefb; --sed:#ad94e4; --sed-soft:#ece6fb; --nut:#f0a37c; --nut-soft:#fde9dc; --ins:#e0679a; --ins-soft:#fde0ec; --lab:#6aa84f; --lab-soft:#dcf1cf; --ecg:#c0392b; --ecg-soft:#fde0e0; --atb:#b26a00; --atb-soft:#ffe6c2; --neo:#0e7490; --neo-soft:#cff1f8; --cre:#4f46e5; --cre-soft:#e0e1ff; --vad:#8d5b3e; --vad-soft:#f3e3d6; --ehi:#5b4fc4; --ehi-soft:#e6e3fb; --fue:#4a5878; --fue-soft:#e3e8f3; --bal:#2b6a8a; --bal-soft:#dcecf5; --vaf:#7b4fd1; --vaf-soft:#ece3fd;
   --font-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
-  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; --ehi:#b4abff; --ehi-soft:#2c2850; --fue:#b9c6e4; --fue-soft:#2a3248; --bal:#8cc4e2; --bal-soft:#1e3342; color-scheme:dark;}}
+  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; --ehi:#b4abff; --ehi-soft:#2c2850; --fue:#b9c6e4; --fue-soft:#2a3248; --bal:#8cc4e2; --bal-soft:#1e3342; --vaf:#c9b0ff; --vaf-soft:#2e2550; color-scheme:dark;}}
 :root[data-theme="dark"]{
   --bg:#181a27; --surface:#202436; --surface-2:#2a2f45; --fg:#eceefa; --muted:#a7abc7; --line:#363c56;
-  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; --ehi:#b4abff; --ehi-soft:#2c2850; --fue:#b9c6e4; --fue-soft:#2a3248; --bal:#8cc4e2; --bal-soft:#1e3342; color-scheme:dark;}
+  --inf:#a6ecdc; --inf-soft:#1e3a3b; --ele:#9cc3ef; --ele-soft:#1f2f45; --sed:#c8b6f4; --sed-soft:#2c2745; --nut:#f6bb9c; --nut-soft:#3a2a26; --ins:#f6a3c4; --ins-soft:#3e2232; --lab:#b4e48f; --lab-soft:#25351f; --ecg:#ff9f9f; --ecg-soft:#3e2228; --atb:#ffc277; --atb-soft:#3d2e19; --neo:#7fd6ea; --neo-soft:#173840; --cre:#a5a1ff; --cre-soft:#2b2a52; --vad:#e7b895; --vad-soft:#3a2a20; --ehi:#b4abff; --ehi-soft:#2c2850; --fue:#b9c6e4; --fue-soft:#2a3248; --bal:#8cc4e2; --bal-soft:#1e3342; --vaf:#c9b0ff; --vaf-soft:#2e2550; color-scheme:dark;}
 html,body{height:100%}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);display:flex;flex-direction:column;overflow:hidden}
@@ -189,6 +189,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button role="tab" id="bNfx" aria-selected="false" style="--c:var(--vad);--soft:var(--vad-soft)"><i></i><span class="l">NeoFax</span><span class="s">NeoFax</span></button>
       <button role="tab" id="bEhi" aria-selected="false" style="--c:var(--ehi);--soft:var(--ehi-soft)"><i></i><span class="l">Encefalopatía</span><span class="s">EHI</span></button>
       <button role="tab" id="bBal" aria-selected="false" style="--c:var(--bal);--soft:var(--bal-soft)"><i></i><span class="l">Balance</span><span class="s">Balance</span></button>
+      <button role="tab" id="bVaf" aria-selected="false" style="--c:var(--vaf);--soft:var(--vaf-soft)"><i></i><span class="l">VAFO</span><span class="s">VAFO</span></button>
       <button role="tab" id="bFue" aria-selected="false" style="--c:var(--fue);--soft:var(--fue-soft)"><i></i><span class="l">Fuentes</span><span class="s">Fuentes</span></button>
       <button type="button" id="bBus" class="busb" aria-label="Buscar en toda la app"><span class="l">🔍 Buscar</span><span class="s">🔍 Buscar</span></button>
     </div>
@@ -231,6 +232,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <iframe id="vNfx" data-src="neofax.html" title="NeoFax" hidden></iframe>
   <iframe id="vEhi" data-src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
   <iframe id="vBal" data-src="balance.html" title="Balance hídrico" hidden></iframe>
+  <iframe id="vVaf" data-src="vafo.html" title="VAFO: ventilación de alta frecuencia" hidden></iframe>
   <iframe id="vFue" data-src="fuentes.html" title="Fuentes y alcance" hidden></iframe>
 </div>
 <nav class="bn" id="bn" aria-label="Pestañas favoritas"></nav>
@@ -271,7 +273,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </div>
 </div>
 <script>
-const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"],ehi:["vEhi","bEhi"],bal:["vBal","bBal"],fue:["vFue","bFue"]};
+const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"],ehi:["vEhi","bEhi"],bal:["vBal","bBal"],vaf:["vVaf","bVaf"],fue:["vFue","bFue"]};
 const loadTab=k=>{const f=document.getElementById(TABS[k][0]);if(f&&!f.getAttribute("src")&&f.dataset.src)f.setAttribute("src",f.dataset.src)};
 const show=k=>{loadTab(k);for(const [key,[v,b]] of Object.entries(TABS)){const on=key===k;
   document.getElementById(v).hidden=!on;document.getElementById(b).setAttribute("aria-selected",on)}if(window.onTab)window.onTab(k);};
@@ -288,6 +290,7 @@ document.getElementById("bCre").onclick=()=>show("cre");
 document.getElementById("bNfx").onclick=()=>show("nfx");
 document.getElementById("bEhi").onclick=()=>show("ehi");
 document.getElementById("bBal").onclick=()=>show("bal");
+document.getElementById("bVaf").onclick=()=>show("vaf");
 document.getElementById("bFue").onclick=()=>show("fue");
 if(location.hash==="#electrolitos")show("ele");
 if(location.hash==="#sedoanalgesia")show("sed");
@@ -301,6 +304,7 @@ if(location.hash==="#crecimiento")show("cre");
 if(location.hash==="#neofax")show("nfx");
 if(location.hash==="#ehi"||location.hash==="#encefalopatia")show("ehi");
 if(location.hash==="#balance")show("bal");
+if(location.hash==="#vafo")show("vaf");
 if(location.hash==="#fuentes")show("fue");
 try{const t=localStorage.getItem("tab");if(!location.hash&&t&&TABS[t])show(t);}catch(e){}
 if(!document.querySelector(".views iframe[src]"))show("inf");
@@ -356,7 +360,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   const $=id=>document.getElementById(id);
   const META={};for(const k in TABS){const b=$(TABS[k][1]);META[k]={n:(b.querySelector(".l")||b).textContent.trim(),s:(b.querySelector(".s")||b).textContent.trim(),st:b.getAttribute("style")||""}}
   META.neo.n="RCP · Bili · Sangre";META.ecg.s="Cardio";META.bal.s="Balance";META.ehi.s="EHI";
-  const GROUPS=[["Fármacos",["inf","sed","atb","ins","nfx"]],["Cálculos",["ele","nut","lab","bal"]],["Clínica",["ecg","neo","cre","ehi"]],["Referencias",["fue"]]];
+  const GROUPS=[["Fármacos",["inf","sed","atb","ins","nfx"]],["Cálculos",["ele","nut","lab","bal","vaf"]],["Clínica",["ecg","neo","cre","ehi"]],["Referencias",["fue"]]];
   let FAV;try{FAV=JSON.parse(localStorage.getItem("favs")||"null")}catch(e){}
   if(!Array.isArray(FAV)||!FAV.length)FAV=["inf","atb","bal","ehi"];FAV=FAV.filter(k=>TABS[k]).slice(0,4);
   let cur="inf";
@@ -402,7 +406,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Varios pacientes (camas) ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const PK=/^(pac|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap)$/;
+  const PK=/^(pac|vafo|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap)$/;
   const get=()=>{try{return JSON.parse(localStorage.getItem("camas")||"null")}catch(e){return null}};
   const put=c=>{try{localStorage.setItem("camas",JSON.stringify(c))}catch(e){toast("No hay espacio para guardar más pacientes")}};
   let C=get();
@@ -459,7 +463,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Resumen completo ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const ORD=["inf","sed","atb","ins","ele","nut","lab","bal","ehi","neo","ecg","cre","nfx"];
+  const ORD=["inf","sed","atb","ins","ele","nut","lab","bal","vaf","ehi","neo","ecg","cre","nfx"];
   function build(){const parts=[];let pac="";
     for(const k of ORD){const f=$(TABS[k][0]);if(!f.getAttribute("src"))continue;let w;try{w=f.contentWindow}catch(e){continue}
       if(!w||!w.CalcNeo||!w.CalcNeo.hasSummary||!w.CalcNeo.hasSummary())continue;let t="";const wasH=f.hidden;if(wasH){f.style.visibility="hidden";f.hidden=false}try{t=w.CalcNeo.buildSummary()}catch(e){}if(wasH){f.hidden=true;f.style.visibility=""}if(!t)continue;
@@ -503,7 +507,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
       if(r.kind==="opt"){el.value=r.val;el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}))}
       else if(r.kind==="btn")el.click();
       setTimeout(()=>{el.scrollIntoView({block:"center",behavior:"smooth"});const o=el.style.outline,t=el.style.transition;el.style.transition="outline-color .6s";el.style.outline="3px solid #f0a37c";setTimeout(()=>{el.style.outline=o;el.style.transition=t},1600)},60)},30)}
-  function run(){const q=norm($("busQ").value),R=$("busR");if(!q){R.innerHTML=`<p>Escribí un fármaco (vanco, adrenalina), un cálculo (MAP, GIR, QTc) o una sección (Sarnat, balance).</p>`;return}
+  function run(){const q=norm($("busQ").value),R=$("busR");if(!q){R.innerHTML=`<p>Escribí un fármaco (vanco, adrenalina), un cálculo (MAP, GIR, QTc, DCO₂) o una sección (Sarnat, balance).</p>`;return}
     if(!IDX)build();const w=q.split(" ");
     const hits=IDX.filter(r=>w.every(x=>r.n.includes(x))).map(r=>({r,s:(r.n.startsWith(q)?0:r.n.split(/[^a-z0-9]/).some(t=>t.startsWith(w[0]))?1:2)*10+r.rank})).sort((a,b)=>a.s-b.s||a.r.txt.length-b.r.txt.length).slice(0,40);
     if(!hits.length){R.innerHTML=`<p>Sin resultados para «${$("busQ").value.replace(/</g,"&lt;")}».</p>`;return}

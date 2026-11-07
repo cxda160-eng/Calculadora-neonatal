@@ -17,6 +17,7 @@
     cardio: [["#zPeso", "peso", "g"], ["#aPeso", "peso", "g"], ["#dPeso", "peso", "g"], ["#pdaPeso", "peso", "g"], ["#pdaDias", "dias"], ["#taEG", "eg"], ["#taDias", "dias"]],
     neo: [["#nPeso", "peso", "g"], ["#nEG", "eg"], ["#nHoras", "horas"]],
     balance: [["#peso", "peso", "g"]],
+    vafo: [["#peso", "peso", "g"]],
     crecimiento: [["#cPeso", "peso", "g"], ["#cEGw", "egw"], ["#cEGd", "egd"], ["#cDias", "dias"]]
   };
 
@@ -122,7 +123,7 @@
     crecimiento: ["#rRes", "#rTrend"]
   };
   var TITLES = { infusiones: "Infusiones", electrolitos: "Electrolitos", sedoanalgesia: "Sedoanalgesia", insulina: "Insulina",
-    laboratorio: "Laboratorio", antimicrobianos: "Antimicrobianos", cardio: "Cardiología", neo: "RCP · Bilirrubina · Transfusiones", crecimiento: "Crecimiento INTERGROWTH-21st", balance: "Balance hídrico" };
+    laboratorio: "Laboratorio", antimicrobianos: "Antimicrobianos", cardio: "Cardiología", neo: "RCP · Bilirrubina · Transfusiones", crecimiento: "Crecimiento INTERGROWTH-21st", balance: "Balance hídrico", vafo: "VAFO" };
 
   function visible(el) {
     if (!el || !el.getClientRects().length) return false;
