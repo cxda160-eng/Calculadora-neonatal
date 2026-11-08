@@ -211,7 +211,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
           <div class="seg" role="group" aria-label="Modo de preparación">
             <button id="mProto" aria-pressed="false" hidden>Protocolo UCIN</button>
             <button id="mRegla" aria-pressed="true">Por dosis y velocidad</button>
-            <button id="mManual" aria-pressed="false">Manual</button>
+            <button id="mManual" aria-pressed="false">Ya preparada</button>
           </div>
           <div id="prepRegla" class="row2">
             <div class="field">
@@ -224,11 +224,21 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
             </div>
           </div>
           <div id="prepProto" class="sub" hidden></div>
-          <div id="prepManual" class="field" hidden>
-            <label for="amt">Cantidad de fármaco en la jeringa</label>
-            <div class="inrow"><input id="amt" inputmode="decimal" autocomplete="off"><span id="amtUnit"></span></div>
+          <div id="prepManual" hidden>
+            <div class="sub" style="margin:0 0 8px">Cargá lo que pusiste en la jeringa: la app calcula la concentración, cuánto es 1 mL/h para este peso y la dosis a la velocidad que esté pasando.</div>
+            <div class="row2">
+              <div class="field">
+                <label for="amt">Fármaco cargado</label>
+                <div class="inrow"><input id="amt" inputmode="decimal" autocomplete="off"><select id="amtSel" aria-label="Unidad del fármaco cargado" style="border:0;background:transparent;font:inherit;color:inherit;max-width:6.5em"><option value="u" id="amtUnit"></option><option value="ml">mL ampolla</option></select></div>
+              </div>
+              <div class="field">
+                <label for="solv" id="solvL">Solvente agregado</label>
+                <div class="inrow"><input id="solv" inputmode="decimal" autocomplete="off"><span>mL</span></div>
+              </div>
+            </div>
+            <label style="display:flex;gap:8px;align-items:center;font-size:.85rem;margin-top:6px"><input type="checkbox" id="solvTot"><span>El volumen que cargué es el <b>total final</b> de la jeringa (ya incluye el fármaco)</span></label>
           </div>
-          <div class="field">
+          <div class="field" id="volField">
             <span class="lbl" style="font-size:.82rem;text-transform:none;letter-spacing:0;font-weight:500">Volumen final de la jeringa</span>
             <div class="seg" id="volBtns" role="group" aria-label="Volumen de la jeringa"></div>
           </div>
@@ -430,6 +440,7 @@ function selectDrug(d){
   $("infGrid").hidden=!!d.bolusOnly;$("bolusPanel").hidden=!d.bolusOnly;$("loadPanel").hidden=!d.load;
   S.amt=manualDefault();
   $("mProto").hidden=!d.proto;
+  if(S.mode==="manual"){$("amtUnit").textContent=d.amtU;manFill();}
   if(d.proto){S.vol=24;setMode("proto",true)} else if(S.mode==="proto") setMode("regla",true);
   $("drugSel").value=d.id;$("selDot").parentElement.style.setProperty("--c",GROUPS[d.g].c);
   $("ref").value=fmt(S.ref,dpOf(d));$("amt").value=fmt(S.amt,3);$("dose").value=fmt(S.dose,dpOf(d));
@@ -439,7 +450,8 @@ function selectDrug(d){
 function update(src){
   if(S.drug.bolusOnly){updateBolus();return}
   const d=S.drug,c=concentration(),g=GROUPS[d.g];
-  $("refUnit").textContent=doseU(d);$("amtUnit").textContent=d.amtU;$("doseUnit").textContent=doseU(d);
+  $("refUnit").textContent=doseU(d);$("amtUnit").textContent=d.amtU;
+  if(S.mode==="manual"&&src==="prep"){const r0=parse($("rate").value);if(isFinite(r0)&&r0>0)S.dose=+doseOf(r0,c).toPrecision(4);}$("doseUnit").textContent=doseU(d);
   // slider
   const sl=$("slider");sl.min=d.range[0];sl.max=d.range[1];sl.step=d.step;
   if(src!=="slider") sl.value=Math.min(Math.max(S.dose,d.range[0]),d.range[1]);
@@ -459,7 +471,11 @@ function update(src){
       ${P.pre?`<li>Preparar la ${P.pre.txt}.</li>`:""}
       <li>Cargar <b class="num">${fmt(preMl,2)} mL</b> de ${P.pre?P.pre.name:d.name+" (ampolla pura, "+d.amp.txt+")"}.</li>
       <li>Completar con <b>SF</b> hasta <b class="num">${fmt(S.vol,1)} mL</b> (${fmt(S.vol-preMl,2)} mL de SF).</li>
-    </ol><div class="sub">Protocolo UCIN (jeringa de 24 mL): ${P.base}.</div>`:`
+    </ol><div class="sub">Protocolo UCIN (jeringa de 24 mL): ${P.base}.</div>`:S.mode==="manual"?`
+    <ol class="steps">
+      <li>Cargado: <b class="num">${fmt(ampMl,2)} mL</b> de ${d.name} (${d.amp.txt}) = ${fmt(toAmtU(amtMcg,d),3)} ${d.amtU}.</li>
+      <li>Más <b class="num">${fmt(dilMl,2)} mL</b> de diluyente → <b class="num">${fmt(S.vol,1)} mL</b> en total.</li>
+    </ol>${manualTxt(c,ampMl,per1)}`:`
     <ol class="steps">
       <li>Cargar <b class="num">${fmt(ampMl,2)} mL</b> de ${d.name} (${d.amp.txt}).</li>
       <li>Completar con <b>${d.dil}</b> hasta <b class="num">${fmt(S.vol,1)} mL</b> (≈ ${fmt(dilMl,2)} mL de diluyente).</li>
@@ -503,6 +519,9 @@ function update(src){
 }
 
 
+function manualTxt(c,ampMl,per1){const d=S.drug,cs=d.start*S.w*fac(d)/1,k=c/cs;
+  const stdAmp=cs*S.vol/d.amp.c;
+  return `<div class="sub" style="margin-top:8px"><b>Estándar para ${fmt(S.w*1000,0)} g</b> (dosis de inicio ${fmt(d.start,dpOf(d))} ${doseU(d)} a 1 mL/h): ${cTxt(cs,d)} → ${fmt(toAmtU(cs*S.vol,d),3)} ${d.amtU} (${fmt(stdAmp,2)} mL de ampolla) completando hasta ${fmt(S.vol,1)} mL.<br>${isFinite(k)&&k>0?(Math.abs(k-1)<0.05?"Tu jeringa coincide con la estándar.":`Tu jeringa está <b>${fmt(k>1?k:1/k,2)} veces más ${k>1?"concentrada":"diluida"}</b> que la estándar: 1 mL/h te da ${fmt(per1,dpOf(d))} en lugar de ${fmt(d.start,dpOf(d))} ${doseU(d)}.`):""}</div>`;}
 function updateLoad(){
   const d=S.drug,L=d.load,mg=L.mgkg*S.w,ml=mg/(L.c/1000),rate=ml/(S.loadMin/60);
   $("loadBtns").innerHTML=L.mins.map(m=>`<button data-m="${m}" aria-pressed="${m===S.loadMin}">${m} min</button>`).join("");
@@ -556,14 +575,27 @@ $("wMinus").onclick=()=>{S.w=Math.max(0.1,+((S.w||0)-0.1).toFixed(2));$("peso").
 $("wPlus").onclick=()=>{S.w=+((S.w||0)+0.1).toFixed(2);$("peso").value=fmt(S.w*1000,0);update()};
 $("ref").addEventListener("input",e=>{S.ref=parse(e.target.value);S.dose=S.ref;update("prep")});
 $("refRate").addEventListener("input",e=>{S.refRate=parse(e.target.value);S.dose=S.ref;update("prep")});
-$("amt").addEventListener("input",e=>{S.amt=parse(e.target.value);update()});
+// «Ya preparada»: fármaco cargado (en su unidad o en mL de ampolla) + solvente → volumen final
+S.amtIn="u";S.solv=null;S.solvTot=false;
+function manSync(){const d=S.drug,a=parse($("amt").value),v=parse($("solv").value);
+  S.amtIn=$("amtSel").value;S.solvTot=$("solvTot").checked;$("solvL").textContent=S.solvTot?"Volumen total final":"Solvente agregado";
+  const amtU=S.amtIn==="ml"?a*d.amp.c/big(d):a, ampMl=S.amtIn==="ml"?a:a*big(d)/d.amp.c;
+  S.amt=amtU;S.solv=v;S.vol=S.solvTot?v:(isFinite(ampMl)?ampMl:0)+v;S.manAmpMl=ampMl;}
+function manFill(){const d=S.drug;S.amt=manualDefault();const ampMl=S.amt*big(d)/d.amp.c;
+  $("amtSel").value="u";$("solvTot").checked=false;$("amt").value=fmt(S.amt,3);$("solv").value=fmt(Math.max(0,S.vol-ampMl),2);manSync();}
+["amt","solv"].forEach(id=>$(id).addEventListener("input",()=>{manSync();update("prep")}));
+["amtSel","solvTot"].forEach(id=>$(id).addEventListener("change",()=>{const d=S.drug;
+  if(id==="amtSel"){const a=parse($("amt").value);if(isFinite(a))$("amt").value=fmt($("amtSel").value==="ml"?a*big(d)/d.amp.c:a*d.amp.c/big(d),3);}
+  if(id==="solvTot"){const v=parse($("solv").value),am=S.manAmpMl||0;if(isFinite(v))$("solv").value=fmt($("solvTot").checked?v+am:Math.max(0,v-am),2);}
+  manSync();update("prep")}));
 $("dose").addEventListener("input",e=>{S.dose=parse(e.target.value);update("dose")});
 $("rate").addEventListener("input",e=>{const r=parse(e.target.value);S.dose=+doseOf(r,concentration()).toPrecision(4);update("rate")});
 $("slider").addEventListener("input",e=>{S.dose=parse(e.target.value);update("slider")});
 function setMode(m,silent){S.mode=m;$("mProto").setAttribute("aria-pressed",m==="proto");$("mRegla").setAttribute("aria-pressed",m==="regla");$("mManual").setAttribute("aria-pressed",m==="manual");
   $("prepRegla").hidden=m!=="regla";$("prepManual").hidden=m!=="manual";$("prepProto").hidden=m!=="proto";
   if(m==="proto"&&S.drug.proto) $("prepProto").textContent="Concentración fija según el Protocolo de Sedoanalgesia de la UCIN. Podés cambiar el volumen de la jeringa: la concentración se mantiene.";
-  if(m==="manual"){S.amt=manualDefault();$("amt").value=fmt(S.amt,3)}
+  $("volField").hidden=m==="manual";
+  if(m==="manual")manFill();
   if(!silent) update()}
 $("mProto").onclick=()=>setMode("proto");$("mRegla").onclick=()=>setMode("regla");$("mManual").onclick=()=>setMode("manual");
 
