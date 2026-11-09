@@ -51,7 +51,13 @@ const VW = [
    mide:[['Alternativa al PEC: posición del septo, FA','e-vd']]},
   {id:'cav', n:'Subcostal de cavas (VCI)', sonda:'Desde el S4C, girar 90° antihorario. Marca cefálica (12 h).',
    ve:['VCI en su eje largo entrando en la AD','Vena suprahepática media'],
-   mide:[['Diámetro máximo y mínimo de la VCI, distal a la suprahepática','e-pre'],['Colapsabilidad (respiración espontánea) o distensibilidad (ventilado)','e-flu']]}
+   mide:[['Diámetro máximo y mínimo de la VCI, distal a la suprahepática','e-pre'],['Colapsabilidad (respiración espontánea) o distensibilidad (ventilado)','e-flu']]},
+  {id:'sel', n:'Supraesternal eje largo · cayado aórtico', sonda:'Hueco supraesternal con el cuello en extensión (rollo bajo los hombros). Marca entre las 12 y la 1 h, apuntando hacia el hombro izquierdo y la espalda, siguiendo el plano del cayado.',
+   ve:['Aorta ascendente, cayado transverso e istmo','Los 3 vasos del cayado izquierdo: tronco braquiocefálico (innominado), carótida común izquierda y subclavia izquierda','Aorta descendente torácica','Rama pulmonar derecha en corte transversal, por debajo del cayado','Vena innominada izquierda por encima del cayado','En el neonato: ductus arterioso entrando en la aorta frente a la subclavia izquierda (plano ductal, bascular algo a la izquierda)'],
+   mide:[['Diámetros de aorta ascendente, cayado proximal y distal e istmo (z-score) para descartar hipoplasia o coartación',''],['Doppler continuo en aorta descendente: gradiente y prolongación diastólica («cola diastólica») sugieren coartación',''],['Flujo reverso holodiastólico en aorta descendente: robo ductal (DAP hemodinámicamente significativo) o insuficiencia aórtica',''],['Dirección del flujo ductal (izquierda-derecha, bidireccional o derecha-izquierda)',''],['Lateralidad del cayado: en el cayado izquierdo el primer vaso se dirige a la derecha y se bifurca (subclavia y carótida derechas)','']]},
+  {id:'sec', n:'Supraesternal eje corto · «cangrejo»', sonda:'Desde el eje largo supraesternal, girar 90° (marca hacia la izquierda, 3 h).',
+   ve:['Cayado aórtico en corte transversal','Rama pulmonar derecha en su eje largo, por debajo de la aorta','Aurícula izquierda con las 4 venas pulmonares llegando («cangrejo»)','Vena cava superior a la derecha y vena innominada por encima'],
+   mide:[['Drenaje de las 4 venas pulmonares (descartar drenaje venoso anómalo)',''],['Diámetro de la rama pulmonar derecha',''],['Flujo de la VCS con Doppler pulsado (flujo de VCS como marcador de flujo sistémico superior en el prematuro)','']]}
 ];
 
 // IndexedDB para las imágenes
