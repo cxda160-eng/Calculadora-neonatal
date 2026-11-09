@@ -86,6 +86,7 @@ table.zt{width:100%;border-collapse:collapse;font-size:.85rem}
 /* Vistas y ECG */
 .seg.big button{font-size:.95rem;min-height:44px}
 .view{display:flex;flex-direction:column;gap:16px}
+.pmw{display:flex;gap:6px;align-items:stretch}.pmw input{flex:1;min-width:0}.pmb{flex:none;min-width:46px;border:1px solid var(--line,#cfd8e3);border-radius:10px;background:var(--surface,#fff);color:inherit;font:700 1.15rem/1 system-ui,sans-serif;cursor:pointer}.pmb:active{transform:scale(.96)}
 .ejewrap{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
 @media (min-width:600px){.ejewrap{grid-template-columns:260px 1fr}}
 #hexa svg{width:100%;max-width:300px;display:block;margin:0 auto}
@@ -425,8 +426,8 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <h2>Eje eléctrico del QRS</h2>
     <p class="hint">Cargá la amplitud neta del QRS (R menos la mayor de Q o S, en mm) en DI y aVF.</p>
     <div class="grid">
-      <label for="eI">Neto en DI <span class="u">mm (±)</span><input id="eI" inputmode="decimal" autocomplete="off" placeholder="+6"></label>
-      <label for="eF">Neto en aVF <span class="u">mm (±)</span><input id="eF" inputmode="decimal" autocomplete="off" placeholder="+8"></label>
+      <label for="eI">Neto en DI <span class="u">mm (±)</span><span class="pmw"><button type="button" class="pmb" data-for="eI" aria-label="Cambiar signo de DI">±</button><input id="eI" inputmode="decimal" autocomplete="off" placeholder="+6"></span></label>
+      <label for="eF">Neto en aVF <span class="u">mm (±)</span><span class="pmw"><button type="button" class="pmb" data-for="eF" aria-label="Cambiar signo de aVF">±</button><input id="eF" inputmode="decimal" autocomplete="off" placeholder="+8"></span></label>
       <label for="eAge">Edad<select id="eAge"></select></label>
     </div>
     <div class="ejewrap"><div id="hexa"></div><div class="res" id="rEje"></div></div>
@@ -994,6 +995,10 @@ function ta(){
   $('rTA').innerHTML = h;
 }
 ['taEG', 'taDias', 'taS', 'taD', 'taM'].forEach(id => $(id).addEventListener('input', ta));
+// Botón ± (el teclado numérico del celular no siempre trae el signo menos)
+document.querySelectorAll('.pmb').forEach(b => b.addEventListener('click', e => { e.preventDefault(); const i = $(b.dataset.for); let s = String(i.value).trim();
+  if (s === '' || s === '-') s = s === '-' ? '' : '-'; else s = s.startsWith('-') ? s.slice(1) : s.startsWith('+') ? '-' + s.slice(1) : '-' + s;
+  i.value = s; i.dispatchEvent(new Event('input', { bubbles: true })); i.focus(); }));
 
 
 // ---------- Superficie corporal y z-scores (Detroit, Pettersen 2008) ----------
