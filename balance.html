@@ -28,6 +28,7 @@ h1{font-size:1.25rem;margin:0}
 .f span{color:var(--muted);font-size:.75rem;padding-left:4px}
 .f:focus-within{border-color:var(--accent)}
 .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--sunk);padding:3px;border-radius:10px}
+#hs{grid-template-columns:repeat(6,1fr)}
 .seg button{border:0;background:transparent;color:var(--fg);font:600 .9rem var(--font);padding:7px 0;border-radius:8px}
 .seg button[aria-pressed=true]{background:var(--surface);box-shadow:0 1px 3px #0002}
 .tot{display:flex;justify-content:space-between;font-weight:700;border-top:1px dashed var(--line);padding-top:8px}
@@ -91,7 +92,8 @@ table.lg{width:100%;border-collapse:collapse;font-size:.76rem}
     <div class="row"><label>Peso anterior<small>opcional · peso del día previo</small></label><div class="f"><input id="pAnt" inputmode="numeric" placeholder="0"><span>g</span></div></div>
     <div class="row"><label>Peso de nacimiento<small>opcional</small></label><div class="f"><input id="pNac" inputmode="numeric" placeholder="0"><span>g</span></div></div>
     <div><div style="font-size:.92rem;margin-bottom:6px">Horas del balance</div>
-      <div class="seg" id="hs"><button data-h="6">6 h</button><button data-h="8">8 h</button><button data-h="12">12 h</button><button data-h="24" aria-pressed="true">24 h</button></div></div>
+      <div class="seg" id="hs"><button data-h="3">3 h</button><button data-h="6">6 h</button><button data-h="8">8 h</button><button data-h="12">12 h</button><button data-h="24" aria-pressed="true">24 h</button><button data-h="otra">Otra</button></div>
+      <div class="row" id="hOtraRow" hidden style="margin-top:10px"><label>Horas del balance<small>escribí las horas que necesites (por ejemplo 4, 10 o 18)</small></label><div class="f"><input id="hOtra" inputmode="decimal" placeholder="0"><span>h</span></div></div></div>
   </section>
 
   <section class="card in">
@@ -154,7 +156,7 @@ const num=v=>{v=parseFloat(String(v).replace(",","."));return isFinite(v)?v:0};
 const f0=n=>Math.round(n).toLocaleString("es-AR");
 const f1=n=>n.toLocaleString("es-AR",{minimumFractionDigits:1,maximumFractionDigits:1});
 const f2=n=>n.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2});
-let H=24;
+let H=24;const hT=h=>String(+(+h).toFixed(2)).replace(".",",");
 const store={get(){try{return JSON.parse(localStorage.getItem("balance")||"{}")}catch(e){return{}}},set(o){try{localStorage.setItem("balance",JSON.stringify(o))}catch(e){}}};
 const LI=[["i_pn","NPT / EV"],["i_inf","Infusiones"],["i_ent","VO / SOG"],["i_otr","Otros"]],LE=[["e_diu","Diuresis"],["e_sog","Débito SOG"],["e_dre","Drenajes"],["e_otr","Otros"]];
 const brk=(L,kg)=>kg?L.map(([id,n])=>{const v=num($(id).value);return v?`<div><span>${n}</span><b>${f1(v/kg)}</b></div>`:""}).join(""):"";
@@ -167,8 +169,8 @@ function calc(){
   const E=[...document.querySelectorAll(".e")].reduce((s,x)=>s+num(x.value),0);
   $("tI").textContent=f0(I)+" mL";$("tE").textContent=f0(E)+" mL";
   const diu=num($("e_diu").value);const Ik=kg?I/kg:0,Ek=kg?E/kg:0,Bk=Ik-Ek,B=I-E;
-  $("vI").textContent=kg?f1(Ik):"—";$("uI").textContent=kg?`mL/kg en ${H} h (total ${f0(I)} mL)`:"mL/kg · falta peso";
-  $("vE").textContent=kg?f1(Ek):"—";$("uE").textContent=kg?`mL/kg en ${H} h (total ${f0(E)} mL)`:"mL/kg · falta peso";
+  $("vI").textContent=kg?f1(Ik):"—";$("uI").textContent=kg?`mL/kg en ${hT(H)} h (total ${f0(I)} mL)`:"mL/kg · falta peso";
+  $("vE").textContent=kg?f1(Ek):"—";$("uE").textContent=kg?`mL/kg en ${hT(H)} h (total ${f0(E)} mL)`:"mL/kg · falta peso";
   $("bI").innerHTML=brk(LI,kg);$("bE").innerHTML=brk(LE,kg);
   $("vB").textContent=kg?(Bk>0?"+":"")+f1(Bk):"—";
   $("uB").textContent=kg?`mL/kg (${(B>0?"+":"")+f0(B)} mL)`:"mL/kg · falta peso";
@@ -197,11 +199,14 @@ function calc(){
   return {kg,I,E,Ik,Ek,Bk,diu,W,pi};
 }
 document.querySelectorAll("input").forEach(x=>x.addEventListener("input",calc));
-$("hs").onclick=e=>{const b=e.target.closest("button");if(!b)return;H=+b.dataset.h;
+function hOtraVal(){const v=parseFloat(String($("hOtra").value).replace(",","."));return v>0&&v<=72?v:NaN}
+$("hs").onclick=e=>{const b=e.target.closest("button");if(!b)return;const ot=b.dataset.h==="otra";
+  $("hOtraRow").hidden=!ot;if(ot){const v=hOtraVal();if(isFinite(v))H=v;else{$("hOtra").focus();}}else H=+b.dataset.h;
   [...$("hs").children].forEach(x=>x.setAttribute("aria-pressed",x===b));calc()};
+$("hOtra").addEventListener("input",()=>{const v=hOtraVal();if(isFinite(v)){H=v;calc();}});
 $("borrar").onclick=()=>{ids.slice(4).forEach(i=>$(i).value="");calc()};
 function balText(){const r=calc();const kg=r.kg;
-  const t=[`Balance ${H} h${kg?` · peso ${f0(kg*1000)} g`:""}`,
+  const t=[`Balance ${hT(H)} h${kg?` · peso ${f0(kg*1000)} g`:""}`,
   `Ingresos: ${kg?f1(r.Ik)+" mL/kg":"—"} (${f0(r.I)} mL)`+det(LI,kg),
   `Egresos: ${kg?f1(r.Ek)+" mL/kg":"—"} (${f0(r.E)} mL)`+det(LE,kg),
   kg?`Balance: ${(r.Bk>0?"+":"")+f1(r.Bk)} mL/kg`:"",
@@ -216,7 +221,7 @@ $("copiar").onclick=async()=>{const t=balText();
   try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
   $("toast").classList.add("on");setTimeout(()=>$("toast").classList.remove("on"),1200)};
 const s=store.get();ids.forEach(i=>{if(s[i])$(i).value=s[i]});
-if(s.H){const b=[...$("hs").children].find(x=>+x.dataset.h===s.H);if(b)b.click()}
+if(s.H){const b=[...$("hs").children].find(x=>+x.dataset.h===s.H);if(b)b.click();else{$("hOtra").value=String(s.H).replace(".",",");$("hs").querySelector('[data-h="otra"]').click();}}
 calc();
 
 // ---------- Bitácora ----------
@@ -236,7 +241,7 @@ $("lgSave").onclick=()=>{
   const e={id:Date.now(),ts,H,g:Math.round(r.kg*1000),I:r.I,E:r.E,diu:r.diu,ins:r.pi||0,c:comp,nota:$("lgNota").value.trim()};
   const a=LG.get(); a.push(e); a.sort((x,y)=>x.ts-y.ts); LG.set(a);
   $("lgNota").value=""; $("lgTs").value=nowLocal(); lgSel=[]; lgRender();
-  lgMsg("ok",`Guardado: balance de ${H} h cerrado el ${fdt(ts)}.`);
+  lgMsg("ok",`Guardado: balance de ${hT(H)} h cerrado el ${fdt(ts)}.`);
 };
 function met(e){const kg=e.g/1000,m=lgMode==="24"?24/e.H:1;
   return {Ik:e.I/kg*m,Ek:e.E/kg*m,Bk:(e.I-e.E)/kg*m,ei:e.I?e.E/e.I:NaN,rd:e.diu?e.diu/kg/e.H:NaN,diu:e.diu/kg*m}}
@@ -250,7 +255,7 @@ function lgRender(){
   h+=`<div id="lgChart">${chart(a)}</div>`;
   h+=`<div class="tw"><table class="lg"><thead><tr><th>Cierre</th><th>Ingr.</th><th>Egr.</th><th>Bal.</th><th>E/I</th><th>RD</th></tr></thead><tbody>`;
   [...a].reverse().forEach(e=>{const m=met(e);
-    h+=`<tr data-c="${e.id}" class="${lgSel.includes(e.id)?"sel":""}"><td>${lgSel.includes(e.id)?"✓ ":""}${fdt(e.ts)}<small>${e.H} h · ${f0(e.g)} g${e.nota?" · "+e.nota.replace(/</g,"&lt;"):""}</small><button class="x" data-d="${e.id}">borrar</button></td><td>${f1(m.Ik)}</td><td>${f1(m.Ek)}</td><td>${sg(m.Bk)}</td><td>${isFinite(m.ei)?f2(m.ei):"—"}</td><td class="${rdCls(m.rd)}">${isFinite(m.rd)?f2(m.rd):"—"}</td></tr>`});
+    h+=`<tr data-c="${e.id}" class="${lgSel.includes(e.id)?"sel":""}"><td>${lgSel.includes(e.id)?"✓ ":""}${fdt(e.ts)}<small>${hT(e.H)} h · ${f0(e.g)} g${e.nota?" · "+e.nota.replace(/</g,"&lt;"):""}</small><button class="x" data-d="${e.id}">borrar</button></td><td>${f1(m.Ik)}</td><td>${f1(m.Ek)}</td><td>${sg(m.Bk)}</td><td>${isFinite(m.ei)?f2(m.ei):"—"}</td><td class="${rdCls(m.rd)}">${isFinite(m.rd)?f2(m.rd):"—"}</td></tr>`});
   h+=`</tbody></table></div>`;
   h+=cmpBox(a)+dayBox(a);
   h+=`<div class="btns"><button id="lgClr">Borrar bitácora</button><button id="lgCopy">Copiar bitácora</button></div>`;
@@ -305,7 +310,7 @@ function chart(a){
 function lgText(){
   const a=LG.get(); if(!a.length) return "";
   return "Bitácora de balances\n"+a.map(e=>{const kg=e.g/1000,rd=e.diu?e.diu/kg/e.H:NaN;
-    return `${fdt(e.ts)} · ${e.H} h · ${f0(e.g)} g: I ${f1(e.I/kg)} / E ${f1(e.E/kg)} mL/kg, balance ${sg((e.I-e.E)/kg)} mL/kg${e.I?`, E/I ${f2(e.E/e.I)}`:""}${isFinite(rd)?`, RD ${f2(rd)} mL/kg/h`:""}${e.nota?` (${e.nota})`:""}`}).join("\n");
+    return `${fdt(e.ts)} · ${hT(e.H)} h · ${f0(e.g)} g: I ${f1(e.I/kg)} / E ${f1(e.E/kg)} mL/kg, balance ${sg((e.I-e.E)/kg)} mL/kg${e.I?`, E/I ${f2(e.E/e.I)}`:""}${isFinite(rd)?`, RD ${f2(rd)} mL/kg/h`:""}${e.nota?` (${e.nota})`:""}`}).join("\n");
 }
 window.addEventListener("storage",ev=>{if(ev.key==="balLog")lgRender()});
 lgRender();
