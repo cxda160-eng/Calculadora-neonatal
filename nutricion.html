@@ -526,11 +526,11 @@ function setBolsa(m){bolsaModo=m;
 $("manSub").querySelectorAll("button").forEach(b=>b.onclick=()=>{manSub=b.dataset.v;setBolsa("man");calc()});
 function setPk(on){npPk=on;["cInf","cLip","cRes","bolsaBody"].forEach(i=>{$(i).hidden=on;$(i).style.display=on?"none":""});$("pkBody").hidden=!on;$("pkHint").hidden=!on;
   if(on)$("bolsaModo").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.v==="pk")));
-  try{localStorage.setItem("np_pk",on?"1":"0")}catch(e){}if(on)setTimeout(calcPR,0);}
+  try{localStorage.setItem("np_pk",on?"1":"0")}catch(e){}if(on)setTimeout(()=>{if(typeof calcPR==="function")calcPR()},0);}
 $("bolsaModo").querySelectorAll("button").forEach(b=>b.onclick=()=>{if(b.dataset.v==="pk"){setPk(true);return}setPk(false);manSub="tot";setBolsa(b.dataset.v);calc()});
 $("manNeo").onclick=()=>{load(NEO);calc()};
 $("manClr").onclick=()=>{FIELDS.forEach(([k])=>$("b_"+k).value="");calc()};
-if(npPk&&bolsaModo==="man")bolsaModo="neo";setBolsa(bolsaModo);if(npPk)setPk(true);
+if(npPk&&bolsaModo==="man")bolsaModo="neo";setBolsa(bolsaModo);if(npPk){const _pk=()=>setPk(true);if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",_pk);else setTimeout(_pk,0);}
 function seg(id,key,after){$(id).querySelectorAll("button").forEach(b=>b.onclick=()=>{
   $(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));st[key]=b.dataset.v;after&&after(b.dataset.v);calc()})}
 seg("unidad","unidad",v=>{const p=+$("peso").value||0;$("peso").value=v==="kg"?+(p/1000).toFixed(3):Math.round(p*1000)});
