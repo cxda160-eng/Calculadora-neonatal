@@ -150,6 +150,16 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border
 nav.tabs button{flex:1;max-width:240px;border:0;background:transparent;color:var(--muted);padding:10px;border-radius:10px;font-weight:600;font-size:.95rem;min-height:48px}
 nav.tabs button[aria-selected="true"]{background:var(--surface-2);color:var(--fg)}
 @media (prefers-reduced-motion:no-preference){.pump .rate{transition:color .2s}}
+#actPanel .actRow{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;margin-top:8px}
+#actPanel .actRow label{font-size:.85rem;color:var(--muted)}
+#actPanel select,#actPanel input{min-height:40px;border:1px solid var(--line);border-radius:10px;padding:0 10px;font:inherit;background:var(--surface);color:inherit}
+.actI{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.actI b{display:block}.actI small{color:var(--muted);font-size:.78rem}
+.actI .r{font-family:var(--mono,monospace);font-weight:700;white-space:nowrap}
+.actI button{min-width:40px;min-height:40px;border:1px solid var(--line);border-radius:10px;background:transparent;color:inherit;font-size:1.1rem;cursor:pointer}
+.actBtn{width:100%;margin-top:10px;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:inherit;font:inherit;font-weight:700;cursor:pointer}.actBtn.p{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.actTot{display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700}
+.actMan{margin-top:10px}.actMan summary{cursor:pointer;color:var(--accent);font-weight:600;padding:8px 0;min-height:40px}
 </style>
 <style id="tema-vivo">
 /* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
@@ -185,6 +195,22 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       </section>
 
       <div class="pump" id="pump" aria-live="polite"></div>
+      <section class="panel" id="actPanel" data-nofrm data-novac>
+        <div class="lbl">Infusiones activas del paciente</div>
+        <div class="sub" style="margin:0 0 8px">Agregá cada infusión que está pasando: sus mL/h se suman a los líquidos de <b>Nutrición → Totales</b> (con la glucosa del SG y el sodio del SF) y a la <b>Hoja del día</b>.</div>
+        <div id="actList"></div>
+        <div class="actRow">
+          <label for="actDil">Diluyente</label>
+          <select id="actDil"><option value="SG5">SG 5 %</option><option value="SF">SF 0,9 %</option><option value="SG10">SG 10 %</option><option value="AD">Agua destilada</option></select>
+        </div>
+        <button type="button" class="actBtn p" id="actAdd">+ Agregar esta infusión</button>
+        <details class="actMan"><summary>Agregar otra a mano (heparina, línea, lavado…)</summary>
+          <div class="actRow"><label for="amN">Nombre</label><input id="amN" autocomplete="off" placeholder="Heparina 0,5 U/mL"></div>
+          <div class="actRow"><label for="amR">Velocidad (mL/h)</label><input id="amR" inputmode="decimal" autocomplete="off" placeholder="0,5"></div>
+          <div class="actRow"><label for="amD">Diluyente</label><select id="amD"><option value="SF">SF 0,9 %</option><option value="SG5">SG 5 %</option><option value="SG10">SG 10 %</option><option value="AD">Agua destilada</option></select></div>
+          <button type="button" class="actBtn" id="amAdd">Agregar</button>
+        </details>
+      </section>
       <section class="panel" id="loadPanel" hidden>
         <div class="lbl">Dosis de carga</div>
         <div class="field">
@@ -434,7 +460,7 @@ function buildDrugs(){
 
 const manualDefault=()=>+toAmtU(S.ref*S.w*fac(S.drug)*S.vol/S.refRate,S.drug).toPrecision(3);
 function selectDrug(d){
-  S.drug=d;S.ref=d.start;S.dose=d.start;
+  S.drug=d;S.ref=d.start;S.dose=d.start;try{$("actDil").value=actDefDil(d)}catch(e){}
   if(d.load) S.loadMin=d.load.def;
   if(d.bolus) S.bStart=d.start;
   $("infGrid").hidden=!!d.bolusOnly;$("bolusPanel").hidden=!d.bolusOnly;$("loadPanel").hidden=!d.load;
@@ -570,7 +596,7 @@ function updateBolus(){
 }
 
 // eventos
-$("peso").addEventListener("input",e=>{S.w=parse(e.target.value)/1000;update()});
+$("peso").addEventListener("input",e=>{S.w=parse(e.target.value)/1000;update();try{actPaint()}catch(_){}});
 $("wMinus").onclick=()=>{S.w=Math.max(0.1,+((S.w||0)-0.1).toFixed(2));$("peso").value=fmt(S.w*1000,0);update()};
 $("wPlus").onclick=()=>{S.w=+((S.w||0)+0.1).toFixed(2);$("peso").value=fmt(S.w*1000,0);update()};
 $("ref").addEventListener("input",e=>{S.ref=parse(e.target.value);S.dose=S.ref;update("prep")});
@@ -636,6 +662,28 @@ function buildMono(q=""){
 }
 $("q").addEventListener("input",e=>buildMono(e.target.value));
 
+
+// ---------- Infusiones activas del paciente (LS infAct, por paciente) ----------
+const DILS={SG5:{n:"SG 5 %",g:50,na:0},SF:{n:"SF 0,9 %",g:0,na:0.154},SG10:{n:"SG 10 %",g:100,na:0},AD:{n:"Agua destilada",g:0,na:0}};
+const actGet=()=>{try{const a=JSON.parse(localStorage.getItem("infAct")||"[]");return Array.isArray(a)?a:[]}catch(e){return []}};
+const actPut=a=>{try{localStorage.setItem("infAct",JSON.stringify(a))}catch(e){}};
+function actDefDil(d){const t=(d.dil||"").toUpperCase();return t.startsWith("SF")?"SF":"SG5"}
+function actPaint(){const a=actGet(),kg=S.w;
+  if(!a.length){$("actList").innerHTML='<div class="sub" style="margin:4px 0">Todavía no agregaste infusiones.</div>';return}
+  let tot=0;
+  $("actList").innerHTML=a.map((x,i)=>{tot+=+x.rate||0;const di=DILS[x.dil]||DILS.AD;
+    return `<div class="actI"><div><b>${x.n.replace(/</g,"&lt;")}</b><small>${x.dose?x.dose+" · ":""}${x.conc?x.conc+" · ":""}${di.n}</small></div><span class="r">${fmt(+x.rate,2)} mL/h</span><button type="button" data-del="${i}" aria-label="Quitar ${x.n.replace(/"/g,"")}">✕</button></div>`}).join("")+
+    `<div class="actTot"><span>Total infusiones</span><span>${fmt(tot,2)} mL/h${kg>0?` · ${fmt(tot*24/kg,1)} mL/kg/día`:""}</span></div>`;
+  $("actList").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{const a2=actGet();const [rm]=a2.splice(+b.dataset.del,1);actPut(a2);actPaint();actToast(rm)});}
+function actToast(rm){const t=document.createElement("div");t.className="vacToast";t.innerHTML=`<span>Quitada: ${rm.n.replace(/</g,"&lt;")}</span>`;const u=document.createElement("button");u.type="button";u.textContent="Deshacer";u.onclick=()=>{const a=actGet();a.push(rm);actPut(a);actPaint();t.remove()};t.appendChild(u);document.body.appendChild(t);setTimeout(()=>t.remove(),6000)}
+$("actAdd").onclick=()=>{const d=S.drug;if(d.bolusOnly){alert("Esta medicación es en bolo: no se agrega como infusión.");return}
+  const c=concentration(),rate=parse($("rate").value);if(!(rate>0)){$("rate").focus();return}
+  const a=actGet();a.push({n:d.name,dose:fmt(S.dose,dpOf(d))+" "+doseU(d),conc:cTxt(c,d),rate:+rate.toFixed(3),dil:$("actDil").value,t:Date.now()});actPut(a);actPaint();
+  $("actAdd").textContent="✓ Agregada";setTimeout(()=>$("actAdd").textContent="+ Agregar esta infusión",1400)};
+$("amAdd").onclick=()=>{const n=$("amN").value.trim(),r=parse($("amR").value);if(!n){$("amN").focus();return}if(!(r>0)){$("amR").focus();return}
+  const a=actGet();a.push({n:n.slice(0,50),rate:+r.toFixed(3),dil:$("amD").value,t:Date.now()});actPut(a);$("amN").value="";$("amR").value="";actPaint()};
+setTimeout(()=>{try{actPaint()}catch(e){}},0);
+window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setTimeout(()=>{try{actPaint()}catch(_){}},80)});
 function show(v){
   const calc=v!=="vademecum";
   $("view-calc").hidden=!calc;$("view-vad").hidden=calc;
@@ -649,6 +697,6 @@ show(location.hash==="#vademecum"?"vademecum":"calcular");
 </script>
 
 
-<script src="paciente.js?v=v91"></script>
+<script src="paciente.js?v=v92"></script>
 </body>
 </html>

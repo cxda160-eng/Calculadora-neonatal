@@ -464,7 +464,8 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <section class="card">
     <h2>Todo lo que recibe en 24 h</h2>
     <p class="hint">Suma lo cargado en Parenteral (NP o hidratación, la opción que esté elegida) y en Enteral, por kg y por día.</p>
-    <label class="check" for="totP"><input type="checkbox" id="totP" checked> Parenteral: <b id="totPlab">—</b></label>
+    <label class="check" for="totP"><input type="checkbox" id="totP" checked><span>Parenteral: <b id="totPlab">—</b></span></label>
+    <label class="check" for="totI"><input type="checkbox" id="totI" checked><span>Infusiones activas (pestaña Infusiones): <b id="totIlab">—</b></span></label>
     <label class="check" for="totE"><input type="checkbox" id="totE" checked> Enteral (leches, módulo proteico y suplementos VO)</label>
   </section>
   <section class="card">
@@ -750,31 +751,37 @@ function totSrc(){
 function calcTOT(){
   try{calc()}catch(e){}try{calcPR()}catch(e){}try{calcPH()}catch(e){}try{calcEN()}catch(e){}
   const kg=pesoKg(),f=(x,d)=>isFinite(x)?x.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d}):"—";
-  const S=totSrc(),incP=$("totP").checked,incE=$("totE").checked;
+  const S=totSrc(),incP=$("totP").checked,incE=$("totE").checked,incI=$("totI").checked;
+  let IA=[];try{IA=JSON.parse(localStorage.getItem("infAct")||"[]");if(!Array.isArray(IA))IA=[]}catch(e){IA=[]}
+  const DG={SG5:[50,0],SF:[0,0.154],SG10:[100,0],AD:[0,0]};
   $("totPlab").textContent=S.lab;
   if(!(kg>0)){$("totTiles").innerHTML="";$("totTab").innerHTML="";$("totAl").innerHTML='<div class="pill info"><span>Cargá el peso del paciente.</span></div>';window._totSummary="";return}
   const P=incP&&S.d?S.d:{},E=incE&&window.ENT?window.ENT:{};
   const v=(o,k)=>isFinite(o[k])?o[k]:0;
   const pLiq=v(P,"liq")+v(P,"otros");
+  const I={liq:0,gir:0,na:0,kcal:0,mlh:0};if(incI)IA.forEach(x=>{const r=+x.rate||0,dg=DG[x.dil]||[0,0];I.mlh+=r;I.liq+=r*24/kg;I.gir+=r*dg[0]/(kg*60);I.na+=r*24*dg[1]/kg;I.kcal+=r*24*dg[0]/1000*3.4/kg});
+  $("totIlab").textContent=IA.length?`${IA.length} · ${f(IA.reduce((a,x)=>a+(+x.rate||0),0),2)} mL/h`:"ninguna cargada";
   const R=[ // nombre, unidad, parenteral, enteral (null = no informado), decimales
-    ["Líquidos","mL/kg/día",pLiq,v(E,"vol"),0],
-    ["Calorías","kcal/kg/día",v(P,"kcal"),v(E,"kcal"),0],
+    ["Líquidos","mL/kg/día",pLiq,v(E,"vol"),0,I.liq],
+    ["Calorías","kcal/kg/día",v(P,"kcal"),v(E,"kcal"),0,I.kcal],
     ["Proteínas","g/kg/día",v(P,"aa"),v(E,"p"),2],
     ["Lípidos","g/kg/día",v(P,"lip"),null,2],
-    ["Sodio","mEq/kg/día",v(P,"na"),v(E,"na"),2],
+    ["Sodio","mEq/kg/día",v(P,"na"),v(E,"na"),2,I.na],
     ["Potasio","mEq/kg/día",v(P,"k"),v(E,"k")>0?v(E,"k"):null,2],
     ["Calcio","mg/kg/día",v(P,"ca"),v(E,"ca"),0],
     ["Fósforo","mg/kg/día",v(P,"p"),v(E,"ph"),0],
     ["Magnesio","mEq/kg/día",v(P,"mg"),null,2]];
-  const tot=r=>r[2]+(r[3]||0);
-  $("totTiles").innerHTML=[["Líquidos totales",f(tot(R[0]),0),"mL/kg/día · "+f(tot(R[0])*kg,0)+" mL/día"],["Calorías totales",f(tot(R[1]),0),"kcal/kg/día"],["Proteínas totales",f(tot(R[2]),2),"g/kg/día"],["Flujo de glucosa IV",f(v(P,"gir"),1),"mg/kg/min (sin lactosa enteral)"]]
+  const tot=r=>r[2]+(r[3]||0)+(r[5]||0);const showI=incI&&IA.length>0;
+  $("totTiles").innerHTML=[["Líquidos totales",f(tot(R[0]),0),"mL/kg/día · "+f(tot(R[0])*kg,0)+" mL/día"],["Calorías totales",f(tot(R[1]),0),"kcal/kg/día"],["Proteínas totales",f(tot(R[2]),2),"g/kg/día"],["Flujo de glucosa IV",f(v(P,"gir")+I.gir,1),showI&&I.gir?`mg/kg/min (${f(I.gir,1)} de las infusiones)`:"mg/kg/min (sin lactosa enteral)"]]
     .map(([k,x,s],i)=>`<div class="tile ${["sky","mint","peach","lav"][i]}"><span class="k">${k}</span><span class="v">${x}</span><span class="s">${s}</span></div>`).join("");
-  $("totTab").innerHTML=`<thead><tr><th>Aporte</th><th>Parent.</th><th>Enteral</th><th>Total</th></tr></thead><tbody>`+
-    R.map(r=>`<tr><td>${r[0]}<small>${r[1]}</small></td><td>${incP?f(r[2],r[4]):"—"}</td><td>${!incE?"—":r[3]==null?"<small>s/d</small>":f(r[3],r[4])}</td><td><b>${f(tot(r),r[4])}</b></td></tr>`).join("")+
-    `<tr class="sub"><td colspan="4" style="white-space:normal;text-align:left;font-family:var(--body)">Relación Ca:P total (mg): ${tot(R[7])?f(tot(R[6])/tot(R[7]),2)+" : 1":"—"}</td></tr></tbody>`;
+  $("totTab").innerHTML=`<thead><tr><th>Aporte</th><th>${showI?"NP/PHP":"Parent."}</th>${showI?"<th>Infus.</th>":""}<th>Enteral</th><th>Total</th></tr></thead><tbody>`+
+    R.map(r=>`<tr><td>${r[0]}<small>${r[1]}</small></td><td>${incP?f(r[2],r[4]):"—"}</td>${showI?`<td>${r[5]!=null?f(r[5],r[4]):"–"}</td>`:""}<td>${!incE?"—":r[3]==null?"<small>s/d</small>":f(r[3],r[4])}</td><td><b>${f(tot(r),r[4])}</b></td></tr>`).join("")+
+    `<tr class="sub"><td colspan="${showI?5:4}" style="white-space:normal;text-align:left;font-family:var(--body)">Relación Ca:P total (mg): ${tot(R[7])?f(tot(R[6])/tot(R[7]),2)+" : 1":"—"}</td></tr></tbody>`;
   const A=[];
   if(incP&&!S.d)A.push(["info","No hay parenteral cargada."]);
   if(incP&&v(P,"otros")>0)A.push(["info",`Los líquidos parenterales incluyen ${f(v(P,"otros"),0)} mL/kg/día de otras infusiones.`]);
+  if(showI)A.push(["info",`Infusiones de drogas: ${f(I.mlh,2)} mL/h = ${f(I.liq,1)} mL/kg/día${I.gir?`, glucosa ${f(I.gir,2)} mg/kg/min`:""}${I.na?`, sodio ${f(I.na,2)} mEq/kg/día`:""} (según el diluyente cargado en Infusiones).`]);
+  if(showI&&incP&&v(P,"otros")>0)A.push(["warn","También hay «otras infusiones» cargadas a mano en Parenteral: revisá que no estén repetidas con las infusiones activas."]);
   if(incE&&!v(E,"vol")&&!v(E,"na"))A.push(["info","No hay aporte enteral cargado (pestaña Enteral)."]);
   if(incE&&v(E,"vol"))A.push(["info",v(E,"k")>0?"s/d: las leches no informan lípidos ni magnesio en esta app. El potasio enteral es solo el del suplemento de fosfato (sin el de la leche).":"s/d: las leches no informan lípidos, potasio ni magnesio en esta app; el total de esas filas es solo parenteral."]);
   if(S.lab.startsWith("NP")&&!npPk&&window.NP&&+$("ent").value)A.push(["warn","En Parenteral hay un valor en «Enteral (solo volumen)»: acá no se usa; el enteral sale de la pestaña Enteral para no contarlo dos veces."]);
@@ -805,7 +812,18 @@ function calcTOT(){
    window._totSummary+=`\nCa ${f(tc,0)} mg/kg/día (parenteral ${f(pc,0)} + enteral ${f(ec,0)}) · P ${f(tp,0)} mg/kg/día (parenteral ${f(pp,0)} + enteral ${f(ep,0)}) · Ca:P ${isFinite(mass)?f(mass,2):"—"} mg / ${isFinite(mol)?f(mol,2):"—"} molar`;}
 
 }
-["totP","totE"].forEach(i=>$(i).addEventListener("change",calcTOT));
+["totP","totE","totI"].forEach(i=>$(i).addEventListener("change",calcTOT));
+// Datos para la Hoja del día (por paciente): se actualiza solo cuando cambia algo en Nutrición
+function hojaSave(){try{calcTOT()}catch(e){return}
+  const S=totSrc();let par="";
+  if(!$("phBody").hidden)par=window._phSummary||"";else if(npPk)par=window._prSummary||"";else par=typeof resumen==="string"?resumen:"";
+  const tab=[...document.querySelectorAll("#totTab tbody tr")].filter(r=>!r.classList.contains("sub")).map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g," ").trim()));
+  const head=[...document.querySelectorAll("#totTab thead th")].map(c=>c.textContent);
+  const al=[...document.querySelectorAll("#totAl .pill")].map(x=>x.innerText);
+  const d={t:Date.now(),parLab:S.lab,par,en:typeof enResumen==="string"&&window.ENT&&(window.ENT.vol||window.ENT.na)?enResumen:"",head,tab,tiles:[...document.querySelectorAll("#totTiles .tile")].map(x=>[x.querySelector(".k").textContent,x.querySelector(".v").textContent,x.querySelector(".s").textContent]),al};
+  try{localStorage.setItem("hojaNut",JSON.stringify(d))}catch(e){}}
+let hojaT=null;["input","change","click"].forEach(ev=>document.addEventListener(ev,()=>{clearTimeout(hojaT);hojaT=setTimeout(hojaSave,500)},true));
+setTimeout(hojaSave,700);
 /* ---------- Plan de hidratación parenteral (dentro de Parenteral) ---------- */
 // Líquidos parenterales sugeridos (mL/kg/día), ESPGHAN 2018: día 1..5 y desde el día 6
 const PHV={term:[[40,60],[50,70],[60,80],[60,100],[100,140],[140,170]],g1500:[[60,80],[80,100],[100,120],[120,140],[140,160],[140,160]],g1000:[[70,90],[90,110],[110,130],[130,150],[160,180],[140,160]],m1000:[[80,100],[100,120],[120,140],[140,160],[160,180],[140,160]]};
@@ -868,7 +886,7 @@ function calcPH(){
   if(n("phCa")>0)A.push(["info","Calcio por vía periférica: riesgo de necrosis por extravasación."]);
   $("phAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}"><span>${t}</span></div>`).join("");
   window.PHT={liq:Vph/kg,otros:n("phOt")/kg,kcal,gir:FG,aa:0,lip:0,na:n("phNa"),k:n("phK"),ca:n("phCa")*20,p:0,mg:0};
-  window._phSummary=`Plan de hidratación parenteral · ${f1(kg*1000,0)} g\n${$("phRx").innerText}\nPreparación (${H} h):\n`+rows.map(([a,v])=>`${a}: ${f1(v,1)} mL`).join("\n")+`\nTotal ${f1(Vph,1)} mL`;
+  window._phSummary=`Plan de hidratación parenteral · ${f1(kg*1000,0)} g\n${Vph>0?`PHP ${f1(Vph/kg,0)} mL/kg/día a ${f1(rate,1)} mL/h\nDextrosa ${f1(PC,1)} % · FG ${f1(FG,1)} mg/kg/min\n${elTxt?elTxt+" mEq/kg/día":"Sin electrolitos"}`:""}\nPreparación (${H} h):\n`+rows.map(([a,v])=>`${a}: ${f1(v,1)} mL`).join("\n")+`\nTotal ${f1(Vph,1)} mL`;
 }
 $("phSug").addEventListener("click",e=>{const b=e.target.closest("button");if(b){const kg=pesoKg(),en=parseFloat(String($("phEn").value).replace(",","."))||0,ot=parseFloat(String($("phOt").value).replace(",","."))||0;$("phV").value=String(Math.max(0,Math.round((+b.dataset.v-en-(kg>0?ot/kg:0))*10)/10));calcPH();}});
 [...PHI,"csNa","csK","csCa","peso"].forEach(i=>$(i).addEventListener("input",calcPH));["phDa","phDb"].forEach(i=>$(i).addEventListener("change",calcPH));
@@ -956,6 +974,6 @@ drawComp();drawRows();
 try{const mm=localStorage.getItem("nut_mod");if(mm==="en"||mm==="tot")$("modulo").querySelector(`[data-v="${mm}"]`).click();}catch(e){}
 calc();
 </script>
-<script src="paciente.js?v=v91"></script>
+<script src="paciente.js?v=v92"></script>
 </body>
 </html>

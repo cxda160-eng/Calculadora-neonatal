@@ -246,6 +246,7 @@
     function fire(el) { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); }
     document.querySelectorAll("section.card,section.panel,div.card").forEach(function (card) {
       if (card.parentElement && card.parentElement.closest("section.card,section.panel,div.card")) return;
+      if (card.hasAttribute("data-novac")) return;
       var h = card.querySelector(":scope > h2, :scope > .lbl"); if (!h || !fields(card).length || h.querySelector(".vacBtn")) return;
       var b = document.createElement("button"); b.type = "button"; b.className = "vacBtn"; b.textContent = "Vaciar";
       b.title = "Borrar los datos cargados en esta tarjeta"; b.setAttribute("aria-label", "Vaciar " + h.textContent.trim());
@@ -262,7 +263,7 @@
   }
 
   /* Guardar lo escrito en cada calculadora por paciente (clave frm_<página>, se guarda con la cama) */
-  var FRM_SKIP_PAGES = /^(fuentes|neofax|index|ehi)$/;
+  var FRM_SKIP_PAGES = /^(fuentes|neofax|index|ehi|hoja)$/;
   var FRM_SEG_SKIP = { sView: 1, "sm-hv": 1, lgMode: 1, thSeg: 1 };
   var frmBusy = false, frmLocked = false, frmT = null;
   function frmOkEl(el, pacSel) {

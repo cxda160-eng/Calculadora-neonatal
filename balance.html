@@ -216,6 +216,8 @@ function balText(){const r=calc();const kg=r.kg;
   ...r.W.map(([a,b])=>`Peso ${a.toLowerCase()}: ${b}`),
   H<24&&kg?`Proyección 24 h: ingresos ${f1(r.Ik*24/H)} mL/kg, egresos ${f1(r.Ek*24/H)} mL/kg, balance ${(r.Bk>0?"+":"")+f1(r.Bk*24/H)} mL/kg${r.diu?`, diuresis ${f0(r.diu*24/H)} mL (${f1(r.diu/kg*24/H)} mL/kg)`:""}`:""].filter(Boolean).join("\n");
   return t}
+function hojaBal(){try{const r=calc();const d={t:Date.now(),bal:(r.I||r.E)?balText():"",log:(typeof lgText==="function")?lgText():""};localStorage.setItem("hojaBal",JSON.stringify(d))}catch(e){}}
+let hbT=null;["input","change","click"].forEach(ev=>document.addEventListener(ev,()=>{clearTimeout(hbT);hbT=setTimeout(hojaBal,500)},true));setTimeout(hojaBal,700);
 window.customSummary=()=>{const r=calc();const t=(r.I||r.E)?balText():"";const l=(typeof lgText==="function")?lgText():"";return [t,l].filter(Boolean).join("\n\n")};
 $("copiar").onclick=async()=>{const t=balText();
   try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
@@ -315,6 +317,6 @@ function lgText(){
 window.addEventListener("storage",ev=>{if(ev.key==="balLog")lgRender()});
 lgRender();
 </script>
-<script src="paciente.js?v=v91"></script>
+<script src="paciente.js?v=v92"></script>
 </body>
 </html>

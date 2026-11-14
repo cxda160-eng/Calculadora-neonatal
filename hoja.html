@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3d5a99">
+<title>Hoja del día</title>
+<style>
+:root{--bg:#f4f7fb;--surface:#fff;--sunk:#edf1f8;--line:#d9e0ec;--fg:#1f2b40;--muted:#66748c;--accent:#3d5a99;--soft:#e2e9f8;
+--warn:#86590a;--warnb:#fff1cf;--font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--bg:#121722;--surface:#1a2130;--sunk:#222b3c;--line:#313c52;--fg:#e7ecf5;--muted:#9eabc2;--accent:#9db4ea;--soft:#222f4a;--warn:#ffd98a;--warnb:#3a3016;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.45;
+padding:16px max(14px,env(safe-area-inset-left)) calc(30px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right))}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+h1{font-size:1.25rem;margin:0}
+.sub{color:var(--muted);font-size:.85rem;margin:2px 0 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.card h2{margin:0;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--accent);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2 a{font-size:.75rem;letter-spacing:0;text-transform:none;color:var(--accent);font-weight:600;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:34px;display:inline-flex;align-items:center;cursor:pointer}
+.pac{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.95rem}
+.pac b{font-family:var(--mono)}
+pre{margin:0;white-space:pre-wrap;font:500 .88rem/1.5 var(--font);color:var(--fg)}
+.age{font-size:.75rem;color:var(--muted)}
+.age.old{color:var(--warn);font-weight:600}
+.empty{color:var(--muted);font-size:.88rem}
+.inf{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.inf small{grid-column:1;color:var(--muted);font-size:.78rem}
+.inf .r{grid-row:1/3;grid-column:2;font:700 .95rem var(--mono);align-self:center;white-space:nowrap}
+.tot{display:flex;justify-content:space-between;font-weight:700;padding-top:6px}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th,td{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.72rem;color:var(--muted);font-weight:700}
+td:last-child{font-weight:700}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{background:var(--sunk);border-radius:12px;padding:10px}
+.tile .k{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+.tile .v{font:700 1.3rem var(--mono)}
+.tile .s{font-size:.75rem;color:var(--muted)}
+textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:12px;background:var(--sunk);color:var(--fg);font:inherit;padding:10px;resize:vertical}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.btns button{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 .9rem var(--font);padding:12px 6px;border-radius:12px;min-height:46px;cursor:pointer}
+.btns button.p{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.al{font-size:.8rem;color:var(--muted);margin:2px 0 0;padding-left:18px}
+.note{font-size:.78rem;color:var(--muted);margin:0}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:.88rem;opacity:0;transition:.2s;pointer-events:none}
+.toast.on{opacity:1}
+@media print{body{background:#fff;color:#000;padding:0;font-size:12px}.card{border:1px solid #bbb;break-inside:avoid;padding:10px}.btns,.card h2 a,.noprint{display:none!important}textarea{border:0;background:#fff;min-height:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Hoja del día</h1>
+    <p class="sub" id="hFecha">—</p>
+  </header>
+
+  <section class="card">
+    <h2>Paciente</h2>
+    <div class="pac" id="hPac"><span class="empty">Cargá el peso, la EG y los días en la barra del paciente.</span></div>
+  </section>
+
+  <section class="card" id="cPar">
+    <h2><span id="hParT">Plan parenteral</span><a data-go="bNut">Abrir Nutrición</a></h2>
+    <div id="hPar"></div>
+  </section>
+
+  <section class="card" id="cInf">
+    <h2>Infusiones activas<a data-go="bInf">Abrir Infusiones</a></h2>
+    <div id="hInf"></div>
+  </section>
+
+  <section class="card" id="cEn">
+    <h2>Enteral<a data-go="bNut">Abrir Nutrición</a></h2>
+    <div id="hEn"></div>
+  </section>
+
+  <section class="card" id="cTot">
+    <h2>Totales en 24 h<a data-go="bNut">Ver detalle</a></h2>
+    <div id="hTot"></div>
+  </section>
+
+  <section class="card" id="cBal">
+    <h2>Último balance<a data-go="bBal">Abrir Balance</a></h2>
+    <div id="hBal"></div>
+  </section>
+
+  <section class="card">
+    <h2>Indicaciones y notas</h2>
+    <textarea id="hNota" aria-label="Indicaciones y notas del día" placeholder="Ej.: control de glucemia c/6 h, ionograma mañana, ecocardiograma…"></textarea>
+    <p class="note">Se guarda con el paciente, solo en este equipo.</p>
+  </section>
+
+  <div class="btns">
+    <button type="button" class="p" id="hCopy">Copiar</button>
+    <button type="button" id="hShare">Compartir</button>
+    <button type="button" id="hPrint">Imprimir</button>
+  </div>
+  <p class="note">Se arma con lo cargado en Nutrición, Infusiones y Balance de este paciente. Es un resumen de apoyo: verificar cada indicación con el protocolo de la unidad y doble chequeo antes de pasarla a la historia clínica.</p>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const $=id=>document.getElementById(id);
+const J=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
+const esc=s=>String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const fmt=(n,d=1)=>isFinite(n)?(+n).toLocaleString("es-AR",{maximumFractionDigits:d,minimumFractionDigits:0}):"—";
+const DIL={SG5:"SG 5 %",SF:"SF 0,9 %",SG10:"SG 10 %",AD:"Agua destilada"};
+function ago(t){if(!t)return "";const m=(Date.now()-t)/60000;const tx=m<1?"recién":m<60?`hace ${Math.round(m)} min`:m<1440?`hace ${fmt(m/60,0)} h`:`hace ${fmt(m/1440,0)} días`;return `<span class="age${m>720?" old":""}">Actualizado ${tx}${m>720?" · revisar si sigue vigente":""}</span>`}
+let TXT="";
+function pacInfo(){const p=J("pac")||{};const a=[];let nom="";const C=J("camas");if(C&&C.l){const c=C.l.find(x=>x.id===C.a);if(c)nom=c.nom}
+  let dias=p.dias;if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(h>=0)dias=h/24}
+  if(p.kg)a.push(["Peso",fmt(p.kg*1000,0)+" g"]);if(p.eg)a.push(["EG",String(p.eg).replace(".",",")+" sem"]);
+  if(isFinite(dias)&&dias!==""&&dias!=null){a.push(["Días de vida",fmt(+dias,dias<3?1:0)]);if(p.eg){const pm=+p.eg+dias/7;a.push(["EG corregida",Math.floor(pm)+"+"+Math.floor((pm%1)*7)+" sem"])}}
+  return {nom,a,kg:+p.kg||0}}
+function render(){
+  const now=new Date();$("hFecha").textContent=now.toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"})+" · "+now.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"});
+  const P=pacInfo();const L=[];
+  L.push("HOJA DEL DÍA · "+now.toLocaleDateString("es-AR")+" "+now.toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"}));
+  $("hPac").innerHTML=P.a.length?(P.nom?`<span><b style="font-family:var(--font)">${esc(P.nom)}</b></span>`:"")+P.a.map(([k,v])=>`<span>${k}: <b>${v}</b></span>`).join(""):'<span class="empty">Cargá el peso, la EG y los días en la barra del paciente.</span>';
+  if(P.nom)L.push(P.nom);if(P.a.length)L.push(P.a.map(([k,v])=>k+" "+v).join(" · "));
+  // Nutrición
+  const N=J("hojaNut");
+  const parTxt=N&&N.par?N.par.trim():"";
+  $("hParT").textContent=N&&N.parLab?N.parLab:"Plan parenteral";
+  $("hPar").innerHTML=parTxt?`<pre>${esc(parTxt)}</pre>${ago(N.t)}`:'<div class="empty">Sin plan parenteral cargado en Nutrición.</div>';
+  if(parTxt)L.push("","PARENTERAL ("+(N.parLab||"")+")",parTxt);
+  // Infusiones
+  let IA=J("infAct");if(!Array.isArray(IA))IA=[];
+  if(IA.length){const tot=IA.reduce((a,x)=>a+(+x.rate||0),0);
+    $("hInf").innerHTML=IA.map(x=>`<div class="inf"><b>${esc(x.n)}</b><span class="r">${fmt(+x.rate,2)} mL/h</span><small>${[x.dose,x.conc,DIL[x.dil]].filter(Boolean).map(esc).join(" · ")}</small></div>`).join("")+`<div class="tot"><span>Total</span><span>${fmt(tot,2)} mL/h${P.kg?" · "+fmt(tot*24/P.kg,1)+" mL/kg/día":""}</span></div>`;
+    L.push("","INFUSIONES");IA.forEach(x=>L.push(`- ${x.n}: ${[x.dose,x.conc].filter(Boolean).join(", ")}${x.dose||x.conc?" · ":""}${fmt(+x.rate,2)} mL/h (${DIL[x.dil]||""})`));L.push(`Total infusiones: ${fmt(tot,2)} mL/h${P.kg?" = "+fmt(tot*24/P.kg,1)+" mL/kg/día":""}`)}
+  else $("hInf").innerHTML='<div class="empty">Sin infusiones activas. En Infusiones, calculá cada una y tocá «+ Agregar esta infusión».</div>';
+  // Enteral
+  const en=N&&N.en?N.en.trim():"";
+  $("hEn").innerHTML=en?`<pre>${esc(en)}</pre>${ago(N.t)}`:'<div class="empty">Sin aporte enteral cargado.</div>';
+  if(en)L.push("","ENTERAL",en);
+  // Totales
+  if(N&&N.tab&&N.tab.length){
+    $("hTot").innerHTML=(N.tiles&&N.tiles.length?`<div class="tiles">${N.tiles.map(([k,v,s])=>`<div class="tile"><div class="k">${esc(k)}</div><div class="v">${esc(v)}</div><div class="s">${esc(s)}</div></div>`).join("")}</div>`:"")+
+      `<table><thead><tr>${(N.head||[]).map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${N.tab.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`+
+      (N.al&&N.al.length?`<ul class="al">${N.al.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`:"")+ago(N.t);
+    L.push("","TOTALES 24 h");(N.tiles||[]).forEach(([k,v,s])=>L.push(`${k}: ${v} ${s}`));
+    const H=N.head||[];N.tab.forEach(r=>{const tot=r[r.length-1];const parts=r.slice(1,-1).map((c,i)=>H[i+1]?`${H[i+1]} ${c}`:c).join(", ");L.push(`${r[0]}: ${tot}${parts?` (${parts})`:""}`)});
+  } else $("hTot").innerHTML='<div class="empty">Abrí Nutrición para calcular los totales.</div>';
+  // Balance
+  const B=J("hojaBal");
+  $("hBal").innerHTML=B&&B.bal?`<pre>${esc(B.bal)}</pre>${ago(B.t)}`:'<div class="empty">Sin balance cargado.</div>';
+  if(B&&B.bal)L.push("","BALANCE",B.bal);
+  const nota=$("hNota").value.trim();if(nota)L.push("","INDICACIONES Y NOTAS",nota);
+  L.push("","Resumen de apoyo generado por la Calculadora Neonatal: verificar con el protocolo de la unidad.");
+  TXT=L.join("\n");
+}
+// Notas por paciente
+try{$("hNota").value=localStorage.getItem("hojaNota")||""}catch(e){}
+$("hNota").addEventListener("input",()=>{try{localStorage.setItem("hojaNota",$("hNota").value)}catch(e){}render()});
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),1800)}
+$("hCopy").onclick=()=>{render();const ok=()=>toast("Hoja copiada");const fb=()=>{const t=document.createElement("textarea");t.value=TXT;document.body.appendChild(t);t.select();try{document.execCommand("copy");ok()}catch(e){}t.remove()};
+  if(navigator.clipboard)navigator.clipboard.writeText(TXT).then(ok,fb);else fb()};
+$("hShare").onclick=async()=>{render();if(navigator.share){try{await navigator.share({title:"Hoja del día",text:TXT})}catch(e){}}else $("hCopy").click()};
+$("hPrint").onclick=()=>{render();window.print()};
+document.querySelectorAll("[data-go]").forEach(a=>a.onclick=()=>{try{parent.document.getElementById(a.dataset.go).click()}catch(e){}});
+window.addEventListener("storage",render);
+window.addEventListener("message",e=>{if(e.data&&e.data.type==="pac")setTimeout(render,50)});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)render()});
+window.customSummary=()=>{render();return TXT};
+render();setInterval(()=>{if(!document.hidden)render()},60000);
+</script>
+<script src="paciente.js?v=v92"></script>
+</body>
+</html>

@@ -190,6 +190,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button role="tab" id="bCre" aria-selected="false" style="--c:var(--cre);--soft:var(--cre-soft)"><i></i><span class="l">Crecimiento</span><span class="s">Creci.</span></button>
       <button role="tab" id="bNfx" aria-selected="false" style="--c:var(--vad);--soft:var(--vad-soft)"><i></i><span class="l">NeoFax</span><span class="s">NeoFax</span></button>
       <button role="tab" id="bEhi" aria-selected="false" style="--c:var(--ehi);--soft:var(--ehi-soft)"><i></i><span class="l">Encefalopatía</span><span class="s">EHI</span></button>
+      <button role="tab" id="bHoj" aria-selected="false" style="--c:var(--ele);--soft:var(--ele-soft)"><i></i><span class="l">Hoja del día</span><span class="s">Hoja</span></button>
       <button role="tab" id="bBal" aria-selected="false" style="--c:var(--bal);--soft:var(--bal-soft)"><i></i><span class="l">Balance</span><span class="s">Balance</span></button>
       <button role="tab" id="bVaf" aria-selected="false" style="--c:var(--vaf);--soft:var(--vaf-soft)"><i></i><span class="l">VAFO</span><span class="s">VAFO</span></button>
       <button role="tab" id="bFue" aria-selected="false" style="--c:var(--fue);--soft:var(--fue-soft)"><i></i><span class="l">Fuentes</span><span class="s">Fuentes</span></button>
@@ -233,6 +234,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   <iframe id="vCre" data-src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
   <iframe id="vNfx" data-src="neofax.html" title="NeoFax" hidden></iframe>
   <iframe id="vEhi" data-src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
+  <iframe id="vHoj" data-src="hoja.html" title="Hoja del día" hidden></iframe>
   <iframe id="vBal" data-src="balance.html" title="Balance hídrico" hidden></iframe>
   <iframe id="vVaf" data-src="vafo.html" title="VAFO: ventilación de alta frecuencia" hidden></iframe>
   <iframe id="vFue" data-src="fuentes.html" title="Fuentes y alcance" hidden></iframe>
@@ -281,7 +283,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
   </div>
 </div>
 <script>
-const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"],ehi:["vEhi","bEhi"],bal:["vBal","bBal"],vaf:["vVaf","bVaf"],fue:["vFue","bFue"]};
+const TABS={inf:["vInf","bInf"],ele:["vEle","bEle"],sed:["vSed","bSed"],nut:["vNut","bNut"],ins:["vIns","bIns"],lab:["vLab","bLab"],ecg:["vEcg","bEcg"],atb:["vAtb","bAtb"],neo:["vNeo","bNeo"],cre:["vCre","bCre"],nfx:["vNfx","bNfx"],ehi:["vEhi","bEhi"],bal:["vBal","bBal"],hoj:["vHoj","bHoj"],vaf:["vVaf","bVaf"],fue:["vFue","bFue"]};
 const loadTab=k=>{const f=document.getElementById(TABS[k][0]);if(f&&!f.getAttribute("src")&&f.dataset.src)f.setAttribute("src",f.dataset.src)};
 const show=k=>{loadTab(k);for(const [key,[v,b]] of Object.entries(TABS)){const on=key===k;
   document.getElementById(v).hidden=!on;document.getElementById(b).setAttribute("aria-selected",on)}if(window.onTab)window.onTab(k);};
@@ -298,6 +300,7 @@ document.getElementById("bCre").onclick=()=>show("cre");
 document.getElementById("bNfx").onclick=()=>show("nfx");
 document.getElementById("bEhi").onclick=()=>show("ehi");
 document.getElementById("bBal").onclick=()=>show("bal");
+document.getElementById("bHoj").onclick=()=>show("hoj");
 document.getElementById("bVaf").onclick=()=>show("vaf");
 document.getElementById("bFue").onclick=()=>show("fue");
 if(location.hash==="#electrolitos")show("ele");
@@ -368,7 +371,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   const $=id=>document.getElementById(id);
   const META={};for(const k in TABS){const b=$(TABS[k][1]);META[k]={n:(b.querySelector(".l")||b).textContent.trim(),s:(b.querySelector(".s")||b).textContent.trim(),st:b.getAttribute("style")||""}}
   META.neo.n="RCP · Bili · Sangre";META.ecg.s="Cardio";META.bal.s="Balance";META.ehi.s="EHI";
-  const GROUPS=[["Fármacos",["inf","sed","atb","ins","nfx"]],["Cálculos",["ele","nut","lab","bal","vaf"]],["Clínica",["ecg","neo","cre","ehi"]],["Referencias",["fue"]]];
+  const GROUPS=[["Fármacos",["inf","sed","atb","ins","nfx"]],["Paciente",["hoj","bal"]],["Cálculos",["ele","nut","lab","vaf"]],["Clínica",["ecg","neo","cre","ehi"]],["Referencias",["fue"]]];
   let FAV;try{FAV=JSON.parse(localStorage.getItem("favs")||"null")}catch(e){}
   if(!Array.isArray(FAV)||!FAV.length)FAV=["inf","atb","bal","ehi"];FAV=FAV.filter(k=>TABS[k]).slice(0,4);
   let cur="inf";
@@ -414,7 +417,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Varios pacientes (camas) ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const PK=/^(pac|vafo|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap|frm_.*|nut_mod|par_tipo|np_pk|np_modo|np_sub|neo_mod)$/;
+  const PK=/^(pac|vafo|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap|frm_.*|nut_mod|par_tipo|np_pk|np_modo|np_sub|neo_mod|infAct|hojaNota|hojaNut|hojaBal)$/;
   const get=()=>{try{return JSON.parse(localStorage.getItem("camas")||"null")}catch(e){return null}};
   const put=c=>{try{localStorage.setItem("camas",JSON.stringify(c))}catch(e){toast("No hay espacio para guardar más pacientes")}};
   let C=get();
