@@ -108,6 +108,8 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 .chiprow .chip{flex:1;min-width:0;margin:0}
 .cama{flex:none;display:flex;align-items:center;gap:5px;max-width:42%;min-height:42px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:700;font-size:.82rem;cursor:pointer}
 .cama span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mas-vid{display:flex;align-items:center;gap:8px;min-height:44px;margin:10px 0 0;padding:0 14px;border:1px solid var(--line);border-radius:12px;color:var(--accent);font-weight:600;text-decoration:none}
+.bkp{border-top:1px solid var(--line);margin-top:12px;padding-top:6px}.bkp-b{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.bkp-b .add{margin:0}
 .vacb{color:var(--muted)}.vacOp{width:100%;text-align:left;cursor:pointer}.vacOp span{display:flex;flex-direction:column;gap:2px}.vacOp small{color:var(--muted);font-size:.78rem;font-weight:400}#vacAll b{color:#b3261e}
 @media (max-width:420px){.vacb span{display:none}.vacb{padding:0 12px}}
 .camas .row{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 12px;min-height:56px}
@@ -239,9 +241,14 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 <div class="mas" id="camas" hidden role="dialog" aria-label="Pacientes">
   <div class="mas-in camas">
     <div class="mas-h"><h2>Pacientes</h2><button type="button" class="ib" id="camX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-    <p class="mas-p">Cada paciente guarda sus propios datos: peso, EG, balance, EHI, escalas y crecimiento. Tocá uno para pasar a él.</p>
+    <p class="mas-p">Cada paciente guarda sus propios datos: peso, EG, balance, EHI, escalas, crecimiento y lo que escribiste en cada calculadora. Tocá uno para pasar a él.</p>
     <div id="camL" style="display:flex;flex-direction:column;gap:8px"></div>
     <button type="button" class="add" id="camAdd">+ Agregar paciente</button>
+    <div class="bkp">
+      <p class="mas-p" style="margin:6px 0 0"><b>Respaldo.</b> Todo se guarda solo en este equipo. Exportá un archivo para no perder los pacientes si reinstalás la app o cambiás de teléfono.</p>
+      <div class="bkp-b"><button type="button" class="add" id="bkExp">Exportar respaldo</button><button type="button" class="add" id="bkImp">Importar respaldo</button></div>
+      <input type="file" id="bkFile" accept=".json,application/json" hidden>
+    </div>
   </div>
 </div>
 <div class="mas" id="vacM" hidden role="dialog" aria-label="Vaciar datos">
@@ -269,6 +276,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <button type="button" class="add" id="resAll" style="margin-top:8px">Resumen completo del paciente</button>
     <div class="opt-r"><span>Tema</span><div class="segm" id="thSeg"><button type="button" data-t="auto">Automático</button><button type="button" data-t="light">Claro</button><button type="button" data-t="dark">Oscuro</button></div></div>
     <label class="opt-r"><span>Letra más grande</span><input type="checkbox" id="bigTx"></label>
+    <a class="mas-vid" href="instructivo.html" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Ver el video instructivo</a>
     <div class="mas-f"><span>Versión instalada: <b id="masV">—</b></span><button type="button" id="masUp">Buscar actualización</button></div>
   </div>
 </div>
@@ -406,24 +414,25 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Varios pacientes (camas) ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const PK=/^(pac|vafo|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap)$/;
+  const PK=/^(pac|vafo|balance|balLog|ehi_.*|wat1Log|finneganLog|crec_sex|crec_hist|bili_pre|xa_lo|atb_ren|np_presc|nbs|php|en_cap|frm_.*|nut_mod|par_tipo|np_pk|np_modo|np_sub|neo_mod)$/;
   const get=()=>{try{return JSON.parse(localStorage.getItem("camas")||"null")}catch(e){return null}};
   const put=c=>{try{localStorage.setItem("camas",JSON.stringify(c))}catch(e){toast("No hay espacio para guardar más pacientes")}};
   let C=get();
   if(!C||!Array.isArray(C.l)||!C.l.length){C={a:"c1",n:2,l:[{id:"c1",nom:"Paciente 1",snap:null}]};put(C)}
+  const flushFrames=lock=>{document.querySelectorAll(".views iframe").forEach(f=>{try{const w=f.contentWindow;if(w&&w.CalcNeo&&w.CalcNeo.frmFlush)w.CalcNeo.frmFlush(lock)}catch(e){}})};
   const snapNow=()=>{const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(PK.test(k))o[k]=localStorage.getItem(k)}return o};
   const clearNow=()=>{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(PK.test(k))ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))};
   const cur=()=>C.l.find(x=>x.id===C.a)||C.l[0];
   function resumen(snap){try{const p=JSON.parse((snap||{}).pac||"{}");const a=[];if(p.kg)a.push(Math.round(p.kg*1000)+" g");if(p.eg)a.push(String(p.eg).replace(".",",")+" sem");let d=p.dias;if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(h>=0)d=h/24}if(d!=null&&isFinite(d))a.push(Math.floor(d)+" días");return a.join(" · ")||"Sin datos cargados"}catch(e){return ""}}
   function paintName(){$("pCamaN").textContent=cur().nom}
   function reloadViews(){document.querySelectorAll(".views iframe[src]").forEach(f=>{f.setAttribute("src",f.dataset.src)});const P=window.CalcPac;if(P)P.paint(P.read());if(window.paciSum)window.paciSum()}
-  function go(id){if(id===C.a){close();return}const c=cur();c.snap=snapNow();clearNow();const t=C.l.find(x=>x.id===id);if(t&&t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){}
+  function go(id){if(id===C.a){close();return}flushFrames(true);const c=cur();c.snap=snapNow();clearNow();const t=C.l.find(x=>x.id===id);if(t&&t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){}
     C.a=id;put(C);paintName();reloadViews();close();toast("Paciente: "+cur().nom)}
-  function list(){const live=snapNow();$("camL").innerHTML=C.l.map(x=>`<div class="row" aria-current="${x.id===C.a}"><button type="button" class="go" data-g="${x.id}"><b>${x.nom.replace(/</g,"&lt;")}</b><small>${resumen(x.id===C.a?live:x.snap)}</small></button><button type="button" class="sm" data-r="${x.id}">Nombre</button>${C.l.length>1?`<button type="button" class="sm" data-d="${x.id}" aria-label="Borrar ${x.nom.replace(/"/g,"")}">Borrar</button>`:""}</div>`).join("");
+  function list(){flushFrames(false);const live=snapNow();$("camL").innerHTML=C.l.map(x=>`<div class="row" aria-current="${x.id===C.a}"><button type="button" class="go" data-g="${x.id}"><b>${x.nom.replace(/</g,"&lt;")}</b><small>${resumen(x.id===C.a?live:x.snap)}</small></button><button type="button" class="sm" data-r="${x.id}">Nombre</button>${C.l.length>1?`<button type="button" class="sm" data-d="${x.id}" aria-label="Borrar ${x.nom.replace(/"/g,"")}">Borrar</button>`:""}</div>`).join("");
     $("camL").querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>go(b.dataset.g));
     $("camL").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const x=C.l.find(y=>y.id===b.dataset.r);const n=prompt("Nombre o cama (ej.: Cama 3 · RN Pérez)",x.nom);if(n&&n.trim()){x.nom=n.trim().slice(0,40);put(C);paintName();list()}});
     $("camL").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const x=C.l.find(y=>y.id===b.dataset.d);if(!confirm(`¿Borrar ${x.nom} y todos sus datos?`))return;
-      if(x.id===C.a){clearNow();C.l=C.l.filter(y=>y.id!==x.id);C.a=C.l[0].id;const t=C.l[0];if(t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){};put(C);paintName();reloadViews()}else{C.l=C.l.filter(y=>y.id!==x.id);put(C)}list()})}
+      if(x.id===C.a){flushFrames(true);clearNow();C.l=C.l.filter(y=>y.id!==x.id);C.a=C.l[0].id;const t=C.l[0];if(t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){};put(C);paintName();reloadViews()}else{C.l=C.l.filter(y=>y.id!==x.id);put(C)}list()})}
   function open(){list();$("camas").hidden=false}
   function close(){$("camas").hidden=true}
   $("pCama").onclick=open;$("camX").onclick=close;$("camas").addEventListener("click",e=>{if(e.target.id==="camas")close()});
@@ -433,11 +442,33 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
   function vacClose(){$("vacM").hidden=true}
   $("pVac").onclick=()=>{$("vacM").hidden=false};$("vacX").onclick=vacClose;$("vacM").addEventListener("click",e=>{if(e.target.id==="vacM")vacClose()});
   function undoToast(msg,snap){toast(msg);const e=document.getElementById("toast");const b=document.createElement("button");b.type="button";b.textContent="Deshacer";b.className="tUndo";
-    b.onclick=()=>{clearNow();for(const k in snap)try{localStorage.setItem(k,snap[k])}catch(_){}reloadViews();e.hidden=true;toast("Datos restaurados")};e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)}
+    b.onclick=()=>{flushFrames(true);clearNow();for(const k in snap)try{localStorage.setItem(k,snap[k])}catch(_){}reloadViews();e.hidden=true;toast("Datos restaurados")};e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)}
   $("vacPac").onclick=()=>{const old=localStorage.getItem("pac");vacClose();document.getElementById("gClr").click();
     toast("Peso, EG y días borrados");const e=document.getElementById("toast");const b=document.createElement("button");b.type="button";b.textContent="Deshacer";b.className="tUndo";
     b.onclick=()=>{try{if(old)localStorage.setItem("pac",old)}catch(_){}reloadViews();e.hidden=true};e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)};
-  $("vacAll").onclick=()=>{const snap=snapNow();vacClose();clearNow();reloadViews();undoToast("Se vaciaron todos los datos de "+cur().nom+".",snap)};
+  // Respaldo: exportar e importar todas las camas
+  $("bkExp").onclick=async()=>{flushFrames(false);const c=cur();c.snap=snapNow();put(C);
+    const data={app:"calculadora-neonatal",formato:1,fecha:new Date().toISOString(),camas:C};
+    const txt=JSON.stringify(data),d=new Date(),pad=n=>String(n).padStart(2,"0");
+    const name=`respaldo-calculadora-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
+    const blob=new Blob([txt],{type:"application/json"});
+    try{const file=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Respaldo Calculadora Neonatal"});toast("Respaldo listo");return}}catch(e){if(e&&e.name==="AbortError")return}
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast("Respaldo descargado: "+C.l.length+" paciente"+(C.l.length>1?"s":""))};
+  $("bkImp").onclick=()=>{$("bkFile").value="";$("bkFile").click()};
+  $("bkFile").onchange=async()=>{const f=$("bkFile").files[0];if(!f)return;let d;try{d=JSON.parse(await f.text())}catch(e){toast("El archivo no es un respaldo válido");return}
+    const cc=d&&d.camas;if(!d||d.app!=="calculadora-neonatal"||!cc||!Array.isArray(cc.l)||!cc.l.length){toast("El archivo no es un respaldo de la calculadora");return}
+    const fe=d.fecha?new Date(d.fecha).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"}):"";
+    if(!confirm(`¿Reemplazar los pacientes de este equipo por los ${cc.l.length} del respaldo${fe?" del "+fe:""}?\nLo que tenés ahora se pierde (podés exportarlo antes).`))return;
+    const old={C:JSON.parse(JSON.stringify(C)),live:snapNow()};
+    flushFrames(true);clearNow();C=cc;if(!C.l.find(x=>x.id===C.a))C.a=C.l[0].id;
+    const ns=C.l.map(x=>+String(x.id).replace(/\D/g,"")||0);C.n=Math.max(C.n||0,...ns)+1;
+    const t=cur();if(t.snap)for(const k in t.snap)if(PK.test(k))try{localStorage.setItem(k,t.snap[k])}catch(e){}
+    put(C);paintName();reloadViews();list();
+    toast("Respaldo importado: "+C.l.length+" paciente"+(C.l.length>1?"s":""));
+    const e=document.getElementById("toast");const b=document.createElement("button");b.type="button";b.textContent="Deshacer";b.className="tUndo";
+    b.onclick=()=>{flushFrames(true);clearNow();C=old.C;for(const k in old.live)try{localStorage.setItem(k,old.live[k])}catch(_){}put(C);paintName();reloadViews();list();e.hidden=true};
+    e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)};
+  $("vacAll").onclick=()=>{flushFrames(true);const snap=snapNow();vacClose();clearNow();reloadViews();undoToast("Se vaciaron todos los datos de "+cur().nom+".",snap)};
 })();
 
 /* ---- Tema y tamaño de letra ---- */
@@ -528,7 +559,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 window.appVersion=async()=>{try{const k=(await caches.keys()).map(x=>/^calc-neonatal-v(\d+)$/.exec(x)).filter(Boolean).map(m=>+m[1]);return k.length?"v"+Math.max(...k):"—"}catch(e){return "—"}};
 function toast(t){const e=document.getElementById("toast");e.textContent=t;e.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,4000)}
 if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let reloaded=false;
-  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!reloaded){reloaded=true;try{sessionStorage.setItem("upd","1")}catch(e){}location.reload();}});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!reloaded){reloaded=true;try{sessionStorage.setItem("upd","1")}catch(e){}document.querySelectorAll(".views iframe").forEach(f=>{try{f.contentWindow.CalcNeo.frmFlush(true)}catch(e){}});location.reload();}});
   window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(!document.hidden)r.update().catch(()=>{})})}).catch(()=>{})});
   try{if(sessionStorage.getItem("upd")){sessionStorage.removeItem("upd");window.addEventListener("load",async()=>toast("Calculadora actualizada a "+await window.appVersion()))}}catch(e){}}
 </script>

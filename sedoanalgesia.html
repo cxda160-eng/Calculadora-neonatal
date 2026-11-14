@@ -114,8 +114,8 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 <!-- Paciente (compartido) -->
 <div class="card">
   <div class="row">
-    <div><label>Peso (g)</label><input id="peso" type="text" inputmode="numeric" autocomplete="off" value="1000"></div>
-    <div><label>Edad gestacional (semanas)</label><input id="eg" type="number" step="1" min="22" max="44" value="30"></div>
+    <div><label for="peso">Peso (g)</label><input id="peso" type="text" inputmode="numeric" autocomplete="off" value="1000"></div>
+    <div><label for="eg">Edad gestacional (semanas)</label><input id="eg" type="number" step="1" min="22" max="44" value="30"></div>
   </div>
   <div class="small" id="egTxt" style="margin-top:6px"></div>
 </div>
@@ -124,7 +124,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 <section id="calc" class="on">
   <div class="card">
     <h2>Calcular dosis</h2>
-    <label>Fármaco</label>
+    <label for="drug">Fármaco</label>
     <select id="drug"></select>
     <label>Vía / modalidad</label>
     <div class="seg" id="modes"></div>
@@ -415,7 +415,7 @@ function renderCalcBody(reset){
   const [lo,hi]=m.range();
   const unit = m.u+'/kg/'+(m.prep?'h':'dosis');
   const prevDose = reset ? m.def() : num('dose');
-  let html = `<label>Dosis (${unit}) <span class="pill">protocolo: ${lo===hi?lo:lo+' – '+hi}</span></label>
+  let html = `<label for="dose">Dosis (${unit}) <span class="pill">protocolo: ${lo===hi?lo:lo+' – '+hi}</span></label>
     <input id="dose" type="number" step="${m.u==='mg'?0.005:0.1}" value="${prevDose}">`;
   if(m.prep){
     html += `<label>Jeringa (mL)</label><div class="seg" id="syr"><button data-v="12">12</button><button data-v="24" class="on">24</button><button data-v="48">48</button></div>
@@ -839,6 +839,6 @@ $('eg').addEventListener('input',refreshAll);
 
 fillDrugs(); fillProcs(); renderDil(); egInfo(); renderModes(); updOpLbl(); renderNP(); renderFN(); renderFNLog(); renderWAT(); renderWATLog(); refreshAll();
 </script>
-<script src="paciente.js?v=v86"></script>
+<script src="paciente.js?v=v91"></script>
 </body>
 </html>

@@ -224,7 +224,7 @@
     if (/^(fuentes|neofax|index)$/.test(page)) return;
     var pacSel = (FIELDS[page] || []).map(function (f) { return f[0]; });
     var st = document.createElement("style");
-    st.textContent = ".vacBtn{float:right;margin:-4px 0 0 8px;border:1px solid currentColor;background:transparent;color:inherit;opacity:.75;border-radius:999px;padding:3px 10px;font:600 .72rem/1.4 inherit;font-family:inherit;letter-spacing:.02em;text-transform:none;cursor:pointer;min-height:28px}.vacBtn:hover{opacity:1}" +
+    st.textContent = ".vacBtn{float:right;margin:-4px 0 0 8px;border:1px solid currentColor;background:transparent;color:inherit;opacity:.75;border-radius:999px;padding:3px 10px;font:600 .72rem/1.4 inherit;font-family:inherit;letter-spacing:.02em;text-transform:none;cursor:pointer;min-height:34px;min-width:64px}.vacBtn:hover{opacity:1}input[type=checkbox],input[type=radio]{min-width:20px;min-height:20px}" +
       ".vacToast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#2d3142;color:#fff;border-radius:12px;padding:10px 14px;font:500 .9rem/1.3 system-ui,sans-serif;display:flex;gap:14px;align-items:center;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.25)}.vacToast button{background:none;border:0;color:#ffd27a;font:700 .9rem system-ui,sans-serif;cursor:pointer;padding:4px}";
     document.head.appendChild(st);
     var OK = /^(text|number|search|tel|date|time|datetime-local|)$/;
@@ -260,8 +260,85 @@
       h.appendChild(b);
     });
   }
+
+  /* Guardar lo escrito en cada calculadora por paciente (clave frm_<página>, se guarda con la cama) */
+  var FRM_SKIP_PAGES = /^(fuentes|neofax|index|ehi)$/;
+  var FRM_SEG_SKIP = { sView: 1, "sm-hv": 1, lgMode: 1, thSeg: 1 };
+  var frmBusy = false, frmLocked = false, frmT = null;
+  function frmOkEl(el, pacSel) {
+    if (!el.id || el.disabled || el.readOnly) return false;
+    if (el.tagName === "INPUT" && /^(hidden|file|password|button|submit|reset|image)$/.test(el.type)) return false;
+    if (el.closest("[data-global],[data-nofrm]") || el.classList.contains("us")) return false;
+    if (page === "nutricion" && /^cs[A-Z]/.test(el.id)) return false;
+    return !pacSel.some(function (sel) { try { return el.matches(sel); } catch (e) { return false; } });
+  }
+  function frmSegs() {
+    return [].filter.call(document.querySelectorAll(".seg[id],.seg2[id],.modsel[id],[role=group][id],[role=tablist][id]"), function (c) {
+      return !FRM_SEG_SKIP[c.id] && !c.closest("[data-global],[data-nofrm]") && c.querySelector(":scope > button");
+    });
+  }
+  function segKey(b, i) { return b.dataset.v || b.dataset.h || b.dataset.m || b.id || ("#" + i); }
+  function segPressed(c) {
+    var bs = [].slice.call(c.querySelectorAll(":scope > button"));
+    for (var i = 0; i < bs.length; i++) if (bs[i].getAttribute("aria-pressed") === "true" || bs[i].classList.contains("on")) return segKey(bs[i], i);
+    return null;
+  }
+  function frmSave() {
+    if (frmBusy || frmLocked) return;
+    var pacSel = (FIELDS[page] || []).map(function (f) { return f[0]; });
+    var o = { v: {}, s: {} };
+    document.querySelectorAll("input[id],select[id],textarea[id]").forEach(function (el) {
+      if (!frmOkEl(el, pacSel)) return;
+      o.v[el.id] = (el.type === "checkbox" || el.type === "radio") ? (el.checked ? 1 : 0) : el.value;
+    });
+    frmSegs().forEach(function (c) { var k = segPressed(c); if (k != null) o.s[c.id] = k; });
+    try { localStorage.setItem("frm_" + page, JSON.stringify(o)); } catch (e) {}
+  }
+  function frmRestore() {
+    var o = null; try { o = JSON.parse(localStorage.getItem("frm_" + page) || "null"); } catch (e) {}
+    if (!o) return;
+    frmBusy = true;
+    try {
+      var pacSel = (FIELDS[page] || []).map(function (f) { return f[0]; });
+      // 1) botones de opción (modo, pestañas internas)
+      frmSegs().forEach(function (c) {
+        var want = o.s && o.s[c.id]; if (want == null || segPressed(c) === want) return;
+        var bs = [].slice.call(c.querySelectorAll(":scope > button"));
+        for (var i = 0; i < bs.length; i++) if (segKey(bs[i], i) === want && !bs[i].hidden && !bs[i].disabled) { bs[i].click(); break; }
+      });
+      var fire = function (el) { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); };
+      // 2) listas desplegables (pueden reconstruir la tarjeta) y 3) casillas y campos
+      ["SELECT", "OTHER"].forEach(function (pass) {
+        Object.keys(o.v || {}).forEach(function (id) {
+          var el = document.getElementById(id); if (!el || !frmOkEl(el, pacSel)) return;
+          if ((el.tagName === "SELECT") !== (pass === "SELECT")) return;
+          var val = o.v[id];
+          if (el.type === "checkbox" || el.type === "radio") { if (!!el.checked !== !!val) { el.checked = !!val; fire(el); } }
+          else if (el.value !== val) {
+            if (el.tagName === "SELECT" && ![].some.call(el.options, function (op) { return op.value === val; })) return;
+            el.value = val; fire(el);
+          }
+        });
+      });
+    } catch (e) {}
+    frmBusy = false;
+    frmSave();
+  }
+  function frmInit() {
+    if (FRM_SKIP_PAGES.test(page)) return;
+    var later = function () { clearTimeout(frmT); frmT = setTimeout(frmSave, 120); };
+    window.CalcNeo = window.CalcNeo || {};
+    // La app llama a esto antes de cambiar de paciente: guarda ya y no vuelve a escribir hasta recargar
+    window.CalcNeo.frmFlush = function (lock) { clearTimeout(frmT); frmSave(); if (lock) frmLocked = true; };
+    document.addEventListener("input", later, true);
+    document.addEventListener("change", later, true);
+    document.addEventListener("click", function () { setTimeout(frmSave, 60); }, true);
+    window.addEventListener("pagehide", frmSave);
+    document.addEventListener("visibilitychange", function () { if (document.hidden) frmSave(); });
+    setTimeout(frmRestore, 80);
+  }
   window.CalcNeo = window.CalcNeo || {};
-  function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); try { addVac(); } catch (e) {} }
+  function init() { hook(); apply(read()); lockFields(); if (!EMB) addCopyButton(); try { addVac(); } catch (e) {} try { frmInit(); } catch (e) {} }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
   else setTimeout(init, 0);
 })();

@@ -4,6 +4,8 @@
 const {chromium}=require('playwright');
 const BASE=process.env.BASE||'http://localhost:8765/';
 const pac=(kg,eg,dias)=>JSON.stringify({kg,eg,dias});
+// Paciente + otros datos ya guardados (simula a quien viene usando versiones anteriores)
+const pacLS=(kg,eg,dias,ls)=>JSON.stringify({__pac:{kg,eg,dias},__ls:ls});
 const has=(t,s)=>t.replace(/\s+/g,' ').includes(s);
 const CASOS=[
  ['Infusiones · adrenalina 0,1 mcg/kg/min, 1500 g, 1 mL/h → 9 mcg/mL','infusiones.html',pac(1.5),async f=>{await f.selectOption('#drugSel','adrenalina');return f.$eval('#pump',e=>e.innerText)},t=>has(t,'Conc. 9 mcg/mL')],
@@ -52,9 +54,17 @@ const CASOS=[
   ['Balance · horas libres: 4 h, diuresis 20 mL en 1500 g → ritmo 3,33 mL/kg/h','balance.html',pac(1.5,32,5),async f=>{await f.click('#hs [data-h="otra"]');await f.fill('#hOtra','4');await f.fill('#e_diu','20');await f.waitForTimeout(100);return await f.textContent('#vD')+' | '+await f.textContent('#uI')},t=>has(t,'3,33')&&has(t,'en 4 h')],
   ['Cardio · eje con botón ±: DI 6 → −6, aVF 8 → eje ≈ 127°','cardio.html',pac(3,39,10),async f=>{await f.click('#sView [data-v="ecg"]');await f.fill('#eI','6');await f.fill('#eF','8');await f.click('.pmb[data-for="eI"]');await f.waitForTimeout(100);return await f.inputValue('#eI')+' | '+await f.textContent('#rEje')},t=>t.startsWith('-6')&&has(t,'127')],
   ['Cardio · Eco: ventana supraesternal del cayado con sus 3 vasos','cardio.html',pac(3,39,5),async f=>{await f.click('#sView [data-v="eco"]');await f.waitForTimeout(200);return await f.textContent('#eVW')},t=>has(t,'Supraesternal eje largo')&&has(t,'tronco braquiocefálico')&&has(t,'subclavia izquierda')&&has(t,'cangrejo')],
+  // Estados guardados de versiones anteriores: cada pestaña tiene que abrir y calcular sin errores
+  ['Estado guardado · Nutrición abierta en Indicar por kg/día (usuario de Prescribir NP)','nutricion.html',pacLS(1.5,32,5,{nut_mod:'pr',np_modo:'man',np_sub:'kg',np_pk:'1',php:'{"phV":"80","gm":"pc"}',en_cap:'{"on":true,"caPrep":"9.3","phPrep":"31|2"}'}),async f=>{for(const [k,v] of [['prL','120'],['prG','6'],['prA','3']])await f.fill('#'+k,v);await f.waitForTimeout(150);return await f.textContent('#prTiles')},t=>has(t,'Glucosa final')&&!has(t,'— %')],
+  ['Estado guardado · Nutrición abierta en Totales con hidratación y suplementos','nutricion.html',pacLS(1.5,32,5,{nut_mod:'tot',par_tipo:'ph',php:'{"phV":"100","phG":"5"}',en_cap:'{"on":true,"v":2,"caVal":"40","phVal":"20"}'}),async f=>{await f.waitForTimeout(200);return await f.textContent('#totTab')},t=>has(t,'Líquidos')&&/Líquidos.*?100/.test(t.replace(/\s+/g,''))],
+  ['Estado guardado · Balance con horas libres guardadas (4,5 h)','balance.html',pacLS(1.5,32,5,{balance:'{"H":4.5}'}),async f=>{await f.fill('#e_diu','15');await f.waitForTimeout(100);return await f.inputValue('#hOtra')+' | '+await f.textContent('#vD')},t=>has(t,'4,5')&&has(t,'2,22')],
+  ['Estado guardado · Cardio con datos de calculadoras guardados se restaura','cardio.html',pacLS(1.5,30,28,{frm_cardio:'{"v":{"taS":"92","taD":"58"},"s":{}}'}),async f=>{await f.waitForTimeout(300);return await f.inputValue('#taS')+' | '+await f.textContent('#rTA')},t=>has(t,'92 |')&&has(t,'Estadio 1')],
+  ['Estado guardado · Infusiones restaura fármaco y velocidad del paciente','infusiones.html',pacLS(1.5,30,5,{frm_infusiones:'{"v":{"drugSel":"dopamina","rate":"0,8"},"s":{}}'}),async f=>{await f.waitForTimeout(300);return await f.inputValue('#drugSel')+' | '+await f.inputValue('#rate')},t=>has(t,'dopamina | 0,8')],
+  ...['infusiones','electrolitos','sedoanalgesia','insulina','laboratorio','antimicrobianos','neo','crecimiento','ehi','neofax','balance','cardio','nutricion','fuentes'].map(pg=>['Estado guardado · '+pg+' abre sin errores con datos viejos y basura en localStorage',pg+'.html',pacLS(1.2,30,8,{frm_cardio:'{malo',frm_nutricion:'null',frm_infusiones:'{"v":{"noexiste":"1"}}',php:'{malo',en_cap:'x',balance:'{"H":"x"}',lab_units:'{"ca":9}',crec_hist:'{malo',balLog:'{malo'}),async f=>{await f.waitForTimeout(300);return 'ok'},t=>t==='ok']),
 ];
 (async()=>{const b=await chromium.launch();let ok=0,bad=0;
- for(const [n,url,p,run,check] of CASOS){const ctx=await b.newContext();await ctx.addInitScript(p=>{try{if(!sessionStorage.getItem('t')){localStorage.clear();localStorage.setItem('pac',p);sessionStorage.setItem('t','1')}}catch(e){}},p);
-  const pg=await ctx.newPage();let t='';try{await pg.goto(BASE+url);await pg.waitForTimeout(600);t=await run(pg)}catch(e){t='ERROR '+e.message}
-  const pass=(()=>{try{return check(t)}catch(e){return false}})();pass?ok++:bad++;console.log((pass?'✔ ':'✘ ')+n+(pass?'':'\n    obtenido: '+String(t).replace(/\s+/g,' ').slice(0,200)));await ctx.close()}
+ for(const [n,url,p,run,check] of CASOS){const ctx=await b.newContext();await ctx.addInitScript(p=>{try{if(!sessionStorage.getItem('t')){localStorage.clear();let o=null;try{o=JSON.parse(p)}catch(e){}if(o&&o.__pac){localStorage.setItem('pac',JSON.stringify(o.__pac));for(const k in o.__ls)localStorage.setItem(k,o.__ls[k])}else localStorage.setItem('pac',p);sessionStorage.setItem('t','1')}}catch(e){}},p);
+  const pg=await ctx.newPage();const perr=[];pg.on('pageerror',e=>perr.push(e.message));let t='';try{await pg.goto(BASE+url);await pg.waitForTimeout(600);t=await run(pg)}catch(e){t='ERROR '+e.message}
+  if(perr.length)t='ERROR DE PÁGINA: '+perr.join(' | ')+' · '+t;
+  const pass=!perr.length&&(()=>{try{return check(t)}catch(e){return false}})();pass?ok++:bad++;console.log((pass?'✔ ':'✘ ')+n+(pass?'':'\n    obtenido: '+String(t).replace(/\s+/g,' ').slice(0,200)));await ctx.close()}
  console.log(`\n${ok} correctas, ${bad} con error`);await b.close();process.exit(bad?1:0)})();

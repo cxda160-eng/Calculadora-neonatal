@@ -105,6 +105,7 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
 .labt .its label{flex-direction:row;align-items:center;gap:5px;font-size:.8rem;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:4px 9px;background:var(--surface);cursor:pointer}
 .labt .its input{width:auto;margin:0;accent-color:var(--accent)}
 .labt .its label.ok{background:var(--mint);color:var(--mint-fg);border-color:transparent}
+input[type=checkbox],input[type=radio]{width:22px;height:22px;flex:none}
 </style>
 </head>
 <body>
@@ -131,7 +132,7 @@ th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mut
     <div class="grid">
       <label>Apgar al 5′<input id="apgar" inputmode="numeric" placeholder="4"></label>
       <label>pH (cordón o 1.ª hora)<input id="ph" inputmode="decimal" placeholder="6,95"></label>
-      <label>EB (mmol/L)<span class="pm"><button type="button" id="ebSign" aria-label="Cambiar el signo del EB">±</button><input id="eb" inputmode="decimal" placeholder="-14"></span></label>
+      <label>EB (mmol/L)<span class="pm"><button type="button" id="ebSign" aria-label="Cambiar el signo del EB">±</button><input id="eb" inputmode="decimal" placeholder="-14" aria-label="EB en mmol/L"></span></label>
       <label>Ácido láctico (mmol/L)<input id="lac" inputmode="decimal" placeholder="10"></label>
     </div>
     <label class="chk" id="vppL"><input type="checkbox" id="vpp"><span>Necesidad de soporte ventilatorio durante 10 minutos o más</span></label>
