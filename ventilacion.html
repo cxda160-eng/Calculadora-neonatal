@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventilación convencional neonatal</title>
+<meta name="theme-color" content="#2a7fb8">
+<style>
+:root{
+  --bg:#f6f4fb; --card:#ffffff; --ink:#2b2840; --muted:#6d6a85; --line:#e6e2f2;
+  --lav:#b9a7f2; --lav-d:#2a7fb8; --mint:#bdeedc; --mint-d:#1d8a63;
+  --peach:#ffd6c2; --peach-d:#c2532a; --sky:#c6e3ff; --sky-d:#2a6fb8;
+  --yel:#fff1b8; --yel-d:#8a6d00; --rose:#ffd0dc; --rose-d:#b5244d;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{background:linear-gradient(135deg,#cfc2ff,#c6e3ff);padding:14px 16px 10px}
+header h1{margin:0;font-size:20px}
+header p{margin:2px 0 0;color:#4a4566;font-size:13px}
+nav{display:flex;gap:6px;padding:10px 12px;position:sticky;top:0;background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+nav button{flex:1;border:0;border-radius:999px;padding:9px 6px;font-weight:600;background:#ebe6fa;color:var(--lav-d);font-size:14px}
+nav button.on{background:var(--lav-d);color:#fff}
+main{max-width:720px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(60,40,120,.08)}
+.card h2{margin:0 0 10px;font-size:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+label{display:block;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px}
+input,select{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;background:#fcfbff;color:var(--ink)}
+input:focus,select:focus{outline:none;border-color:var(--lav)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{border-radius:14px;padding:10px 12px}
+.kpi .t{font-size:12px;font-weight:600;opacity:.85}
+.kpi .v{font-size:24px;font-weight:700;margin-top:2px}
+.kpi .u{font-size:12px;font-weight:500}
+.kpi .s{font-size:12px;margin-top:2px}
+.lav{background:#ece6ff;color:#3d2c96}.mint{background:var(--mint);color:#0f5a3f}
+.sky{background:var(--sky);color:#174c85}.peach{background:var(--peach);color:#7c3214}
+.yel{background:var(--yel);color:#5e4a00}.rose{background:var(--rose);color:#7d1534}
+.bar{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,#ffd0dc 0 37.5%,#bdeedc 37.5% 75%,#fff1b8 75% 100%);margin:8px 0 2px}
+.bar i{position:absolute;top:-4px;width:4px;height:20px;background:var(--ink);border-radius:2px;transform:translateX(-2px)}
+.barlbl{position:relative;height:14px;font-size:11px;color:var(--muted)}.barlbl span{position:absolute;transform:translateX(-50%)}.barlbl span:first-child{transform:none}.barlbl span:last-child{transform:translateX(-100%)}
+.sug{border-left:4px solid var(--lav-d);background:#f4f1ff;border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px;line-height:1.45}
+.sug.warn{border-color:var(--peach-d);background:#fff3ec}
+.sug.ok{border-color:var(--mint-d);background:#eefaf4}
+.sug.alert{border-color:var(--rose-d);background:#fff0f4}
+.sug b{display:block;margin-bottom:2px}
+.muted{color:var(--muted);font-size:12px}
+.note{font-size:12px;color:var(--muted);line-height:1.4;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#f4f1ff;font-size:12px;color:var(--lav-d)}
+ul{margin:6px 0;padding-left:20px;line-height:1.5}
+.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:700;background:var(--lav-d);color:#fff;font-size:15px;width:100%}
+.btn.sec{background:#ebe6fa;color:var(--lav-d)}
+input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--lav-d);height:30px}
+.rowv{display:flex;justify-content:space-between;align-items:baseline}
+.rowv b{font-size:18px}
+.big{font-size:40px;font-weight:800;text-align:center;margin:6px 0}
+.hide{display:none}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+.chk label{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);font-weight:500;padding:7px 0;border-bottom:1px solid var(--line)}
+.chk input{width:20px;height:20px;flex:none;margin-top:1px}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#17141f; --card:#211d2c; --ink:#ece8f7; --muted:#a9a3c2; --line:#352f47;
+  --lav:#8f7ae0; --lav-d:#c9b6ff; --mint-d:#8fe0bf; --peach-d:#ffb08c; --rose-d:#ff9fb7; color-scheme:dark}
+  header{background:linear-gradient(135deg,#2e2650,#1f3550)!important}header p{color:#c9c3e3!important}
+  nav button{background:#2c2640!important;color:#c9b6ff!important}nav button.on{background:#c9b6ff!important;color:#17141f!important}
+  input,select{background:#1b1825!important}
+  .lav{background:#2e2752;color:#d8ccff}.mint{background:#183a2e;color:#a9f0d2}.sky{background:#1c3047;color:#b9dcff}
+  .peach{background:#3d2a20;color:#ffd0b8}.yel{background:#3a3218;color:#ffe9a0}.rose{background:#432230;color:#ffc6d4}
+  .sug{background:#28223a}.sug.warn{background:#3a2a22}.sug.ok{background:#1b3329}.sug.alert{background:#3d2029}
+  th{background:#2a2440!important}.btn{color:#17141f}.btn.sec{background:#2c2640;color:#c9b6ff}
+  .bar i{background:#fff}
+}
+@media(max-width:420px){.grid3{grid-template-columns:1fr 1fr}}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.seg button{border:0;border-radius:999px;padding:9px 12px;font-weight:600;background:#ebe6fa;color:var(--lav-d);font-size:13.5px;min-height:40px}
+.seg button[aria-pressed=true]{background:var(--lav-d);color:#fff}
+.mdesc{font-size:13.5px;line-height:1.45;background:#f4f1ff;border-radius:10px;padding:10px 12px;margin-top:4px}
+.fld.off{display:none}
+@media (prefers-color-scheme: dark){.seg button{background:#2c2640;color:#c9b6ff}.seg button[aria-pressed=true]{background:#c9b6ff;color:#17141f}.mdesc{background:#28223a}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Ventilación convencional</h1>
+  <p>CPAP · NIPPV · A/C (SIPPV) · SIMV · PSV · volumen garantizado</p>
+</header>
+<nav>
+  <button data-tab="calc" class="on">Calculadora</button>
+  <button data-tab="sim">Simulador</button>
+  <button data-tab="guia">Guía</button>
+</nav>
+<main>
+
+<!-- ============ CALCULADORA ============ -->
+<section id="calc">
+  <div class="card">
+    <h2>Paciente y respirador</h2>
+    <div class="grid">
+      <div><label for="peso">Peso (g)</label><input id="peso" type="text" inputmode="numeric" autocomplete="off" placeholder="g"></div>
+      <div><label for="modo">Modo</label>
+        <select id="modo">
+          <option value="acvg">A/C (SIPPV) + VG</option>
+          <option value="simvvg">SIMV + VG (+ PS)</option>
+          <option value="psvvg">PSV + VG</option>
+          <option value="ac">A/C (SIPPV) por presión</option>
+          <option value="simv">SIMV por presión (+ PS)</option>
+          <option value="ippv">IPPV / CMV (sin sincronizar)</option>
+          <option value="nippv">NIPPV (no invasiva)</option>
+          <option value="cpap">CPAP nasal</option>
+        </select></div>
+    </div>
+    <div class="mdesc" id="mdesc"></div>
+    <div class="grid" style="margin-top:10px">
+      <div class="fld" data-m="vg"><label for="vtset" id="vtsetL">VT objetivo (ml/kg)</label><input id="vtset" type="text" inputmode="decimal" autocomplete="off" value="5"></div>
+      <div class="fld" data-m="vt"><label for="vte">VTe medido (ml totales)</label><input id="vte" type="text" inputmode="decimal" autocomplete="off" placeholder="opcional"></div>
+      <div class="fld" data-m="pip"><label for="pip" id="pipL">PIP (cmH₂O)</label><input id="pip" type="text" inputmode="decimal" autocomplete="off" value="18"></div>
+      <div class="fld" data-m="vg"><label for="pmax">Pmax / límite de PIP</label><input id="pmax" type="text" inputmode="decimal" autocomplete="off" value="25"></div>
+      <div class="fld" data-m="peep"><label for="peep" id="peepL">PEEP (cmH₂O)</label><input id="peep" type="text" inputmode="decimal" autocomplete="off" value="5"></div>
+      <div class="fld" data-m="ti"><label for="ti">Ti (s)</label><input id="ti" type="text" inputmode="decimal" autocomplete="off" value="0,35"></div>
+      <div class="fld" data-m="fr"><label for="fr" id="frL">FR programada (rpm)</label><input id="fr" type="text" inputmode="decimal" autocomplete="off" value="40"></div>
+      <div class="fld" data-m="frt"><label for="frt">FR total del paciente (rpm)</label><input id="frt" type="text" inputmode="decimal" autocomplete="off" placeholder="opcional"></div>
+      <div class="fld" data-m="ps"><label for="ps">Presión de soporte sobre PEEP</label><input id="ps" type="text" inputmode="decimal" autocomplete="off" placeholder="opcional"></div>
+      <div class="fld" data-m="fuga"><label for="fuga">Fuga del tubo (%)</label><input id="fuga" type="text" inputmode="decimal" autocomplete="off" placeholder="opcional"></div>
+      <div><label for="fio2">FiO₂ (%)</label><input id="fio2" type="text" inputmode="decimal" autocomplete="off" value="30"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Gases y saturación</h2>
+    <div class="grid3">
+      <div><label for="ph">pH</label><input id="ph" type="text" inputmode="decimal" autocomplete="off" placeholder="7.25"></div>
+      <div><label for="pco2">pCO₂ (mmHg)</label><input id="pco2" type="text" inputmode="decimal" autocomplete="off" placeholder="55"></div>
+      <div><label for="pao2">PaO₂ (mmHg)</label><input id="pao2" type="text" inputmode="decimal" autocomplete="off" placeholder="arterial"></div>
+      <div><label for="spo2">SpO₂ (%)</label><input id="spo2" type="text" inputmode="decimal" autocomplete="off" placeholder="92"></div>
+      <div><label for="muestra">Muestra</label><select id="muestra"><option value="cap">Capilar / venosa</option><option value="art">Arterial</option></select></div>
+      <div><label for="meta">Meta pCO₂</label><select id="meta">
+        <option value="45-55" selected>45–55 (primeros días)</option><option value="50-60">50–60 (permisiva)</option><option value="55-65">55–65 (DBP establecida)</option><option value="40-50">40–50 (HTPP / término)</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Resultados</h2>
+    <div class="out">
+      <div class="kpi lav"><div class="t">MAP estimada</div><div class="v" id="o-map">–</div><div class="u" id="o-mapu">cmH₂O</div></div>
+      <div class="kpi sky"><div class="t">VT</div><div class="v" id="o-vt">–</div><div class="u" id="o-vtu">ml/kg</div></div>
+      <div class="kpi mint"><div class="t">Volumen minuto</div><div class="v" id="o-vm">–</div><div class="u" id="o-vmu">ml/kg/min</div></div>
+      <div class="kpi yel"><div class="t">Tiempos</div><div class="v" id="o-te">–</div><div class="u" id="o-ie">Te · I:E</div></div>
+      <div class="kpi rose"><div class="t">Presión de distensión</div><div class="v" id="o-dp">–</div><div class="u">PIP − PEEP (cmH₂O)</div></div>
+      <div class="kpi peach"><div class="t">Índice de oxigenación</div><div class="v" id="o-oi">–</div><div class="u" id="o-osi">MAP×FiO₂ / PaO₂</div></div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="muted" id="o-barL">VT · rango habitual 4–6 ml/kg (DBP 5–8)</div>
+      <div class="bar" style="background:linear-gradient(90deg,#ffd0dc 0 35%,#bdeedc 35% 75%,#fff1b8 75% 100%)"><i id="o-bar" style="left:0"></i></div>
+      <div class="barlbl"><span style="left:0">2</span><span style="left:35%">4</span><span style="left:75%">6</span><span style="left:100%">8+</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Sugerencias</h2>
+    <div id="sugs"><div class="muted">Cargá los parámetros y la pCO₂ para ver sugerencias.</div></div>
+    <p class="note">Orientativo: no reemplaza el juicio clínico ni el protocolo de la unidad. La MAP se estima con onda cuadrada (PEEP + (PIP − PEEP) × Ti/Ttot): el respirador la mide mejor. La estimación del VT necesario supone que la pCO₂ cambia en proporción inversa a la ventilación alveolar ((VT − espacio muerto) × FR), algo que solo se cumple en forma aproximada. Hacé cambios de a uno y controlá gases.</p>
+  </div>
+
+  <button class="btn sec" id="reset">Limpiar gases</button>
+</section>
+
+<!-- ============ SIMULADOR ============ -->
+<section id="sim" class="hide">
+  <div class="card">
+    <h2>¿Qué pasa si cambio…?</h2>
+    <p class="muted" style="margin-top:-4px">Partís de los valores de la Calculadora. Mové los controles para comparar.</p>
+    <div class="rowv"><span id="s-l1">VT objetivo</span><b id="s-v1">5 ml/kg</b></div>
+    <input type="range" id="s-1" min="3" max="8" step="0.1" value="5" aria-label="VT o PIP">
+    <div class="rowv"><span>FR</span><b id="s-v2">40 rpm</b></div>
+    <input type="range" id="s-2" min="15" max="80" step="1" value="40" aria-label="Frecuencia respiratoria">
+    <div class="rowv"><span>PEEP</span><b id="s-v3">5 cmH₂O</b></div>
+    <input type="range" id="s-3" min="3" max="10" step="0.5" value="5" aria-label="PEEP">
+    <div class="rowv"><span>Ti</span><b id="s-v4">0,35 s</b></div>
+    <input type="range" id="s-4" min="0.25" max="0.6" step="0.01" value="0.35" aria-label="Tiempo inspiratorio">
+    <div class="out" style="margin-top:10px">
+      <div class="kpi sky"><div class="t">pCO₂ estimada</div><div class="v" id="s-co2">–</div><div class="u" id="s-co2u">mmHg</div></div>
+      <div class="kpi lav"><div class="t">MAP estimada</div><div class="v" id="s-map">–</div><div class="u">cmH₂O</div></div>
+      <div class="kpi yel"><div class="t">Te</div><div class="v" id="s-te">–</div><div class="u" id="s-ie">s</div></div>
+      <div class="kpi mint"><div class="t">Volumen minuto</div><div class="v" id="s-vm">–</div><div class="u">ml/kg/min</div></div>
+    </div>
+    <div id="s-cmp" class="sug" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <h2>Mismo aumento, distinto efecto</h2>
+    <table id="s-tab"><thead><tr><th>Cambio</th><th>pCO₂ estimada</th><th>MAP</th></tr></thead><tbody></tbody></table>
+    <p class="note">El espacio muerto no ventila: subir el VT 1 ml/kg aumenta la ventilación alveolar más que subir la FR en la misma proporción. Subir la FR acorta el Te: con Te menor de ~0,3 s puede haber atrapamiento (PEEP inadvertida) y el CO₂ deja de bajar. La PEEP y el Ti suben la MAP (oxigenación) más que el CO₂.</p>
+  </div>
+</section>
+
+<!-- ============ GUÍA ============ -->
+<section id="guia" class="hide">
+  <div class="card">
+    <h2>Modos</h2>
+    <table>
+      <tr><th>Modo</th><th>Cómo funciona</th><th>Cuándo</th></tr>
+      <tr><td><b>CPAP</b></td><td>Presión continua; el bebé respira solo.</td><td>Primera línea en el prematuro que respira. Surfactante si FiO₂ &gt; 0,30 con CPAP ≥ 6.</td></tr>
+      <tr><td><b>NIPPV</b></td><td>CPAP + ciclos con PIP por interfase nasal (sincronizados si el equipo lo permite).</td><td>Apneas o falla de CPAP; después de extubar reduce la reintubación.</td></tr>
+      <tr><td><b>A/C (SIPPV)</b></td><td>Cada esfuerzo que el sensor detecta recibe un ciclo completo; FR de respaldo si hay apnea.</td><td>Fase aguda. El bebé fija la FR: para destetar se baja el VT o la PIP, no la FR.</td></tr>
+      <tr><td><b>SIMV</b></td><td>Solo la FR programada recibe ciclos sincronizados; las demás respiraciones son espontáneas (con PS si se agrega).</td><td>Destete. Sin PS, en prematuros chicos aumenta el trabajo respiratorio: agregar PS.</td></tr>
+      <tr><td><b>PSV</b></td><td>Asiste cada esfuerzo y termina el ciclo por flujo (el bebé fija el Ti).</td><td>Destete del bebé con buen impulso respiratorio; necesita FR de respaldo.</td></tr>
+      <tr><td><b>VG (volumen garantizado)</b></td><td>Se combina con A/C, SIMV o PSV: el equipo ajusta la PIP (hasta Pmax) para entregar el VT espirado programado.</td><td>Preferido en la ventilación invasiva del prematuro: menos muerte/DBP, neumotórax e hipocapnia que la ventilación por presión.</td></tr>
+      <tr><td><b>IPPV / CMV</b></td><td>Ciclos a FR fija, sin sincronizar con el bebé.</td><td>Bebé sin esfuerzo (sedado, relajado) o sin sensor de flujo.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Programación inicial orientativa</h2>
+    <table>
+      <tr><th>Parámetro</th><th>Prematuro (SDR)</th><th>Término / DBP</th></tr>
+      <tr><td>VT (VG)</td><td>&lt; 750 g: 5–6 ml/kg<br>750–999 g: 4,5–5<br>≥ 1000 g: 4–4,5</td><td>Término: 4–5 ml/kg<br>DBP: 5–8 ml/kg</td></tr>
+      <tr><td>PEEP</td><td>5–6 cmH₂O (4–8)</td><td>5–6; en DBP grave a veces 7–8</td></tr>
+      <tr><td>Ti</td><td>0,30–0,35 s</td><td>0,35–0,5 s</td></tr>
+      <tr><td>FR</td><td>A/C: respaldo 30–40<br>SIMV: 40–60</td><td>A/C: 30–40<br>DBP: FR más baja con Ti más largo</td></tr>
+      <tr><td>Pmax (VG)</td><td>Empezar 25–30; ya estable, 5–6 por encima de la PIP de trabajo</td><td>Igual; en general ≤ 30</td></tr>
+      <tr><td>Trigger</td><td colspan="2">Sensibilidad máxima del sensor de flujo, sin autociclado (agua en el circuito, fugas).</td></tr>
+    </table>
+    <ul>
+      <li>Evitar VTe &gt; 8 ml/kg (volutrauma) y &lt; 3,5 ml/kg (atelectrauma). Cambiar el VT de a 0,5 ml/kg.</li>
+      <li>En menores de 800 g el espacio muerto del sensor pesa más: suelen necesitar 5–6 ml/kg, y el requerimiento sube a &gt; 6 ml/kg hacia la tercera semana.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Palancas</h2>
+    <table>
+      <tr><th>Objetivo</th><th>Con VG</th><th>Por presión</th></tr>
+      <tr><td><b>↓ CO₂</b></td><td>↑ VT 0,5 ml/kg<br>SIMV: ↑ FR o PS</td><td>↑ PIP 1–2 cmH₂O<br>↑ FR (si el Te alcanza)</td></tr>
+      <tr><td><b>↑ CO₂</b></td><td>↓ VT 0,5 ml/kg (no menos de 3,5–4)<br>SIMV: ↓ FR</td><td>↓ PIP 1–2<br>↓ FR (en A/C manda el bebé)</td></tr>
+      <tr><td><b>↑ Oxigenación</b></td><td colspan="2">↑ FiO₂ · ↑ PEEP 1 cmH₂O · ↑ Ti (sube la MAP) · surfactante si hay SDR</td></tr>
+      <tr><td><b>Sobredistensión</b></td><td colspan="2">↓ PEEP · ↓ VT/PIP (Rx con más de 9 costillas, diafragmas planos)</td></tr>
+      <tr><td><b>Atrapamiento</b></td><td colspan="2">↓ FR o ↓ Ti para alargar el Te; revisar la curva de flujo (no vuelve a cero)</td></tr>
+    </table>
+  </div>
+
+  <div class="card chk">
+    <h2>Hipercapnia que no mejora: revisar</h2>
+    <label><input type="checkbox">Tubo obstruido o con secreciones (aspirar, revisar si hace falta cambiarlo)</label>
+    <label><input type="checkbox">Posición del tubo (Rx): selectivo, alto o acodado</label>
+    <label><input type="checkbox">Fuga &gt; 40–50 %: el VTe medido no es confiable y el VG entrega de más o de menos</label>
+    <label><input type="checkbox">Con VG, la PIP llega a Pmax y no entrega el VT programado</label>
+    <label><input type="checkbox">Espacio muerto: adaptadores y sensor en menores de 1000 g</label>
+    <label><input type="checkbox">Atrapamiento por Te corto (FR alta)</label>
+    <label><input type="checkbox">Atelectasia o sobredistensión (Rx, FiO₂)</label>
+    <label><input type="checkbox">Neumotórax / enfisema intersticial</label>
+    <label><input type="checkbox">Distensión abdominal que limita el diafragma</label>
+    <label><input type="checkbox">Ductus hemodinámicamente significativo o edema pulmonar</label>
+    <label><input type="checkbox">Desincronía o autociclado (agua en el circuito, trigger)</label>
+    <label><input type="checkbox">Muestra capilar mal tomada (repetir o correlacionar con TcCO₂)</label>
+  </div>
+
+  <div class="card">
+    <h2>Metas e índices</h2>
+    <ul>
+      <li><b>SpO₂</b> en prematuros con O₂: 90–94 % (alarmas en 89 y 95 %).</li>
+      <li><b>pCO₂:</b> hipercapnia permisiva moderada, con pH &gt; 7,22. Evitar pCO₂ &lt; 35–40 (leucomalacia, HIV).</li>
+      <li><b>IO</b> = MAP × FiO₂(%) / PaO₂ (arterial). <b>OSI</b> = MAP × FiO₂(%) / SpO₂ (≈ la mitad del IO).</li>
+      <li><b>Índice ventilatorio</b> = PIP × FR × pCO₂ / 1000.</li>
+      <li>Considerar <b>VAFO</b> si para llegar a las metas hacen falta PIP &gt; 25–28 cmH₂O o VT &gt; 7 ml/kg, si hay fuga aérea o si el IO ≥ 15–20.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Destete y extubación</h2>
+    <ul>
+      <li><b>Con VG en A/C:</b> el destete es casi automático: al mejorar la compliance baja la PIP. Si la PIP de trabajo queda baja con buen VT, bajá el VT solo si hay hipocapnia.</li>
+      <li><b>Por presión:</b> bajá PIP de a 1–2 cmH₂O; en SIMV, FR de a 5 hasta 20–25 rpm, con PS.</li>
+      <li><b>Criterios orientativos para extubar:</b> MAP ≤ 7–8 cmH₂O, FiO₂ ≤ 0,30, PIP de trabajo ≤ 15–16 cmH₂O con VT adecuado, gases aceptables y esfuerzo respiratorio sostenido.</li>
+      <li><b>Cafeína</b> antes de extubar en menores de 32 semanas. Extubar a <b>CPAP</b> con presión algo mayor (7–9 cmH₂O) o a <b>NIPPV</b>, que reduce la reintubación.</li>
+      <li>Si falla la extubación por SDR evolutivo o DBP, valorar corticoides posnatales según el protocolo de la unidad.</li>
+    </ul>
+    <p class="note">Basado en: European Consensus Guidelines on the Management of RDS, actualización 2022 (Sweet DG y col., Neonatology 2023); Klingenberg C y col., guía práctica de volumen garantizado (J Perinatol 2011) y revisión Cochrane de ventilación con volumen objetivo (2017); Keszler M y col. sobre VT en menores de 800 g (Arch Dis Child 2009); guías de ventilación con volumen objetivo del NHS. Rangos orientativos: ajustar al protocolo de la unidad.</p>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast">Copiado</div>
+
+<script>
+var restoring=false;
+if(window.parent!==window)document.querySelector('header').style.display='none';
+const $=id=>document.getElementById(id);
+const num=id=>{const v=parseFloat(String($(id).value).replace(',','.'));return isNaN(v)?null:v};
+const fx=(v,d=1)=>v==null||!isFinite(v)?'–':v.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const FIELDS=['modo','vtset','vte','pip','pmax','peep','ti','fr','frt','ps','fuga','fio2','ph','pco2','pao2','spo2','muestra','meta'];
+// qué campos usa cada modo
+const MODES={
+  acvg:{n:'A/C (SIPPV) + VG',vg:1,f:['vg','vt','pip','peep','ti','fr','frt','fuga'],pipL:'PIP de trabajo (cmH₂O)',frL:'FR de respaldo (rpm)',d:'Cada esfuerzo del bebé recibe un ciclo; el equipo ajusta la PIP (hasta Pmax) para entregar el VT espirado programado. Para destetar: bajar el VT o dejar que la PIP baje sola, no la FR.'},
+  simvvg:{n:'SIMV + VG',vg:1,f:['vg','vt','pip','peep','ti','fr','frt','ps','fuga'],pipL:'PIP de trabajo (cmH₂O)',frL:'FR SIMV (rpm)',d:'Solo la FR programada recibe ciclos con VG; las demás respiraciones son espontáneas. Agregar presión de soporte en prematuros chicos.'},
+  psvvg:{n:'PSV + VG',vg:1,f:['vg','vt','pip','peep','fr','frt','fuga'],pipL:'PIP de trabajo (cmH₂O)',frL:'FR de respaldo (rpm)',d:'Asiste cada esfuerzo y termina el ciclo por flujo (el bebé fija el Ti); el VG ajusta la presión. Necesita FR de respaldo.'},
+  ac:{n:'A/C por presión',vg:0,f:['vt','pip','peep','ti','fr','frt','fuga'],pipL:'PIP (cmH₂O)',frL:'FR de respaldo (rpm)',d:'Cada esfuerzo recibe la PIP programada. El VT cambia con la compliance: medilo (VTe) y ajustá la PIP.'},
+  simv:{n:'SIMV por presión',vg:0,f:['vt','pip','peep','ti','fr','frt','ps','fuga'],pipL:'PIP (cmH₂O)',frL:'FR SIMV (rpm)',d:'La FR programada recibe la PIP; el resto son respiraciones espontáneas (con PS si se agrega).'},
+  ippv:{n:'IPPV / CMV',vg:0,f:['vt','pip','peep','ti','fr','fuga'],pipL:'PIP (cmH₂O)',frL:'FR (rpm)',d:'Ciclos a FR fija sin sincronizar. Útil si el bebé no tiene esfuerzo (sedado, relajado) o no hay sensor de flujo.'},
+  nippv:{n:'NIPPV',vg:0,f:['pip','peep','ti','fr'],pipL:'PIP (cmH₂O)',frL:'FR (rpm)',peepL:'PEEP / CPAP (cmH₂O)',d:'CPAP con ciclos de PIP por interfase nasal. Útil en apneas, falla de CPAP y después de extubar.'},
+  cpap:{n:'CPAP nasal',vg:0,f:['peep'],peepL:'CPAP (cmH₂O)',d:'Presión continua; el bebé respira solo. Primera línea en el prematuro que respira.'}
+};
+function mode(){return MODES[$('modo').value]||MODES.acvg}
+function paintMode(){const m=mode();
+  document.querySelectorAll('.fld').forEach(e=>e.classList.toggle('off',!m.f.includes(e.dataset.m)));
+  $('mdesc').textContent=m.d;$('pipL').textContent=m.pipL||'PIP (cmH₂O)';$('frL').textContent=m.frL||'FR (rpm)';$('peepL').textContent=m.peepL||'PEEP (cmH₂O)';
+  $('vtsetL').textContent='VT objetivo (ml/kg)';}
+
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  ['calc','sim','guia'].forEach(t=>$(t).classList.toggle('hide',t!==b.dataset.tab));
+  if(b.dataset.tab==='sim') initSim();
+  try{localStorage.setItem('vent_tab',b.dataset.tab)}catch(e){}
+});
+
+const VD=kg=>1.5+(kg>0?0.8/kg:0); // espacio muerto efectivo ml/kg: ~1,5 fisiológico + ~0,8 ml fijo de sensor/adaptadores (orientativo: el gas fresco penetra parte del espacio muerto)
+function getState(){
+  const kg=(num('peso')||0)/1000,m=mode(),k=$('modo').value;
+  const vte=num('vte');let vtk=null;
+  if(vte!=null&&kg>0)vtk=vte/kg;else if(m.vg)vtk=num('vtset');
+  const fr=num('fr'),frt=num('frt');
+  const frEff=k==='cpap'?null:(frt&&frt>0?frt:fr);
+  const pip=m.f.includes('pip')?num('pip'):null,peep=num('peep'),ti=m.f.includes('ti')?num('ti'):null;
+  return{kg,k,m,vtk,vtset:num('vtset'),vte,pip,pmax:num('pmax'),peep,ti,fr,frt,frEff,ps:num('ps'),fuga:num('fuga'),fio2:num('fio2'),
+    ph:num('ph'),pco2:num('pco2'),pao2:num('pao2'),spo2:num('spo2'),muestra:$('muestra').value,meta:$('meta').value.split('-').map(Number)};
+}
+function mapEst(s,fr=(['acvg','ac','psvvg'].includes(s.k)?s.frEff:s.fr),pip=s.pip,peep=s.peep,ti=s.ti){
+  if(s.k==='cpap')return peep;
+  if(pip==null||peep==null||!fr||!ti)return null;const tt=60/fr;return peep+(pip-peep)*Math.min(1,ti/tt);}
+const barPos=v=>Math.max(0,Math.min(100,(v-2)/6*100));
+
+function calc(){
+  const s=getState();paintMode();
+  const map=mapEst(s);
+  const te=(s.fr&&s.ti)?60/s.fr-s.ti:null;
+  const vm=(s.vtk!=null&&s.frEff)?s.vtk*s.frEff:null;
+  const dp=(s.pip!=null&&s.peep!=null)?s.pip-s.peep:null;
+  $('o-map').textContent=fx(map,1);$('o-mapu').textContent=s.k==='cpap'?'cmH₂O (= CPAP)':'cmH₂O · onda cuadrada';
+  $('o-vt').textContent=fx(s.vtk,1);$('o-vtu').textContent=s.vtk!=null?`ml/kg${s.kg?` · ${fx(s.vtk*s.kg,1)} ml`:''}${s.vte==null&&s.m.vg?' (objetivo)':''}`:(s.k==='cpap'||s.k==='nippv'?'no se mide':'cargá el VTe');
+  $('o-vm').textContent=fx(vm,0);$('o-vmu').textContent=vm!=null?`ml/kg/min · FR ${fx(s.frEff,0)}${s.frt?' (total)':''}`:'ml/kg/min';
+  $('o-te').textContent=te!=null?fx(te,2)+' s':'–';$('o-ie').textContent=te!=null&&s.ti?`Te · I:E 1:${fx(te/s.ti,1)}`:'Te · I:E';
+  $('o-dp').textContent=fx(dp,0);
+  $('o-bar').style.left=s.vtk!=null?barPos(s.vtk)+'%':'0';
+  let oi=null,osi=null;
+  if(map&&s.fio2&&s.pao2&&s.muestra==='art')oi=map*s.fio2/s.pao2;
+  if(map&&s.fio2&&s.spo2)osi=map*s.fio2/s.spo2;
+  $('o-oi').textContent=oi!=null?fx(oi,1):(osi!=null?fx(osi,1):'–');
+  $('o-osi').textContent=oi!=null?`IO · OSI ${fx(osi,1)}`:(osi!=null?'OSI = MAP×FiO₂ / SpO₂':'Cargá PaO₂ arterial o SpO₂');
+  sugerir(s,map,te,oi,osi);
+  if(!restoring){try{const o={};FIELDS.forEach(k=>o[k]=$(k).value);localStorage.setItem('vent',JSON.stringify(o))}catch(e){}}
+  return{s,map,te,vm,dp,oi,osi};
+}
+
+function card(cls,t,body){return `<div class="sug ${cls}"><b>${t}</b>${body}</div>`}
+const r05=v=>Math.round(v*2)/2;
+
+function sugerir(s,map,te,oi,osi){
+  const out=[];const [lo,hi]=s.meta,mid=(lo+hi)/2,k=s.k,vg=!!s.m.vg;
+  const inv=k!=='cpap'&&k!=='nippv';
+  const acid=s.ph!=null&&s.ph<7.22;
+  // seguridad de volumen
+  if(inv&&s.vtk!=null){
+    if(s.vtk>8)out.push(card('alert',`VT ${fx(s.vtk,1)} ml/kg`,'Por encima de 8 ml/kg: riesgo de volutrauma. Revisá la fuga y el sensor; si el VT es real, bajá el VT/PIP o considerá VAFO.'));
+    else if(s.vtk<3.5)out.push(card('warn',`VT ${fx(s.vtk,1)} ml/kg`,'Por debajo de 3,5 ml/kg: riesgo de atelectrauma e hipercapnia por espacio muerto.'));
+  }
+  if(vg&&s.pip!=null&&s.pmax!=null&&s.pip>=s.pmax-1)out.push(card('alert','La PIP llega al límite (Pmax)',`El equipo probablemente no entrega el VT programado. Revisá el tubo (secreciones, acodamiento, posición) y la compliance (Rx). Si el bebé está estable, subí Pmax de a 2–3 cmH₂O (en general ≤ 30). Si necesita PIP &gt; 25–28 para llegar al VT, considerá VAFO.`));
+  if(vg&&s.pip!=null&&s.pmax!=null&&s.pmax-s.pip>10)out.push(card('','Pmax muy por encima de la PIP de trabajo',`Con el bebé estable conviene dejar Pmax ~5–6 cmH₂O por encima de la PIP de trabajo (${fx(s.pip,0)} → Pmax ${fx(s.pip+6,0)}) para que avise si cambia la compliance.`));
+  if(s.fuga!=null&&s.fuga>40)out.push(card('warn',`Fuga ${fx(s.fuga,0)} %`,'Con fuga mayor de 40–50 % el VTe medido no es confiable y el VG puede entregar volúmenes erráticos. Evaluá cambiar el tubo por uno de mayor calibre.'));
+  if(te!=null&&te<0.3)out.push(card('warn',`Te ${fx(te,2)} s`,'Te corto: riesgo de atrapamiento (PEEP inadvertida) y de que el CO₂ no baje aunque subas la FR. Bajá la FR o el Ti.'));
+  // CO2
+  if(s.pco2!=null){
+    if(s.pco2>hi){
+      let body='';
+      if(vg&&s.vtk!=null&&s.frEff){const vd=VD(s.kg);const need=vd+(s.vtk-vd)*s.pco2/mid;const next=Math.min(r05(s.vtk+0.5),8);
+        body=`<br><b style="display:inline">1. Subir el VT</b> de ${fx(s.vtk,1)} a <b style="display:inline">${fx(next,1)} ml/kg</b>${s.kg?` (${fx(next*s.kg,1)} ml)`:''}.<br>VT estimado para llegar a la meta: ~${fx(need,1)} ml/kg (supone espacio muerto ~${fx(vd,1)} ml/kg). Llegá de a 0,5 ml/kg.${need>7?'<br>⚠️ Supera 7 ml/kg: antes de seguir subiendo, revisá tubo, fuga, atrapamiento y la checklist de la Guía; considerá VAFO.':''}`;
+        if(k==='simvvg')body+=`<br><b style="display:inline">2.</b> Subir la FR SIMV de a 5 rpm o agregar/subir la PS.`;
+        if(k==='acvg'&&s.frt&&s.fr&&s.frt<=s.fr+2)body+=`<br><b style="display:inline">2.</b> El bebé respira casi a la FR de respaldo (poco impulso): subir la FR de respaldo 5–10 rpm también ayuda.`;
+        else if(k==='acvg')body+='<br>En A/C la FR la pone el bebé: subir la FR de respaldo casi no cambia el CO₂ si respira por encima de ella.';
+      }else if(inv&&s.pip!=null){const dp=s.pip-s.peep;
+        body=`<br><b style="display:inline">1. Subir la PIP</b> de a 1–2 cmH₂O (a ${fx(s.pip+2,0)}). Con compliance estable el VT sube ~${dp>0?fx(2/dp*100,0):'–'} %.${s.vte==null?' Medí el VTe para no pasar de 6 ml/kg.':''}`;
+        if(te==null||te>=0.35)body+=`<br><b style="display:inline">2.</b> Subir la FR${k==='ac'?' de respaldo (solo sirve si el bebé no respira por encima)':''} de a 5–10 rpm${s.fr?` (a ${fx(s.fr+5,0)})`:''}.`;
+        if(k==='simv')body+='<br>En SIMV también podés agregar o subir la presión de soporte.';
+      }else if(k==='nippv'){body='<br>Subir PIP 1–2 cmH₂O o FR 5–10 rpm. Si el pH queda &lt; 7,22 con pCO₂ alta, hay apneas recurrentes o FiO₂ &gt; 0,40: considerar intubar.';}
+      else if(k==='cpap'){body='<br>En CPAP no hay palanca de ventilación: si el pH queda &lt; 7,22, hay apneas recurrentes o aumenta el trabajo respiratorio, pasar a NIPPV o intubar. Revisar interfase, boca abierta y fuga.';}
+      out.push(card(acid?'alert':'warn',`pCO₂ ${s.pco2} por encima de la meta (${lo}–${hi})${s.ph!=null?' · pH '+fx(s.ph,2):''}`,body+(acid?'<br>pH &lt; 7,22: por debajo de lo que tolera la hipercapnia permisiva.':'')));
+    }else if(s.pco2<lo){
+      let body='';
+      if(vg&&s.vtk!=null){const vd=VD(s.kg);const need=Math.max(3.5,vd+(s.vtk-vd)*s.pco2/mid);body=`Bajá el VT de a 0,5 ml/kg (a ${fx(Math.max(3.5,r05(s.vtk-0.5)),1)}), sin bajar de 3,5–4 ml/kg. VT estimado para la meta: ~${fx(need,1)} ml/kg.${k==='simvvg'?' En SIMV también podés bajar la FR.':''}`;}
+      else if(inv)body=`Bajá la PIP de a 1–2 cmH₂O${k==='simv'||k==='ippv'?' o la FR de a 5 rpm':''}. ${k==='ac'?'En A/C bajar la FR de respaldo no sirve si el bebé respira por encima.':''}`;
+      else body='Con soporte no invasivo la hipocapnia suele deberse a taquipnea: buscá la causa (dolor, acidosis metabólica, sepsis).';
+      out.push(card(s.pco2<35?'alert':'warn',`pCO₂ ${s.pco2} por debajo de la meta (${lo}–${hi})`,body+(s.pco2<35?'<br>La hipocapnia aumenta el riesgo de leucomalacia periventricular y de HIV.':'')));
+    }else out.push(card('ok',`pCO₂ ${s.pco2} dentro de la meta (${lo}–${hi})`,'Mantener. Si subís la PEEP o el Ti por la oxigenación, volvé a controlar el CO₂.'));
+  }
+  // oxigenación
+  if(s.fio2!=null){
+    if(k==='cpap'&&s.fio2>30&&(s.peep||0)>=6)out.push(card('warn',`FiO₂ ${s.fio2}% con CPAP ${fx(s.peep,0)}`,'Si hay SDR, la guía europea 2022 indica surfactante con FiO₂ &gt; 0,30 y CPAP ≥ 6 cmH₂O (umbral más bajo en los muy inmaduros).'));
+    else if(s.fio2>40&&inv)out.push(card('warn',`FiO₂ ${s.fio2}%`,`Volumen pulmonar probablemente bajo: subí la PEEP de a 1 cmH₂O${s.peep?` (a ${fx(s.peep+1,0)})`:''} y controlá la Rx (8–9 costillas). Si hay SDR, considerá surfactante. Con PIP alta o IO ≥ 15, considerá VAFO.`));
+    else if(s.fio2<=25&&inv&&map!=null&&map<=8)out.push(card('ok','Cerca de extubar',`FiO₂ ≤ 25 % y MAP ${fx(map,1)}: revisá la Guía (criterios de extubación, cafeína, CPAP/NIPPV post-extubación).`));
+  }
+  if(s.spo2!=null&&s.fio2>21&&s.spo2>95)out.push(card('warn',`SpO₂ ${s.spo2}% con O₂`,'Por encima de 95 % con oxígeno: bajá la FiO₂ (meta 90–94 % en prematuros).'));
+  if(oi!=null&&oi>=15)out.push(card(oi>=25?'alert':'warn',`IO ${fx(oi,1)}`,oi>=25?'Falla respiratoria grave: pasar a VAFO, evaluar HTPP con ecocardiograma y óxido nítrico, y contactar un centro con ECMO según la evolución.':'Falla respiratoria moderada: considerar VAFO y ecocardiograma (HTPP).'));
+  $('sugs').innerHTML=out.length?out.join(''):'<div class="muted">Cargá la pCO₂ (y el pH) para ver sugerencias de ajuste.</div>';
+}
+
+FIELDS.concat(['peso']).forEach(k=>{$(k).addEventListener('input',calc);$(k).addEventListener('change',calc)});
+$('reset').onclick=()=>{['ph','pco2','pao2','spo2','vte','frt','fuga'].forEach(k=>$(k).value='');calc()};
+window.customSummary=()=>{const {s,map,te,vm,dp,oi,osi}=calc();const m=s.m;
+  const p=[];if(s.k==='cpap')p.push(`CPAP ${fx(s.peep,0)} cmH₂O`);else{
+    if(m.vg)p.push(`VT ${fx(s.vtset,1)} ml/kg (Pmax ${fx(s.pmax,0)})`);if(s.pip!=null)p.push(`PIP ${fx(s.pip,0)}`);p.push(`PEEP ${fx(s.peep,0)}`);
+    if(s.ti!=null)p.push(`Ti ${fx(s.ti,2)} s`);if(s.fr)p.push(`FR ${fx(s.fr,0)}${s.frt?` (total ${fx(s.frt,0)})`:''}`);if(s.ps)p.push(`PS ${fx(s.ps,0)}`);}
+  p.push(`FiO₂ ${s.fio2??'–'} %`);
+  return [m.n,p.join(' · '),
+    [map!=null?`MAP ~${fx(map,1)}`:'',s.vtk!=null?`VT ${fx(s.vtk,1)} ml/kg`:'',vm!=null?`VM ${fx(vm,0)} ml/kg/min`:'',te!=null?`Te ${fx(te,2)} s`:''].filter(Boolean).join(' · '),
+    s.pco2!=null?`Gases (${s.muestra==='art'?'arterial':'capilar/venosa'}): pH ${s.ph!=null?fx(s.ph,2):'–'} · pCO₂ ${fx(s.pco2,0)} · meta ${s.meta.join('–')}`:'',
+    oi!=null?`IO ${fx(oi,1)}`:(osi!=null?`OSI ${fx(osi,1)}`:'')].filter(Boolean).join('\n')};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1600)}
+
+// simulador
+let base=null;
+function initSim(){const s=getState();const vg=!!s.m.vg;
+  base={vg,vt:s.vtk!=null?Math.round(s.vtk*10)/10:(vg?5:null),pip:s.pip!=null?Math.round(s.pip):18,peep:s.peep!=null?s.peep:5,ti:s.ti?Math.round(s.ti*100)/100:0.35,fr:Math.round(s.frEff||40),pco2:s.pco2||null,kg:s.kg||1,k:s.k};
+  if(vg){$('s-1').min=3;$('s-1').max=8;$('s-1').step=0.1;$('s-1').value=base.vt;$('s-l1').textContent='VT objetivo';}
+  else{$('s-1').min=10;$('s-1').max=30;$('s-1').step=1;$('s-1').value=base.pip;$('s-l1').textContent='PIP';}
+  $('s-2').value=base.fr;$('s-3').value=base.peep;$('s-4').value=base.ti;sim();}
+function simCalc(v1,fr,peep,ti){const b=base;let vt,pip;
+  if(b.vg){vt=v1;pip=b.pip!=null&&b.vt?b.peep+(b.pip-b.peep)*vt/b.vt:null}
+  else{pip=v1;vt=b.vt!=null&&(b.pip-b.peep)>0?b.vt*(pip-peep)/(b.pip-b.peep):null}
+  const vd=VD(b.kg);const va=vt!=null?(vt-vd)*fr:null,va0=b.vt!=null?(b.vt-vd)*b.fr:null;
+  const co2=b.pco2&&va&&va0&&va>0?b.pco2*va0/va:null;
+  const tt=60/fr;const map=peep+((pip??b.pip)-peep)*Math.min(1,ti/tt);
+  return{vt,pip,co2,map,te:tt-ti,vm:vt!=null?vt*fr:null}}
+function sim(){if(!base)return;const v1=parseFloat($('s-1').value),fr=parseFloat($('s-2').value),peep=parseFloat($('s-3').value),ti=parseFloat($('s-4').value);
+  $('s-v1').textContent=base.vg?fx(v1,1)+' ml/kg':fx(v1,0)+' cmH₂O';$('s-v2').textContent=fx(fr,0)+' rpm';$('s-v3').textContent=fx(peep,1)+' cmH₂O';$('s-v4').textContent=fx(ti,2)+' s';
+  const r=simCalc(v1,fr,peep,ti),r0=simCalc(base.vg?base.vt:base.pip,base.fr,base.peep,base.ti);
+  $('s-co2').textContent=fx(r.co2,0);$('s-co2u').textContent=base.pco2?'mmHg':'cargá la pCO₂ en la Calculadora';
+  $('s-map').textContent=fx(r.map,1);$('s-te').textContent=fx(r.te,2);$('s-ie').textContent=`s · I:E 1:${fx(r.te/ti,1)}`;$('s-vm').textContent=fx(r.vm,0);
+  const msg=[];if(r.te<0.3)msg.push('⚠️ Te menor de 0,3 s: riesgo de atrapamiento; el CO₂ real puede no bajar como estima el cálculo.');
+  if(r.vt!=null&&r.vt>8)msg.push('⚠️ VT por encima de 8 ml/kg.');if(r.vt!=null&&r.vt<3.5)msg.push('⚠️ VT por debajo de 3,5 ml/kg.');
+  if(!base.vg&&r.vt!=null)msg.push(`Con compliance estable, el VT pasaría a ~${fx(r.vt,1)} ml/kg.`);
+  $('s-cmp').innerHTML=`<b>Respecto a lo actual (${base.vg?fx(base.vt,1)+' ml/kg':'PIP '+fx(base.pip,0)} · FR ${fx(base.fr,0)} · PEEP ${fx(base.peep,0)} · Ti ${fx(base.ti,2)})</b>${base.pco2?`pCO₂ ${fx(base.pco2,0)} → ~${fx(r.co2,0)} mmHg. `:''}MAP ${fx(r0.map,1)} → ${fx(r.map,1)}. ${msg.join(' ')}`;
+  const b=base,v=b.vg?b.vt:b.pip;
+  const rows=b.vg?[['VT +0,5 ml/kg',v+0.5,b.fr,b.peep,b.ti],['VT +1 ml/kg',v+1,b.fr,b.peep,b.ti],['FR +10 %',v,b.fr*1.1,b.peep,b.ti],['FR +10 rpm',v,b.fr+10,b.peep,b.ti],['PEEP +1',v,b.fr,b.peep+1,b.ti],['Ti +0,05 s',v,b.fr,b.peep,b.ti+0.05]]
+    :[['PIP +2 cmH₂O',v+2,b.fr,b.peep,b.ti],['PIP +4 cmH₂O',v+4,b.fr,b.peep,b.ti],['FR +10 %',v,b.fr*1.1,b.peep,b.ti],['FR +10 rpm',v,b.fr+10,b.peep,b.ti],['PEEP +1 (baja la ΔP)',v,b.fr,b.peep+1,b.ti],['Ti +0,05 s',v,b.fr,b.peep,b.ti+0.05]];
+  document.querySelector('#s-tab tbody').innerHTML=rows.map(([n,a,f,p,t])=>{const x=simCalc(a,f,p,t);return `<tr><td>${n}</td><td>${b.pco2?fx(x.co2,0):(x.vm!=null?'VM '+fx(x.vm,0):'–')}</td><td>${fx(x.map,1)}</td></tr>`}).join('');
+}
+['s-1','s-2','s-3','s-4'].forEach(i=>$(i).oninput=sim);
+
+// restaurar (datos por paciente; el peso viene de la barra del paciente)
+restoring=true;
+try{const o=JSON.parse(localStorage.getItem('vent')||'null');if(o)FIELDS.forEach(k=>{if(o[k]!=null&&$(k))$(k).value=o[k]})}catch(e){}
+if(!MODES[$('modo').value])$('modo').value='acvg';
+try{const p=JSON.parse(localStorage.getItem('pac')||'{}');if(p&&p.kg>0)$('peso').value=Math.round(p.kg*1000)}catch(e){}
+calc();restoring=false;
+try{const t=localStorage.getItem('vent_tab');if(t&&t!=='calc')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
+</script>
+<script src="paciente.js?v=v93"></script>
+</body>
+</html>
