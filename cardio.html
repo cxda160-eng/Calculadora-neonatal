@@ -72,7 +72,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{ou
 .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 /* Tabla de z-scores */
 table.zt{width:100%;border-collapse:collapse;font-size:.85rem}
-.taTag{display:inline-block;font-size:.7rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:4px;white-space:nowrap}.taTag.ok{background:#e3f4e8;color:#1e6b38}.taTag.warn{background:#fdf0d5;color:#8a5a00}.taTag.crit{background:#fde2e0;color:#a61b12}
+.taTag{display:inline-block;font-size:.7rem;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:4px;white-space:nowrap}.taTag.ok{background:#e3f4e8;color:#1e6b38}.taTag.warn,.taTag.low{background:#fdf0d5;color:#8a5a00}.taTag.crit{background:#fde2e0;color:#a61b12}
 .zt th{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
 .zt th:first-child,.zt td:first-child{text-align:left}
 .zt td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -958,6 +958,8 @@ const TA_DIONNE = [
   [32,[68,40,49],[83,55,64],[88,60,69]],[34,[70,40,50],[85,55,65],[90,60,70]],[36,[72,50,57],[87,65,72],[92,70,77]],
   [38,[77,50,59],[92,65,74],[97,70,79]],[40,[80,50,60],[95,65,75],[100,70,80]],[42,[85,50,62],[98,65,76],[102,70,81]],
   [44,[88,50,63],[105,68,80],[110,73,85]]];
+// Percentil 3 por EG (S, M, D) en los primeros días: Giesinger y McNamara, Semin Perinatol 2016 (citado en el protocolo de vasoactivos)
+const TA_P3={24:[32,26,15],25:[34,26,16],26:[36,27,17],27:[38,27,17],28:[40,28,18],29:[42,28,19],30:[43,29,20],31:[45,30,20],32:[46,30,21],33:[47,30,22],34:[48,31,23],35:[49,32,24],36:[50,32,25]};
 function taRef(epm){
   const e = Math.min(44, Math.max(26, epm)); let i = TA_DIONNE.findIndex(r => r[0] >= e); if (i <= 0) return TA_DIONNE[0].slice(1);
   const a = TA_DIONNE[i-1], b = TA_DIONNE[i], t = (e - a[0]) / (b[0] - a[0]);
@@ -971,7 +973,8 @@ function ta(){
   const out = epm < 26 || epm > 44;
   let h = `<div class="tiles">${tile('Edad posmenstrual', f(epm, 1) + ' sem', `EG ${f(eg, 1)} + ${f(dias, 0)} días`, true)}${isFinite(S)||isFinite(D)?tile('TA medida', `${isFinite(S)?f(S):'–'}/${isFinite(D)?f(D):'–'}`, `media ${f(M, 0)}${mCalc?' (calculada)':''}`):''}</div>`;
   const val = [S, D, M], nm = ['Sistólica', 'Diastólica', 'Media'];
-  const cls = (x, k) => { if (!isFinite(x)) return ['', '']; const p95 = R[1][k], p99 = R[2][k];
+  const P3e = dias <= 3 ? TA_P3[Math.round(eg)] : null, P3k = P3e ? [P3e[0], P3e[2], P3e[1]] : null; let anyLow = false;
+  const cls = (x, k) => { if (!isFinite(x)) return ['', '']; if (P3k && x < P3k[k]) { anyLow = true; return ['low', '< p3']; } const p95 = R[1][k], p99 = R[2][k];
     if (x > p99 + 5) return ['crit', 'Estadio 2']; if (x >= p95) return ['warn', 'Estadio 1']; if (x >= R[0][k]) return ['ok', 'p50–p95']; return ['ok', '< p50']; };
   let worst = 0;
   h += `<div class="tablewrap" style="overflow-x:auto"><table class="zt"><thead><tr><th></th><th>p50</th><th>p95</th><th>p99</th><th>Medida</th></tr></thead><tbody>` +
@@ -982,9 +985,12 @@ function ta(){
   if (dias < 14) h += pill('info', `<b>Menos de 2 semanas de vida:</b> la tabla de Dionne se construyó para después de las 2 semanas y acá es solo orientativa. En los primeros 5 días la TA sube sola unos 2,2–2,7 mmHg/día la sistólica y 1,6–2 mmHg/día la diastólica (Zubrow 1995); repetir antes de rotular hipertensión.`);
   if (worst === 2) h += pill('crit', `<b>Hipertensión estadio 2</b> (&gt; p99 + 5 mmHg). Confirmar con mediciones repetidas y buscar causa (trombosis de arteria renal por catéter umbilical, enfermedad renal, DBP, coartación, fármacos como corticoides o cafeína, dolor, sobrecarga de volumen). Evaluar daño de órgano blanco (eco: hipertrofia del VI; función renal; neurológico). Suele requerir tratamiento.`);
   else if (worst === 1) h += pill('warn', `<b>Hipertensión estadio 1</b> (p95 a p99 + 5 mmHg). Repetir con técnica correcta y vigilar; si persiste o hay daño de órgano blanco, estudiar y considerar tratamiento.`);
-  else if (val.some(isFinite)) h += pill('ok', 'Por debajo del percentil 95 para la edad posmenstrual.');
+  else if (val.some(isFinite) && !anyLow) h += pill('ok', 'Por debajo del percentil 95 para la edad posmenstrual.');
   // Primeras 72 h: hipotensión y referencias
   if (dias <= 3) {
+    const egi = Math.round(eg), p3 = TA_P3[egi];
+    if (p3) { const lo = [S, M, D].map((x, k) => isFinite(x) && x < p3[[0,1,2][k]] ? ['sistólica','media','diastólica'][k] : null).filter(Boolean);
+      h += pill(lo.length ? 'warn' : 'info', `<b>Percentil 3 para ${egi} semanas</b> (primeros días): ${p3[0]}/${p3[2]} (${p3[1]}) mmHg.${lo.length ? ` <b>Por debajo del p3: ${lo.join(', ')}.</b> La sistólica baja orienta a bajo volumen sistólico (precarga, contractilidad, poscarga); la diastólica baja, a baja resistencia vascular (ductus, vasodilatación).` : ''} Otra definición usada: media &lt; 30 mmHg en las primeras 72 h en menores de 32 semanas.`); }
     if (isFinite(M) && M < eg) h += pill('warn', `<b>Media ${f(M, 0)} mmHg &lt; EG en semanas (${f(eg, 0)}).</b> La regla «media ≥ EG» es práctica pero no está validada: en 23–26 semanas, dos tercios de los pacientes tienen alguna media ≤ EG (Batton 2014). Decidir por perfusión, lactato, diuresis, FC y eco funcional, no por el número aislado.`);
     let ref = '';
     if (eg < 28) ref = `<b>Referencia &lt; 28 semanas, primeras 72 h (Vesoulis 2016, catéter umbilical):</b> media ≈ 33 mmHg al nacer, sube ≈ 1 mmHg/día; sistólica ≈ 44 mmHg al nacer, sube ≈ 2,2 mmHg/día. En 23–26 semanas la TA baja las primeras 4 h (nadir a las 4–5 h, media 30 ± 8 mmHg) y luego sube ≈ 0,2 mmHg/h (Batton 2014).`;
@@ -2717,7 +2723,7 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 })();
 
 </script>
-<script src="paciente.js?v=v93"></script>
+<script src="paciente.js?v=v94"></script>
 <script src="eco.js?v=v89"></script>
 <script src="arr.js?v=v72"></script>
 <script src="ped.js?v=v74"></script>

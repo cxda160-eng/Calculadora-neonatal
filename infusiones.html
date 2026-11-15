@@ -160,6 +160,9 @@ nav.tabs button[aria-selected="true"]{background:var(--surface-2);color:var(--fg
 .actBtn{width:100%;margin-top:10px;min-height:46px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:inherit;font:inherit;font-weight:700;cursor:pointer}.actBtn.p{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .actTot{display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700}
 .actMan{margin-top:10px}.actMan summary{cursor:pointer;color:var(--accent);font-weight:600;padding:8px 0;min-height:40px}
+.recep{margin-top:10px}.recep summary{cursor:pointer;font-weight:600;color:var(--accent);padding:8px 0;min-height:40px}
+table.rcp{border-collapse:collapse;font-size:.78rem;width:100%}table.rcp th,table.rcp td{padding:5px 4px;border-bottom:1px solid var(--line);text-align:center}table.rcp td:first-child{text-align:left}
+table.rcp .cur{background:var(--accent-soft,#e6f3f0);font-weight:700}
 </style>
 <style id="tema-vivo">
 /* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
@@ -236,6 +239,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
           <div class="lbl">Preparación de la jeringa</div>
           <div class="seg" role="group" aria-label="Modo de preparación">
             <button id="mProto" aria-pressed="false" hidden>Protocolo UCIN</button>
+            <button id="mStd" aria-pressed="false" hidden>Estándar 48 mL</button>
             <button id="mRegla" aria-pressed="true">Por dosis y velocidad</button>
             <button id="mManual" aria-pressed="false">Ya preparada</button>
           </div>
@@ -250,6 +254,10 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
             </div>
           </div>
           <div id="prepProto" class="sub" hidden></div>
+          <div id="prepStd" hidden>
+            <div class="sub" style="margin:0 0 8px">Dilución estándar de 48 mL en SG 5 %: <b>0,1 mL/h por kg</b> da la dosis de referencia, con la misma jeringa para cualquier peso.</div>
+            <div class="field" id="stdAmpF" hidden><label for="stdAmp">Presentación de la ampolla</label><select id="stdAmp"></select></div>
+          </div>
           <div id="prepManual" hidden>
             <div class="sub" style="margin:0 0 8px">Cargá lo que pusiste en la jeringa: la app calcula la concentración, cuánto es 1 mL/h para este peso y la dosis a la velocidad que esté pasando.</div>
             <div class="row2">
@@ -440,6 +448,7 @@ const toAmtU=(mcg,d)=>mcg/big(d);
 function concentration(){ // mcg/mL
   const d=S.drug;
   if(S.mode==="proto"&&d.proto) return d.proto.c; // concentración fija del protocolo
+  if(S.mode==="std"&&STD[d.id]) return stdConc(); // estándar 48 mL (misma unidad que amp.c: mcg/mL o U/mL)
   if(S.mode==="regla") return S.ref*S.w*fac(d)/S.refRate; // dosis deseada a refRate mL/h
   const amtMcg=S.amt*big(d);
   return amtMcg/S.vol;
@@ -467,7 +476,9 @@ function selectDrug(d){
   S.amt=manualDefault();
   $("mProto").hidden=!d.proto;
   if(S.mode==="manual"){$("amtUnit").textContent=d.amtU;manFill();}
-  if(d.proto){S.vol=24;setMode("proto",true)} else if(S.mode==="proto") setMode("regla",true);
+  stdFill();
+  if(d.proto){S.vol=24;setMode("proto",true)} else if(S.mode==="proto"||(S.mode==="std"&&!STD[d.id])) setMode("regla",true);
+  else if(S.mode==="std"){S.vol=48;}
   $("drugSel").value=d.id;$("selDot").parentElement.style.setProperty("--c",GROUPS[d.g].c);
   $("ref").value=fmt(S.ref,dpOf(d));$("amt").value=fmt(S.amt,3);$("dose").value=fmt(S.dose,dpOf(d));
   update();
@@ -497,7 +508,7 @@ function update(src){
       ${P.pre?`<li>Preparar la ${P.pre.txt}.</li>`:""}
       <li>Cargar <b class="num">${fmt(preMl,2)} mL</b> de ${P.pre?P.pre.name:d.name+" (ampolla pura, "+d.amp.txt+")"}.</li>
       <li>Completar con <b>SF</b> hasta <b class="num">${fmt(S.vol,1)} mL</b> (${fmt(S.vol-preMl,2)} mL de SF).</li>
-    </ol><div class="sub">Protocolo UCIN (jeringa de 24 mL): ${P.base}.</div>`:S.mode==="manual"?`
+    </ol><div class="sub">Protocolo UCIN (jeringa de 24 mL): ${P.base}.</div>`:S.mode==="std"&&STD[d.id]?stdRecipe(c,per1):S.mode==="manual"?`
     <ol class="steps">
       <li>Cargado: <b class="num">${fmt(ampMl,2)} mL</b> de ${d.name} (${d.amp.txt}) = ${fmt(toAmtU(amtMcg,d),3)} ${d.amtU}.</li>
       <li>Más <b class="num">${fmt(dilMl,2)} mL</b> de diluyente → <b class="num">${fmt(S.vol,1)} mL</b> en total.</li>
@@ -530,6 +541,10 @@ function update(src){
   if(d.periph&&c>d.periph&&!(d.maxC&&c>d.maxC)) A.push(["",`Concentración mayor de ${cTxt(d.periph,d)}: solo por vía central.`]);
   if(d.perDay&&S.dose*1440/1000>d.perDay) A.push(["",`Equivale a ${fmt(S.dose*1440/1000,1)} mg/kg/día: supera el máximo diario que fijan algunas guías (${d.perDay} mg/kg/día). Confirmar con cardiología.`]);
   if(P) A.push(["",`Rango del protocolo UCIN: ${P.range}.`]);
+  if(S.mode==="std"&&STD[d.id]){const st=STD[d.id],mU=d.base==="U",f2=v=>mU?fmt(v*1000,2)+" mU/kg/min":fmt(v,dpOf(d))+" "+doseU(d);
+    if(S.dose>st.rng[1]+1e-12)A.push(["bad",`⛔ Por encima del máximo del protocolo de vasoactivos (${f2(st.rng[1])}).`]);
+    else if(S.dose<st.rng[0]-1e-12)A.push(["",`Por debajo del rango del protocolo (${f2(st.rng[0])}–${f2(st.rng[1])}).`]);
+    if(r<0.3&&isFinite(r))A.push(["",`Caudal bajo (${fRate(r)} mL/h): muchas bombas no son precisas por debajo de 0,3–0,5 mL/h y los cambios de dosis tardan en llegar al paciente. En bebés chicos considerá una concentración mayor con «Por dosis y velocidad».`]);}
   if(!P&&ampMl<0.1&&isFinite(ampMl)) A.push(["","Volumen de ampolla menor a 0,1 mL: considerá una dilución intermedia para medir con precisión."]);
   if(d.id==="vasopresina"&&S.dose>0.002) A.push(["",`Dosis por encima de 0,002 U/kg/min (2 mU/kg/min), el rango habitual neonatal: el Vademécum la describe hasta 0,02 U/kg/min en shock refractario y poscirugía cardíaca. Monitorear isquemia periférica y esplácnica, natremia y diuresis.`]);
   if(d.id==="vasopresina"&&(c<0.1||c>1)&&isFinite(c)) A.push(["",`Concentración de ${cTxt(c,d)}: el Vademécum indica administrar entre 0,1 y 1 U/mL. ${c<0.1?"Podés aumentar la cantidad o bajar la velocidad de referencia.":"Aumentá el volumen."}`]);
@@ -617,13 +632,42 @@ function manFill(){const d=S.drug;S.amt=manualDefault();const ampMl=S.amt*big(d)
 $("dose").addEventListener("input",e=>{S.dose=parse(e.target.value);update("dose")});
 $("rate").addEventListener("input",e=>{const r=parse(e.target.value);S.dose=+doseOf(r,concentration()).toPrecision(4);update("rate")});
 $("slider").addEventListener("input",e=>{S.dose=parse(e.target.value);update("slider")});
-function setMode(m,silent){S.mode=m;$("mProto").setAttribute("aria-pressed",m==="proto");$("mRegla").setAttribute("aria-pressed",m==="regla");$("mManual").setAttribute("aria-pressed",m==="manual");
+
+// ---------- Estándar 48 mL (protocolo de vasoactivos: 0,1 mL/h/kg = dosis de referencia) ----------
+// c = concentración de la ampolla en la unidad base del fármaco (mcg/mL o U/mL); ml = mL que se cargan; pre = dilución previa
+const STD={
+  adrenalina:{amps:[{p:"1 mg/mL",c:1000,ml:3}],eq:0.1,rng:[0.05,0.3],via:"Preferir acceso central. Más estable en dextrosa.",max:"Hasta 0,3 mcg/kg/min en el protocolo: por encima de 0,5 se describen vasoconstricción excesiva y aumento de lactato y glucemia."},
+  noradrenalina:{amps:[{p:"1 mg/mL (4 mL)",c:1000,ml:3}],eq:0.1,rng:[0.02,0.4],via:"Solo por acceso venoso central. No se recomienda diluir en SF.",max:"Rango del protocolo 0,02–0,4 mcg/kg/min."},
+  dopamina:{amps:[{p:"200 mg/5 mL (40 mg/mL)",c:40000,ml:2},{p:"100 mg/5 mL (20 mg/mL)",c:20000,ml:4}],eq:3,rng:[2,20],via:"Preferir acceso central.",max:"En muy bajo peso empezar con 2–5 mcg/kg/min y titular."},
+  dobutamina:{amps:[{p:"250 mg/20 mL (12,5 mg/mL)",c:12500,ml:12},{p:"14 mg/mL",c:14000,ml:10}],eq:5,rng:[2,20],via:"Admite vía periférica o central.",max:"Rango del protocolo 2–20 mcg/kg/min."},
+  milrinona:{amps:[{p:"10 mg/10 mL (1 mg/mL)",c:1000,ml:7}],eq:0.25,rng:[0.25,0.75],via:"Preferir acceso central.",max:"Sin dosis de carga (riesgo de hipotensión)."},
+  vasopresina:{amps:[{p:"20 U/mL",c:20,ml:2.5,pre:{c:2,txt:"Dilución 1: 1 mL de ampolla + 9 mL de SG 5 % = 2 U/mL (2000 mU/mL)",name:"Dilución 1"}}],eq:0.00017,rng:[0.00017,0.01],via:"Preferir acceso central.",max:"Rangos del protocolo: hipotensión 0,17–0,67 mU/kg/min · HTPP 0,1–1,2 mU/kg/min · shock vasodilatado refractario 0,17–10 mU/kg/min. Empezar por el extremo inferior."}
+};
+const RECEP=[["Frecuencia cardíaca","++","++","+++","+++","+","0/+"],["Contractilidad","++","+++","+++","++","+++","0/+"],["Gasto cardíaco","++","+++","++","+/0","++","0/+"],["Resistencia vascular sistémica","+++","−/+","+++","++++","−","+++"],["Resistencia vascular pulmonar","++/−","−/+","−/+","−/+","−","−"],["Presión arterial","+++","+/−","+++","++++","−","++++"]];
+const RECEP_IDS=["dopamina","dobutamina","adrenalina","noradrenalina","milrinona","vasopresina"];
+S.stdIdx=0;
+function stdAmp(){const st=STD[S.drug.id];return st?st.amps[Math.min(S.stdIdx,st.amps.length-1)]:null}
+function stdConc(){const a=stdAmp();if(!a)return NaN;return a.pre?a.ml*a.pre.c/48:a.ml*a.c/48}
+function stdFill(){const st=STD[S.drug.id];$("mStd").hidden=!st;if(!st)return;
+  $("stdAmp").innerHTML=st.amps.map((a,i)=>`<option value="${i}">${a.p}</option>`).join("");$("stdAmp").value=String(Math.min(S.stdIdx,st.amps.length-1));$("stdAmpF").hidden=st.amps.length<2;}
+$("stdAmp").addEventListener("change",()=>{S.stdIdx=+$("stdAmp").value;update()});
+function stdRecipe(c,per1){const d=S.drug,st=STD[d.id],a=stdAmp(),u=doseU(d),dp=dpOf(d);
+  const ref=doseOf(0.1*S.w,c),mU=d.base==="U";
+  const loadMl=a.ml,dilMl=48-a.ml;
+  const tab=`<details class="recep"><summary>Efectos por receptor de los vasoactivos</summary><div style="overflow-x:auto"><table class="rcp"><thead><tr><th></th>${RECEP_IDS.map(i=>`<th class="${i===d.id?"cur":""}">${DRUGS.find(x=>x.id===i).name.slice(0,5)}.</th>`).join("")}</tr></thead><tbody>${RECEP.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map((v,j)=>`<td class="${RECEP_IDS[j]===d.id?"cur":""}">${v}</td>`).join("")}</tr>`).join("")}</tbody></table></div><div class="sub">Fuente: Phad y col., Clin Perinatol 2020, citado en el protocolo.</div></details>`;
+  return `<ol class="steps">${a.pre?`<li>Preparar la ${a.pre.txt}.</li>`:""}
+      <li>Cargar <b class="num">${fmt(loadMl,2)} mL</b> de ${a.pre?a.pre.name:d.name+" (ampolla "+a.p+")"}.</li>
+      <li>Completar con <b>SG 5 %</b> hasta <b class="num">48 mL</b> (${fmt(dilMl,1)} mL).</li></ol>
+    <div class="line"><span>0,1 mL/h por kg (${fRate(0.1*S.w)} mL/h) =</span><b>${fmt(ref,mU?5:dp)} ${u}${mU?` (${fmt(ref*1000,2)} mU/kg/min)`:""}</b></div>
+    ${Math.abs(ref/st.eq-1)>0.03?`<div class="sub">El protocolo lo redondea a ${fmt(st.eq,mU?5:dp)} ${u}; el valor exacto es ${fmt(ref,mU?5:3)}.</div>`:""}
+    <div class="sub"><b>Vía:</b> ${st.via} No administrar por catéter arterial umbilical.<br>${st.max}</div>${RECEP_IDS.includes(d.id)?tab:""}`;}
+function setMode(m,silent){S.mode=m;$("mProto").setAttribute("aria-pressed",m==="proto");$("mStd").setAttribute("aria-pressed",m==="std");$("prepStd").hidden=m!=="std";if(m==="std"){S.vol=48;stdFill();}$("mRegla").setAttribute("aria-pressed",m==="regla");$("mManual").setAttribute("aria-pressed",m==="manual");
   $("prepRegla").hidden=m!=="regla";$("prepManual").hidden=m!=="manual";$("prepProto").hidden=m!=="proto";
   if(m==="proto"&&S.drug.proto) $("prepProto").textContent="Concentración fija según el Protocolo de Sedoanalgesia de la UCIN. Podés cambiar el volumen de la jeringa: la concentración se mantiene.";
-  $("volField").hidden=m==="manual";
+  $("volField").hidden=m==="manual"||m==="std";
   if(m==="manual")manFill();
   if(!silent) update()}
-$("mProto").onclick=()=>setMode("proto");$("mRegla").onclick=()=>setMode("regla");$("mManual").onclick=()=>setMode("manual");
+$("mProto").onclick=()=>setMode("proto");$("mStd").onclick=()=>setMode("std");$("mRegla").onclick=()=>setMode("regla");$("mManual").onclick=()=>setMode("manual");
 
 
 const VIA={"vasopresina": "Preferir acceso venoso central. Por vía periférica con precaución y vigilancia estrecha del sitio (riesgo de isquemia y necrosis). No administrar por catéter arterial.", "amiodarona": "Acceso venoso central recomendado (hasta 6 mg/mL). Por vía periférica solo si no hay acceso central, sin superar 2 mg/mL y vigilando flebitis. Equipo de infusión sin DEHP. No administrar por catéter arterial.", "adenosina": "Bolo IV rápido por el acceso venoso más cercano al corazón (central o periférico de miembro superior), con llave de 3 vías y lavado inmediato con SF. No administrar por catéter arterial.", "adrenalina": "Preferir acceso venoso central (CVC o catéter venoso umbilical bien posicionado). Por vía periférica solo de forma transitoria en emergencia, bien diluida y con control estricto del sitio. No administrar por catéter arterial.", "noradrenalina": "Preferir acceso venoso central. Por vía periférica solo transitoriamente, diluida y vigilando el sitio por riesgo de necrosis. No administrar por catéter arterial.", "dobutamina": "Venosa central o periférica (hasta 5 mg/mL); es preferible la central si se prevé uso prolongado o a dosis altas. No administrar por catéter arterial.", "dopamina": "Preferir acceso venoso central. Por vía periférica sin superar 3,2 mg/mL y con vigilancia estrecha del sitio (extravasación: fentolamina). No administrar por catéter arterial.", "milrinona": "Venosa central o periférica. No administrar por catéter arterial.", "alprostadil": "Venosa central o periférica, incluido el catéter venoso umbilical. Puede administrarse por catéter arterial umbilical posicionado cerca del ductus, según protocolo de la unidad.", "fentanilo": "Venosa central o periférica. No administrar por catéter arterial.", "morfina": "Venosa central o periférica. No administrar por catéter arterial.", "midazolam": "Venosa central o periférica. No administrar por catéter arterial.", "dexmedetomidina": "Venosa central o periférica. No administrar por catéter arterial.", "clonidina": "Venosa central o periférica. No administrar por catéter arterial."};
@@ -697,6 +741,6 @@ show(location.hash==="#vademecum"?"vademecum":"calcular");
 </script>
 
 
-<script src="paciente.js?v=v93"></script>
+<script src="paciente.js?v=v94"></script>
 </body>
 </html>
