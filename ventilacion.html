@@ -81,6 +81,9 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
 .mdesc{font-size:13.5px;line-height:1.45;background:#f4f1ff;border-radius:10px;padding:10px 12px;margin-top:4px}
 .fld.off{display:none}
 @media (prefers-color-scheme: dark){.seg button{background:#2c2640;color:#c9b6ff}.seg button[aria-pressed=true]{background:#c9b6ff;color:#17141f}.mdesc{background:#28223a}}
+body.simOn{overflow:hidden}body.simOn>header{display:none}
+#simFr{position:fixed;left:0;right:0;bottom:0;top:var(--simTop,58px);width:100%;height:var(--simH,80vh);border:0;background:var(--bg);z-index:4;display:none}
+body.simOn #simFr{display:block}
 </style>
 </head>
 <body>
@@ -170,12 +173,8 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
 
 <!-- ============ SIMULADOR ============ -->
 <section id="sim" class="hide">
-  <div class="card">
-    <h2>Simulador de respirador</h2>
-    <p class="muted" style="margin-top:-4px">El mismo simulador de la app «Simulador VM». Arranca con el peso, la EG, los días de vida y la programación de la Calculadora; podés cambiar el modo, la patología, la mecánica y sumar complicaciones o tratamientos.</p>
-    <button class="btn sec" id="simLoad" style="width:100%">↺ Volver a cargar con los valores de la Calculadora</button>
-  </div>
-  <iframe id="simFr" title="Simulador de ventilación" style="width:100%;border:0;border-radius:16px;display:block;height:1400px;margin-bottom:12px;background:var(--card)"></iframe>
+  <iframe id="simFr" title="Simulador de respirador"></iframe>
+  <div id="cmpBox">
   <div class="card">
     <h2>¿Qué pasa si cambio…?</h2>
     <p class="muted" style="margin-top:-4px">Partís de los valores de la Calculadora. Mové los controles para comparar.</p>
@@ -200,6 +199,7 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
     <table id="s-tab"><thead><tr><th>Cambio</th><th>pCO₂ estimada</th><th>MAP</th></tr></thead><tbody></tbody></table>
     <p class="note">El espacio muerto no ventila: subir el VT 1 ml/kg aumenta la ventilación alveolar más que subir la FR en la misma proporción. Subir la FR acorta el Te: con Te menor de ~0,3 s puede haber atrapamiento (PEEP inadvertida) y el CO₂ deja de bajar. La PEEP y el Ti suben la MAP (oxigenación) más que el CO₂.</p>
   </div>
+</div>
 </section>
 
 <!-- ============ GUÍA ============ -->
@@ -314,10 +314,13 @@ function paintMode(){const m=mode();
   $('vtsetL').textContent='VT objetivo (ml/kg)';}
 
 // tabs
+$('guia').prepend($('cmpBox'));
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   ['calc','sim','guia'].forEach(t=>$(t).classList.toggle('hide',t!==b.dataset.tab));
-  if(b.dataset.tab==='sim') initSim();
+  const sOn=b.dataset.tab==='sim';document.body.classList.toggle('simOn',sOn);
+  if(sOn){scrollTo(0,0);simTop();loadSimFr()}
+  if(b.dataset.tab==='guia') initSim();
   try{localStorage.setItem('vent_tab',b.dataset.tab)}catch(e){}
 });
 
@@ -435,10 +438,11 @@ function simUrl(){const s=getState(),p=pq(),k=s.k;
   const pip=s.pip!=null?s.pip:(s.ps!=null&&s.peep!=null?s.peep+s.ps:null);
   [['peep',s.peep],['pip',pip],['ti',s.ti],['rr',s.fr],['fio2',s.fio2],['vt',s.vtset],['pmax',s.pmax]].forEach(([k,v])=>{if(v!=null&&isFinite(v))q.set(k,v)});
   return 'simvm/index.html?'+q}
-function loadSimFr(){$('simFr').src=simUrl()}
-$('simLoad').onclick=loadSimFr;
-$('simFr').onload=()=>{try{const d=$('simFr').contentDocument,fit=()=>{$('simFr').style.height=Math.max(600,d.documentElement.scrollHeight)+'px'};new ResizeObserver(fit).observe(d.body);fit()}catch(e){}};
-function initSim(){if(!$('simFr').src)loadSimFr();const s=getState();const vg=!!s.m.vg;
+let simLast='';
+function loadSimFr(){const u=simUrl();if(u!==simLast){simLast=u;$('simFr').src=u}}
+function simTop(){const n=document.querySelector('nav'),t=n.getBoundingClientRect().bottom,r=document.documentElement.style;r.setProperty('--simTop',t+'px');r.setProperty('--simH',(innerHeight-t)+'px')}
+addEventListener('resize',()=>{if(document.body.classList.contains('simOn'))simTop()});
+function initSim(){const s=getState();const vg=!!s.m.vg;
   base={vg,vt:s.vtk!=null?Math.round(s.vtk*10)/10:(vg?5:null),pip:s.pip!=null?Math.round(s.pip):18,peep:s.peep!=null?s.peep:5,ti:s.ti?Math.round(s.ti*100)/100:0.35,fr:Math.round(s.frEff||40),pco2:s.pco2||null,kg:s.kg||1,k:s.k};
   if(vg){$('s-1').min=3;$('s-1').max=8;$('s-1').step=0.1;$('s-1').value=base.vt;$('s-l1').textContent='VT objetivo';}
   else{$('s-1').min=10;$('s-1').max=30;$('s-1').step=1;$('s-1').value=base.pip;$('s-l1').textContent='PIP';}
@@ -474,6 +478,6 @@ try{const p=JSON.parse(localStorage.getItem('pac')||'{}');if(p&&p.kg>0)$('peso')
 calc();restoring=false;
 try{const t=localStorage.getItem('vent_tab');if(t&&t!=='calc')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v95"></script>
+<script src="paciente.js?v=v96"></script>
 </body>
 </html>
