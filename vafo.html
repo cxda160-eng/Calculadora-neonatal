@@ -75,9 +75,6 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
   .bar i{background:#fff}
 }
 @media(max-width:420px){.grid3{grid-template-columns:1fr 1fr}}
-body.simOn{overflow:hidden}body.simOn>header{display:none}
-#simFr{position:fixed;left:0;right:0;bottom:0;top:var(--simTop,58px);width:100%;height:var(--simH,80vh);border:0;background:var(--bg);z-index:4;display:none}
-body.simOn #simFr{display:block}
 </style>
 </head>
 <body>
@@ -151,7 +148,6 @@ body.simOn #simFr{display:block}
 
 <!-- ============ SIMULADOR ============ -->
 <section id="sim" class="hide">
-  <iframe id="simFr" title="Simulador de respirador"></iframe>
   <div id="cmpBox">
   <div class="card">
     <h2>¿Qué pasa con el DCO₂ si cambio…?</h2>
@@ -253,8 +249,7 @@ $('guia').prepend($('cmpBox'));
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   ['calc','sim','guia'].forEach(t=>$(t).classList.toggle('hide',t!==b.dataset.tab));
-  const sOn=b.dataset.tab==='sim';document.body.classList.toggle('simOn',sOn);
-  if(sOn){scrollTo(0,0);simTop();loadSimFr()}
+  if(b.dataset.tab==='sim'){openSim();return}
   if(b.dataset.tab==='guia') initSim();
   try{localStorage.setItem('vafo_tab',b.dataset.tab)}catch(e){}
 });
@@ -365,10 +360,7 @@ function simUrl(){const s=getState(),p=pq(),q=new URLSearchParams({embed:1,m:'hf
   const vg=s.modo!=='amp'&&s.modo!=='sin';q.set('vg',vg?1:0);
   [['hfMap',s.map],['f',s.f],['vthf',s.vtk],['fio2',s.fio2],['amp',s.amp],['ampMax',s.ampmax],['ie',s.ie==='1:2'?2:s.ie==='1:1'?1:null]].forEach(([k,v])=>{if(v!=null&&isFinite(v))q.set(k,v)});
   return 'simvm/index.html?'+q}
-let simLast='';
-function loadSimFr(){const u=simUrl();if(u!==simLast){simLast=u;$('simFr').src=u}}
-function simTop(){const n=document.querySelector('nav'),t=n.getBoundingClientRect().bottom,r=document.documentElement.style;r.setProperty('--simTop',t+'px');r.setProperty('--simH',(innerHeight-t)+'px')}
-addEventListener('resize',()=>{if(document.body.classList.contains('simOn'))simTop()});
+function openSim(){try{CalcNeo.frmFlush&&CalcNeo.frmFlush()}catch(e){}location.replace(simUrl()+'&back=vafo.html')}
 function initSim(){
   const s=getState();
   if(s.f&&s.vtk){base={f:s.f,vt:s.vtk};$('s-f').value=s.f;$('s-vt').value=Math.min(3,Math.max(0.8,s.vtk))}
@@ -392,8 +384,8 @@ restoring=true;
 try{const o=JSON.parse(localStorage.getItem('vafo')||'null');if(o)FIELDS.forEach(k=>{if(o[k]!=null)$(k).value=o[k]})}catch(e){}
 try{const p=JSON.parse(localStorage.getItem('pac')||'{}');if(p&&p.kg>0)$('peso').value=Math.round(p.kg*1000)}catch(e){}
 calc();restoring=false;
-try{const t=localStorage.getItem('vafo_tab');if(t&&t!=='calc')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
+try{const h=location.hash.slice(1);const t=(h==='calc'||h==='guia')?h:localStorage.getItem('vafo_tab');if(t&&t!=='calc'&&t!=='sim')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v96"></script>
+<script src="paciente.js?v=v97"></script>
 </body>
 </html>

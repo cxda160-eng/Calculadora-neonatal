@@ -81,9 +81,6 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
 .mdesc{font-size:13.5px;line-height:1.45;background:#f4f1ff;border-radius:10px;padding:10px 12px;margin-top:4px}
 .fld.off{display:none}
 @media (prefers-color-scheme: dark){.seg button{background:#2c2640;color:#c9b6ff}.seg button[aria-pressed=true]{background:#c9b6ff;color:#17141f}.mdesc{background:#28223a}}
-body.simOn{overflow:hidden}body.simOn>header{display:none}
-#simFr{position:fixed;left:0;right:0;bottom:0;top:var(--simTop,58px);width:100%;height:var(--simH,80vh);border:0;background:var(--bg);z-index:4;display:none}
-body.simOn #simFr{display:block}
 </style>
 </head>
 <body>
@@ -173,7 +170,6 @@ body.simOn #simFr{display:block}
 
 <!-- ============ SIMULADOR ============ -->
 <section id="sim" class="hide">
-  <iframe id="simFr" title="Simulador de respirador"></iframe>
   <div id="cmpBox">
   <div class="card">
     <h2>¿Qué pasa si cambio…?</h2>
@@ -318,8 +314,7 @@ $('guia').prepend($('cmpBox'));
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
   ['calc','sim','guia'].forEach(t=>$(t).classList.toggle('hide',t!==b.dataset.tab));
-  const sOn=b.dataset.tab==='sim';document.body.classList.toggle('simOn',sOn);
-  if(sOn){scrollTo(0,0);simTop();loadSimFr()}
+  if(b.dataset.tab==='sim'){openSim();return}
   if(b.dataset.tab==='guia') initSim();
   try{localStorage.setItem('vent_tab',b.dataset.tab)}catch(e){}
 });
@@ -438,10 +433,7 @@ function simUrl(){const s=getState(),p=pq(),k=s.k;
   const pip=s.pip!=null?s.pip:(s.ps!=null&&s.peep!=null?s.peep+s.ps:null);
   [['peep',s.peep],['pip',pip],['ti',s.ti],['rr',s.fr],['fio2',s.fio2],['vt',s.vtset],['pmax',s.pmax]].forEach(([k,v])=>{if(v!=null&&isFinite(v))q.set(k,v)});
   return 'simvm/index.html?'+q}
-let simLast='';
-function loadSimFr(){const u=simUrl();if(u!==simLast){simLast=u;$('simFr').src=u}}
-function simTop(){const n=document.querySelector('nav'),t=n.getBoundingClientRect().bottom,r=document.documentElement.style;r.setProperty('--simTop',t+'px');r.setProperty('--simH',(innerHeight-t)+'px')}
-addEventListener('resize',()=>{if(document.body.classList.contains('simOn'))simTop()});
+function openSim(){try{CalcNeo.frmFlush&&CalcNeo.frmFlush()}catch(e){}location.replace(simUrl()+'&back=ventilacion.html')}
 function initSim(){const s=getState();const vg=!!s.m.vg;
   base={vg,vt:s.vtk!=null?Math.round(s.vtk*10)/10:(vg?5:null),pip:s.pip!=null?Math.round(s.pip):18,peep:s.peep!=null?s.peep:5,ti:s.ti?Math.round(s.ti*100)/100:0.35,fr:Math.round(s.frEff||40),pco2:s.pco2||null,kg:s.kg||1,k:s.k};
   if(vg){$('s-1').min=3;$('s-1').max=8;$('s-1').step=0.1;$('s-1').value=base.vt;$('s-l1').textContent='VT objetivo';}
@@ -476,8 +468,8 @@ try{const o=JSON.parse(localStorage.getItem('vent')||'null');if(o)FIELDS.forEach
 if(!MODES[$('modo').value])$('modo').value='acvg';
 try{const p=JSON.parse(localStorage.getItem('pac')||'{}');if(p&&p.kg>0)$('peso').value=Math.round(p.kg*1000)}catch(e){}
 calc();restoring=false;
-try{const t=localStorage.getItem('vent_tab');if(t&&t!=='calc')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
+try{const h=location.hash.slice(1);const t=(h==='calc'||h==='guia')?h:localStorage.getItem('vent_tab');if(t&&t!=='calc'&&t!=='sim')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v96"></script>
+<script src="paciente.js?v=v97"></script>
 </body>
 </html>
