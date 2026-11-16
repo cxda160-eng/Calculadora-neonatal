@@ -171,6 +171,12 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
 <!-- ============ SIMULADOR ============ -->
 <section id="sim" class="hide">
   <div class="card">
+    <h2>Simulador de respirador</h2>
+    <p class="muted" style="margin-top:-4px">El mismo simulador de la app «Simulador VM». Arranca con el peso, la EG, los días de vida y la programación de la Calculadora; podés cambiar el modo, la patología, la mecánica y sumar complicaciones o tratamientos.</p>
+    <button class="btn sec" id="simLoad" style="width:100%">↺ Volver a cargar con los valores de la Calculadora</button>
+  </div>
+  <iframe id="simFr" title="Simulador de ventilación" style="width:100%;border:0;border-radius:16px;display:block;height:1400px;margin-bottom:12px;background:var(--card)"></iframe>
+  <div class="card">
     <h2>¿Qué pasa si cambio…?</h2>
     <p class="muted" style="margin-top:-4px">Partís de los valores de la Calculadora. Mové los controles para comparar.</p>
     <div class="rowv"><span id="s-l1">VT objetivo</span><b id="s-v1">5 ml/kg</b></div>
@@ -419,7 +425,20 @@ function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTi
 
 // simulador
 let base=null;
-function initSim(){const s=getState();const vg=!!s.m.vg;
+
+// simulador completo (copia de la app Simulador VM en simvm/)
+const pq=()=>{let p={};try{p=JSON.parse(localStorage.getItem('pac')||'{}')||{}}catch(e){}return p};
+function simUrl(){const s=getState(),p=pq(),k=s.k;
+  const M={acvg:'ac',simvvg:'simv',psvvg:'psv',ac:'ac',simv:'simv',ippv:'ac',nippv:'nippv',cpap:'cpap'};
+  const q=new URLSearchParams({embed:1,m:M[k]||'ac',vg:s.m&&s.m.vg?1:0});
+  const kg=s.kg>0?s.kg:(+p.kg>0?+p.kg:null);if(kg)q.set('kg',kg);if(+p.eg>0)q.set('eg',p.eg);if(p.dias!=null&&p.dias!=='')q.set('d',p.dias);
+  const pip=s.pip!=null?s.pip:(s.ps!=null&&s.peep!=null?s.peep+s.ps:null);
+  [['peep',s.peep],['pip',pip],['ti',s.ti],['rr',s.fr],['fio2',s.fio2],['vt',s.vtset],['pmax',s.pmax]].forEach(([k,v])=>{if(v!=null&&isFinite(v))q.set(k,v)});
+  return 'simvm/index.html?'+q}
+function loadSimFr(){$('simFr').src=simUrl()}
+$('simLoad').onclick=loadSimFr;
+$('simFr').onload=()=>{try{const d=$('simFr').contentDocument,fit=()=>{$('simFr').style.height=Math.max(600,d.documentElement.scrollHeight)+'px'};new ResizeObserver(fit).observe(d.body);fit()}catch(e){}};
+function initSim(){if(!$('simFr').src)loadSimFr();const s=getState();const vg=!!s.m.vg;
   base={vg,vt:s.vtk!=null?Math.round(s.vtk*10)/10:(vg?5:null),pip:s.pip!=null?Math.round(s.pip):18,peep:s.peep!=null?s.peep:5,ti:s.ti?Math.round(s.ti*100)/100:0.35,fr:Math.round(s.frEff||40),pco2:s.pco2||null,kg:s.kg||1,k:s.k};
   if(vg){$('s-1').min=3;$('s-1').max=8;$('s-1').step=0.1;$('s-1').value=base.vt;$('s-l1').textContent='VT objetivo';}
   else{$('s-1').min=10;$('s-1').max=30;$('s-1').step=1;$('s-1').value=base.pip;$('s-l1').textContent='PIP';}
@@ -455,6 +474,6 @@ try{const p=JSON.parse(localStorage.getItem('pac')||'{}');if(p&&p.kg>0)$('peso')
 calc();restoring=false;
 try{const t=localStorage.getItem('vent_tab');if(t&&t!=='calc')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v94"></script>
+<script src="paciente.js?v=v95"></script>
 </body>
 </html>

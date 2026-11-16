@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador de Ventilación Neonatal</title>
+<meta name="theme-color" content="#0f1424">
+<link rel="stylesheet" href="eval/eval.css">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Simulador VM">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{
+  --bg:#f4f3fa; --card:#fff; --ink:#272640; --muted:#6c6a86; --line:#e4e1f0; --acc:#5b46d6; --acc-s:#ece8ff;
+  --ok:#1d8a63; --okb:#e3f6ee; --warn:#a1620a; --warnb:#fff3dc; --bad:#b5244d; --badb:#ffe6ec;
+  --mon:#0f1424; --mon2:#171d33; --monl:#2a3150;
+  --cP:#ffd166; --cF:#7be0b5; --cV:#8ec5ff; --cT:#ff9fb7;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#13121b; --card:#1e1c2a; --ink:#ebe9f6; --muted:#a6a3c0; --line:#322f45; --acc:#b7a8ff; --acc-s:#2b2647;
+  --ok:#8fe0bf; --okb:#183a2e; --warn:#ffd28a; --warnb:#3a2e17; --bad:#ffa3b9; --badb:#43202a; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
+header{padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:6px}
+header h1{font-size:16px;margin:0;flex:1;min-width:0;line-height:1.2}
+header h1 small{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-top:2px}
+.hbtn{border:0;border-radius:999px;padding:8px 11px;font-weight:700;font-size:13px;white-space:nowrap;background:var(--acc-s);color:var(--acc)}
+.hbtn.on{background:var(--acc);color:#fff}
+#alarm{display:none!important}
+.vit-old{position:sticky;top:0;z-index:20;background:var(--mon);color:#fff;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;padding:6px 8px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.vit div{padding:2px 6px}
+.vit .t{font-size:10.5px;opacity:.7;font-weight:600;letter-spacing:.03em}
+.vit .v{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.vit .v small{font-size:11px;font-weight:600;opacity:.7}
+#alarm{grid-column:1/-1;font-size:12.5px;font-weight:700;padding:3px 6px;border-radius:6px;display:none}
+#alarm.on{display:block;background:#b5244d;animation:bl 1s infinite}
+#alarm.mid{display:block;background:#a1620a}
+@keyframes bl{50%{opacity:.6}}
+main{max-width:860px;margin:0 auto;padding:10px}
+.card{background:var(--card);border-radius:16px;padding:12px;margin-bottom:10px;box-shadow:0 1px 3px rgba(40,30,90,.08)}
+.card h2{font-size:15px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mon{background:var(--mon);border-radius:14px;padding:6px;color:#fff}
+canvas{display:block;width:100%}
+#waves{height:270px}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}
+.nums div{background:var(--mon2);border-radius:8px;padding:5px 7px}
+.nums .t{font-size:10.5px;opacity:.65;font-weight:600}
+.nums .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.nums .v small{font-size:10.5px;opacity:.7;font-weight:500}
+.nums .w{color:#ffd166}.nums .b{color:#ff9fb7}
+.loopw{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;margin-top:6px}
+#loop{height:170px;background:var(--mon2);border-radius:10px}
+.lsel{display:flex;flex-direction:column;gap:6px}
+.lsel button,.seg button{border:0;border-radius:9px;padding:8px 10px;font-weight:700;font-size:13px;background:var(--monl);color:#cfd6f5}
+.lsel button.on{background:#ffd166;color:#1a1a2a}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.ctl button{border:0;border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:700;background:var(--monl);color:#cfd6f5}
+.ctl button.on{background:#8ec5ff;color:#0f1424}
+.modes{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:8px}
+.modes button{border:0;border-radius:10px;padding:10px 2px;font-weight:800;font-size:13px;background:var(--acc-s);color:var(--acc)}
+.modes button.on{background:var(--acc);color:#fff}
+.modes button small{display:block;font-size:9.5px;font-weight:600;opacity:.8}
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.st{border:1.5px solid var(--line);border-radius:12px;padding:6px 8px}
+.st .l{font-size:11.5px;color:var(--muted);font-weight:700;display:flex;justify-content:space-between}
+.st .r{display:flex;align-items:center;gap:6px;margin-top:3px}
+.st button{width:36px;height:36px;border-radius:10px;border:0;background:var(--acc-s);color:var(--acc);font-size:20px;font-weight:800;flex:none}
+.st .val{flex:1;text-align:center;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.st.dis{opacity:.4}
+.st.hl{border-color:var(--acc)}
+.tg{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--acc-s);margin-bottom:8px;font-weight:700;font-size:14px;color:var(--acc)}
+.tg input{width:22px;height:22px;accent-color:var(--acc)}
+.info{font-size:12.5px;color:var(--muted);line-height:1.45;margin:6px 0 0}
+select,input[type=range]{width:100%}
+select{padding:10px;border-radius:10px;border:1.5px solid var(--line);font-size:15px;background:var(--card);color:var(--ink)}
+input[type=range]{accent-color:var(--acc)}
+.lg3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.lg3 label,.lsl{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);font-weight:700}
+.lsl{margin-top:8px}
+.lg3 input{width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--line);font-size:17px;font-weight:700;background:var(--card);color:var(--ink);text-align:center}
+.lg3 input:focus{outline:none;border-color:var(--acc)}
+.lder{font-size:12.5px;line-height:1.5;margin-top:8px;color:var(--muted)}
+.lder b{color:var(--ink)}
+details.fine{border-top:0;padding:6px 0 0}details.fine summary{font-size:13px;color:var(--acc)}
+.rowv{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-top:8px}
+.case{background:var(--acc-s);border-radius:12px;padding:10px;font-size:13.5px;line-height:1.45;margin-top:8px}
+.case b{color:var(--acc)}
+.goals{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--badb);color:var(--bad)}
+.chip.ok{background:var(--okb);color:var(--ok)}
+.btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.btn{border:0;border-radius:12px;padding:11px 8px;font-weight:800;font-size:13.5px;background:var(--acc);color:#fff}
+.btn.s{background:var(--acc-s);color:var(--acc)}
+.btn.r{background:var(--badb);color:var(--bad)}
+.gas{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.gas div{background:var(--bg);border-radius:10px;padding:7px 9px}
+.gas .t{font-size:11px;color:var(--muted);font-weight:700}
+.gas .v{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums}
+.gas .v.hi{color:var(--bad)}.gas .v.lo{color:var(--warn)}.gas .v.okv{color:var(--ok)}
+.tip{border-left:4px solid var(--acc);background:var(--acc-s);border-radius:10px;padding:9px 11px;margin-top:8px;font-size:13.5px;line-height:1.45}
+.tip.w{border-color:var(--warn);background:var(--warnb)}
+.tip.b{border-color:var(--bad);background:var(--badb)}
+.tip.o{border-color:var(--ok);background:var(--okb)}
+.ev{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:8px}
+.ev button{border:0;border-radius:12px;padding:10px 6px;font-weight:700;font-size:12.5px;background:var(--warnb);color:var(--warn)}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.acts button{border:0;border-radius:12px;padding:11px 6px;font-weight:800;font-size:13.5px;background:var(--okb);color:var(--ok)}
+.acts button:disabled{opacity:.6}
+.case .lrn{display:block;margin-top:6px}.case .ref{display:block;margin-top:6px;font-size:12px;color:var(--muted)}
+.ev button.on{background:var(--bad);color:#fff}
+details{border-top:1px solid var(--line);padding:8px 0}
+details summary{font-weight:700;cursor:pointer;font-size:14px}
+details p,details li{font-size:13.5px;line-height:1.5}
+details ul{padding-left:18px;margin:6px 0}
+.win{display:none;background:var(--okb);color:var(--ok);font-weight:800;border-radius:12px;padding:10px;text-align:center;margin-top:6px}
+.win.on{display:block}
+ul.refs li{font-size:12.5px;line-height:1.45;margin-bottom:4px}ul.refs a{color:var(--acc)}
+.foot{font-size:11.5px;color:var(--muted);text-align:center;padding:4px 10px calc(24px + env(safe-area-inset-bottom,0px));line-height:1.4}
+/* ===== pantalla del respirador (diseño propio) ===== */
+.vvit{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:0 0 6px;background:#050c1f;border:1px solid #24427f;border-radius:10px;padding:5px 4px}
+.vvit>div{padding:1px 5px;border-right:1px solid #1b3266}.vvit>div:last-child{border-right:0}
+.vvit .t{font-size:10.5px;color:#8fa6d6;font-weight:700;white-space:nowrap}
+.vvit .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1;color:#fff}
+.vvit .v small{font-size:10.5px;font-weight:600;opacity:.7}
+.mini{position:fixed;top:0;left:0;right:0;z-index:30;background:#081127;color:#fff;font-size:13px;font-weight:700;padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;
+  display:flex;gap:12px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.35);transform:translateY(-110%);transition:transform .2s;font-variant-numeric:tabular-nums}
+.mini.on{transform:none}.mini span small{opacity:.65;font-weight:600;margin-right:3px}.mini .al{margin-left:auto;background:#ffcc33;color:#1a1300;border-radius:6px;padding:2px 8px;font-size:12px}
+@media(max-width:520px){.vvit .v{font-size:18px}.vvit .t{font-size:9.5px}.vvit>div{padding:1px 3px}.mini{font-size:12px;gap:8px}}
+.vent{--vb:#0a1530;--vp:#10234d;--vl:#24427f;--vt:#d9e6ff;--vm:#8fa6d6;--vc:#7fd3ff;--va:#ffcc33;
+  background:linear-gradient(180deg,#0c1b3d,#081127);color:var(--vt);border-radius:18px;padding:8px;margin-bottom:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.35),inset 0 0 0 1px #1b3266}
+.vbar{display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:center;padding:2px 2px 8px}
+.vpat{display:flex;gap:6px;align-items:center;font-size:12px}.vpat .vico{font-size:20px}
+.vpat b{display:block;font-size:14px}.vpat small{color:var(--vm)}
+.vmode{font-size:20px;font-weight:800;letter-spacing:.02em;padding:2px 10px;border-left:1px solid var(--vl);border-right:1px solid var(--vl)}
+.valarm{min-height:30px;border-radius:6px;font-weight:800;font-size:13.5px;padding:5px 10px;text-align:center;color:#1a1300;background:transparent}
+.valarm.on{background:var(--va);animation:bl 1s infinite}.valarm.mid{background:var(--va)}
+.vclock{text-align:right;font-size:11px;color:var(--vm)}.vclock b{display:block;font-size:15px;color:var(--vt);font-variant-numeric:tabular-nums}
+.vmain{display:grid;grid-template-columns:1fr;gap:6px}
+.vcurves{background:var(--vp);border:1px solid var(--vl);border-radius:10px;padding:2px}
+#waves{height:280px}
+.vnums{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.vnums>div{background:var(--vp);border:1px solid var(--vl);border-radius:8px;padding:5px 8px;min-height:58px;display:flex;flex-direction:column;justify-content:space-between}
+.vnums .t{font-size:11px;color:var(--vm);font-weight:700}
+.vnums .v{font-size:24px;font-weight:700;color:var(--vc);text-align:right;font-variant-numeric:tabular-nums;line-height:1.1}
+.vnums .v small{display:block;font-size:10px;color:var(--vm);font-weight:600}
+.vnums .w{color:#ffd166}.vnums .b{color:#ff8fab}
+.vloops{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:6px}
+#loop{height:150px;background:var(--vp);border:1px solid var(--vl);border-radius:10px}
+.vside{display:flex;flex-direction:column;gap:6px;justify-content:space-between}
+.lsel,.ctl{display:flex;flex-direction:column;gap:5px}.ctl{flex-direction:row}
+.lsel button,.ctl button{border:1px solid var(--vl);border-radius:8px;padding:8px 9px;font-weight:700;font-size:12px;background:var(--vp);color:var(--vt)}
+.lsel button.on,.ctl button.on{background:#2b5bb5;border-color:#4d7fe0;color:#fff}
+.vdials{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 6px;scrollbar-width:none;margin-top:4px}
+.vdials::-webkit-scrollbar{display:none}
+.dial{flex:none;width:76px;text-align:center;cursor:pointer;user-select:none}
+.ring{width:66px;height:66px;margin:0 auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--vc) var(--p,0%),#21386b 0)}
+.ring span{width:56px;height:56px;border-radius:50%;background:#0d1c3f;display:grid;place-items:center;font-size:17px;font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums}
+.ring span small{font-size:9px!important}
+.dial .dl{font-size:11px;font-weight:700;margin-top:4px;line-height:1.15}.dial .du{font-size:10px;color:var(--vm)}
+.dial.sel .ring{box-shadow:0 0 0 3px #ffffff,0 0 14px #7fd3ff}.dial.sel .dl{color:#fff}
+.dial.dis{opacity:.35}
+.dial.hl .ring span{background:#16336f}
+.vadj{display:grid;grid-template-columns:64px 1fr 64px;gap:8px;align-items:center;margin-top:4px;background:var(--vp);border:1px solid var(--vl);border-radius:12px;padding:6px}
+.vadj button{height:52px;border-radius:10px;border:0;background:#2b5bb5;color:#fff;font-size:28px;font-weight:800}
+.vadjv{text-align:center}.vadjv small{display:block;font-size:11px;color:var(--vm);font-weight:700}
+.vadjv b{font-size:28px;font-variant-numeric:tabular-nums;color:#fff}.vadjv b small{display:inline!important;font-size:12px!important}
+.vtg{display:flex;align-items:center;gap:10px;margin-top:8px;padding:9px 12px;border-radius:10px;background:var(--vp);border:1px solid var(--vl);font-weight:700;font-size:14px}
+.vtg input{width:22px;height:22px;accent-color:#4d9bff}
+.vtabs{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:8px;border-radius:10px;overflow:hidden;border:1px solid var(--vl)}
+.vtabs button{border:0;border-right:1px solid var(--vl);background:#d7deec;color:#1b2a4a;font-weight:800;font-size:13.5px;padding:12px 2px}
+.vtabs button:last-child{border-right:0}
+.vtabs button.on{background:#0c1b3d;color:#fff;box-shadow:inset 0 3px 0 #7fd3ff}
+.vinfo{font-size:12.5px;color:var(--vm);margin:8px 2px 2px;line-height:1.45}
+@media(min-width:760px){.vmain{grid-template-columns:1fr 290px}.vnums{grid-template-columns:1fr 1fr;align-content:start}#waves{height:330px}}
+@media(max-width:520px){.vmode{font-size:16px;padding:2px 6px}.vbar{grid-template-columns:auto auto 1fr}.vclock{display:none}#waves{height:250px}.vit .v{font-size:19px}.vnums .v{font-size:20px}}
+#vnav,#caseSel,#win,#fuentesCasos{display:none!important}
+body.emb header h1{font-size:14px}body.emb header h1 small{font-size:11px}
+</style>
+</head>
+<body data-view="sim">
+<header>
+  <h1>Simulador de ventilación<small id="hCase">—</small></h1>
+  <button class="hbtn on" id="bPlay">⏸ Pausa</button>
+  <button class="hbtn" id="bSlow">🐢 Lento</button>
+</header>
+<nav class="vnav" id="vnav"><button class="on" data-v="sim">🫁 Simulador</button><button data-v="casos">📋 Casos</button><button data-v="recursos">📚 Recursos</button></nav>
+
+<div id="alarm"></div>
+<div class="mini" id="mini"></div>
+
+<main id="vSim">
+<!-- PACIENTE -->
+<section class="card">
+  <h2>Paciente</h2>
+  <select id="caseSel"></select>
+  <div class="case" id="caseTxt"></div>
+  <div id="libre" style="display:none">
+    <div class="lg3">
+      <label>Peso (g)<input id="lPeso" inputmode="numeric" autocomplete="off" value="1500"></label>
+      <label>EG (sem)<input id="lEG" inputmode="decimal" autocomplete="off" value="32"></label>
+      <label>Días de vida<input id="lDias" inputmode="numeric" autocomplete="off" value="3"></label>
+    </div>
+    <label class="lsl">Patología pulmonar
+      <select id="lPat">
+        <option value="sano">Pulmón sano</option>
+        <option value="emh" selected>Enfermedad de membrana hialina</option>
+        <option value="sam">Aspiración de meconio (SAM)</option>
+        <option value="htpp">Hipertensión pulmonar (HTPP)</option>
+        <option value="dbp">Displasia broncopulmonar (DBP)</option>
+      </select></label>
+    <div class="lder" id="lDer"></div>
+    <details class="fine"><summary>Ajuste fino de la mecánica</summary>
+      <div class="rowv"><span>Compliance (ml/cmH₂O/kg)</span><b id="lCV"></b></div><input type="range" id="lC" min="0.2" max="2" step="0.05">
+      <div class="rowv"><span>Resistencia total, con tubo (cmH₂O/L/s)</span><b id="lRV"></b></div><input type="range" id="lR" min="30" max="300" step="5">
+    </details>
+  </div>
+  <div class="rowv"><span>Fuga alrededor del tubo</span><b id="lkV"></b></div>
+  <input type="range" id="lk" min="0" max="0.6" step="0.05">
+  <div class="rowv"><span>Esfuerzo respiratorio propio</span><b id="drvV"></b></div>
+  <input type="range" id="drv" min="0" max="1" step="0.05">
+  <label class="tg" style="margin-top:8px"><input type="checkbox" id="ino"> Óxido nítrico inhalado 20 ppm</label>
+  <div class="acts" id="acts"><button id="bSurf">💧 Surfactante</button><button id="bCaf">☕ Cafeína</button><button id="bPda">💊 Tratar ductus</button></div>
+  <div class="acts" id="sucRow"><button id="bSucO">🧹 Aspirar (abierta)</button><button id="bSucC">🧹 Aspirar (cerrada)</button></div>
+  <div style="font-weight:700;font-size:13.5px;margin-top:6px">Complicaciones</div>
+  <div class="ev">
+    <button data-e="obs">Obstrucción del tubo</button>
+    <button data-e="ptx">Neumotórax</button>
+    <button data-e="ext">Extubación</button>
+    <button data-e="hem">Hemorragia pulmonar</button>
+    <button data-e="sel">Intubación selectiva</button>
+    <button data-e="abd">Distensión abdominal</button>
+  </div>
+  <p class="info">Tocá de nuevo la complicación para resolverla (drenar, reintubar, retirar el tubo, descomprimir). La obstrucción también se resuelve aspirando.</p>
+  <div class="btns" style="margin-top:8px;grid-template-columns:1fr">
+    <button class="btn s" id="bReset">↺ Reiniciar</button>
+  </div>
+</section>
+
+<!-- PANTALLA DEL RESPIRADOR -->
+<section class="vent" id="vent">
+  <div class="vbar">
+    <div class="vpat"><span class="vico">👶</span><div><b id="vKg">–</b><small id="vTubo">–</small></div></div>
+    <div class="vmode" id="vMode">–</div>
+    <div class="valarm" id="vAlarm"></div>
+    <div class="vclock"><small>Paciente</small><b id="vClock">00:00</b></div>
+  </div>
+  <div class="vvit" id="vvit">
+    <div><div class="t">SpO₂</div><div class="v" id="vSat">–<small>%</small></div></div>
+    <div><div class="t">TcCO₂</div><div class="v" id="vCO2">–<small>mmHg</small></div></div>
+    <div><div class="t" id="vVTl">VT</div><div class="v" id="vVT">–<small>ml/kg</small></div></div>
+    <div><div class="t" id="vXl">FR total</div><div class="v" id="vX">–<small>rpm</small></div></div>
+    <div><div class="t">PA media</div><div class="v" id="vBP">–<small>mmHg</small></div></div>
+  </div>
+  <div class="vmain">
+    <div class="vcurves"><canvas id="waves"></canvas></div>
+    <div class="vnums" id="nums"></div>
+  </div>
+  <div class="vloops">
+    <canvas id="loop"></canvas>
+    <div class="vside">
+      <div class="lsel"><button id="lPV" class="on">Bucle P-V</button><button id="lFV">Bucle F-V</button></div>
+      <div class="ctl"><button id="wFast">2 s</button><button id="wNorm" class="on">6 s</button><button id="wSlow">12 s</button></div>
+    </div>
+  </div>
+  <div class="vdials" id="steps"></div>
+  <div class="vadj" id="adj">
+    <button data-d="-1" aria-label="Bajar">−</button>
+    <div class="vadjv"><small id="adjL">–</small><b id="adjV">–</b><small id="adjU"></small></div>
+    <button data-d="1" aria-label="Subir">+</button>
+  </div>
+  <label class="vtg" id="vgRow"><input type="checkbox" id="vg"><span>VG · volumen garantizado</span></label>
+  <label class="vtg" id="lcRow"><input type="checkbox" id="lcomp"><span>Compensación de fugas</span></label>
+  <div class="vtabs" id="modes">
+    <button data-m="cpap">CPAP</button>
+    <button data-m="nippv">NIPPV</button>
+    <button data-m="ac">AC</button>
+    <button data-m="simv">SIMV</button>
+    <button data-m="psv">PSV</button>
+    <button data-m="hfo">VAFO</button>
+  </div>
+  <p class="vinfo" id="modeInfo"></p>
+</section>
+
+<!-- GASES Y OBJETIVOS -->
+<section class="card">
+  <h2>Gases y objetivos</h2>
+  <div class="goals" id="goals"></div>
+  <div class="win" id="win">✅ Caso resuelto: objetivos cumplidos durante 1 minuto</div>
+  <div class="btns">
+    <button class="btn" id="bGas">🩸 Pedir gases</button>
+    <button class="btn s" id="bTip">💡 Pista</button>
+    <button class="btn s" id="bFwd">⏩ +10 min</button>
+  </div>
+  <div id="gasOut"></div>
+  <div id="tipOut"></div>
+  <p class="info">Los gases evolucionan acelerados (×10): 1 segundo real equivale a 10 segundos del paciente. «+10 min» lleva al equilibrio con la programación actual.</p>
+</section>
+
+
+<!-- GUÍA -->
+<section class="card">
+  <h2>Guía rápida</h2>
+  <details><summary>Constante de tiempo (τ) y atrapamiento</summary>
+    <p>τ = R × C. El pulmón se llena o vacía un 63 % en 1 τ, un 95 % en 3 τ y un 99 % en 5 τ. Si el tiempo espiratorio es menor de 3 τ, el pulmón no se vacía: aparece auto-PEEP, baja el VT y sube la pCO₂. En la curva de flujo se ve porque el flujo espiratorio no vuelve a cero antes de la próxima inspiración.</p>
+    <p>Pulmón con EMH: C baja → τ corto → tolera FR altas y Ti cortos. SAM o DBP: R alta → τ largo → FR más bajas y Te largo.</p></details>
+  <details><summary>CPAP y NIPPV</summary>
+    <ul><li><b>CPAP:</b> presión continua. Recluta y mantiene la CRF; el paciente hace todo el trabajo. Si el esfuerzo es pobre o el pulmón es muy rígido, sube la pCO₂.</li>
+    <li><b>NIPPV:</b> CPAP con ciclos de presión no sincronizados. Por la fuga, la presión que llega es menor que la programada. Ayuda en apneas e hipercapnia leve.</li></ul></details>
+  <details><summary>AC / SIPPV</summary>
+    <p>Cada esfuerzo que dispara el respirador recibe una ventilación completa (mismo PIP y Ti). La FR programada es la de respaldo. Si el paciente respira rápido, la FR total sube: para bajar la ventilación, bajá el PIP o el VT objetivo, no la FR.</p></details>
+  <details><summary>SIMV</summary>
+    <p>Solo la FR programada recibe ventilaciones con presión, sincronizadas con el esfuerzo. Las demás respiraciones son espontáneas, sobre la PEEP. En prematuros chicos estas respiraciones son de bajo volumen (el tubo agrega resistencia), así que aumentan el trabajo respiratorio.</p></details>
+  <details><summary>PSV</summary>
+    <p>Cada esfuerzo recibe presión de soporte. La inspiración termina cuando el flujo cae al porcentaje programado del pico (terminación por flujo), así el paciente fija su propio Ti. Tiene FR de respaldo por si hay apnea.</p></details>
+  <details><summary>Volumen garantizado</summary>
+    <p>Programás un VT objetivo y un PIP máximo. El respirador ajusta la presión respiración por respiración según el VT medido. Si la compliance mejora (surfactante, reclutamiento), baja solo la presión. Si el VT no se alcanza con el PIP máximo, aparece la alarma «VT bajo». VT habitual: 4–6 ml/kg (DBP 6–8).</p></details>
+  <details><summary>VAFO</summary>
+    <p>Oxigenación: MAP y FiO₂. Ventilación: DCO₂ = f × VT². Con VG se programa el VThf y la amplitud se ajusta sola; sin VG se programa la amplitud. Con VG, subir el VThf es la palanca más potente. Sin VG, bajar la frecuencia aumenta el volumen entregado.</p></details>
+  <details><summary>Disparo, fugas y autociclado</summary>
+    <p>El respirador dispara cuando el flujo medido supera el trigger (L/min). Con fuga alrededor del tubo hay flujo continuo en el sensor aunque el paciente no respire: si supera el trigger, el equipo dispara solo (autociclado: FR muy alta, hipocapnia, curva de flujo que no vuelve a cero). Soluciones: compensación de fugas, subir el trigger, tubo de mayor calibre.</p></details>
+  <details><summary>Asincronías en PSV</summary>
+    <p>La PSV termina la inspiración cuando el flujo cae a un % del pico. Con fuga el flujo no baja lo suficiente y cicla por Ti máx: el paciente empieza a exhalar contra la presión. Subí la terminación (25–40 %), acortá el Ti máx o compensá la fuga.</p></details>
+  <details><summary>Control de la respiración, trabajo y fatiga</summary>
+    <ul><li><b>Quimiorreflejo:</b> la hipercapnia y la hipoxemia aumentan el esfuerzo y la FR; la hipocapnia lo reduce y por debajo del umbral apneico el paciente deja de respirar.</li>
+    <li><b>Trabajo respiratorio:</b> respirar sin soporte a través del tubo, con un pulmón rígido, cuesta mucho. En SIMV con FR baja el prematuro se fatiga en minutos.</li>
+    <li><b>Fatiga:</b> se ve como caída del esfuerzo con pCO₂ en ascenso. Se trata dando más soporte (AC/PSV con VG, NIPPV tras extubar) y cafeína.</li></ul></details>
+  <details><summary>Aspiración abierta vs cerrada</summary>
+    <p>La aspiración abierta desconecta el circuito: se pierde la presión y un pulmón inestable (SDR, VAFO) se colapsa en segundos. Después hay que reclutar de nuevo. La aspiración cerrada mantiene la presión y solo aumenta un momento la resistencia.</p></details>
+  <details><summary>Interacciones clínicas</summary>
+    <ul><li><b>Intubación selectiva:</b> ventila un solo pulmón: baja la compliance, sube el PIP, cae la SpO₂.</li>
+    <li><b>Distensión abdominal:</b> baja la compliance de la caja torácica y colapsa las bases.</li>
+    <li><b>Ductus:</b> el shunt de izquierda a derecha encharca el pulmón; la PEEP/MAP lo limita.</li></ul></details>
+  <details><summary>VAFO: frecuencia alta, tubo y fuga</summary>
+    <ul><li><b>Límite del equipo:</b> la amplitud que el oscilador logra generar cae a medida que sube la frecuencia. A 18 Hz puede quedar en ~25 cmH₂O aunque la amplitud máxima programada sea 40, y aparece «VT hf no alcanzado».</li>
+    <li><b>Tubo:</b> cuanto más fino el tubo y más alta la frecuencia, menos oscilación llega al pulmón (con tubo 2,5 a 18 Hz llega ~60 %).</li>
+    <li><b>Fuga:</b> con fuga alrededor del tubo, el VThf medido subestima el real. El VG regula sobre ese valor, así que el pulmón puede recibir más volumen del que muestra la pantalla.</li>
+    <li><b>Qué hacer:</b> bajar la frecuencia (15, después 13–14 Hz), revisar la posición y el tamaño del tubo, y recién después subir el VThf o la amplitud máxima.</li>
+    <li>En algunos equipos el VThf se programa en <b>mL totales</b>: el simulador muestra la equivalencia debajo del valor.</li></ul></details>
+</section>
+<section class="card" id="fuentesCasos">
+  <h2>Fuentes de los casos</h2>
+  <details><summary>Guías, consensos y estudios</summary><ul class="refs">
+    <li>Sweet DG y col. European Consensus Guidelines on the Management of RDS: 2022 update. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10064400">Neonatology 2023</a>.</li>
+    <li>Snoek KG y col. CDH EURO Consortium Consensus, 2015 update. Neonatology 2016;110:66–74. Resumen de metas: <a href="https://www.childrensmercy.org/health-care-providers/evidence-based-practice/cpgs-cpms-and-eras-pathways/congenital-diaphragmatic-hernia/oxygenation-and-ventilation-management/">Children’s Mercy</a>.</li>
+    <li>ELSO. Management of CDH treated with ECLS (<a href="https://www.elso.org/Portals/0/files/pdf/Management_of_Congenital_Diaphragmatic_Hernia.1.pdf">ASAIO J 2021</a>).</li>
+    <li>Tana M y col. VAFO con VG durante el surfactante en ELGAN. <a href="https://www.frontiersin.org/articles/10.3389/fped.2021.804807">Front Pediatr 2022</a>.</li>
+    <li>Wheeler KI y col. AC-VG durante la administración de surfactante. Arch Dis Child Fetal Neonatal Ed 2009.</li>
+    <li>Squires KA y col. VAFO de baja frecuencia en enfisema intersticial. Neonatology 2013;104:243–9.</li>
+    <li>NETS WA. <a href="https://www.cahs.health.wa.gov.au/-/media/HSPs/CAHS/Documents/Health-Professionals/NETS/Pulmonary-Haemorrhage.pdf">Pulmonary haemorrhage</a>; <a href="https://cahs.health.wa.gov.au/~/media/HSPs/CAHS/Documents/Health-Professionals/Neonatology-guidelines/Ventilation-High-Frequency-Oscillatory-Ventilation.pdf">HFOV</a>; <a href="https://cahs.health.wa.gov.au/~/media/HSPs/CAHS/Documents/Health-Professionals/Neonatology-guidelines/Transient-Tachypnoea-of-the-Newborn.pdf">TTN</a>.</li>
+    <li>Pediatrix/Mombaby. <a href="https://www.mombaby.org/wp-content/uploads/2020/01/High-Frequency-Ventilation-Guidelines-2023.pdf">High frequency ventilation 2023</a>; <a href="https://www.mombaby.org/wp-content/uploads/2025/09/Initial-Ventilation-ELBW.pdf">Initial ventilation ELBW 2025</a>; <a href="https://www.mombaby.org/wp-content/uploads/2025/08/PPHN-Guidelines-2025.pdf">PPHN 2025</a>.</li>
+    <li>NHS GGC. <a href="https://clinicalguidelines.scot.nhs.uk/nhsggc-guidelines/nhsggc-guidelines/neonatology/high-frequency-oscillatory-ventilation-hfov-a-guide-to-the-use-of-hfov-in-the-neonate/">HFOV in the neonate</a> (maniobra de reclutamiento).</li>
+    <li>Szakmar E y col. Respiratory management during therapeutic hypothermia. Eur J Pediatr 2019; Lantos L y col. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7520879">VG en EHI, J Perinatol 2020</a>; alfa-stat vs pH-stat en EHI, <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12752822/">2025</a>.</li>
+    <li>Kelly DN, Healy M. <a href="https://resources.wfsahq.org/wp-content/uploads/ATOWTutorial_5111.pdf">Hypoplastic left heart syndrome, WFSA ATOTW 511 (2023)</a>; Tabbutt S y col. Circulation 2001 (hipoxia vs hipercapnia en SHCI).</li>
+    <li>Hagen E y col. Transient tachypnea of the newborn. NeoReviews 2017.</li>
+    <li>Keszler M. Volume-targeted ventilation: one size does not fit all. Semin Fetal Neonatal Med 2017 (fugas, trigger, VG).</li>
+    <li>Hoellering AB y col. Lung volume and cardiorespiratory changes during open and closed endotracheal suction in ventilated newborn infants. Arch Dis Child Fetal Neonatal Ed 2008.</li>
+    <li>Lemyre B y col. NIPPV versus nasal CPAP after extubation. Cochrane 2017; Mukerji A y col. CPAP vs NIPPV post-extubation, Pediatrics 2024.</li>
+    <li>Fajardo MF y col. Effect of positive end-expiratory pressure on ductal shunting in preterm infants. Neonatology 2014.</li>
+    <li>Kempley ST y col. Endotracheal tube length for neonatal intubation. Resuscitation 2008.</li>
+  </ul></details>
+  <p class="info">Los números del simulador son docentes y aproximados. Las metas siguen estas fuentes, pero cada unidad tiene su protocolo.</p>
+</section>
+<p class="foot">Modelo docente simplificado (pulmón de un compartimento, gases calculados a partir de la ventilación alveolar o del DCO₂). No representa un equipo comercial en particular ni reemplaza el juicio clínico.</p>
+</main>
+<main id="vCasos" hidden></main>
+<main id="vRec" hidden></main>
+
+<script src="eval/sim-casos.js"></script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const fx=(v,d=0)=>v==null||!isFinite(v)?'–':v.toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ============ CASOS ============ */
+const CASES={
+  emh:{grp:'prem',n:'Prematuro 27 sem · 900 g · EMH',desc:'<b>Prematuro de 27 semanas, 900 g.</b> Enfermedad de membrana hialina; recibió surfactante hace 1 h. Pulmón rígido (compliance baja), con atelectasias. Está en AC con PEEP baja y retiene CO₂.',
+    kg:.9,cpk:.45,R:150,mOpen:7,mW:1.1,mOver:13.5,sh0:.65,pphn:.03,vdk:2.8,vco2:6,hco3:21,drive:.3,rrP:50,bp:32,
+    goal:{co2:[45,60],sat:[88,94],vt:[4,6],vthf:[1.2,2.5],fio2:40},
+    start:{mode:'ac',peep:5,pip:17,ti:.3,rr:40,fio2:45,vt:4.5,pmax:25,term:15,hfMap:10,f:15,amp:20,vthf:1.6,ampMax:35,ie:1,vg:false}},
+  sam:{grp:'term',n:'Término 39 sem · 3400 g · SAM',desc:'<b>Recién nacido de término, 3400 g.</b> Síndrome de aspiración de meconio con hipertensión pulmonar leve. Resistencia alta y constante de tiempo larga: con FR alta atrapa aire. Programación inicial con FR 60.',
+    kg:3.4,cpk:.5,R:180,mOpen:8.5,mW:1.3,mOver:13,sh0:.45,pphn:.28,vdk:3.2,vco2:7,hco3:18,drive:.3,rrP:65,bp:42,
+    goal:{co2:[40,50],sat:[92,98],vt:[4,6],vthf:[1.5,2.5],fio2:60},
+    start:{mode:'ac',peep:5,pip:25,ti:.4,rr:60,fio2:80,vt:5,pmax:30,term:15,hfMap:12,f:10,amp:30,vthf:2,ampMax:45,ie:2,vg:false}},
+  htpp:{grp:'term',n:'Término 40 sem · 3500 g · HTPP',desc:'<b>Recién nacido de término, 3500 g.</b> Hipertensión pulmonar persistente con pulmón casi normal. La hipoxemia se debe al shunt de derecha a izquierda. La acidosis la empeora; el óxido nítrico y evitar la sobredistensión la mejoran.',
+    kg:3.5,cpk:.6,R:70,mOpen:5,mW:1.3,mOver:12,sh0:.15,pphn:.5,vdk:2.4,vco2:7,hco3:20,drive:.3,rrP:50,bp:40,
+    goal:{co2:[40,50],sat:[95,99],vt:[4,6],vthf:[1.5,2.5],fio2:60},
+    start:{mode:'ac',peep:5,pip:17,ti:.35,rr:40,fio2:100,vt:5,pmax:28,term:15,hfMap:11,f:10,amp:25,vthf:2,ampMax:45,ie:1,vg:false}},
+  dbp:{grp:'prem',n:'Ex 25 sem, hoy 36 sem · 1600 g · DBP',desc:'<b>Ex prematuro de 25 semanas, hoy 36 semanas, 1600 g.</b> Displasia broncopulmonar establecida. Espacio muerto alto y resistencia alta: necesita VT más grande (6–8 ml/kg), FR baja y Ti más largo. Se acepta hipercapnia (pH ≥ 7,25).',
+    kg:1.6,cpk:.4,R:200,mOpen:7,mW:1.5,mOver:14,sh0:.3,pphn:.1,vdk:3.2,vco2:7,hco3:32,drive:.6,rrP:70,bp:45,
+    goal:{co2:[55,65],sat:[90,95],vt:[6,8],vthf:[1.5,2.5],fio2:40},
+    start:{mode:'simv',peep:5,pip:22,ti:.3,rr:40,fio2:40,vt:5,pmax:30,term:15,hfMap:12,f:10,amp:25,vthf:2,ampMax:40,ie:1,vg:false}},
+  sano:{grp:'cardio',n:'Posoperatorio cardiovascular · 3200 g · destete',desc:'<b>Neonato de 3200 g en el posoperatorio de cirugía cardiovascular.</b> Pulmón sano, sedado (sin esfuerzo propio). Ideal para ver las curvas de cada modo y practicar el destete.',
+    kg:3.2,cpk:1,R:50,mOpen:4,mW:1.5,mOver:11,sh0:.1,pphn:.02,vdk:2.2,vco2:7,hco3:24,drive:0,rrP:40,bp:45,
+    goal:{co2:[40,50],sat:[95,100],vt:[4,6],vthf:[1.5,2.5],fio2:40},
+    start:{mode:'ac',peep:5,pip:14,ti:.4,rr:30,fio2:40,vt:5,pmax:25,term:15,hfMap:10,f:10,amp:20,vthf:2,ampMax:40,ie:1,vg:false}},
+  vn:{grp:'hfo',n:'Prematuro 900 g · VAFO-VG a 18 Hz · VT hf no alcanzado',desc:'<b>Prematuro de 900 g con EMH, en VAFO con VG.</b> Programado: VThf 1,2 mL, 18 Hz, I:E 1:1, MAP 10, amplitud máxima 40, FiO₂ 60 %. Tubo 2,5 con fuga del 30 %. Aparece «VT hf no alcanzado» con ΔPhf ~26, aunque la máxima sea 40: a 18 Hz el equipo no genera más amplitud y el tubo atenúa la oscilación. Objetivo: llegar al VThf y bajar la pCO₂ y la FiO₂.',
+    kg:.9,cpk:.45,R:150,mOpen:9.5,mW:1.1,mOver:14,sh0:.65,pphn:.03,vdk:2.8,vco2:6,hco3:21,drive:.2,rrP:50,bp:32,leak:.3,
+    goal:{co2:[45,60],sat:[90,95],vt:[4,6],vthf:[1.2,2.5],fio2:40},
+    start:{mode:'hfo',peep:5,pip:17,ti:.3,rr:40,fio2:60,vt:4.5,pmax:25,term:15,hfMap:10,f:18,amp:26,vthf:1.33,ampMax:40,ie:1,vg:true}},
+  surf:{grp:'prem',n:'Prematuro 26 sem · 800 g · surfactante',desc:'<b>Prematuro de 26 semanas, 800 g, 1 h de vida.</b> SDR intubado en AC con PIP fijo, FiO₂ 50 %. Todavía no recibió surfactante.',
+    learn:'Indicar surfactante (FiO₂ > 30 %). Tras la dosis hay unos minutos de obstrucción (cae el VT); después la compliance se duplica y, con PIP fijo, el VT y la ventilación suben: hay que bajar el PIP o pasar a VG para evitar volutrauma e hipocapnia, y bajar la FiO₂.',
+    ref:'Consenso europeo de SDR 2022 (Sweet, Neonatology 2023); Wheeler, Arch Dis Child 2009 (AC-VG durante el surfactante).',
+    kg:.8,cpk:.35,R:160,mOpen:8,mW:1.1,mOver:13,sh0:.78,pphn:.03,vdk:3,vco2:6,hco3:21,drive:.3,rrP:55,bp:28,leak:.1,surf:2.2,
+    goal:{co2:[45,60],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:30},
+    start:{mode:'ac',peep:6,pip:20,ti:.3,rr:40,fio2:50,vt:5,pmax:25,term:15,hfMap:11,f:15,amp:24,vthf:1.6,ampMax:35,ie:1,vg:false}},
+  pie:{grp:'prem',n:'Prematuro 25 sem · 700 g · enfisema intersticial',desc:'<b>Prematuro de 25 semanas, 700 g, día 5.</b> Enfisema intersticial bilateral en la Rx. Está en AC con PIP 24 y Ti largo: el pulmón tiene muy alto riesgo de neumotórax.',
+    learn:'Estrategia de bajo volumen: bajar PIP, Ti y MAP aunque haya que aceptar más FiO₂ y pCO₂ (45–65). Alternativa: VAFO con frecuencia baja (6–8 Hz, I:E 1:2) y MAP ≤ 10. Si la presión media queda alta, aparece un neumotórax.',
+    ref:'Squires, Neonatology 2013 (VAFO de baja frecuencia en EIP); Keszler, J Pediatr 1991 (alta frecuencia en EIP).',
+    kg:.7,cpk:.32,R:170,mOpen:6,mW:1.3,mOver:11,sh0:.75,pphn:.1,vdk:3.2,vco2:6,hco3:20,drive:.2,rrP:55,bp:27,leak:.1,ptxRisk:1.5,
+    goal:{co2:[45,65],sat:[88,95],vt:[4,6],vthf:[1.2,2.5],fio2:60,mapMax:10},
+    start:{mode:'ac',peep:5,pip:24,ti:.4,rr:50,fio2:60,vt:5,pmax:25,term:15,hfMap:10,f:8,amp:20,vthf:1.8,ampMax:35,ie:2,vg:false}},
+  hem:{grp:'prem',n:'Prematuro 28 sem · 1100 g · hemorragia pulmonar',desc:'<b>Prematuro de 28 semanas, 1100 g, día 3, con ductus amplio.</b> Sangre fresca por el tubo, caída brusca de la saturación. FiO₂ 80 % en AC con PEEP 5.',
+    learn:'Subir la PEEP a 6–8 (o pasar a VAFO con MAP más alta) para taponar y reclutar; considerar surfactante, transfusión, corrección de la coagulación y el manejo del ductus.',
+    ref:'NETS WA, Pulmonary Haemorrhage (PEEP 6–7); Ko, J Korean Med Sci 1998 (VAFO de rescate).',
+    kg:1.1,cpk:.35,R:180,mOpen:8.5,mW:1.2,mOver:15,sh0:.6,pphn:.1,vdk:2.8,vco2:6.5,hco3:18,drive:.2,rrP:50,bp:30,leak:.1,surf:1.6,hyst:1,
+    goal:{co2:[45,60],sat:[90,95],vt:[4,6],vthf:[1.2,2.5],fio2:50},
+    start:{mode:'ac',peep:5,pip:22,ti:.35,rr:45,fio2:80,vt:5,pmax:28,term:15,hfMap:12,f:12,amp:28,vthf:1.8,ampMax:40,ie:1,vg:false}},
+  apnea:{grp:'prem',n:'Prematuro 30 sem · 1300 g · apneas en CPAP',desc:'<b>Prematuro de 30 semanas, 1300 g.</b> Pulmón casi normal en CPAP 5, pero hace apneas con desaturación. No recibe cafeína.',
+    learn:'Indicar cafeína (de rutina en < 32 semanas). Si las apneas siguen, la NIPPV da ciclos de respaldo y evita la intubación.',
+    ref:'Consenso europeo de SDR 2022 (Sweet, Neonatology 2023).',
+    kg:1.3,cpk:1,R:90,mOpen:4.5,mW:1.3,mOver:12,sh0:.3,pphn:.02,vdk:2.6,vco2:6,hco3:23,drive:.6,rrP:50,bp:35,leak:0,apnea:1,fatK:.3,
+    goal:{co2:[40,55],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:30,noApnea:true,noInt:true},
+    start:{mode:'cpap',peep:5,pip:15,ti:.35,rr:30,fio2:25,vt:5,pmax:25,term:15,hfMap:9,f:12,amp:18,vthf:1.6,ampMax:35,ie:1,vg:false}},
+  destete:{grp:'prem',n:'Prematuro 27 sem · 1000 g · ¿listo para extubar?',desc:'<b>Prematuro de 27 semanas, 1000 g, día 5.</b> Mejoró: está en AC-VG con FiO₂ 35 %. El objetivo es llegar a criterios de extubación.',
+    learn:'Criterios habituales: cafeína, MAP < 10, FiO₂ < 40 %, FR programada ≤ 20, pCO₂ < 60 y pH > 7,20. Luego extubar a CPAP 6–8 o NIPPV (cambiá el modo) y comprobar que se mantiene estable.',
+    ref:'Pediatrix/Mombaby, Initial ventilation ELBW 2025; Brigham and Women’s, BPD weaning; consenso europeo de SDR 2022.',
+    kg:1,cpk:.9,R:130,mOpen:5.5,mW:1.3,mOver:13,sh0:.4,pphn:.03,vdk:2.9,vco2:6,hco3:24,drive:.6,rrP:50,bp:35,leak:.15,apnea:.6,
+    goal:{co2:[40,60],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:40,ext:'conv'},
+    start:{mode:'ac',peep:6,pip:16,ti:.3,rr:40,fio2:35,vt:5,pmax:25,term:15,hfMap:10,f:15,amp:20,vthf:1.6,ampMax:35,ie:1,vg:true}},
+  recl:{grp:'hfo',n:'VAFO · reclutamiento de pulmón abierto · 1200 g',desc:'<b>Prematuro de 1200 g con SDR</b>, recién pasado a VAFO-VG con MAP 9 y FiO₂ 70 %: el pulmón está colapsado.',
+    learn:'Maniobra: subir la MAP de a 1–2 cmH₂O hasta que se pueda bajar la FiO₂ (presión de apertura); bajar la FiO₂ a ≤ 30 %; luego bajar la MAP de a 1 hasta que la SpO₂ empiece a caer (presión de cierre) y dejarla 1–2 cmH₂O por encima. Por la histéresis, el pulmón abierto se mantiene con menos presión que la que hizo falta para abrirlo.',
+    ref:'NHS GGC, HFOV in the neonate (maniobra de reclutamiento); Pediatrix/Mombaby, High frequency ventilation 2023.',
+    kg:1.2,cpk:.5,R:120,mOpen:14,mW:.9,mOver:18,sh0:.6,pphn:.03,vdk:2.6,vco2:6,hco3:22,drive:.15,rrP:50,bp:33,leak:.1,hyst:5,
+    goal:{co2:[45,55],sat:[90,95],vt:[4,6],vthf:[1.2,2.5],fio2:30,mapMax:12},
+    start:{mode:'hfo',peep:6,pip:18,ti:.3,rr:40,fio2:70,vt:5,pmax:25,term:15,hfMap:9,f:12,amp:24,vthf:1.6,ampMax:40,ie:1,vg:true}},
+  hfosurf:{grp:'hfo',n:'VAFO tras surfactante · 25 sem · 750 g',desc:'<b>Prematuro de 25 semanas, 750 g</b>, en VAFO <b>sin VG</b> (amplitud fija 21) con FiO₂ 50 %. Le toca el surfactante.',
+    learn:'Tras el surfactante la compliance sube: sin VG, la misma amplitud entrega más VThf (≈ 2,1 vs 1,6 ml/kg en el estudio de Tana) y cae la pCO₂. Activar VG con VThf 1,6–1,7 ml/kg (o bajar la amplitud) y bajar la MAP a medida que baja la FiO₂.',
+    ref:'Tana, Front Pediatr 2022 (VAFO con y sin VG durante el surfactante); consenso europeo de SDR 2022.',
+    kg:.75,cpk:.3,R:110,mOpen:9,mW:1.1,mOver:13.5,sh0:.85,pphn:.03,vdk:3,vco2:6,hco3:22,drive:.1,rrP:55,bp:27,leak:.1,surf:2,hyst:2,
+    goal:{co2:[45,55],sat:[90,94],vt:[4,6],vthf:[1.4,2],fio2:30},
+    start:{mode:'hfo',peep:6,pip:18,ti:.3,rr:40,fio2:50,vt:5,pmax:25,term:15,hfMap:11,f:15,amp:21,vthf:1.7,ampMax:35,ie:1,vg:false}},
+  samhfo:{grp:'hfo',n:'VAFO · SAM con HTPP · 3600 g',desc:'<b>Recién nacido de término, 3600 g, SAM con HTPP.</b> En VAFO-VG a 12 Hz con FiO₂ 100 %, sedado. Hay diferencia de saturación pre y posductal.',
+    learn:'En el término, usar 8–10 Hz: a 12 Hz cuesta llegar al VThf. Reclutar con la MAP (8–9 costillas) sin sobredistender, evitar la acidosis (pH ≥ 7,25), considerar surfactante (déficit secundario) y óxido nítrico cuando el pulmón ya está reclutado.',
+    ref:'Pediatrix/Mombaby, High frequency ventilation 2023 (8–10 Hz en el término); PPHN guidelines 2025; Nationwide Children’s, PPHN.',
+    kg:3.6,cpk:.45,R:90,mOpen:10,mW:1.4,mOver:15.5,sh0:.35,pphn:.35,vdk:3.2,vco2:7,hco3:18,drive:0,rrP:50,bp:40,leak:.05,surf:1.5,hyst:1.5,duct:.6,
+    goal:{co2:[40,50],sat:[92,98],vt:[4,6],vthf:[1.5,2.5],fio2:60,satPost:85,phMin:7.25},
+    start:{mode:'hfo',peep:6,pip:24,ti:.4,rr:40,fio2:100,vt:5,pmax:30,term:15,hfMap:12,f:12,amp:35,vthf:2,ampMax:45,ie:2,vg:true}},
+  hfowean:{grp:'hfo',n:'Destete de VAFO · 1 kg · día 7',desc:'<b>Prematuro de 1 kg, día 7</b>, en VAFO-VG (MAP 12, VThf 1,8 ml/kg, 15 Hz, FiO₂ 35 %). Mejoró y hay que llevarlo a criterios de extubación.',
+    learn:'Primero bajar la FiO₂ < 40 %, después la MAP de a 1 hasta ≤ 10 y el ΔPhf ≤ 15 (bajando el VThf con pCO₂ aceptable). Con cafeína se puede extubar directo a CPAP.',
+    ref:'Neonatology Solutions, criterios de extubación (VAFO: FiO₂ < 0,4, MAP ≤ 10, ΔP ≤ 15, pCO₂ < 60); NETS WA, HFOV (destete a CPAP con MAP ≤ 10).',
+    kg:1,cpk:.7,R:120,mOpen:6,mW:1.3,mOver:12,sh0:.35,pphn:.03,vdk:2.8,vco2:6,hco3:25,drive:.5,rrP:50,bp:36,leak:.1,hyst:2,apnea:.6,
+    goal:{co2:[40,60],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:40,ext:'hfo'},
+    start:{mode:'hfo',peep:6,pip:16,ti:.3,rr:30,fio2:35,vt:5,pmax:25,term:15,hfMap:12,f:15,amp:20,vthf:1.8,ampMax:35,ie:1,vg:true}},
+  hdc:{grp:'term',n:'Término · 3000 g · hernia diafragmática izquierda',desc:'<b>Recién nacido de término, 3000 g, HDC izquierda</b> con hipoplasia pulmonar e HTPP. Intubado en sala de partos; está en AC con PIP 26 y FiO₂ 100 %.',
+    learn:'Ventilación gentil: PIP ≤ 25, PEEP 2–5, aceptar pCO₂ 50–70 y SpO₂ preductal 80–95 % (posductal > 70 %). Si hace falta PIP > 28 o MAP > 17 en VAFO para las metas, son criterios de ECMO. Con presiones altas aparece neumotórax. La respuesta al óxido nítrico suele ser parcial.',
+    ref:'CDH EURO Consortium 2015 (Snoek, Neonatology 2016); ELSO, CDH 2021; Children’s Mercy, CDH ventilation.',
+    kg:3,cpk:.25,R:80,mOpen:5,mW:1.3,mOver:13,sh0:.3,pphn:.38,inoF:.75,vdk:2.4,vco2:7,hco3:20,drive:0,rrP:50,bp:40,leak:.03,ptxRisk:.8,duct:.5,
+    goal:{co2:[50,70],sat:[80,95],vt:[4,6],vthf:[1.5,2.5],fio2:100,satPost:70,pipMax:25,mapMax:17},
+    start:{mode:'ac',peep:4,pip:26,ti:.35,rr:50,fio2:100,vt:5,pmax:25,term:15,hfMap:13,f:10,amp:35,vthf:2,ampMax:45,ie:2,vg:false}},
+  ttn:{grp:'term',n:'Término 38 sem · 3300 g · taquipnea transitoria',desc:'<b>Recién nacido de 38 semanas, 3300 g, cesárea sin trabajo de parto.</b> Taquipnea de 90 rpm, quejido, FiO₂ 40 % en CPAP 4.',
+    learn:'CPAP 5–6 mejora la capacidad residual y la oxigenación; bajar la FiO₂. Suele haber hipocapnia leve; si la pCO₂ sube, pensar en agotamiento o fuga aérea. No hace falta intubar.',
+    ref:'NETS WA, Transient tachypnoea of the newborn; Hagen, NeoReviews 2017; Cochrane 2022 (intervenciones en TTN).',
+    kg:3.3,cpk:.9,R:50,mOpen:5,mW:1.3,mOver:11,sh0:.45,pphn:.05,vdk:2.2,vco2:7,hco3:23,drive:.8,rrP:85,bp:42,leak:0,
+    goal:{co2:[35,55],sat:[92,97],vt:[3,8],vthf:[1.5,2.5],fio2:30,noInt:true},
+    start:{mode:'cpap',peep:4,pip:16,ti:.4,rr:30,fio2:40,vt:5,pmax:25,term:15,hfMap:10,f:10,amp:25,vthf:2,ampMax:45,ie:1,vg:false}},
+  sepsis:{grp:'term',n:'Término · 3500 g · neumonía y sepsis por SGB',desc:'<b>Recién nacido de término, 3500 g</b>, neumonía por estreptococo grupo B con shock: acidosis metabólica (HCO₃ 15, lactato 5), PA baja e hipertensión pulmonar. AC con FiO₂ 70 %.',
+    learn:'La acidosis aumenta la resistencia pulmonar: ventilar a pCO₂ normal-baja (35–45) para llevar el pH ≥ 7,25, reclutar, considerar surfactante (inactivación secundaria) y óxido nítrico si la hipoxemia es por HTPP. Más el manejo del shock y los antibióticos.',
+    ref:'PPHN guidelines 2025; Nationwide Children’s, PPHN (pH 7,25–7,3).',
+    kg:3.5,cpk:.5,R:70,mOpen:7,mW:1.3,mOver:13,sh0:.4,pphn:.2,vdk:2.6,vco2:8.5,hco3:15,drive:.1,rrP:40,bp:32,leak:.05,surf:1.5,lac0:5,
+    goal:{co2:[35,45],sat:[92,97],vt:[4,6],vthf:[1.5,2.5],fio2:50,phMin:7.25},
+    start:{mode:'ac',peep:5,pip:22,ti:.35,rr:30,fio2:70,vt:5,pmax:28,term:15,hfMap:12,f:10,amp:30,vthf:2,ampMax:45,ie:1,vg:false}},
+  ehi:{grp:'term',n:'Término · 3400 g · EHI en hipotermia (33,5 °C)',desc:'<b>Recién nacido de término, 3400 g, encefalopatía hipóxico-isquémica</b> en hipotermia terapéutica a 33,5 °C. Acidosis metabólica (HCO₃ 14), respira rápido; en SIMV con PIP 18.',
+    learn:'La hipotermia baja ~25 % la producción de CO₂ y el paciente hiperventila para compensar la acidosis: es fácil caer en hipocapnia (< 35), que se asocia a peor pronóstico. Bajar VT o FR, usar VG, ajustar la sedación (esfuerzo) y evitar la hiperoxia. Ojo: el gas sin corregir (37 °C, alfa-stat) sobreestima la pCO₂ real.',
+    ref:'Szakmar, Eur J Pediatr 2019 (respiración en hipotermia); Lopez Laporte, Acta Paediatr 2018; Lantos, J Perinatol 2020 (VG en EHI); Int J Pediatr Endocrinol 2025 (alfa-stat vs pH-stat).',
+    kg:3.4,cpk:1,R:50,mOpen:4.5,mW:1.5,mOver:11,sh0:.12,pphn:.15,vdk:2.2,vco2:7,hco3:14,drive:.6,rrP:65,bp:40,leak:.05,temp:33.5,
+    goal:{co2:[40,55],sat:[92,98],vt:[4,6],vthf:[1.5,2.5],fio2:40},
+    start:{mode:'simv',peep:5,pip:18,ti:.4,rr:40,fio2:40,vt:5,pmax:25,term:15,hfMap:10,f:10,amp:25,vthf:2,ampMax:45,ie:1,vg:false}},
+  shci:{grp:'cardio',n:'SHCI preoperatorio · 3200 g · ventrículo único',desc:'<b>Síndrome de hipoplasia de cavidades izquierdas</b>, 3200 g, con prostaglandinas, intubado y sedado. Está en AC con FiO₂ 40 % y FR 40: SpO₂ alta y presión que cae.',
+    learn:'Circulación en paralelo: el equilibrio Qp:Qs depende de la resistencia pulmonar. Oxígeno e hiperventilación la bajan → sobrecirculación pulmonar (SpO₂ > 85 %, hipotensión, lactato). Metas: SpO₂ 75–85 %, FiO₂ 21 %, pCO₂ 40–50; no usar óxido nítrico.',
+    ref:'WFSA ATOTW 511, HLHS (2023); Barron, Heart 2009 (manejo del SHCI); Tabbutt, Circulation 2001 (hipoxia vs hipercapnia).',
+    kg:3.2,cpk:1,R:50,mOpen:4.5,mW:1.5,mOver:11,sh0:.1,pphn:0,vdk:2.2,vco2:7,hco3:22,drive:0,rrP:40,bp:45,leak:.05,sv:true,qp0:1.3,
+    goal:{co2:[40,50],sat:[75,85],vt:[5,8],vthf:[1.5,2.5],fio2:25,qp:[.7,1.5],bpMin:40},
+    start:{mode:'ac',peep:5,pip:18,ti:.4,rr:40,fio2:40,vt:6,pmax:25,term:15,hfMap:10,f:10,amp:25,vthf:2,ampMax:45,ie:1,vg:false}},
+  autoc:{grp:'asinc',n:'Prematuro 1100 g · autociclado por fuga',desc:'<b>Prematuro de 1100 g, día 10, sedado, en AC.</b> Tubo 3,0 con fuga del 45 %, compensación de fugas apagada, trigger 0,2 L/min. La enfermera avisa que «respira a 120» y la pCO₂ bajó.',
+    learn:'Reconocer el autociclado: FR muy alta sin esfuerzo del paciente, curva de flujo que no vuelve a cero en la espiración, hipocapnia y atrapamiento. Activar la compensación de fugas o subir el trigger, y evaluar un tubo de mayor calibre.',
+    ref:'Keszler M, Semin Fetal Neonatal Med 2017 (fugas y VG); Sinderby C, Pediatr Res 2009 (asincronía en neonatos).',
+    kg:1.1,cpk:.8,R:110,mOpen:5.5,mW:1.3,mOver:13,sh0:.35,pphn:.03,vdk:2.8,vco2:6,hco3:23,drive:.1,rrP:45,bp:34,leak:.45,
+    goal:{co2:[40,55],sat:[90,95],vt:[4,6],vthf:[1.2,2.5],fio2:30,rrMax:50},
+    start:{mode:'ac',peep:6,pip:16,ti:.3,rr:30,fio2:25,vt:5,pmax:25,term:15,hfMap:10,f:15,amp:20,vthf:1.6,ampMax:35,ie:1,vg:false,trig:.2,lcomp:false}},
+  psvleak:{grp:'asinc',n:'Prematuro 1500 g · PSV con fuga',desc:'<b>Prematuro de 1500 g, día 14, en PSV-VG</b> para el destete. Fuga del 40 % sin compensar, terminación 10 %, Ti máx 0,6 s. Está inquieto y peleando con el respirador.',
+    learn:'Con fuga, el flujo inspiratorio nunca cae al 10 % del pico: el respirador cicla por Ti máx (asincronía de ciclado) y el paciente exhala contra la presión. Subir la terminación a 25–40 %, acortar el Ti máx a ~0,35 s o compensar la fuga. Ojo: sin compensación, esa misma fuga puede superar el trigger y producir autociclado.',
+    ref:'Keszler M, Semin Fetal Neonatal Med 2017; Pediatrix/Mombaby, Initial ventilation ELBW 2025.',
+    kg:1.5,cpk:.8,R:100,mOpen:5,mW:1.3,mOver:13,sh0:.3,pphn:.03,vdk:2.6,vco2:6,hco3:24,drive:.5,rrP:55,bp:36,leak:.4,
+    goal:{co2:[40,55],sat:[90,95],vt:[4,6],vthf:[1.2,2.5],fio2:30,noHang:true},
+    start:{mode:'psv',peep:5,pip:16,ti:.6,rr:30,fio2:30,vt:5,pmax:25,term:10,hfMap:10,f:12,amp:20,vthf:1.6,ampMax:35,ie:1,vg:true,trig:.3,lcomp:false}},
+  fatiga:{grp:'asinc',n:'Prematuro 26 sem · 750 g · SIMV con FR baja',desc:'<b>Prematuro de 26 semanas, 750 g, día 4</b>, en SIMV con FR 15 y sin presión de soporte. Respira a 60 rpm, con tiraje.',
+    learn:'En SIMV las respiraciones no sincronizadas pasan por el tubo sin soporte: en un prematuro chico el trabajo respiratorio es muy alto y en minutos aparece fatiga (cae el esfuerzo, sube la pCO₂). Pasar a AC o PSV con VG; la cafeína ayuda.',
+    ref:'Consenso europeo de SDR 2022 (modos sincronizados con VG); Keszler M, Clin Perinatol 2019.',
+    kg:.75,cpk:.5,R:160,mOpen:5.5,mW:1.3,mOver:13,sh0:.4,pphn:.03,vdk:3,vco2:6,hco3:23,drive:.5,rrP:60,bp:28,leak:.1,fatK:1.5,
+    goal:{co2:[45,60],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:30,noFat:true},
+    start:{mode:'simv',peep:5,pip:16,ti:.3,rr:15,fio2:30,vt:5,pmax:25,term:15,hfMap:10,f:15,amp:20,vthf:1.6,ampMax:35,ie:1,vg:false}},
+  selectiva:{grp:'asinc',n:'Término 2500 g · tubo demasiado profundo',desc:'<b>Recién nacido de 2500 g</b> reintubado hace 10 minutos. En AC-VG: el PIP subió al máximo, aparece «VT bajo» y la SpO₂ cae. Murmullo vesicular disminuido a izquierda.',
+    learn:'Intubación selectiva: ventila un solo pulmón, cae la compliance y sube el shunt. Corregir la posición (retirar 0,5–1 cm, regla peso + 6 cm), controlar con Rx y después bajar la FiO₂.',
+    ref:'Kempley ST, Resuscitation 2008 (profundidad del tubo); NETS WA, intubación neonatal.',
+    kg:2.5,cpk:.7,R:60,mOpen:5,mW:1.3,mOver:12,sh0:.2,pphn:.1,vdk:2.3,vco2:7,hco3:22,drive:.1,rrP:45,bp:38,leak:.05,ev0:['sel'],
+    goal:{co2:[40,50],sat:[92,97],vt:[4,6],vthf:[1.5,2.5],fio2:30},
+    start:{mode:'ac',peep:5,pip:18,ti:.35,rr:40,fio2:50,vt:5,pmax:20,term:15,hfMap:10,f:10,amp:25,vthf:2,ampMax:45,ie:1,vg:true}},
+  aspira:{grp:'hfo',n:'VAFO · 1000 g · secreciones y aspiración',desc:'<b>Prematuro de 1000 g en VAFO-VG</b>, bien reclutado con MAP 10 y FiO₂ 30 %. Ahora el VThf cae y aparece «VT hf no alcanzado»: hay secreciones en el tubo.',
+    learn:'Hay que aspirar. La aspiración abierta desconecta: el pulmón, que estaba abierto gracias a la histéresis, se colapsa y después hay que volver a reclutarlo (MAP +2–3 y luego bajarla). La aspiración cerrada mantiene la presión.',
+    ref:'NHS GGC, HFOV in the neonate (evitar desconexiones); Hoellering AB, Arch Dis Child 2008 (aspiración cerrada vs abierta en VAFO).',
+    kg:1,cpk:.5,R:120,mOpen:12,mW:.9,mOver:17,sh0:.6,pphn:.03,vdk:2.7,vco2:6,hco3:22,drive:.1,rrP:50,bp:32,leak:.1,hyst:4.5,rec0:1,ev0:['obs'],
+    goal:{co2:[45,55],sat:[90,95],vt:[4,6],vthf:[1.2,2.5],fio2:30,suc:true},
+    start:{mode:'hfo',peep:6,pip:18,ti:.3,rr:40,fio2:30,vt:5,pmax:25,term:15,hfMap:10,f:15,amp:22,vthf:1.7,ampMax:35,ie:1,vg:true}},
+  pda:{grp:'prem',n:'Prematuro 26 sem · 850 g · ductus significativo',desc:'<b>Prematuro de 26 semanas, 850 g, día 6.</b> Ductus de 2,5 mm con flujo de izquierda a derecha, pulsos saltones. En AC-VG la FiO₂ fue subiendo a 45 % y el PIP que usa el VG aumenta.',
+    learn:'El shunt por el ductus encharca el pulmón y baja la compliance. Subir la PEEP a 6–7 limita el shunt y recluta; indicar el tratamiento del ductus (paracetamol o ibuprofeno según protocolo) y revisar líquidos. La PA baja también mejora al cerrar el ductus.',
+    ref:'Fajardo MF, Neonatology 2014 (PEEP y shunt ductal); consenso europeo de SDR 2022.',
+    kg:.85,cpk:.55,R:150,mOpen:6,mW:1.2,mOver:13,sh0:.6,pphn:.02,vdk:3,vco2:6,hco3:21,drive:.3,rrP:55,bp:28,leak:.1,pda:1,
+    goal:{co2:[45,60],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:30},
+    start:{mode:'ac',peep:5,pip:18,ti:.3,rr:40,fio2:45,vt:5,pmax:25,term:15,hfMap:11,f:15,amp:22,vthf:1.7,ampMax:35,ie:1,vg:true}},
+  nec:{grp:'prem',n:'Prematuro 1200 g · ECN con distensión abdominal',desc:'<b>Prematuro de 1200 g, día 12, con enterocolitis necrotizante.</b> Abdomen muy distendido. En AC-VG con PIP máx 20: aparece «VT bajo», sube la pCO₂ y la FiO₂.',
+    learn:'La distensión abdominal reduce la compliance de la caja torácica y colapsa las bases. Descomprimir (SOG abierta a bolsa), subir el PIP máx mientras tanto, PEEP 6 y considerar VAFO si las presiones son muy altas. Acidosis metabólica por la ECN.',
+    ref:'Pediatrix/Mombaby, High frequency ventilation 2023 (indicaciones de VAFO); Neu J, N Engl J Med 2011 (ECN).',
+    kg:1.2,cpk:.8,R:110,mOpen:5,mW:1.3,mOver:13,sh0:.45,pphn:.03,vdk:2.7,vco2:6.5,hco3:17,drive:.1,rrP:50,bp:30,leak:.1,ev0:['abd'],
+    goal:{co2:[45,55],sat:[90,94],vt:[4,6],vthf:[1.2,2.5],fio2:35},
+    start:{mode:'ac',peep:5,pip:16,ti:.3,rr:40,fio2:40,vt:5,pmax:20,term:15,hfMap:11,f:12,amp:22,vthf:1.7,ampMax:35,ie:1,vg:true}},
+  extfail:{grp:'prem',n:'Prematuro 900 g · extubado a CPAP · fatiga',desc:'<b>Prematuro de 900 g, día 9</b>, extubado hace 1 hora a CPAP 6 con cafeína. Respira a 70 rpm con tiraje; la pCO₂ empieza a subir.',
+    learn:'Tras la extubación el trabajo respiratorio es alto: si se sostiene, aparece fatiga y fracasa la extubación. La NIPPV (FR 30–40, PIP 16–18) reduce el trabajo y disminuye la reintubación; reintubar si pH < 7,20 o apneas que requieren bolsa.',
+    ref:'Lemyre B, Cochrane 2017 (NIPPV post-extubación); Mukerji A, Pediatrics 2024; Brigham and Women’s, criterios de fracaso de extubación.',
+    kg:.9,cpk:.8,R:90,mOpen:5.5,mW:1.3,mOver:12,sh0:.35,pphn:.03,vdk:2.9,vco2:6,hco3:24,drive:.5,rrP:55,bp:32,leak:0,fatK:1.3,apnea:.4,ev0:['caf'],
+    goal:{co2:[40,60],sat:[90,94],vt:[3,8],vthf:[1.2,2.5],fio2:30,noInt:true,noFat:true},
+    start:{mode:'cpap',peep:6,pip:16,ti:.35,rr:30,fio2:30,vt:5,pmax:25,term:15,hfMap:10,f:15,amp:20,vthf:1.6,ampMax:35,ie:1,vg:false}},
+  libre:{n:'Paciente configurable',desc:'',
+    kg:1.5,cpk:.8,R:100,mOpen:6,mW:1.5,mOver:13,sh0:.25,pphn:.05,vdk:2.5,vco2:6.5,hco3:24,drive:.3,rrP:50,bp:38,
+    goal:{co2:[40,55],sat:[90,95],vt:[4,6],vthf:[1.5,2.5],fio2:40},
+    start:{mode:'ac',peep:5,pip:18,ti:.35,rr:40,fio2:40,vt:5,pmax:25,term:15,hfMap:10,f:12,amp:22,vthf:1.8,ampMax:40,ie:1,vg:false}}
+};
+
+/* ============ ESTADO ============ */
+let C0, S, P, M, G, run=true, speed=1, win=6, loopMode='pv';
+const ev={obs:false,ptx:false,ext:false,hem:false,sel:false,abd:false,caf:false,ino:false,surfT:null,pdaT:null,sucDone:false,sucOpen:null};
+
+function newState(){
+  M={V:0,Q:0,paw:0,pmus:0,t:0,
+     ph:'exp',pt:0,since:0,simvT:0,qPk:0,type:'',dPvg:null,vgLim:false,
+     inSeg:false,seg:0,segSup:false,vRef:0,segPk:0,lastBreath:0,breaths:[],
+     curLoop:[],loop:[],pip:0,pipCur:0,map:0,autoPeep:0,vti:0,vtSup:0,
+     patPh:Math.random(),patT:0,effort:false,
+     hfPh:0,hfVmin:1e9,hfVmax:-1e9,hfVT:0,hfVTm:0,hfLim:false,ampEff:null,vEma:0,pY:0,mapY:0,
+     rec:.5,sampAcc:0,apNext:15,apEnd:-1,apList:[],lkAcc:0,ptxAuto:false,qm:0,wob:.5,fat:0,discUntil:-1,closedUntil:-1,tiHist:[],rrF:1,chem:1};
+  G={co2:50,o2:60,tSim:0,okFor:0,lastGas:null};
+}
+const N=600;let buf={p:new Float32Array(N),f:new Float32Array(N),v:new Float32Array(N),i:0};
+
+/* ============ FISIOLOGÍA ============ */
+function sf(){return ev.surfT==null?0:1-Math.exp(-(G.tSim-ev.surfT)/240)} // efecto del surfactante 0..1
+function surfObs(){return ev.surfT!=null&&G.tSim-ev.surfT<90}
+function mOpenE(){return P.mOpen-2*sf()+(ev.hem?2.5:0)+(ev.abd?1.5:0)}
+function pdaL(){return (P.pda||0)*(ev.pdaT==null?1:Math.exp(-(G.tSim-ev.pdaT)/400))} // ductus: se cierra al tratarlo
+function pdaC(){ // el shunt I→D por el ductus encharca el pulmón; la PEEP/MAP lo limita
+  const pr=S.mode==='hfo'?clamp((11-M.map)/4,0,1):clamp((7-S.peep)/3,0,1);return 1-.4*pdaL()*(.35+.65*pr)}
+function disc(){return M.t<M.discUntil}
+function measF(){return S.lcomp?1-.1*leak():1-.6*leak()} // fracción del VT que muestra el sensor
+function sh0E(){return P.sh0*(1-.5*sf())+(ev.hem?.2:0)}
+function vco2E(){return P.vco2*(1-.07*(37-(P.temp||37)))} // la hipotermia baja la producción de CO2
+function lungC(){ // ml/cmH2O efectivos
+  const base=P.cpk*(1+((P.surf||1)-1)*sf())*P.kg*(ev.hem?.55:1)*(ev.sel?.55:1)*(ev.abd?.6:1)*pdaC();
+  let c=base*(.35+.65*M.rec);
+  c*=1-.5*odx();
+  if(ev.ptx)c*=.45;
+  return Math.max(c,.05);
+}
+function odx(){ // sobredistensión 0..1
+  const byMap=Math.max(0,M.map-P.mOver)/4;
+  const byPip=S.mode==='hfo'?0:Math.max(0,M.pip-(P.mOver+14))/8;
+  return clamp(byMap+byPip,0,1);
+}
+function tubo(){return P.kg<1?2.5:P.kg<2?3:3.5}
+function devMax(){return Math.min(90,2000/Math.pow(S.f,1.5))} // amplitud máxima que el equipo logra a esa frecuencia
+function hfTF(){const fc=tubo()===2.5?14:tubo()===3?18:22;return 1/Math.sqrt(1+Math.pow(S.f/fc,2))} // atenuación por tubo
+function leak(){return S.mode==='cpap'||S.mode==='nippv'?0:(P.leak||0)}
+function Rml(){return (P.R*(ev.obs?5:1)*(surfObs()?2.5:1)*(1-.3*sf())*(ev.hem?1.5:1)*(ev.sel?1.4:1)*(M.t<M.closedUntil?2:1))/1000} // cmH2O/(ml/s)
+const sev=p=>{const q=p*26.8/20;return 100/(23400/(q*q*q+150*q)+1)}; // Severinghaus con Hb fetal (P50 ~20)
+function pH(){return 6.1+Math.log10(P.hco3/(.03*G.co2))}
+function pf(){const ph=pH();return (ev.ino?(P.inoF||.4):1)*(ph<7.25?1.35:ph>7.42?.8:1)*(1+odx()*.6)*(G.o2<40?1.1:1)}
+function shunt(){
+  return clamp(sh0E()*(1-M.rec)+P.pphn*pf()+(ev.ptx?.25:0)+(ev.sel?.25:0)+(ev.abd?.05:0)+.1*pdaL()+.25*odx()+.03,0,.92);
+}
+function qpqs(){ // ventrículo único: relación Qp:Qs según la resistencia pulmonar
+  if(!P.sv)return null;const ph=pH();
+  const q=P.qp0*Math.pow(40/G.co2,1.3)*Math.pow(S.fio2/21,.4)*(ph>7.45?1.15:ph<7.25?.85:1)*(1-.4*odx())*(ev.ino?1.6:1)*(ev.ptx?.7:1);
+  return clamp(q,.25,5);
+}
+function lactate(){if(P.sv){const q=qpqs();return 1.2+3*Math.max(0,q-1.6)+4*Math.max(0,.6-q)}return P.lac0||null}
+function vaKg(){ // ventilación alveolar ml/kg/min (convencional)
+  const now=M.t, span=clamp(now-(M.tMode||0),6,30), recent=M.breaths.filter(b=>now-b.t<span);
+  const nonInv=S.mode==='cpap'||S.mode==='nippv'||ev.ext;
+  const vd=(P.vdk-(nonInv?Math.min(.8/P.kg,1):0))*P.kg*(1+odx()*.6); // sin tubo ni sensor, menos espacio muerto
+  let s=0;recent.forEach(b=>s+=Math.max(0,b.vt-vd));
+  return s*60/span/P.kg;
+}
+function dco2c(){return S.f*Math.pow(M.hfVT/P.kg,2)}
+function co2ss(){
+  const vdF=P.vdk/2.2*(1+odx()*.6);
+  if(S.mode==='hfo'&&!ev.ext){
+    const d=dco2c();
+    // aporte de respiraciones espontáneas sobre la VAFO (pequeño)
+    return clamp(1900*(1+odx()*.6)*(vco2E()/P.vco2)/Math.max(d,1),25,130);
+  }
+  const va=vaKg();
+  return clamp(.863*vco2E()/Math.max(va/1000,.004),25,130);
+}
+function o2ss(){
+  const pao=(S.fio2/100)*713-G.co2/.8;
+  const nb=S.mode==='hfo'&&!ev.ext?0:Math.max(0,M.t-M.lastBreath-6); // sin respiraciones: cae la PaO2
+  return Math.max(18,pao*Math.pow(1-shunt(),3)*Math.exp(-nb/20));
+}
+function bp(){return P.bp*(1-.15*pdaL())*(1-.35*odx())*(ev.ptx?.62:1)*(G.o2<35&&!P.sv?.85:1)*(P.sv?Math.pow(2/(1+qpqs()),.7):1)}
+
+/* ============ RESPIRADOR ============ */
+function startBreath(type){M.ph='insp';M.pt=0;M.since=0;M.qPk=0;M.type=type;M.pipCur=0;
+  if(S.mode!=='hfo'){M.autoPeep=Math.max(0,M.V/lungC()-S.peep);} }
+function dPset(){
+  const dp=S.pip-S.peep;
+  if(S.vg&&(S.mode==='ac'||S.mode==='simv'||S.mode==='psv')){if(M.dPvg==null)M.dPvg=dp;return M.dPvg}
+  return dp;
+}
+function step(dt){
+  M.t+=dt;
+  // --- esfuerzo del paciente
+  // quimiorreflejo: la hipercapnia y la hipoxemia aumentan el esfuerzo; la hipocapnia lo apaga (umbral apneico)
+  M.chem=clamp(1+(G.co2-45)/40+(satNow()<85?.3:0),.3,2.5);
+  M.rrF=clamp(1+(G.co2-45)/60+(satNow()<85?.2:0),.6,1.6);
+  let drive=P.drive*M.chem*(1-M.fat)*(ev.ext?1.2:1)*(ev.caf?1.15:1);
+  if(P.apnea>0){ // apneas del prematuro (la cafeína las espacia)
+    if(M.t>=M.apNext){M.apEnd=M.t+10+Math.random()*8;M.apNext=M.apEnd+((ev.caf?90+Math.random()*60:22+Math.random()*18)/P.apnea);
+      M.apList.push({t:M.t,mode:S.mode});if(M.apList.length>30)M.apList.shift()}
+    if(M.t<M.apEnd)drive=0;
+  }
+  let pmus=0;M.effort=false;
+  if(drive>0.01){
+    M.patT+=dt;const per=60/(P.rrP*M.rrF)*(0.9+0.2*M.patPh);
+    if(M.patT>=per){M.patT=0;M.patPh=Math.random()}
+    const ti=.32;
+    if(M.patT<ti){pmus=-drive*8*Math.sin(Math.PI*M.patT/ti);M.effort=true}
+  }
+  M.pmus=pmus;
+  const C=lungC(),R=Rml();
+  const air=disc()?0:ev.ext?.06:1; // fracción de presión que llega al pulmón
+  let target=S.peep;
+  const nonInv=S.mode==='cpap'||S.mode==='nippv';
+  if(S.mode==='hfo'){
+    M.hfPh+=S.f*dt;
+    if(M.hfPh>=1){M.hfPh-=1;
+      M.hfVT=Math.max(0,M.hfVmax-M.hfVmin);M.hfVmin=1e9;M.hfVmax=-1e9;
+      M.hfVTm=M.hfVT*measF(); // lo que mide el sensor (la fuga se pierde en la espiración)
+      const lim=Math.min(S.ampMax,devMax());
+      if(S.vg){const r=S.vthf*P.kg/Math.max(M.hfVTm,.05);M.ampEff=clamp(M.ampEff*(1+.35*(r-1)),4,lim);
+        M.hfLim=M.hfVTm<S.vthf*P.kg*.9&&M.ampEff>=lim-.5}
+      else{M.ampEff=Math.min(S.amp,devMax());M.hfLim=false}
+      M.loop=M.curLoop;M.curLoop=[];
+    }
+    if(M.ampEff==null)M.ampEff=S.vg?Math.min(S.ampMax,20):S.amp;
+    const fi=1/(1+S.ie),ph=M.hfPh;
+    let w=ph<fi?Math.sin(Math.PI*ph/fi):-Math.sin(Math.PI*(ph-fi)/(1-fi));
+    w-=(2/Math.PI)*(2*fi-1);
+    M.pY=(S.hfMap+M.ampEff/2*w)*air;               // presión en la pieza en Y (lo que muestra el monitor)
+    target=S.hfMap*(1-.15*leak())+M.ampEff/2*w*hfTF(); // presión que llega a la vía aérea distal
+    M.paw=target*air;
+  }else{
+    // máquina de estados convencional
+    M.since+=dt;M.pt+=dt;M.simvT+=dt;
+    const per=60/S.rr;
+    const trig=M.qm*.06>S.trig&&M.pt>.2&&!ev.ext&&!disc(); // dispara por flujo medido: un esfuerzo… o la fuga (autociclado)
+    if(M.ph==='insp'){
+      M.qPk=Math.max(M.qPk,M.qm);
+      const ti=S.ti;
+      const endPSV=(M.type==='psv')&&M.pt>.06&&M.qm<M.qPk*S.term/100;
+      if(endPSV||M.pt>=ti){M.tiHist.push(M.pt);if(M.tiHist.length>8)M.tiHist.shift();M.ph='exp';M.pt=0}
+    }else{
+      if(S.mode==='ac'){if(trig||M.since>=per)startBreath('ac')}
+      else if(S.mode==='simv'){if((trig&&M.simvT>=.6*per)||M.simvT>=per){startBreath('simv');M.simvT=0}}
+      else if(S.mode==='psv'){if(trig)startBreath('psv');else if(M.since>=per)startBreath('psv')}
+      else if(S.mode==='nippv'){if(M.since>=per)startBreath('nippv')}
+    }
+    if(M.ph==='insp'&&S.mode!=='cpap'){
+      let dp=dPset();if(S.mode==='nippv')dp*=.6;
+      target=S.peep+dp;
+    }
+    if(nonInv)target*=.9;
+    const tau=M.ph==='insp'?.03:.02;
+    M.paw+=(target*air-M.paw)*Math.min(1,dt/tau);M.pY=M.paw;
+  }
+  // --- mecánica pulmonar
+  const q=(M.paw-M.V/C-pmus)/R;
+  M.Q=q;M.V+=q*dt;
+  // flujo que ve el sensor: el del pulmón + la fuga alrededor del tubo (la compensación resta casi toda la fuga)
+  const ql=S.mode==='hfo'||disc()?0:leak()*2.5*Math.max(0,M.paw)*P.kg;
+  M.qm=disc()?0:q+ql*(S.lcomp?.08:1);
+  M.map+=(M.paw-M.map)*dt/2.5;M.mapY+=(M.pY-M.mapY)*dt/2.5;
+  if(M.ph==='insp')M.pipCur=Math.max(M.pipCur,M.paw);
+  // --- segmentación de respiraciones (convencional)
+  if(S.mode!=='hfo'){
+    if(!M.inSeg&&q>1.2){M.inSeg=true;M.seg=0;M.segSup=M.ph==='insp';M.vRef=M.V;M.segPip=M.paw;
+      if(M.curLoop.length>10)M.loop=M.curLoop;M.curLoop=[]}
+    if(M.inSeg){M.seg+=Math.max(0,q)*dt;if(M.ph==='insp')M.segSup=true;M.segPip=Math.max(M.segPip,M.paw);
+      if(q<-1.2){M.inSeg=false;
+        if(M.seg>.25){M.breaths.push({t:M.t,vt:M.seg,sup:M.segSup});M.lastBreath=M.t;M.vti=M.seg*measF();
+          if(M.segSup){M.vtSup=M.seg*measF();M.pip=Math.max(M.segPip,S.peep);
+            if(S.vg&&(S.mode==='ac'||S.mode==='simv'||S.mode==='psv')){
+              const tgt=S.vt*P.kg,cur=dPset(),vm=M.seg*measF();
+              let nd=cur+clamp(cur*(tgt/Math.max(vm,.05)-1)*.6,-3,3);
+              const mx=S.pmax-S.peep;M.vgLim=nd>mx+.01&&vm<tgt*.9;M.dPvg=clamp(nd,2,mx);
+            }}
+          if(M.breaths.length>160)M.breaths.splice(0,M.breaths.length-160);}
+      }}
+  }else{
+    M.hfVmin=Math.min(M.hfVmin,M.V);M.hfVmax=Math.max(M.hfVmax,M.V);M.pip=M.paw>M.pip?M.paw:M.pip;
+  }
+  M.vEma+=(M.V-M.vEma)*dt/1.2;
+  // loop points
+  if(((M.t*1000)|0)%(S.mode==='hfo'?2:8)===0){
+    const vd=S.mode==='hfo'?M.V-M.vEma:M.V-M.vRef;M.curLoop.push([M.paw,vd,q*.06]);if(M.curLoop.length>800)M.curLoop.shift()}
+  // muestreo de curvas
+  M.sampAcc+=dt;const dts=win/N;
+  while(M.sampAcc>=dts){M.sampAcc-=dts;
+    buf.p[buf.i]=M.pY;buf.f[buf.i]=M.qm*.06;buf.v[buf.i]=S.mode==='hfo'?M.V-M.vEma:(M.inSeg||M.ph==='insp'?M.V-M.vRef:Math.max(0,M.V-M.vRef));
+    buf.i=(buf.i+1)%N;}
+}
+function physio(dtp){ // dtp en segundos del paciente
+  G.tSim+=dtp;
+  const drv=disc()?0:S.mode==='hfo'?M.map:S.peep*(ev.ext?.06:1)+.5*Math.max(0,M.map-S.peep*(ev.ext?.06:1));
+  const recT=1/(1+Math.exp(-(drv-(mOpenE()-(P.hyst||0)*M.rec))/P.mW)); // histéresis: abierto se mantiene con menos presión
+  M.rec+=(recT-M.rec)*Math.min(1,dtp/40);
+  G.co2+=(co2ss()-G.co2)*Math.min(1,dtp/90);
+  G.o2+=(o2ss()-G.o2)*Math.min(1,dtp/20);
+  { // trabajo respiratorio y fatiga
+    const rec=M.breaths.filter(b=>M.t-b.t<20),uns=rec.length?rec.filter(b=>!b.sup).length/rec.length:1;
+    const load=clamp(.8/Math.max(lungC()/P.kg,.1),.7,2.2)*(S.mode==='cpap'?1:S.mode==='nippv'?.75:1.3); // pulmón rígido y tubo (la NIPPV estabiliza la CRF)
+    const eff=P.drive*M.chem*(1-M.fat)*(ev.caf?1.15:1);
+    M.wob=(eff/.5)*Math.sqrt(P.rrP*M.rrF/50)*(.35+.65*uns*load)/1.4; // ~0,6 = respiración tranquila
+    if(P.drive>.05){if(M.wob>1.15)M.fat=Math.min(.85,M.fat+dtp*(M.wob-1.15)*(P.fatK||.4)/3000);
+      else if(M.wob<1)M.fat=Math.max(0,M.fat-dtp/1200);}
+  }
+  if(P.ptxRisk&&!ev.ptx){ // fuga aérea espontánea por barotrauma
+    const r=odx()+(S.mode!=='hfo'?Math.max(0,M.pip-25)/10:0);
+    M.lkAcc=Math.max(0,M.lkAcc+dtp*(r-.08)*P.ptxRisk);
+    if(M.lkAcc>400){ev.ptx=true;M.ptxAuto=true;const b=document.querySelector('.ev button[data-e="ptx"]');if(b)b.classList.add('on')}
+  }
+}
+
+/* ============ CONTROLES ============ */
+const DEF={
+  peep:{l:'PEEP',u:'cmH₂O',st:1,mn:2,mx:12,d:0},
+  pip:{l:'PIP',u:'cmH₂O',st:1,mn:8,mx:40,d:0},
+  ti:{l:'Ti',u:'s',st:.05,mn:.2,mx:.8,d:2},
+  rr:{l:'FR',u:'rpm',st:5,mn:5,mx:100,d:0},
+  fio2:{l:'FiO₂',u:'%',st:5,mn:21,mx:100,d:0},
+  vt:{l:'VT objetivo',u:'ml/kg',st:.5,mn:2.5,mx:10,d:1},
+  pmax:{l:'PIP máx (VG)',u:'cmH₂O',st:1,mn:10,mx:45,d:0},
+  term:{l:'Terminación',u:'% pico',st:5,mn:5,mx:50,d:0},
+  hfMap:{l:'MAP',u:'cmH₂O',st:1,mn:5,mx:25,d:0},
+  f:{l:'Frecuencia',u:'Hz',st:1,mn:5,mx:20,d:0},
+  amp:{l:'Amplitud',u:'cmH₂O',st:2,mn:6,mx:60,d:0},
+  vthf:{l:'VThf objetivo',u:'ml/kg',st:.05,mn:.8,mx:3.5,d:2,fmt:v=>fx(v,2)+`<small style="display:block;font-size:11px;font-weight:600;opacity:.7">= ${fx(v*P.kg,2)} mL</small>`},
+  ampMax:{l:'Amplitud máx',u:'cmH₂O',st:5,mn:10,mx:70,d:0},
+  ie:{l:'I:E',u:'',st:1,mn:1,mx:2,d:0,fmt:v=>'1:'+v},
+  trig:{l:'Trigger',u:'L/min',st:.1,mn:.1,mx:3,d:1}
+};
+const LAYOUT={
+  cpap:['peep','fio2'],
+  nippv:['peep','pip','ti','rr','fio2'],
+  ac:['peep','pip','ti','rr','fio2','vt','pmax','trig'],
+  simv:['peep','pip','ti','rr','fio2','vt','pmax','trig'],
+  psv:['peep','pip','ti','rr','term','fio2','vt','pmax','trig'],
+  hfo:['hfMap','f','amp','vthf','ampMax','ie','fio2']
+};
+const INFO={
+  cpap:'Presión continua (cmH₂O de CPAP = PEEP). El paciente hace todo el trabajo respiratorio. Si no tiene esfuerzo propio, no hay ventilación.',
+  nippv:'Ciclos de presión no sincronizados por interfaz nasal. Por la fuga, al pulmón llega ~60 % del ΔP programado.',
+  ac:'Asistida-controlada (SIPPV): cada esfuerzo que dispara recibe una ventilación completa. FR = respaldo.',
+  simv:'Solo la FR programada recibe presión (sincronizada); el resto de las respiraciones son espontáneas sobre la PEEP.',
+  psv:'Cada esfuerzo recibe soporte; termina cuando el flujo cae al % del pico. Ti = Ti máximo. FR = respaldo por apnea.',
+  hfo:'Oxigenación: MAP y FiO₂. Ventilación: DCO₂ = f × VT². Con VG se programa el VThf; sin VG, la amplitud.'
+};
+let selK=null;
+function dialPct(k){const d=DEF[k];return Math.round((S[k]-d.mn)/(d.mx-d.mn)*100)}
+function dialLab(k){const m=S.mode;let lab=DEF[k].l;
+  if(m!=='hfo'&&k==='pip'&&S.vg)lab='PIP inicial';if(k==='pip'&&m==='psv'&&!S.vg)lab='PIP soporte';if(k==='peep'&&m==='cpap')lab='CPAP';return lab}
+function dialDis(k){const m=S.mode;if(m!=='hfo')return (k==='vt'||k==='pmax')&&!S.vg;return (k==='amp'&&S.vg)||((k==='vthf'||k==='ampMax')&&!S.vg)}
+function valTxt(k){const d=DEF[k];return d.fmt?d.fmt(S[k]):fx(S[k],d.d)}
+function paintAdj(){const k=selK;if(!k)return;const d=DEF[k];
+  $('adjL').textContent=dialLab(k)+(dialDis(k)?' (inactivo)':'');$('adjV').innerHTML=valTxt(k);$('adjU').textContent=d.u}
+function renderSteps(){
+  const m=S.mode, keys=LAYOUT[m];
+  $('vgRow').style.display=(m==='cpap'||m==='nippv')?'none':'flex';
+  $('vg').checked=S.vg;$('lcomp').checked=S.lcomp;$('lcRow').style.display=(m==='cpap'||m==='nippv')?'none':'flex';
+  $('modeInfo').textContent=INFO[m];
+  document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  if(!keys.includes(selK))selK=keys.find(k=>!dialDis(k))||keys[0];
+  $('steps').innerHTML=keys.map(k=>`<div class="dial${dialDis(k)?' dis':''}${k===selK?' sel':''}" data-k="${k}">
+      <div class="ring" style="--p:${dialPct(k)}%"><span id="sv-${k}">${valTxt(k)}</span></div>
+      <div class="dl">${dialLab(k)}</div><div class="du">${DEF[k].u||'&nbsp;'}</div></div>`).join('');
+  $('steps').querySelectorAll('.dial').forEach(el=>el.onclick=()=>{selK=el.dataset.k;
+    $('steps').querySelectorAll('.dial').forEach(x=>x.classList.toggle('sel',x===el));paintAdj()});
+  paintAdj();
+}
+function bump(dir){const k=selK;if(!k)return;const d=DEF[k];
+  S[k]=clamp(Math.round((S[k]+dir*d.st)/d.st*1000)/1000*d.st,d.mn,d.mx);S[k]=+S[k].toFixed(3);
+  if(k==='pip'||k==='peep'){if(S.pip<S.peep+4)S.pip=S.peep+4;M.dPvg=S.vg?M.dPvg:null}
+  if(k==='amp'&&!S.vg)M.ampEff=S.amp;
+  (k==='pip'||k==='peep'?['pip','peep']:[k]).forEach(x=>{const e=$('sv-'+x);if(e){e.innerHTML=valTxt(x);e.parentElement.style.setProperty('--p',dialPct(x)+'%')}});
+  const el=document.querySelector(`.dial[data-k="${k}"]`);if(el){el.classList.add('hl');setTimeout(()=>el.classList.remove('hl'),250)}
+  paintAdj()}
+$('adj').querySelectorAll('button').forEach(b=>{let hold;const dir=+b.dataset.d;
+  b.onclick=()=>bump(dir);
+  b.addEventListener('pointerdown',()=>{hold=setTimeout(function rep(){bump(dir);hold=setTimeout(rep,110)},450)});
+  ['pointerup','pointerleave','pointercancel'].forEach(e=>b.addEventListener(e,()=>clearTimeout(hold)));});
+$('modes').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  const m=b.dataset.m;if(m===S.mode)return;
+  if(m==='hfo'){S.hfMap=Math.max(S.hfMap,Math.round(M.map+2));M.ampEff=S.vg?Math.min(S.ampMax,20):S.amp;M.hfVT=0;setWin(1.5)}
+  else if(S.mode==='hfo'){setWin(6)}
+  if(m==='cpap'||m==='nippv')S.vg=false;
+  S.mode=m;M.tMode=M.t;M.ph='exp';M.pt=0;M.since=0;M.dPvg=null;M.breaths=[];M.curLoop=[];M.loop=[];M.pip=0;
+  renderSteps();actsUI();
+});
+$('lcomp').onchange=()=>{S.lcomp=$('lcomp').checked};
+$('vg').onchange=()=>{S.vg=$('vg').checked;M.dPvg=null;if(S.mode==='hfo')M.ampEff=S.vg?Math.min(S.ampMax,M.ampEff||20):S.amp;renderSteps()};
+
+/* ============ CASOS / UI ============ */
+Object.assign(CASES,window.SIM_EVAL||{});
+const GRP=[['libre','⚙️ Configurable'],['eval','📋 Casos evaluables (por etapa)'],['prem','Prematuros'],['hfo','VAFO'],['asinc','Asincronías y complicaciones'],['term','Término'],['cardio','Cardiología']];
+$('caseSel').innerHTML=GRP.map(([g,l])=>{const ks=Object.keys(CASES).filter(k=>g==='libre'?k==='libre':CASES[k].grp===g);
+  return `<optgroup label="${l}">${ks.map(k=>`<option value="${k}">${k==='libre'?'⚙️ ':''}${CASES[k].n}</option>`).join('')}</optgroup>`}).join('');
+function loadCase(k){
+  C0=k;P=JSON.parse(JSON.stringify(CASES[k]));S=JSON.parse(JSON.stringify(P.start));
+  Object.keys(ev).forEach(e=>ev[e]=false);ev.ino=false;$('ino').checked=false;
+  document.querySelectorAll('.ev button').forEach(b=>b.classList.toggle('on',!!ev[b.dataset.e]));
+  ev.surfT=null;ev.caf=(P.ev0||[]).includes('caf');ev.pdaT=null;ev.sucDone=false;ev.sucOpen=null;
+  if(S.trig==null)S.trig=.2;if(S.lcomp==null)S.lcomp=true;if(P.fatK==null)P.fatK=P.kg<1.5?1:P.kg<2.5?.5:.15;
+  newState();if(P.rec0!=null)M.rec=P.rec0;$('hCase').textContent=P.n;$('caseTxt').innerHTML=P.desc+(P.learn?`<span class="lrn"><b>Qué practicar:</b> ${P.learn}</span>`:'')+(P.ref?`<span class="ref">Basado en: ${P.ref}</span>`:'');
+  actsUI();
+  $('drv').value=P.drive;drvLbl();
+  $('libre').style.display=k==='libre'?'block':'none';
+  if(k==='libre'){applyLibre(true)}
+  $('drv').value=P.drive;drvLbl();
+  if(P.leak==null)P.leak=.05;$('lk').value=P.leak;$('lkV').textContent=fx(P.leak*100)+' %';
+  setWin(S.mode==='hfo'?1.5:6);
+  renderSteps();
+  // precalentamiento: 10 s de mecánica y gases en equilibrio
+  M.map=S.peep+2;
+  for(let i=0;i<20000;i++)step(.0005);
+  for(let i=0;i<40;i++){physio(30)}
+  G.co2=co2ss();if(P.co2i!=null)G.co2=P.co2i;G.o2=o2ss();G.tSim=0;M.fat=P.fat0||0;M.lkAcc=0;M.ptxAuto=false;ev.ptx=false;(P.ev0||[]).forEach(e=>ev[e]=true);
+  document.querySelectorAll('.ev button').forEach(b=>b.classList.toggle('on',!!ev[b.dataset.e]));
+  $('gasOut').innerHTML='';$('tipOut').innerHTML='';G.okFor=0;$('win').classList.remove('on');
+  try{localStorage.setItem('calcsim_case',k)}catch(e){}
+}
+$('caseSel').onchange=()=>loadCase($('caseSel').value);
+function actsUI(){
+  $('bSurf').style.display=P.surf?'':'none';$('bCaf').style.display=(P.apnea||P.goal.ext||P.fatK>=1&&P.drive>.05)?'':'none';$('bPda').style.display=P.pda?'':'none';
+  $('acts').style.display=(P.surf||P.apnea||P.goal.ext||P.pda||P.fatK>=1&&P.drive>.05)?'grid':'none';
+  $('sucRow').style.display=S.mode==='cpap'||S.mode==='nippv'?'none':'grid';
+  $('bPda').disabled=ev.pdaT!=null;$('bPda').textContent=ev.pdaT!=null?'💊 Ductus tratado':'💊 Tratar ductus';
+  $('bSurf').disabled=ev.surfT!=null;$('bSurf').textContent=ev.surfT!=null?'💧 Surfactante dado':'💧 Surfactante';
+  $('bCaf').disabled=ev.caf;$('bCaf').textContent=ev.caf?'☕ Con cafeína':'☕ Cafeína';
+}
+$('bSurf').onclick=()=>{if(ev.surfT==null){ev.surfT=G.tSim;actsUI()}};
+$('bCaf').onclick=()=>{ev.caf=true;actsUI()};
+$('bPda').onclick=()=>{if(ev.pdaT==null){ev.pdaT=G.tSim;actsUI()}};
+function suction(open){ // la abierta desconecta ~8 s: se pierde la presión y el pulmón se desrecluta
+  if(ev.obs){ev.obs=false;const b=document.querySelector('.ev button[data-e="obs"]');if(b)b.classList.remove('on')}
+  if(open){M.discUntil=M.t+8;ev.sucOpen=G.tSim}else M.closedUntil=M.t+5;
+  ev.sucDone=true;}
+$('bSucO').onclick=()=>suction(true);$('bSucC').onclick=()=>suction(false);
+$('bReset').onclick=()=>loadCase(C0);
+function drvLbl(){const v=+$('drv').value;$('drvV').textContent=v<.05?'Sin esfuerzo (sedado)':v<.35?'Débil':v<.7?'Moderado':'Vigoroso'}
+$('lk').oninput=()=>{P.leak=+$('lk').value;$('lkV').textContent=fx(P.leak*100)+' %'};
+$('drv').oninput=()=>{P.drive=+$('drv').value;drvLbl()};
+/* ---- Paciente configurable: peso, EG, días de vida y patología ---- */
+const PAT={
+  sano:{n:'pulmón sano',cpk:1,rx:0,mOpen:4.5,mW:1.5,mOver:11,sh0:.1,pphn:.02,vdx:0,hco3:24},
+  emh:{n:'EMH',cpk:.45,rx:0,mOpen:7,mW:1.1,mOver:13.5,sh0:.65,pphn:.03,vdx:0,hco3:21},
+  sam:{n:'SAM',cpk:.5,rx:80,mOpen:8.5,mW:1.3,mOver:13,sh0:.45,pphn:.28,vdx:.6,hco3:18},
+  htpp:{n:'HTPP',cpk:.6,rx:10,mOpen:5,mW:1.3,mOver:12,sh0:.15,pphn:.5,vdx:0,hco3:20},
+  dbp:{n:'DBP',cpk:.4,rx:100,mOpen:7,mW:1.5,mOver:14,sh0:.3,pphn:.1,vdx:.8,hco3:30}
+};
+const numIn=id=>{const v=parseFloat(String($(id).value).replace(',','.'));return isFinite(v)?v:NaN};
+function libreLbl(){$('lCV').textContent=fx(P.cpk,2);$('lRV').textContent=fx(P.R)}
+function applyLibre(resetMech){
+  const g=numIn('lPeso'),eg=numIn('lEG'),d=numIn('lDias'),pk=$('lPat').value,T=PAT[pk];
+  const kg=clamp((g>0?g:1500)/1000,.4,5),EG=clamp(eg>0?eg:32,22,42),D=clamp(d>=0?d:0,0,180);
+  const pma=EG+D/7,prem=EG<37;
+  const tubo=kg<1?2.5:kg<2?3:3.5,rTubo=tubo===2.5?100:tubo===3?55:35;
+  if(resetMech){P.cpk=T.cpk;P.R=rTubo+30+T.rx;$('lC').value=P.cpk;$('lR').value=P.R}
+  Object.assign(P,{kg,mOpen:T.mOpen,mW:T.mW,mOver:T.mOver,sh0:T.sh0,pphn:T.pphn,hco3:T.hco3,
+    vdk:+(2+1/kg+T.vdx).toFixed(2),vco2:EG<32?6:7,rrP:EG<32?55:45,
+    bp:clamp(EG+Math.min(D,14)*.7,25,55)});
+  const g0={co2:EG<32||pma<34?[45,60]:[40,50],sat:pma<34?[90,95]:[92,97],vt:[4,6],vthf:[1.2,2.5],fio2:40};
+  if(pk==='dbp'){g0.co2=[55,65];g0.sat=[90,95];g0.vt=[6,8]}
+  if(pk==='htpp'){g0.co2=[40,50];g0.sat=[95,99]}
+  P.goal=g0;
+  if(resetMech){P.drive=EG<28?.3:EG<32?.4:.5;$('drv').value=P.drive;drvLbl()}
+  const wk=Math.floor(pma+1e-9),dd=Math.round((pma-wk)*7);
+  const egc=`${dd===7?wk+1:wk}+${dd===7?0:dd}`;
+  P.n=`${fx(kg*1000)} g · ${fx(EG,EG%1?1:0)} sem · ${fx(D)} d · ${T.n}`;
+  $('hCase').textContent='⚙️ '+P.n;
+  $('caseTxt').innerHTML=`<b>Paciente configurable.</b> ${fx(kg*1000)} g, ${fx(EG,EG%1?1:0)} semanas, ${fx(D)} días de vida (EG corregida ${egc}), ${T.n}. Cambiá los datos y la patología: las metas, el tubo, el espacio muerto y la mecánica se ajustan solos.`;
+  $('lDer').innerHTML=`Tubo sugerido <b>${fx(tubo,1)}</b> · EGc <b>${egc}</b> · Espacio muerto <b>${fx(P.vdk,1)} ml/kg</b> · PA media esperada <b>≥ ${fx(P.bp)} mmHg</b><br>Metas: pCO₂ <b>${g0.co2.join('–')}</b> · SpO₂ <b>${g0.sat.join('–')} %</b> · VT <b>${g0.vt.join('–')} ml/kg</b>`;
+  libreLbl();
+  try{localStorage.setItem('calcsim_libre',JSON.stringify({g:$('lPeso').value,eg:$('lEG').value,d:$('lDias').value,p:pk}))}catch(e){}
+}
+let libT;
+['lPeso','lEG','lDias'].forEach(id=>$(id).addEventListener('input',()=>{clearTimeout(libT);libT=setTimeout(()=>applyLibre(true),500)}));
+$('lPat').onchange=()=>applyLibre(true);
+['lC','lR'].forEach(id=>$(id).oninput=()=>{P.cpk=+$('lC').value;P.R=+$('lR').value;libreLbl()});
+try{const o=JSON.parse(localStorage.getItem('calcsim_libre')||'null');if(o){$('lPeso').value=o.g;$('lEG').value=o.eg;$('lDias').value=o.d;$('lPat').value=o.p}}catch(e){}
+$('ino').onchange=()=>ev.ino=$('ino').checked;
+document.querySelectorAll('.ev button').forEach(b=>b.onclick=()=>{const e=b.dataset.e;ev[e]=!ev[e];b.classList.toggle('on',ev[e]);
+  if(!ev[e]&&e==='ext'){M.V=S.peep*lungC()}
+  if(!ev[e]&&e==='ptx'){M.lkAcc=0;M.ptxAuto=false}});
+function setWin(w){win=w;$('wFast').classList.toggle('on',w<=2);$('wNorm').classList.toggle('on',w===6);$('wSlow').classList.toggle('on',w===12);
+  buf.p.fill(0);buf.f.fill(0);buf.v.fill(0)}
+$('wFast').onclick=()=>setWin(S.mode==='hfo'?1.5:2);$('wNorm').onclick=()=>setWin(6);$('wSlow').onclick=()=>setWin(12);
+$('lPV').onclick=()=>{loopMode='pv';$('lPV').classList.add('on');$('lFV').classList.remove('on')};
+$('lFV').onclick=()=>{loopMode='fv';$('lFV').classList.add('on');$('lPV').classList.remove('on')};
+$('bPlay').onclick=()=>{run=!run;$('bPlay').textContent=run?'⏸ Pausa':'▶ Seguir';$('bPlay').classList.toggle('on',run)};
+$('bSlow').onclick=()=>{speed=speed===1?.25:1;$('bSlow').classList.toggle('on',speed<1);$('bSlow').textContent=speed<1?'🐢 ×0,25':'🐢 Lento'};
+$('bFwd').onclick=()=>{for(let i=0;i<20;i++)physio(30);G.co2=co2ss();G.o2=o2ss();$('bFwd').textContent='✓ +10 min';setTimeout(()=>$('bFwd').textContent='⏩ +10 min',1200)};
+
+/* ============ GASES Y PISTAS ============ */
+function satNow(){if(P.sv){const q=qpqs(),spv=sev(G.o2);return clamp(spv-7*(1+q)/q,30,spv)}return sev(G.o2)}
+function satPost(){if(!P.duct)return null;const pre=satNow(),pd=clamp(P.duct*P.pphn*pf(),0,.6);return pre-pd*(pre-40)*.8}
+function invSev(s){let lo=5,hi=600;for(let i=0;i<40;i++){const m=(lo+hi)/2;sev(m)<s?lo=m:hi=m}return (lo+hi)/2}
+function vtKgNow(){return S.mode==='hfo'?M.hfVTm/P.kg:((S.mode==='cpap'?M.vti:M.vtSup)/P.kg)}
+$('bGas').onclick=()=>{
+  const ph=pH(),co2=G.co2,o2=P.sv?invSev(satNow()):G.o2,hco3=P.hco3,eb=.93*(hco3-24.4+14.8*(ph-7.4)),g=P.goal;
+  const cls=(v,lo,hi)=>v>hi?'hi':v<lo?'lo':'okv';
+  const io=(S.mode==='hfo'?S.hfMap:M.map)*S.fio2/o2;
+  $('gasOut').innerHTML=`<div class="gas">
+    <div><div class="t">pH</div><div class="v ${cls(ph,P.n.includes('DBP')?7.25:7.25,7.45)}">${fx(ph,2)}</div></div>
+    <div><div class="t">pCO₂ (meta ${g.co2.join('–')})</div><div class="v ${cls(co2,g.co2[0],g.co2[1])}">${fx(co2)}</div></div>
+    <div><div class="t">PaO₂</div><div class="v ${cls(o2,45,P.goal.sat[1]>96?100:80)}">${fx(o2)}</div></div>
+    <div><div class="t">HCO₃⁻</div><div class="v">${fx(hco3,1)}</div></div>
+    <div><div class="t">EB</div><div class="v">${fx(eb,1)}</div></div>
+    <div><div class="t">IO</div><div class="v ${io>=20?'hi':io>=10?'lo':'okv'}">${fx(io,1)}</div></div>
+    ${P.sv?`<div><div class="t">Qp:Qs (estimado)</div><div class="v ${cls(qpqs(),.7,1.5)}">${fx(qpqs(),1)}</div></div>`:''}
+    ${lactate()!=null?`<div><div class="t">Lactato</div><div class="v ${lactate()>2?'hi':'okv'}">${fx(lactate(),1)}</div></div>`:''}
+    ${P.duct?`<div><div class="t">SpO₂ pre / post</div><div class="v ${satPost()<70?'hi':'okv'}">${fx(satNow())}/${fx(satPost())}</div></div>`:''}
+    ${P.sv?`<div><div class="t">PA media</div><div class="v ${bp()<40?'hi':'okv'}">${fx(bp())}</div></div>`:''}</div>
+    ${(P.temp||37)<36?(()=>{const T=P.temp,c=co2*Math.pow(10,.019*(T-37)),pc=ph+.0147*(37-T),oc=o2*Math.pow(10,.0313*(T-37));
+      return `<div class="gas"><div><div class="t">pH a ${fx(T,1)} °C</div><div class="v">${fx(pc,2)}</div></div><div><div class="t">pCO₂ a ${fx(T,1)} °C</div><div class="v ${c<35?'hi':'okv'}">${fx(c)}</div></div><div><div class="t">PaO₂ a ${fx(T,1)} °C</div><div class="v">${fx(oc)}</div></div></div>
+      <p class="info">Arriba: valores a 37 °C (alfa-stat, sin corregir). Abajo: corregidos a la temperatura del paciente (pH-stat). Las metas del caso usan el valor a 37 °C.</p>`})():''}
+    <p class="info">Gasometría arterial · minuto ${fx(G.tSim/60)} del caso · ${S.mode==='hfo'?'VAFO':S.mode.toUpperCase()} con FiO₂ ${S.fio2} %</p>`;
+};
+function tips(){
+  const out=[],g=P.goal,sat=satNow(),co2=G.co2,od=odx(),hf=S.mode==='hfo';
+  const C=lungC(),tau=Rml()*C,te=60/S.rr-S.ti;
+  if(ev.obs)out.push(['b','Obstrucción del tubo: VT muy bajo con presiones normales y curva de flujo aplanada. Aspirar (tocá «Obstrucción» para resolver).']);
+  if(ev.ptx)out.push(['b','Neumotórax: caída brusca de compliance y saturación, hipotensión. Transiluminar y drenar (tocá «Neumotórax» para resolver).']);
+  if(ev.ext)out.push(['b','Extubación: VT casi cero, presión que no llega al pulmón. Ventilar con bolsa y reintubar (tocá «Extubación» para resolver).']);
+  if(S.mode==='cpap'&&P.drive<.05)out.push(['b','En CPAP sin esfuerzo propio no hay ventilación. Pasá a un modo con ciclos o subí el esfuerzo.']);
+  if(ev.sel)out.push(['b','Intubación selectiva (bronquio derecho): baja la compliance, sube el PIP (o el VG no llega), hipoxemia y asimetría en la auscultación. Retirá el tubo 0,5–1 cm y controlá con Rx (tocá «Intubación selectiva»).']);
+  if(ev.abd)out.push(['b',`Distensión abdominal: cae la compliance de la caja torácica y se colapsan las bases. Descomprimí (SOG abierta, tocá «Distensión abdominal»)${S.vg?', subí el PIP máx mientras tanto':''}${hf?'':' o considerá VAFO'}.`]);
+  if(!hf&&leak()>.2&&!S.lcomp&&rrTot()>Math.max(S.rr,P.rrP)*1.5)out.push(['b',`Autociclado: la fuga (${fx(leak()*100)} %) mantiene un flujo en el sensor que supera el trigger (${fx(S.trig,1)} L/min) y el respirador dispara solo (FR ~${fx(rrTot())}). Activá la compensación de fugas o subí el trigger; revisá el tamaño y la posición del tubo.`]);
+  if(S.mode==='psv'&&psvHang())out.push(['w',`En PSV la inspiración termina cuando el flujo cae al ${fx(S.term)} % del pico, pero con fuga ${!S.lcomp?'sin compensar ':''}el flujo nunca baja tanto y cicla por Ti máx (${fx(S.ti,2)} s): asincronía. Subí la terminación (25–40 %), acortá el Ti máx o activá la compensación de fugas.`]);
+  if(M.fat>.25)out.push(['b',`Fatiga respiratoria: el trabajo respiratorio fue alto varios minutos y el esfuerzo empieza a caer (sube la pCO₂). ${S.mode==='simv'?'En SIMV las respiraciones espontáneas a través del tubo no tienen soporte: pasá a AC o PSV (con VG).':S.mode==='cpap'?'Pasá a NIPPV o reintubá si no mejora.':'Aumentá el soporte.'}${!ev.caf&&P.kg<2?' Indicá cafeína.':''}`]);
+  else if(M.wob>1.1&&P.drive>.05)out.push(['w',`Trabajo respiratorio ${wobTxt().toLowerCase()}: si se mantiene, el prematuro se fatiga. Aumentá el soporte (más respiraciones asistidas, VG, PEEP óptima).`]);
+  if(pdaL()>.4)out.push(['',`Ductus con shunt importante: el pulmón se encharca y baja la compliance. ${S.mode==='hfo'?'Una MAP adecuada':'Subir la PEEP a 6–7'} limita el shunt de izquierda a derecha; indicá el tratamiento del ductus (botón en Paciente) y revisá líquidos.`]);
+  if(ev.sucOpen!=null&&G.tSim-ev.sucOpen<600&&M.rec<.6)out.push(['w',`Después de la aspiración abierta el pulmón se desreclutó. Recluta de nuevo: subí la ${hf?'MAP':'PEEP'} 2–3 cmH₂O unos minutos y después volvé a bajarla. En pacientes con pulmón inestable conviene la aspiración cerrada.`]);
+  if(ev.hem)out.push(['b','Hemorragia pulmonar: subí la PEEP a 6–8 (o la MAP en VAFO), considerá surfactante, transfusión y coagulación. Tocá «Hemorragia» cuando esté controlada.']);
+  if(M.ptxAuto&&ev.ptx)out.push(['b','Apareció un neumotórax por barotrauma: la presión media o el PIP fueron altos para este pulmón. Drená (tocá «Neumotórax») y bajá las presiones.']);
+  if(P.sv){const q=qpqs();
+    if(sat>85)out.push(['b',`Sobrecirculación pulmonar (Qp:Qs ~${fx(q,1)}): SpO₂ alta con PA que cae y lactato que sube. Bajá la FiO₂ a 21 %, evitá la hiperventilación (pCO₂ 40–50: bajá FR o PIP) y no uses óxido nítrico.`]);
+    else if(sat<72)out.push(['b',`Hipoxemia con Qp:Qs bajo (~${fx(q,1)}): subí un poco la FiO₂, bajá la pCO₂ y revisá el pulmón (reclutamiento, PEEP).`]);
+    if(ev.ino)out.push(['b','El óxido nítrico baja la resistencia pulmonar y empeora la sobrecirculación en el ventrículo único: suspendelo.']);}
+  if(P.surf&&ev.surfT==null&&S.fio2>30)out.push(['','Pulmón con déficit de surfactante y FiO₂ > 30 %: administrá surfactante (botón en Paciente). Después, la compliance mejora en minutos: bajá el PIP o usá VG para no hiperventilar.']);
+  if(surfObs())out.push(['w','Obstrucción transitoria por el surfactante: el VT cae por unos minutos. Podés subir el PIP máx o dar insuflaciones; no aspires.']);
+  if(ev.surfT!=null&&!surfObs()&&sf()>.3&&co2<P.goal.co2[0])out.push(['w',`Después del surfactante la compliance subió: ${hf?(S.vg?'bajá el VThf':'activá el VG o bajá la amplitud'):(S.vg?'bajá el VT objetivo':'bajá el PIP o pasá a VG')} para corregir la hipocapnia, y bajá la ${hf?'MAP':'PEEP'} si la FiO₂ ya es baja.`]);
+  if(P.ptxRisk&&!ev.ptx&&(odx()>.05||(!hf&&M.pip>25)))out.push(['w',`Pulmón con alto riesgo de fuga aérea: con esta ${hf?'MAP':'presión'} puede aparecer un neumotórax. Bajá ${hf?'la MAP':'el PIP, el Ti y la MAP'} y aceptá más FiO₂ o pCO₂${P.goal.mapMax&&P.goal.mapMax<=10&&!hf?' (o probá VAFO de baja frecuencia, 6–8 Hz, I:E 1:2)':''}.`]);
+  if(P.goal.pipMax&&!hf&&M.pip>P.goal.pipMax+.5)out.push(['w',`PIP ${fx(M.pip)} > ${P.goal.pipMax}: en la HDC se recomienda PIP ≤ 25. Si hace falta más de 28 para las metas, pasá a VAFO.`]);
+  if(P.goal.mapMax&&M.mapY>P.goal.mapMax+.3)out.push(['w',`MAP ${fx(M.mapY,1)} por encima de ${P.goal.mapMax}${P.duct?': en la HDC, MAP > 17 en VAFO es criterio de ECMO':''}.`]);
+  if(P.duct&&satPost()<70)out.push(['','Diferencia pre/posductal: hay shunt de derecha a izquierda por el ductus (HTPP). Optimizá el reclutamiento, evitá la acidosis y considerá óxido nítrico.']);
+  if((P.temp||37)<36&&co2<P.goal.co2[0])out.push(['b','Hipocapnia en hipotermia: a 33,5 °C la producción de CO₂ cae ~25 % y el paciente hiperventila. Bajá el VT/PIP o la FR, considerá VG y más sedación (bajá el esfuerzo). Mirá también el gas corregido por temperatura.']);
+  if(P.apnea&&!ev.caf&&M.apList.some(a=>M.t-a.t<60))out.push(['','Apneas del prematuro: iniciá cafeína (botón en Paciente; de rutina en < 32 semanas). Si siguen, la NIPPV da ciclos de respaldo.']);
+  if(P.hco3<18&&pH()<(P.goal.phMin||7.25))out.push(['','Acidosis metabólica: compensá con una pCO₂ normal-baja (35–45) para llevar el pH ≥ 7,25; la acidosis aumenta la resistencia vascular pulmonar.']);
+  if(P.goal.ext){const E=goals().filter(x=>!x[1]).map(x=>x[0]);const nonInv=S.mode==='cpap'||S.mode==='nippv';
+    out.push(E.length?['',`${nonInv?'Después de extubar':'Para extubar'} falta: ${E.join(' · ')}.`]:['o',nonInv?'Extubado y estable. ✓':'Cumple criterios: extubá a CPAP 6–8 o NIPPV (cambiá el modo arriba) y verificá que se mantenga estable.']);}
+  if(!hf&&S.mode!=='cpap'){
+    if(te<3*tau)out.push(['w',`Te ${fx(te,2)} s es menor que 3τ (${fx(3*tau,2)} s): atrapamiento aéreo${M.autoPeep>.5?` (auto-PEEP ~${fx(M.autoPeep,1)} cmH₂O)`:''}. Bajá la FR o el Ti para alargar la espiración.`]);
+    const vk=vtKgNow();
+    if(leak()>.3)out.push(['w',`Fuga del ${fx(leak()*100)} %: el VT espirado subestima el real (con VG, el respirador sube la presión para compensar).`]);
+    if(vk>g.vt[1]+.5)out.push(['w',`VT ${fx(vk,1)} ml/kg: por encima de ${g.vt[1]} ml/kg (volutrauma). ${S.vg?'Bajá el VT objetivo.':'Bajá el PIP.'}`]);
+    if(co2>g.co2[1]){
+      if(vk<(g.vt[0]+g.vt[1])/2)out.push(['',`pCO₂ alta con VT bajo (${fx(vk,1)} ml/kg): ${S.vg?'subí el VT objetivo (y revisá que el PIP máx alcance)':'subí el PIP'}${M.rec<.6?' y considerá subir la PEEP para reclutar: con más pulmón abierto, el mismo ΔP da más volumen':''}.`]);
+      else if(S.mode==='ac'&&P.drive>.2)out.push(['',`pCO₂ alta con VT adecuado: en AC la FR la marca el paciente; si la FR total es baja, subí la FR de respaldo. Revisá también el espacio muerto.`]);
+      else out.push(['',`pCO₂ alta con VT adecuado: subí la FR (si el Te lo permite: Te ≥ 3τ).`]);
+    }
+    if(co2<g.co2[0])out.push(['w',`pCO₂ baja: bajá ${S.vg?'el VT objetivo':'el PIP'} o la FR. La hipocapnia reduce el flujo cerebral.`]);
+  }
+  if(hf){
+    const d=dco2c(),vk=vtKgNow();
+    const lim=devMax();
+    if(S.vg&&M.hfLim&&lim<S.ampMax-.5)out.push(['b',`VT hf no alcanzado: a ${fx(S.f)} Hz el equipo solo genera ~${fx(lim)} cmH₂O de ΔPhf, aunque la amplitud máxima sea ${fx(S.ampMax)}. Además, el tubo de ${fx(tubo(),1)} atenúa la oscilación (llega ~${fx(hfTF()*100)} % al pulmón). Bajá la frecuencia: a 15 Hz el límite sube a ~${fx(2000/Math.pow(15,1.5))} y llega más volumen.`]);
+    else if(S.vg&&M.hfLim)out.push(['b','VT hf no alcanzado con la amplitud máxima: subí la amplitud máxima o bajá la frecuencia 1–2 Hz.']);
+    if(leak()>.25)out.push(['w',`Fuga del ${fx(leak()*100)} %: el VThf medido subestima el real y el VG regula sobre un valor erróneo. Revisá la posición del tubo y considerá cambiarlo por uno más grande.`]);
+    if(co2>g.co2[1]&&!M.hfLim)out.push(['',S.vg?`pCO₂ alta: subí el VThf de a 0,1–0,2 ml/kg (medido ${fx(vk,2)} ml/kg; DCO₂ corr ${fx(S.f*vk*vk)}).`:`pCO₂ alta: subí la amplitud de a 2–4 cmH₂O o bajá la frecuencia (sin VG, eso aumenta el volumen).`]);
+    if(co2<g.co2[0])out.push(['w',S.vg?'pCO₂ baja: con VG, bajá el VThf o la frecuencia.':'pCO₂ baja: bajá la amplitud o subí la frecuencia.']);
+  }
+  if(sat<g.sat[0]){
+    if(od>.15)out.push(['w','Saturación baja con sobredistensión (MAP alta): bajá la MAP/PEEP 1–2 cmH₂O. La sobredistensión comprime los capilares y aumenta el shunt.']);
+    else if(M.rec<.75)out.push(['',`Saturación baja con pulmón poco reclutado: subí ${hf?'la MAP':'la PEEP'} de a 1–2 cmH₂O${S.fio2<100?' y la FiO₂ mientras tanto':''}.`]);
+    else if(P.pphn>.15&&!ev.ino)out.push(['','El pulmón ya está reclutado: la hipoxemia es por hipertensión pulmonar. Considerá óxido nítrico, evitá la acidosis y mantené una pCO₂ normal-baja.']);
+    else out.push(['',`Subí la FiO₂.`]);
+  }
+  if(!P.sv&&sat>g.sat[1]+1&&S.fio2>21)out.push(['w',`Saturación por encima del rango: bajá la FiO₂ (hiperoxia${P.kg<2?', riesgo de ROP':''}).`]);
+  if(S.fio2>g.fio2&&sat>=g.sat[0]&&M.rec<.85&&od<.1)out.push(['',`Con FiO₂ ${S.fio2} %, probá reclutar más (${hf?'MAP':'PEEP'} +1) para bajar la FiO₂.`]);
+  if(od>.15&&sat>=g.sat[0])out.push(['w','Signos de sobredistensión (MAP o PIP altas): baja la presión arterial y sube el espacio muerto. Bajá la presión media.']);
+  if(!out.length)out.push(['o','Todo dentro de los objetivos. Probá bajar el soporte de a poco (destete) o desencadená una complicación.']);
+  return out.slice(0,4);
+}
+$('bTip').onclick=()=>{$('tipOut').innerHTML=tips().map(([c,t])=>`<div class="tip ${c==='o'?'o':c}">${t}</div>`).join('')};
+
+function rrTot(){const span=clamp(M.t-(M.tMode||0),6,30);return M.breaths.filter(b=>M.t-b.t<span).length*60/span}
+function psvHang(){const t=M.tiHist.slice(-5);return t.length>=4&&t.every(x=>x>=S.ti-.01)}
+function sigApneas(){return M.apList.filter(a=>M.t-a.t<60&&a.mode==='cpap').length}
+function goals(){
+  const g=P.goal,sat=satNow(),co2=G.co2,hf=S.mode==='hfo',vk=vtKgNow(),nonInv=S.mode==='cpap'||S.mode==='nippv';
+  if(g.ext){
+    let E;
+    if(nonInv)E=[[`Extubado a ${S.mode.toUpperCase()}`,true],[`SpO₂ ${g.sat.join('–')} %`,sat>=g.sat[0]-1],['pCO₂ < 65',co2<65],['Sin apneas con desaturación',sigApneas()===0]];
+    else if(g.ext==='hfo'&&hf)E=[['Cafeína',ev.caf],['MAP ≤ 10',S.hfMap<=10],['ΔPhf ≤ 15',(M.ampEff||S.amp)<=15.5],['FiO₂ < 40 %',S.fio2<40],['pCO₂ < 60',co2<60],[`SpO₂ ≥ ${g.sat[0]} %`,sat>=g.sat[0]-.5]];
+    else E=[['Cafeína',ev.caf],['MAP < 10',M.mapY<10],['FiO₂ < 40 %',S.fio2<40],['FR programada ≤ 20',S.rr<=20],['pCO₂ < 60',co2<60],['pH > 7,20',pH()>7.2],[`SpO₂ ≥ ${g.sat[0]} %`,sat>=g.sat[0]-.5]];
+    if(ev.obs||ev.ptx||ev.ext)E.push(['Complicación resuelta',false]);
+    return E;
+  }
+  const L=[
+    [`pCO₂ ${g.co2.join('–')}`,co2>=g.co2[0]&&co2<=g.co2[1]],
+    [`SpO₂ ${g.sat.join('–')} %`,sat>=g.sat[0]-.5&&sat<=g.sat[1]+.5],
+    hf?[`VThf ≤ ${g.vthf[1]} ml/kg`,vk<=g.vthf[1]+.05]:[`VT ${g.vt.join('–')} ml/kg`,vk>=g.vt[0]-.25&&vk<=g.vt[1]+.25],
+    g.fio2>=100?['FiO₂ según SpO₂',true]:[`FiO₂ ≤ ${g.fio2} %`,S.fio2<=g.fio2],
+    ['Sin sobredistensión',odx()<.1],
+    ['Sin atrapamiento',hf||S.mode==='cpap'||M.autoPeep<1]
+  ];
+  if(g.satPost)L.push([`SpO₂ posductal > ${g.satPost} %`,satPost()>g.satPost]);
+  if(g.pipMax&&!hf&&!nonInv)L.push([`PIP ≤ ${g.pipMax}`,M.pip<=g.pipMax+.5]);
+  if(g.mapMax)L.push([`MAP ≤ ${g.mapMax}`,M.mapY<=g.mapMax+.3]);
+  if(g.phMin)L.push([`pH ≥ ${fx(g.phMin,2)}`,pH()>=g.phMin]);
+  if(g.qp)L.push([`Qp:Qs ${fx(g.qp[0],1)}–${fx(g.qp[1],1)}`,qpqs()>=g.qp[0]&&qpqs()<=g.qp[1]]);
+  if(g.bpMin)L.push([`PA media ≥ ${g.bpMin}`,bp()>=g.bpMin]);
+  if(g.noApnea)L.push(['Sin apneas con desaturación (1 min)',sigApneas()===0]);
+  if(g.noInt)L.push(['Sin intubar (CPAP/NIPPV)',nonInv]);
+  if(g.rrMax)L.push([`FR total ≤ ${g.rrMax}`,!hf&&rrTot()<=g.rrMax]);
+  if(g.noHang)L.push(['Ciclado por flujo (sin Ti máx)',S.mode!=='psv'||!psvHang()]);
+  if(g.noFat)L.push(['Sin fatiga',M.fat<.2&&M.wob<1.1]);
+  if(g.suc)L.push(['Aspirado',ev.sucDone]);
+  if(ev.obs||ev.ptx||ev.ext||ev.hem||ev.sel||ev.abd)L.push(['Complicación resuelta',false]);
+  return L;
+}
+
+/* ============ DIBUJO ============ */
+const cw=$('waves'),cl=$('loop');
+let wctx,lctx,DPR=Math.min(2,window.devicePixelRatio||1);
+function sizeC(){[cw,cl].forEach(c=>{c.width=c.clientWidth*DPR;c.height=c.clientHeight*DPR});wctx=cw.getContext('2d');lctx=cl.getContext('2d')}
+window.addEventListener('resize',sizeC);
+const rng={p:[0,30],f:[-5,5],v:[0,10]};
+function ord(arr){const o=new Float32Array(N);for(let k=0;k<N;k++)o[k]=arr[(buf.i+k)%N];return o}
+function drawWaves(){
+  const W=cw.width,H=cw.height,ctx=wctx;ctx.clearRect(0,0,W,H);
+  const strips=[['p','Presión','cmH₂O','#ffd166'],['f','Flujo','L/min','#7be0b5'],['v','Volumen','ml','#8ec5ff']];
+  const sh=H/3;
+  strips.forEach(([k,name,u,col],si)=>{
+    const a=ord(buf[k]);let mn=Infinity,mx=-Infinity;for(const x of a){if(x<mn)mn=x;if(x>mx)mx=x}
+    let lo,hi;
+    if(k==='p'){lo=0;hi=Math.max(10,Math.ceil((mx+3)/5)*5)}
+    else if(k==='f'){const m=Math.max(1,Math.abs(mn),Math.abs(mx))*1.15;lo=-m;hi=m}
+    else{lo=Math.min(0,mn);hi=Math.max(1,mx*1.15)}
+    const r=rng[k];r[0]+=(lo-r[0])*.08;r[1]+=(hi-r[1])*.08;lo=r[0];hi=r[1];
+    const y0=si*sh+6*DPR,hh=sh-12*DPR,Y=v=>y0+hh-(v-lo)/(hi-lo)*hh;
+    ctx.strokeStyle='rgba(127,170,255,.18)';ctx.lineWidth=1;ctx.beginPath();
+    if(lo<0&&hi>0){ctx.moveTo(0,Y(0));ctx.lineTo(W,Y(0))}
+    ctx.moveTo(0,si*sh);ctx.lineTo(W,si*sh);ctx.stroke();
+    if(k==='p'&&S.mode!=='hfo'){ctx.setLineDash([4*DPR,4*DPR]);ctx.strokeStyle='rgba(255,209,102,.35)';ctx.beginPath();ctx.moveTo(0,Y(S.peep));ctx.lineTo(W,Y(S.peep));ctx.stroke();ctx.setLineDash([])}
+    ctx.strokeStyle=col;ctx.lineWidth=2*DPR;ctx.beginPath();
+    for(let i=0;i<N;i++){const x=i/(N-1)*W,y=Y(a[i]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)}
+    ctx.stroke();
+    ctx.fillStyle=col;ctx.font=`700 ${11*DPR}px system-ui`;ctx.fillText(`${name} (${u})`,6*DPR,si*sh+15*DPR);
+    ctx.fillStyle='rgba(255,255,255,.5)';ctx.font=`${10*DPR}px system-ui`;ctx.textAlign='right';
+    ctx.fillText(fx(hi,k==='v'&&hi<5?1:0),W-4*DPR,si*sh+14*DPR);ctx.fillText(fx(lo,k==='v'&&Math.abs(lo)<5?1:0),W-4*DPR,si*sh+sh-4*DPR);ctx.textAlign='left';
+  });
+}
+function drawLoop(){
+  const W=cl.width,H=cl.height,ctx=lctx;ctx.clearRect(0,0,W,H);
+  const pts=M.loop.length>5?M.loop:M.curLoop;if(pts.length<5)return;
+  let xs=pts.map(p=>loopMode==='pv'?p[0]:p[1]),ys=pts.map(p=>loopMode==='pv'?p[1]:p[2]);
+  const xmn=Math.min(0,...xs),xmx=Math.max(...xs)*1.1||1,ymn=Math.min(0,...ys)*1.1,ymx=Math.max(...ys)*1.1||1;
+  const pad=24*DPR,X=v=>pad+(v-xmn)/(xmx-xmn)*(W-pad*1.4),Y=v=>H-pad-(v-ymn)/(ymx-ymn)*(H-pad*1.6);
+  ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(xmn),Y(0));ctx.lineTo(X(xmx),Y(0));ctx.moveTo(X(0),Y(ymn));ctx.lineTo(X(0),Y(ymx));ctx.stroke();
+  ctx.strokeStyle=loopMode==='pv'?'#ffd166':'#7be0b5';ctx.lineWidth=2*DPR;ctx.beginPath();
+  pts.forEach((p,i)=>{const x=X(loopMode==='pv'?p[0]:p[1]),y=Y(loopMode==='pv'?p[1]:p[2]);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font=`${10*DPR}px system-ui`;
+  ctx.fillText(loopMode==='pv'?'Volumen (ml) vs presión (cmH₂O)':'Flujo (L/min) vs volumen (ml)',pad,12*DPR);
+  ctx.fillText(fx(xmx,loopMode==='pv'?0:1),W-28*DPR,H-6*DPR);
+}
+function wobTxt(){return P.drive<.05?'Sedado':M.wob<.5?'Bajo':M.wob<.85?'Moderado':M.wob<1.2?'Alto':'Muy alto'}
+function numCell(t,v,u,cls=''){return `<div><div class="t">${t}</div><div class="v ${cls}">${v}<small> ${u}</small></div></div>`}
+function paintNums(){
+  const hf=S.mode==='hfo',C=lungC();let h='';
+  if(hf){const vm=M.hfVTm,vk=vm/P.kg,dm=S.f*vm*vm,lim=devMax();
+    h=numCell('MAP',fx(M.mapY,1),'cmH₂O')+numCell('ΔPhf',fx(M.ampEff||S.amp),'cmH₂O',M.hfLim?'b':'')+numCell('Frecuencia',fx(S.f),'Hz')+
+      numCell('VThf medido',fx(vm,2),`ml${S.vg?' · prog '+fx(S.vthf*P.kg,2):''}`,M.hfLim?'b':'')+numCell('VThf/kg',fx(vk,2),'ml/kg',vk>2.5?'w':'')+
+      numCell('DCO₂',fx(dm,0),'ml²/s')+numCell('DCO₂ corr',fx(dm/(P.kg*P.kg),0),'ml²/kg²·s')+
+      numCell('Límite equipo',fx(lim),`cmH₂O a ${fx(S.f)} Hz`,lim<S.ampMax-.5&&M.ampEff>=lim-.5?'b':'')+
+      numCell('Fuga',fx(leak()*100),'%',leak()>.3?'w':'')+numCell('Tubo',fx(tubo(),1),'mm')+numCell('I:E','1:'+S.ie,'')+numCell('Esfuerzo',wobTxt(),M.fat>.2?'fatiga':'',M.wob>1.1||M.fat>.2?'b':'');
+  }else{
+    const span=clamp(M.t-(M.tMode||0),6,30),rec=M.breaths.filter(b=>M.t-b.t<span),rr=rec.length*60/span,vk=vtKgNow(),tau=Rml()*C,te=60/S.rr-S.ti,nonInv=S.mode==='cpap'||S.mode==='nippv';
+    const mv=rec.reduce((s,b)=>s+b.vt,0)*60/span/P.kg;
+    const sp=rec.filter(b=>!b.sup),spv=sp.length?sp.reduce((s,b)=>s+b.vt,0)/sp.length/P.kg:null;
+    h=numCell('PIP',S.mode==='cpap'?'–':fx(M.pip),'cmH₂O')+numCell('PEEP',fx(S.peep),'cmH₂O')+numCell('MAP',fx(M.map,1),'cmH₂O')+
+      numCell(S.mode==='cpap'?'VTi':'VTi (con soporte)',fx(S.mode==='cpap'?M.vti:M.vtSup,1),'ml')+numCell(nonInv?'VT/kg (est.)':'VT/kg',fx(vk,1),'ml/kg',vk>P.goal.vt[1]+.5?'w':vk<P.goal.vt[0]-1?'b':'')+
+      numCell('FR total',fx(rr),'rpm')+numCell('VM',fx(mv),'ml/kg/min')+numCell('C dinámica',fx(M.vtSup/Math.max(M.pip-S.peep,1),2),'ml/cmH₂O')+
+      numCell('τ / Te',`${fx(tau*1000)} ms`,`· Te ${S.mode==='cpap'?'–':fx(te,2)+' s'}`,(S.mode!=='cpap'&&te<3*tau)?'w':'')+
+      numCell('Auto-PEEP',fx(M.autoPeep,1),'cmH₂O',M.autoPeep>1?'w':'')+
+      (S.mode==='simv'?numCell('VT espontáneo',fx(spv,1),'ml/kg'):'')+(S.vg?numCell('PIP (VG)',fx(S.peep+dPset()),'cmH₂O',M.vgLim?'b':''):'')+
+      (nonInv?numCell('Fuga','~40','%','w'):numCell('Fuga',fx(leak()*100),S.lcomp?'% · compensada':'%',leak()>.3?'w':''))+numCell('Esfuerzo',wobTxt(),M.fat>.2?'fatiga':'',M.wob>1.1||M.fat>.2?'b':'');
+  }
+  $('nums').innerHTML=h;
+  // vitales
+  const sat=satNow();
+  const sp=satPost();
+  $('vSat').innerHTML=sp!=null?`${fx(sat)}<small>/${fx(sp)}</small>`:`${fx(sat)}<small>%</small>`;$('vSat').previousElementSibling.textContent=sp!=null?'SpO₂ pre/post':'SpO₂';$('vSat').style.color=sat<85?'#ff9fb7':sat<P.goal.sat[0]?'#ffd166':'#7be0b5';
+  $('vCO2').innerHTML=`${fx(G.co2+3)}<small>mmHg</small>`;$('vCO2').style.color=G.co2>P.goal.co2[1]+5?'#ff9fb7':G.co2<P.goal.co2[0]-5?'#ffd166':'#fff';
+  const vk=vtKgNow();$('vVTl').textContent=hf?'VThf':'VT';
+  $('vVT').innerHTML=`${fx(vk,hf?2:1)}<small>ml/kg</small>`;
+  const b=bp();$('vBP').innerHTML=`${fx(b)}<small>mmHg</small>`;$('vBP').style.color=b<(P.goal.bpMin||P.bp*.8)?'#ff9fb7':'#fff';
+  if(hf){const dc=S.f*Math.pow(M.hfVTm/P.kg,2);$('vXl').textContent='DCO₂ corr';$('vX').innerHTML=`${fx(dc)}<small>ml²/kg²·s</small>`;$('vX').style.color=dc<30?'#ffd166':'#fff'}
+  else{$('vXl').textContent='FR total';$('vX').innerHTML=`${fx(rrTot())}<small>rpm</small>`;$('vX').style.color='#fff'}
+  // alarmas
+  let al='',lvl='';
+  const apnea=!hf&&M.t-M.lastBreath>15;
+  if(disc()){al='⚠ DESCONEXIÓN (aspiración abierta)';lvl='on'}
+  else if(M.ptxAuto&&ev.ptx){al='⚠ NEUMOTÓRAX (barotrauma)';lvl='on'}
+  else if(apnea||(P.apnea&&M.t<M.apEnd&&S.mode==='cpap'&&M.t-M.lastBreath>8)){al='⚠ APNEA';lvl='on'}
+  else if(ev.ext){al='⚠ VT MUY BAJO · fuga 100 %';lvl='on'}
+  else if(sat<85){al='⚠ DESATURACIÓN';lvl='on'}
+  else if(S.vg&&!hf&&M.vgLim){al='VT bajo: el PIP máximo no alcanza';lvl='mid'}
+  else if(hf&&S.vg&&M.hfLim){al='VT hf no alcanzado';lvl='mid'}
+  else if(!hf&&S.mode!=='cpap'&&M.autoPeep>1.5){al='Atrapamiento aéreo (auto-PEEP)';lvl='mid'}
+  else if(!hf&&rrTot()>Math.max(S.rr,P.rrP)*1.6&&leak()>.2&&!S.lcomp){al='FR alta: ¿autociclado por fuga?';lvl='mid'}
+  else if(S.mode==='psv'&&psvHang()){al='Ti máx alcanzado: no termina por flujo';lvl='mid'}
+  else if(M.fat>.35){al='Fatiga respiratoria';lvl='mid'}
+  const A=$('alarm');A.textContent=al;A.className=lvl;
+  const VA=$('vAlarm');VA.textContent=al;VA.className='valarm '+lvl;
+  $('mini').innerHTML=`<span><small>SpO₂</small>${$('vSat').innerHTML.replace(/<small>%<\/small>/,'')}</span><span><small>TcCO₂</small>${fx(G.co2+3)}</span><span><small>${hf?'VThf':'VT'}</small>${fx(vk,hf?2:1)}</span><span><small>PA</small>${fx(b)}</span>${al?`<span class="al">${al}</span>`:''}`;
+  const MN={cpap:'CPAP',nippv:'NIPPV',ac:'AC',simv:'SIMV',psv:'PSV',hfo:'VAFO'};
+  $('vMode').textContent=MN[S.mode]+(S.vg&&S.mode!=='cpap'&&S.mode!=='nippv'?'-VG':'');
+  $('vKg').textContent=fx(P.kg*1000)+' g';$('vTubo').textContent=S.mode==='cpap'||S.mode==='nippv'?'Interfaz nasal':'Tubo '+fx(tubo(),1);
+  const ts=Math.floor(G.tSim);$('vClock').textContent=`${String(Math.floor(ts/60)).padStart(2,'0')}:${String(ts%60).padStart(2,'0')}`;
+  // objetivos
+  const L=goals();$('goals').innerHTML=L.map(([t,ok])=>`<span class="chip ${ok?'ok':''}">${ok?'✓':'✗'} ${t}</span>`).join('');
+}
+
+/* ============ LOOP ============ */
+let last=performance.now(),acc=0,numT=0;
+function frame(now){
+  let dt=Math.min(.05,(now-last)/1000);last=now;
+  if(run&&document.body.dataset.view==='sim'){
+    const sim=dt*speed,n=Math.ceil(sim/.0005),h=sim/n;
+    for(let i=0;i<n;i++)step(h);
+    physio(dt*10);
+    numT+=dt;
+    if(numT>.4){numT=0;paintNums();
+      const ok=goals().every(x=>x[1]);G.okFor=ok?G.okFor+4:0;$('win').classList.toggle('on',G.okFor>=60);
+      $('win').textContent=P.goal.ext&&S.mode!=='cpap'&&S.mode!=='nippv'?'✅ Criterios de extubación cumplidos durante 1 minuto':'✅ Caso resuelto: objetivos cumplidos durante 1 minuto'}
+  }
+  drawWaves();drawLoop();
+  requestAnimationFrame(frame);
+}
+sizeC();
+try{new IntersectionObserver(es=>es.forEach(e=>$('mini').classList.toggle('on',!e.isIntersecting&&e.boundingClientRect.top<0))).observe($('vvit'))}catch(e){}
+let k0='libre';
+const Q=new URLSearchParams(location.search);
+if(Q.has('embed'))document.body.classList.add('emb');
+if(Q.has('kg')){k0='libre';
+  const n=k=>{const v=parseFloat(Q.get(k));return isFinite(v)?v:null};
+  if(n('kg'))$('lPeso').value=Math.round(n('kg')*1000);if(n('eg'))$('lEG').value=n('eg');if(n('d')!=null)$('lDias').value=n('d');
+  const st=CASES.libre.start,m=Q.get('m');if(m&&LAYOUT[m])st.mode=m;st.vg=Q.get('vg')==='1';
+  const lim=(k,v)=>{if(v==null||!DEF[k])return;st[k]=clamp(v,DEF[k].mn,DEF[k].mx)};
+  ['peep','pip','ti','rr','fio2','vt','pmax','hfMap','f','amp','vthf','ampMax','ie'].forEach(k=>lim(k,n(k)));
+  if(st.mode==='hfo'&&n('kg')){const kg=n('kg');if(n('f')==null)st.f=kg<1?15:kg<2?13:10;if(n('vthf')==null)st.vthf=kg<1?1.5:kg<2?1.8:2;}
+  if(st.vg&&st.mode!=='hfo'&&n('pmax')==null)st.pmax=Math.max(st.pip+5,25);}
+$('caseSel').value=k0;loadCase(k0);paintNums();
+requestAnimationFrame(frame);
+// Copia integrada en la Calculadora Neonatal (pestañas VAFO y Ventilación). Original: repo Simulador-ventilacion.
+// para pruebas
+window.__sim={CASES,vtKgNow,get S(){return S},get M(){return M},get G(){return G},get P(){return P},step,physio,co2ss,o2ss,lungC,odx,satNow,loadCase,dco2c,vaKg,satPost,qpqs,goals,tips,pH,bp,ev};
+</script>
+<script src="eval/refs.js"></script>
+<script src="eval/casos-m1.js"></script>
+<script src="eval/casos-m2.js"></script>
+<script src="eval/casos-m3.js"></script>
+<script src="eval/casos-m45.js"></script>
+<script src="eval/casos-m6.js"></script>
+<script src="eval/casos-m7.js"></script>
+<script src="eval/casos-m8.js"></script>
+<script src="eval/recursos.js"></script>
+<script src="eval/motor.js"></script>
+</body>
+</html>
