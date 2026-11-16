@@ -591,7 +591,7 @@ const sev=p=>{const q=p*26.8/20;return 100/(23400/(q*q*q+150*q)+1)}; // Severing
 function pH(){return 6.1+Math.log10(P.hco3/(.03*G.co2))}
 function pf(){const ph=pH();return (ev.ino?(P.inoF||.4):1)*(ph<7.25?1.35:ph>7.42?.8:1)*(1+odx()*.6)*(G.o2<40?1.1:1)}
 function shunt(){
-  return clamp(sh0E()*(1-M.rec)+P.pphn*pf()+(ev.ptx?.25:0)+(ev.sel?.25:0)+(ev.abd?.05:0)+.1*pdaL()+.25*odx()+.03,0,.92);
+  return clamp((P.shX||0)+sh0E()*(1-M.rec)+P.pphn*pf()+(ev.ptx?.25:0)+(ev.sel?.25:0)+(ev.abd?.05:0)+.1*pdaL()+.25*odx()+.03,0,.92);
 }
 function qpqs(){ // ventrículo único: relación Qp:Qs según la resistencia pulmonar
   if(!P.sv)return null;const ph=pH();
@@ -612,10 +612,10 @@ function co2ss(){
   if(S.mode==='hfo'&&!ev.ext){
     const d=dco2c();
     // aporte de respiraciones espontáneas sobre la VAFO (pequeño)
-    return clamp(1900*(1+odx()*.6)*(vco2E()/P.vco2)/Math.max(d,1),25,130);
+    return clamp((P.co2k||1)*1900*(1+odx()*.6)*(vco2E()/P.vco2)/Math.max(d,1),25,130);
   }
   const va=vaKg();
-  return clamp(.863*vco2E()/Math.max(va/1000,.004),25,130);
+  return clamp((P.co2k||1)*.863*vco2E()/Math.max(va/1000,.004),25,130);
 }
 function o2ss(){
   const pao=(S.fio2/100)*713-G.co2/.8;
@@ -862,6 +862,7 @@ function loadCase(k){
   document.querySelectorAll('.ev button').forEach(b=>b.classList.toggle('on',!!ev[b.dataset.e]));
   $('gasOut').innerHTML='';$('tipOut').innerHTML='';G.okFor=0;$('win').classList.remove('on');
   try{localStorage.setItem('calcsim_case',k)}catch(e){}
+  if(k==='libre'&&window.CAL)calibrate();
 }
 $('caseSel').onchange=()=>loadCase($('caseSel').value);
 function actsUI(){
@@ -1187,10 +1188,28 @@ sizeC();
 try{new IntersectionObserver(es=>es.forEach(e=>$('mini').classList.toggle('on',!e.isIntersecting&&e.boundingClientRect.top<0))).observe($('vvit'))}catch(e){}
 let k0='libre';
 const Q=new URLSearchParams(location.search);
+function calibrate(){const c=window.CAL;P.shX=0;P.co2k=1;
+  for(let it=0;it<4;it++){
+    if(c.pco2){for(let i=0;i<3000;i++)step(.002);const ss=co2ss();if(ss>0)P.co2k*=c.pco2/ss;G.co2=c.pco2}
+    if(c.ph&&c.pco2)P.hco3=.03*c.pco2*Math.pow(10,c.ph-6.1);
+    const po=c.pao2||(c.spo2?invSev(Math.min(c.spo2,99.5)):null);
+    if(po){let lo=-.6,hi=.92;for(let i=0;i<40;i++){const m=(lo+hi)/2;P.shX=m;o2ss()>po?lo=m:hi=m}P.shX=(lo+hi)/2;G.o2=po}
+    for(let i=0;i<4;i++)physio(15);
+  }
+  if(c.pco2)G.co2=c.pco2;if(c.pao2||c.spo2)G.o2=o2ss();
+  // ajuste fino mientras la mecánica se estabiliza (se corta si el usuario toca algo)
+  clearInterval(calibrate.iv);const s0=JSON.stringify(S),ev0=JSON.stringify(ev);let n=0;
+  let em=null;calibrate.iv=setInterval(()=>{if(++n>50||JSON.stringify(S)!==s0||JSON.stringify(ev)!==ev0){clearInterval(calibrate.iv);return}
+    if(c.pco2){const ss=co2ss();if(ss>0&&ss<129){em=em==null?ss:em+.3*(ss-em);P.co2k*=Math.pow(c.pco2/em,.3);em*=Math.pow(c.pco2/em,.3)}G.co2+=.5*(c.pco2-G.co2)}
+    const po=c.pao2||(c.spo2?invSev(Math.min(c.spo2,99.5)):null);
+    if(po){let lo=-.6,hi=.92;for(let i=0;i<30;i++){const m=(lo+hi)/2;P.shX=m;o2ss()>po?lo=m:hi=m}P.shX=(lo+hi)/2;G.o2+=.5*(po-G.o2)}},500);
+}
 if(Q.has('embed'))document.body.classList.add('emb');
 if(Q.has('back')&&/^[a-z]+\.html$/.test(Q.get('back'))){const bk='../'+Q.get('back'),nv=document.createElement('nav');nv.className='cnav';
   nv.innerHTML='<button data-t="calc">Calculadora</button><button class="on">Simulador</button><button data-t="guia">Guía</button>';
-  nv.querySelectorAll('button[data-t]').forEach(b=>b.onclick=()=>location.replace(bk+'#'+b.dataset.t));document.body.prepend(nv);const mt=()=>{$('mini').style.top=nv.offsetHeight+'px'};mt();addEventListener('resize',mt);}
+  const simOut=()=>{try{const s0=JSON.parse(ST0),o={mode:S.mode,vg:!!S.vg,ch:{}};['peep','pip','ti','rr','fio2','vt','pmax','hfMap','f','amp','vthf','ampMax','ie'].forEach(k=>{if(S[k]!=null&&Math.abs(S[k]-(s0[k]??NaN))>1e-9||(s0[k]==null&&0))o.ch[k]=S[k]});
+    if(S.mode!==s0.mode||!!S.vg!==!!s0.vg)o.mc=1;return Object.keys(o.ch).length||o.mc?'?sim='+encodeURIComponent(JSON.stringify(o)):''}catch(e){return ''}};
+  nv.querySelectorAll('button[data-t]').forEach(b=>b.onclick=()=>location.replace(bk+simOut()+'#'+b.dataset.t));document.body.prepend(nv);const mt=()=>{$('mini').style.top=nv.offsetHeight+'px'};mt();addEventListener('resize',mt);}
 if(Q.has('kg')){k0='libre';
   const n=k=>{const v=parseFloat(Q.get(k));return isFinite(v)?v:null};
   if(n('kg'))$('lPeso').value=Math.round(n('kg')*1000);if(n('eg'))$('lEG').value=n('eg');if(n('d')!=null)$('lDias').value=n('d');
@@ -1198,7 +1217,9 @@ if(Q.has('kg')){k0='libre';
   const lim=(k,v)=>{if(v==null||!DEF[k])return;st[k]=clamp(v,DEF[k].mn,DEF[k].mx)};
   ['peep','pip','ti','rr','fio2','vt','pmax','hfMap','f','amp','vthf','ampMax','ie'].forEach(k=>lim(k,n(k)));
   if(st.mode==='hfo'&&n('kg')){const kg=n('kg');if(n('f')==null)st.f=kg<1?15:kg<2?13:10;if(n('vthf')==null)st.vthf=kg<1?1.5:kg<2?1.8:2;}
-  if(st.vg&&st.mode!=='hfo'&&n('pmax')==null)st.pmax=Math.max(st.pip+5,25);}
+  if(st.vg&&st.mode!=='hfo'&&n('pmax')==null)st.pmax=Math.max(st.pip+5,25);
+  const cal={pco2:n('pco2'),ph:n('ph'),pao2:n('pao2'),spo2:n('spo2')};if(cal.pco2||cal.pao2||cal.spo2)window.CAL=cal;}
+const ST0=JSON.stringify(CASES.libre.start);
 $('caseSel').value=k0;loadCase(k0);paintNums();
 requestAnimationFrame(frame);
 // Copia integrada en la Calculadora Neonatal (pestañas VAFO y Ventilación). Original: repo Simulador-ventilacion.
