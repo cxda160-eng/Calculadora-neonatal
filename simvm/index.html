@@ -175,7 +175,7 @@ ul.refs li{font-size:12.5px;line-height:1.45;margin-bottom:4px}ul.refs a{color:v
 .vinfo{font-size:12.5px;color:var(--vm);margin:8px 2px 2px;line-height:1.45}
 @media(min-width:760px){.vmain{grid-template-columns:1fr 290px}.vnums{grid-template-columns:1fr 1fr;align-content:start}#waves{height:330px}}
 @media(max-width:520px){.vmode{font-size:16px;padding:2px 6px}.vbar{grid-template-columns:auto auto 1fr}.vclock{display:none}#waves{height:250px}.vit .v{font-size:19px}.vnums .v{font-size:20px}}
-#vnav,#caseSel,#win,#fuentesCasos{display:none!important}
+#vnav,#caseSel,#caseTxt,#win,#fuentesCasos,#libre .lg3{display:none!important}
 html,body{overscroll-behavior:none}
 .cnav{display:flex;gap:6px;padding:10px 12px;position:sticky;top:0;background:var(--bg);z-index:40;border-bottom:1px solid var(--line)}
 .cnav button{flex:1;border:0;border-radius:999px;padding:9px 6px;font-weight:600;background:var(--acc-s);color:var(--acc);font-size:14px;font-family:inherit}
@@ -913,7 +913,7 @@ function applyLibre(resetMech){
   const egc=`${dd===7?wk+1:wk}+${dd===7?0:dd}`;
   P.n=`${fx(kg*1000)} g · ${fx(EG,EG%1?1:0)} sem · ${fx(D)} d · ${T.n}`;
   $('hCase').textContent='⚙️ '+P.n;
-  $('caseTxt').innerHTML=`<b>Paciente configurable.</b> ${fx(kg*1000)} g, ${fx(EG,EG%1?1:0)} semanas, ${fx(D)} días de vida (EG corregida ${egc}), ${T.n}. Cambiá los datos y la patología: las metas, el tubo, el espacio muerto y la mecánica se ajustan solos.`;
+  $('caseTxt').innerHTML=`<b>Paciente configurable.</b> ${fx(kg*1000)} g, ${fx(EG,EG%1?1:0)} semanas, ${fx(D)} días de vida (EG corregida ${egc}), ${T.n}. Peso, EG y días se toman de la barra del paciente; elegí la patología: las metas, el tubo, el espacio muerto y la mecánica se ajustan solos.`;
   $('lDer').innerHTML=`Tubo sugerido <b>${fx(tubo,1)}</b> · EGc <b>${egc}</b> · Espacio muerto <b>${fx(P.vdk,1)} ml/kg</b> · PA media esperada <b>≥ ${fx(P.bp)} mmHg</b><br>Metas: pCO₂ <b>${g0.co2.join('–')}</b> · SpO₂ <b>${g0.sat.join('–')} %</b> · VT <b>${g0.vt.join('–')} ml/kg</b>`;
   libreLbl();
   try{localStorage.setItem('calcsim_libre',JSON.stringify({g:$('lPeso').value,eg:$('lEG').value,d:$('lDias').value,p:pk}))}catch(e){}
