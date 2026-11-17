@@ -45,6 +45,7 @@ function taq(){
       add(7, '<b>Taquicardia auricular caótica</b>: ≥ 3 morfologías de P con línea isoeléctrica entre ellas.');
       add(6, '<b>Aleteo o TRIA con conducción variable</b>.');
       add(4, '<b>Extrasístoles auriculares frecuentes</b> (algunas bloqueadas o aberradas) o arritmia sinusal.');
+      add(sel.p === 'menos' ? 8 : 3, '<b>Doble respuesta nodal («double fire», DAVNNT)</b>: cada P conduce dos veces, por la vía rápida (PR corto) y por la lenta (PR largo): una P seguida de dos QRS angostos. Imita extrasístoles, bigeminia o FA. Rara; tratamiento de elección: ablación de la vía lenta.');
     } else {
       if (sel.ini === 'gradual' && fc <= 220) add(sel.p === 'mas' ? 3 : 8, '<b>Taquicardia sinusal</b>: P normal (positiva en DI y aVF), inicio y fin progresivos, FC que varía con el estado del niño. Tratar la causa.');
       if (sel.p === 'nv' || sel.p === 'corto' || !sel.p) {
@@ -61,6 +62,7 @@ function taq(){
         add(6, '<b>TRIA</b> (posoperatorio auricular): P pequeñas con línea isoeléctrica; una P escondida en el QRS o la T.');
         add(5, '<b>Taquicardia auricular con bloqueo AV</b>.');
       }
+      if (sel.p === 'menos') add(5, '<b>Doble respuesta nodal («double fire», DAVNNT)</b>: cada P conduce dos veces, por la vía rápida (PR corto) y por la lenta (PR largo): una P seguida de dos QRS angostos. Imita extrasístoles, bigeminia o FA. Rara; tratamiento de elección: ablación de la vía lenta.');
       if (sel.p === 'menos') add(9, '<b>JET</b>: QRS igual al sinusal con disociación AV (más QRS que P). Típica en las primeras 24–48 h tras cirugía cardíaca; la congénita es rara y grave.');
     }
     if (sel.ade === 'term') { dx.forEach(d => { if (/TRAV|TRNAV|PJRT/.test(d[1])) d[0] += 3; }); h += pill('ok', 'Terminó con adenosina: reentrada que usa el nodo AV (TRAV, TRNAV, PJRT) o una TA focal no automática. Si se reinicia enseguida, una extrasístole la volvió a disparar.'); }

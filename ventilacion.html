@@ -472,8 +472,11 @@ calc();restoring=false;
 
 // programación cambiada en el simulador → vuelve a la Calculadora
 function simToast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(simToast.t);simToast.t=setTimeout(()=>t.classList.remove('on'),4500)}
-function applySim(){const q=new URLSearchParams(location.search).get('sim');if(!q)return;try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}
-  let o;try{o=JSON.parse(q)}catch(e){return}const c=o.ch||{},lst=[],ids=[];const set=(id,v,l)=>{if(!$(id))return;$(id).value=v;ids.push(id);lst.push(l)};const r=(v,d)=>+(+v).toFixed(d);
+function applySim(){let q=new URLSearchParams(location.search).get('sim');if(q){try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}}
+  if(!q){try{q=localStorage.getItem('simsync_ventilacion');localStorage.removeItem('simsync_ventilacion')}catch(e){}}
+  if(!q)return;let o;try{o=JSON.parse(q)}catch(e){return}
+  if(o.pk!=null){if((Date.now()-(o.t||0))>12*3600e3)return;const u=new URLSearchParams(simUrl().split('?')[1]);if([u.get('kg'),u.get('eg'),u.get('d')].join('|')!==o.pk)return;}
+  const c=o.ch||{},lst=[],ids=[];const set=(id,v,l)=>{if(!$(id))return;$(id).value=v;ids.push(id);lst.push(l)};const r=(v,d)=>+(+v).toFixed(d);
   if(o.mode==='hfo')return;
   if(o.mc){const k={ac:o.vg?'acvg':($('modo').value==='ippv'?'ippv':'ac'),simv:o.vg?'simvvg':'simv',psv:o.vg?'psvvg':null,nippv:'nippv',cpap:'cpap'}[o.mode];if(k&&k!==$('modo').value)set('modo',k,MODES[k].n)}
   if(c.peep!=null)set('peep',r(c.peep,1),'PEEP '+r(c.peep,1));
@@ -489,6 +492,6 @@ function applySim(){const q=new URLSearchParams(location.search).get('sim');if(!
 setTimeout(applySim,300);
 try{const h=location.hash.slice(1);const t=(h==='calc'||h==='guia')?h:localStorage.getItem('vent_tab');if(t&&t!=='calc'&&t!=='sim')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v100"></script>
+<script src="paciente.js?v=v101"></script>
 </body>
 </html>

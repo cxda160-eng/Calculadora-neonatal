@@ -1447,6 +1447,9 @@ const ATLAS = [
   {id:'trnav', sim:'trnav', n:'TRNAV (reentrada nodal)', strips:[{lead:'DII', build:({beat,P})=>{ for(let t=200;t<3000;t+=260){ beat(t,'n',{t:[180,28,0.22]}); P(t+10,{inv:true,a:0.07,w:8}); } }}],
    crit:['QRS estrecho regular; la P retrógrada queda dentro del QRS o justo al final (pseudo-r′ en V1, pseudo-s en DII): RP muy corto.','Comienzo y fin bruscos; termina con maniobras vagales o adenosina.'],
    notas:'Rara en el lactante y más frecuente a partir de la edad escolar y la adolescencia. Circuito por las vías lenta y rápida del nodo AV.'},
+  {id:'dfire', sim:'dfire', n:'Doble respuesta nodal («double fire», DAVNNT)', strips:[{lead:'DII', build:({P,beat,mark})=>{ for(let t=250;t<3000;t+=760){ P(t-120); beat(t); beat(t+330); } mark(580,'2.º QRS'); }}],
+   crit:['Una P sinusal seguida de dos QRS angostos: el primero con PR corto (vía rápida) y el segundo con PR largo (vía lenta). Conducción AV 1:2.','Puede alternar con conducción 1:1 y mostrar Wenckebach en una o en ambas vías; el segundo QRS puede salir aberrante.','En el estudio electrofisiológico: un solo electrograma auricular seguido de dos His y dos ventriculogramas.'],
+   notas:'Taquicardia no reentrante por doble vía nodal: el mismo impulso baja por las dos vías porque la diferencia de conducción entre ellas supera la refractariedad del His-Purkinje. Es un «camaleón»: imita extrasístoles auriculares, bigeminia, fibrilación auricular o, con aberrancia, TV; confundirla lleva a anticoagular o dar antiarrítmicos sin necesidad. Si es incesante puede producir taquicardiomiopatía. Tratamiento de elección: ablación de la vía lenta. Rara y descripta sobre todo en adultos; hay poca evidencia pediátrica (series y casos).'},
   {id:'pjrt', sim:'pjrt', n:'PJRT (taquicardia reciprocante permanente de la unión)', strips:[{lead:'DII', build:({beat,P,mark})=>{ for(let t=250;t<3000;t+=380){ beat(t,'n',{t:[170,28,0.22]}); P(t+190,{inv:true,a:0.2,w:16}); } mark(480,'P′'); }}],
    crit:['Taquicardia de QRS estrecho de RP largo, relativamente lenta (140–200 lpm).','P′ profundamente negativas en DII, DIII y aVF.','Incesante en alrededor de la mitad de los casos; se reinicia tras pocos latidos sinusales.'],
    notas:'Vía accesoria oculta, de conducción lenta y decremental, casi siempre posteroseptal derecha. El 60 % se presenta antes del año. Por su frecuencia moderada pasa inadvertida en el lactante y lleva a miocardiopatía por taquicardia, reversible al controlarla.'},
@@ -1842,6 +1845,29 @@ def({id:"trnav",group:"Supraventriculares",name:"TRNAV",mech:"re",
   if(st.mode==="tachy") trnavCycle(sim.next);
   else if(st.mode==="pac"){ const t=sim.next; anim("focus-av",t,80); flash("la",t+10); P(t+30,{amp:.1,mark:"EA"}); block(178,200,t+70,500); st.mode="tachy"; sim.next=t+110; }
   else { sinus(sim.next); sim.next+=520; }
+ }});
+
+/* Doble respuesta nodal («double fire», DAVNNT) */
+def({id:"dfire",group:"Supraventriculares",name:"Doble respuesta nodal («double fire»)",mech:"co",
+ show:["sa-ra","sa-la","av-fast","av-slow","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["Cada P va seguida de dos QRS angostos: el primero con PR corto (vía rápida) y el segundo con PR largo (vía lenta).","La FC ventricular duplica la sinusal y el RR alterna corto–largo: imita bigeminia, extrasístoles o FA."],
+ fisio:["Doble fisiología nodal sin reentrada: el mismo impulso sinusal baja a la vez por la vía rápida y por la lenta.","Ocurre cuando la diferencia de conducción entre las dos vías supera la refractariedad del His-Purkinje, así el segundo impulso encuentra el His recuperado.","Si es incesante puede producir taquicardiomiopatía. Tratamiento de elección: ablación de la vía lenta."],
+ tip:"Seguí un solo latido sinusal: fijate cómo baja primero por la vía rápida y, más tarde, por la lenta. Después probá la maniobra vagal y la ablación.",
+ actions:[
+  {label:"Maniobra vagal", run(){ sim.st.vagal=sim.t+2400; event(sim.t,"Vagal"); }},
+  {label:"Ablación de la vía lenta", run(){ sim.st.abl=true; event(sim.t,"Ablación VL"); }}
+ ],
+ init(){ setLead("DII"); sim.st.vagal=0; sim.st.abl=false; sim.next=200; },
+ step(){
+  const st=sim.st; if(sim.t<sim.next)return; const t=sim.next, vag=sim.t<st.vagal;
+  anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); flash("la",t+55); P(t+45,{amp:.15});
+  anim("av-fast",t+70,50); const q1=t+125; QRS(q1,"narrow");
+  anim("his-r",q1-12,55); anim("his-l",q1-12,55); flash("rv",q1+10); flash("lv",q1+10); T(q1+215,{amp:.24,w:32});
+  if(st.abl){ sim.next=t+(vag?820:700); return; }
+  if(vag){ anim("av-slow",t+70,150); block(186,214,t+230,500); sim.next=t+820; return; }
+  anim("av-slow",t+70,330); const q2=t+420; QRS(q2,"narrow",{mark:"2.º QRS"});
+  anim("his-r",q2-12,55); anim("his-l",q2-12,55); flash("rv",q2+10); flash("lv",q2+10); T(q2+190,{amp:.2,w:28});
+  sim.next=t+700;
  }});
 
 /* WPW */
@@ -2723,7 +2749,7 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 })();
 
 </script>
-<script src="paciente.js?v=v100"></script>
+<script src="paciente.js?v=v101"></script>
 <script src="eco.js?v=v89"></script>
 <script src="arr.js?v=v72"></script>
 <script src="ped.js?v=v74"></script>

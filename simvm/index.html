@@ -1207,9 +1207,13 @@ function calibrate(){const c=window.CAL;P.shX=0;P.co2k=1;
 if(Q.has('embed'))document.body.classList.add('emb');
 if(Q.has('back')&&/^[a-z]+\.html$/.test(Q.get('back'))){const bk='../'+Q.get('back'),nv=document.createElement('nav');nv.className='cnav';
   nv.innerHTML='<button data-t="calc">Calculadora</button><button class="on">Simulador</button><button data-t="guia">Guía</button>';
+  const simObj=()=>{try{const s0=JSON.parse(ST0),o={mode:S.mode,vg:!!S.vg,ch:{}};['peep','pip','ti','rr','fio2','vt','pmax','hfMap','f','amp','vthf','ampMax','ie'].forEach(k=>{if(S[k]!=null&&s0[k]!=null&&Math.abs(S[k]-s0[k])>1e-9)o.ch[k]=S[k]});if(S.mode!==s0.mode||!!S.vg!==!!s0.vg)o.mc=1;return Object.keys(o.ch).length||o.mc?o:null}catch(e){return null}};
+  // sincronización continua: lo que cambies queda guardado para la Calculadora aunque salgas por otro lado
+  const SK='simsync_'+Q.get('back').replace('.html',''),PK=[Q.get('kg'),Q.get('eg'),Q.get('d')].join('|');let lastSync='';
+  setInterval(()=>{const o=simObj(),j=o?JSON.stringify(o):'';if(j===lastSync)return;lastSync=j;try{if(o)localStorage.setItem(SK,JSON.stringify(Object.assign(o,{pk:PK,t:Date.now()})));else localStorage.removeItem(SK)}catch(e){}},700);
   const simOut=()=>{try{const s0=JSON.parse(ST0),o={mode:S.mode,vg:!!S.vg,ch:{}};['peep','pip','ti','rr','fio2','vt','pmax','hfMap','f','amp','vthf','ampMax','ie'].forEach(k=>{if(S[k]!=null&&Math.abs(S[k]-(s0[k]??NaN))>1e-9||(s0[k]==null&&0))o.ch[k]=S[k]});
     if(S.mode!==s0.mode||!!S.vg!==!!s0.vg)o.mc=1;return Object.keys(o.ch).length||o.mc?'?sim='+encodeURIComponent(JSON.stringify(o)):''}catch(e){return ''}};
-  nv.querySelectorAll('button[data-t]').forEach(b=>b.onclick=()=>location.replace(bk+simOut()+'#'+b.dataset.t));document.body.prepend(nv);const mt=()=>{$('mini').style.top=nv.offsetHeight+'px'};mt();addEventListener('resize',mt);}
+  nv.querySelectorAll('button[data-t]').forEach(b=>b.onclick=()=>location.replace(bk+'#'+b.dataset.t));addEventListener('pagehide',()=>{const o=simObj();try{if(o)localStorage.setItem(SK,JSON.stringify(Object.assign(o,{pk:PK,t:Date.now()})))}catch(e){}});document.body.prepend(nv);const mt=()=>{$('mini').style.top=nv.offsetHeight+'px'};mt();addEventListener('resize',mt);}
 if(Q.has('kg')){k0='libre';
   const n=k=>{const v=parseFloat(Q.get(k));return isFinite(v)?v:null};
   if(n('kg'))$('lPeso').value=Math.round(n('kg')*1000);if(n('eg'))$('lEG').value=n('eg');if(n('d')!=null)$('lDias').value=n('d');
