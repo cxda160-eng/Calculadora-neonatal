@@ -649,7 +649,7 @@ try{const c=JSON.parse(localStorage.getItem("en_comp")||"null");if(Array.isArray
 try{const m=JSON.parse(localStorage.getItem("en_mod")||"null");if(m)MOD=m;}catch(e){}
 const saveComp=()=>{try{localStorage.setItem("en_comp",JSON.stringify(COMP));localStorage.setItem("en_mod",JSON.stringify(MOD))}catch(e){}};
 const enSt={modo:"mlkg"};
-let rows=[{m:"fort",v:150}];
+let rows=[{m:"fort",v:""}]; // vacío por defecto: no sumar enteral que no se indicó
 let enResumen="";
 
 function drawComp(){
@@ -661,7 +661,7 @@ function drawRows(){
   const lbl=enSt.modo==="mlkg"?"ml/kg/día":"ml por toma";
   $("enRows").innerHTML=rows.map((r,i)=>`<div class="enrow">
     <label for="em_${i}">Leche ${rows.length>1?i+1:""}<select id="em_${i}" data-ri="${i}">${COMP.map(c=>`<option value="${c.id}"${c.id===r.m?" selected":""}>${c.n}</option>`).join("")}</select></label>
-    <label for="ev_${i}">${lbl}<input id="ev_${i}" data-ri="${i}" type="number" inputmode="decimal" step="any" value="${r.v}"></label>
+    <label for="ev_${i}">${lbl}<input id="ev_${i}" data-ri="${i}" type="number" inputmode="decimal" step="any" value="${r.v}" placeholder="0"></label>
     ${rows.length>1?`<button type="button" class="x" data-del="${i}" aria-label="Quitar leche ${i+1}">×</button>`:"<span></span>"}
     <div class="eq" id="eq_${i}"></div></div>`).join("");
   $("enAdd").hidden=rows.length>=4;
@@ -738,7 +738,7 @@ function calcPR(){const n=i=>{const v=parseFloat(String($(i).value).replace(",",
   if(n("prG")>12)A.push(["warn","Flujo de glucosa mayor de 12 mg/kg/min."]);
   if(isFinite(ratio)&&(ratio<1.3||ratio>2))A.push(["info",`Relación Ca:P en mg ${f1(ratio,2)}: lo habitual es 1,3–1,7 : 1. Consultar compatibilidad con farmacia.`]);
   $("prAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}">${t}</div>`).join("");
-  window._prSummary=`Prescripción de NP · ${f1(kg*1000,0)} g\nMetas: líquidos ${$("prL").value} mL/kg/día, glucosa ${$("prG").value} mg/kg/min, AA ${$("prA").value} g/kg, lípidos ${$("prLi").value} g/kg, Na ${$("prNa").value}, K ${$("prK").value}, Ca ${$("prCa").value} mEq/kg, P ${$("prP").value} mmol/kg, Mg ${$("prMg").value} mEq/kg\n`+rows.map(([a,v])=>`${a}: ${f1(v,2)} mL`).join("\n")+`\nBolsa acuosa ${f1(Vaq,1)} mL a ${f1(Vaq/H,2)} mL/h · glucosa ${f1(glc,1)} % · ${f1(kcal,0)} kcal/kg/día\nLípidos ${f1(V.lip,2)} mL a ${f1(V.lip/H,2)} mL/h`;}
+  window._prSummary=`Prescripción de NP · ${f1(kg*1000,0)} g\nMetas: líquidos ${$("prL").value} mL/kg/día, glucosa ${$("prG").value} mg/kg/min, AA ${$("prA").value} g/kg, lípidos ${$("prLi").value} g/kg, Na ${$("prNa").value}, K ${$("prK").value}, Ca ${$("prCa").value||"0"} mEq/kg, P ${$("prP").value||"0"} mmol/kg, Mg ${$("prMg").value||"0"} mEq/kg\nBolsa acuosa ${f1(Vaq,1)} mL a ${f1(Vaq/H,2)} mL/h · glucosa final ${f1(glc,1)} % · flujo de glucosa ${$("prG").value} mg/kg/min · ${f1(kcal,0)} kcal/kg/día\nLípidos ${f1(V.lip,2)} mL a ${f1(V.lip/H,2)} mL/h\nPreparación estimada (según las soluciones de farmacia cargadas en la app, editables; una bolsa ya preparada puede usar otras):\n`+rows.map(([a,v])=>`  ${a}: ${f1(v,2)} mL`).join("\n");}
 [...PRI,...PRC].forEach(i=>$(i).addEventListener("input",calcPR));$("prLipIn").addEventListener("change",calcPR);$("peso").addEventListener("input",calcPR);
 window.customSummary=()=>{const m=document.querySelector('#modulo [aria-pressed="true"]');if(!m)return "";if(m.dataset.v==="tot")return window._totSummary||"";if(m.dataset.v==="np"&&!$("phBody").hidden)return window._phSummary||"";if(m.dataset.v==="np"&&npPk)return window._prSummary||"";return ""};
 setTimeout(calcPR,0);
@@ -785,6 +785,7 @@ function calcTOT(){
   if(incE&&!v(E,"vol")&&!v(E,"na"))A.push(["info","No hay aporte enteral cargado (pestaña Enteral)."]);
   if(incE&&v(E,"vol"))A.push(["info",v(E,"k")>0?"s/d: las leches no informan lípidos ni magnesio en esta app. El potasio enteral es solo el del suplemento de fosfato (sin el de la leche).":"s/d: las leches no informan lípidos, potasio ni magnesio en esta app; el total de esas filas es solo parenteral."]);
   if(S.lab.startsWith("NP")&&!npPk&&window.NP&&+$("ent").value)A.push(["warn","En Parenteral hay un valor en «Enteral (solo volumen)»: acá no se usa; el enteral sale de la pestaña Enteral para no contarlo dos veces."]);
+  if(incP&&npPk&&!(+String($("prCa").value).replace(",","."))&&!(+String($("prP").value).replace(",","."))&&+String($("prL").value).replace(",","."))A.push(["warn","La NP indicada por kg/día no tiene calcio ni fósforo cargados: si la bolsa los trae, cargalos para que los totales sean reales."]);
   if(tot(R[0])>180)A.push(["warn",`Líquidos totales ${f(tot(R[0]),0)} mL/kg/día: por encima de 180.`]);
   if(tot(R[2])>4.5)A.push(["warn",`Proteínas totales ${f(tot(R[2]),2)} g/kg/día: por encima de 4,5.`]);
   $("totAl").innerHTML=A.map(([c,t])=>`<div class="pill ${c}"><span>${t}</span></div>`).join("");
@@ -819,8 +820,8 @@ function hojaSave(){try{calcTOT()}catch(e){return}
   if(!$("phBody").hidden)par=window._phSummary||"";else if(npPk)par=window._prSummary||"";else par=typeof resumen==="string"?resumen:"";
   const tab=[...document.querySelectorAll("#totTab tbody tr")].filter(r=>!r.classList.contains("sub")).map(r=>[...r.cells].map(c=>c.innerText.replace(/\s+/g," ").trim()));
   const head=[...document.querySelectorAll("#totTab thead th")].map(c=>c.textContent);
-  const al=[...document.querySelectorAll("#totAl .pill")].map(x=>x.innerText);
-  const d={t:Date.now(),parLab:S.lab,par,en:typeof enResumen==="string"&&window.ENT&&(window.ENT.vol||window.ENT.na)?enResumen:"",head,tab,tiles:[...document.querySelectorAll("#totTiles .tile")].map(x=>[x.querySelector(".k").textContent,x.querySelector(".v").textContent,x.querySelector(".s").textContent]),al};
+  const al=[...document.querySelectorAll("#totAl .pill")].map(x=>x.innerText),alw=[...document.querySelectorAll("#totAl .pill.warn,#totAl .pill.crit")].map(x=>x.innerText);
+  const d={t:Date.now(),parLab:S.lab,par,en:typeof enResumen==="string"&&window.ENT&&(window.ENT.vol||window.ENT.na)?enResumen:"",head,tab,tiles:[...document.querySelectorAll("#totTiles .tile")].map(x=>[x.querySelector(".k").textContent,x.querySelector(".v").textContent,x.querySelector(".s").textContent]),al,alw};
   try{localStorage.setItem("hojaNut",JSON.stringify(d))}catch(e){}}
 let hojaT=null;["input","change","click"].forEach(ev=>document.addEventListener(ev,()=>{clearTimeout(hojaT);hojaT=setTimeout(hojaSave,500)},true));
 setTimeout(hojaSave,700);
@@ -974,6 +975,6 @@ drawComp();drawRows();
 try{const mm=localStorage.getItem("nut_mod");if(mm==="en"||mm==="tot")$("modulo").querySelector(`[data-v="${mm}"]`).click();}catch(e){}
 calc();
 </script>
-<script src="paciente.js?v=v103"></script>
+<script src="paciente.js?v=v104"></script>
 </body>
 </html>

@@ -141,6 +141,7 @@ function render(){
       `<table><thead><tr>${(N.head||[]).map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${N.tab.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`+
       (N.al&&N.al.length?`<ul class="al">${N.al.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`:"")+ago(N.t);
     L.push("","TOTALES 24 h");(N.tiles||[]).forEach(([k,v,s])=>L.push(`${k}: ${v} ${s}`));
+    (N.alw||[]).forEach(a=>L.push("⚠ "+a.replace(/\s+/g," ").trim()));
     const H=N.head||[];N.tab.forEach(r=>{const tot=r[r.length-1];const parts=r.slice(1,-1).map((c,i)=>H[i+1]?`${H[i+1]} ${c}`:c).join(", ");L.push(`${r[0]}: ${tot}${parts?` (${parts})`:""}`)});
   } else $("hTot").innerHTML='<div class="empty">Abrí Nutrición para calcular los totales.</div>';
   // Balance
@@ -166,6 +167,6 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)render()})
 window.customSummary=()=>{render();return TXT};
 render();setInterval(()=>{if(!document.hidden)render()},60000);
 </script>
-<script src="paciente.js?v=v103"></script>
+<script src="paciente.js?v=v104"></script>
 </body>
 </html>
