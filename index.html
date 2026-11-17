@@ -250,7 +250,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <button type="button" class="add" id="camAdd">+ Agregar paciente</button>
     <div class="bkp">
       <p class="mas-p" style="margin:6px 0 0"><b>Respaldo.</b> Todo se guarda solo en este equipo. Exportá un archivo para no perder los pacientes si reinstalás la app o cambiás de teléfono.</p>
-      <div class="bkp-b"><button type="button" class="add" id="bkExp">Exportar respaldo</button><button type="button" class="add" id="bkImp">Importar respaldo</button></div>
+      <p class="bkLast" id="bkLast" style="margin:6px 0 0;font-size:.82rem;opacity:.8"></p><div class="bkp-b"><button type="button" class="add" id="bkExp">Exportar respaldo</button><button type="button" class="add" id="bkImp">Importar respaldo</button></div>
       <input type="file" id="bkFile" accept=".json,application/json" hidden>
     </div>
   </div>
@@ -277,9 +277,9 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <div class="mas-h"><h2>Todas las pestañas</h2><button type="button" class="ib" id="masX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <p class="mas-p">Tocá la estrella para fijar hasta 4 pestañas en la barra de abajo.</p>
     <div id="masG"></div>
-    <button type="button" class="add" id="resAll" style="margin-top:8px">Resumen completo del paciente</button>
+    <button type="button" class="add" id="resAll" style="margin-top:8px;width:100%;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:14px;font:inherit;font-weight:700;min-height:50px;cursor:pointer">📋 Resumen completo del paciente</button>
     <div class="opt-r"><span>Tema</span><div class="segm" id="thSeg"><button type="button" data-t="auto">Automático</button><button type="button" data-t="light">Claro</button><button type="button" data-t="dark">Oscuro</button></div></div>
-    <label class="opt-r"><span>Letra más grande</span><input type="checkbox" id="bigTx"></label>
+    <div class="opt-r" style="flex-wrap:wrap"><span>Letra</span><div class="segm" id="fsSeg"><button type="button" data-f="0">Normal</button><button type="button" data-f="1">Grande</button><button type="button" data-f="2">Muy grande</button></div></div>
     <a class="mas-vid" href="instructivo.html" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Ver el video instructivo</a>
     <div class="mas-f"><span>Versión instalada: <b id="masV">—</b></span><button type="button" id="masUp">Buscar actualización</button></div>
   </div>
@@ -440,7 +440,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     $("camL").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const x=C.l.find(y=>y.id===b.dataset.r);const n=prompt("Nombre o cama (ej.: Cama 3 · RN Pérez)",x.nom);if(n&&n.trim()){x.nom=n.trim().slice(0,40);put(C);paintName();list()}});
     $("camL").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const x=C.l.find(y=>y.id===b.dataset.d);if(!confirm(`¿Borrar ${x.nom} y todos sus datos?`))return;
       if(x.id===C.a){flushFrames(true);clearNow();C.l=C.l.filter(y=>y.id!==x.id);C.a=C.l[0].id;const t=C.l[0];if(t.snap)for(const k in t.snap)try{localStorage.setItem(k,t.snap[k])}catch(e){};put(C);paintName();reloadViews()}else{C.l=C.l.filter(y=>y.id!==x.id);put(C)}list()})}
-  function open(){list();$("camas").hidden=false}
+  function open(){list();bkPaint();$("camas").hidden=false}
   function close(){$("camas").hidden=true}
   $("pCama").onclick=open;$("camX").onclick=close;$("camas").addEventListener("click",e=>{if(e.target.id==="camas")close()});
   $("camAdd").onclick=()=>{const id="c"+(C.n++);const nom="Paciente "+(C.l.length+1);C.l.push({id,nom,snap:{}});put(C);go(id);setTimeout(()=>{if(window.paciSum)window.paciSum();const r=$("pacRow");if(r&&r.hidden)$("pChip").click()},300)};
@@ -459,7 +459,9 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     const txt=JSON.stringify(data),d=new Date(),pad=n=>String(n).padStart(2,"0");
     const name=`respaldo-calculadora-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}.json`;
     const blob=new Blob([txt],{type:"application/json"});
-    try{const file=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Respaldo Calculadora Neonatal"});toast("Respaldo listo");return}}catch(e){if(e&&e.name==="AbortError")return}
+    const mark=()=>{try{localStorage.setItem("bkLast",String(Date.now()))}catch(e){}bkPaint()};
+    try{const file=new File([blob],name,{type:"application/json"});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"Respaldo Calculadora Neonatal"});mark();toast("Respaldo listo");return}}catch(e){if(e&&e.name==="AbortError")return}
+    mark();
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast("Respaldo descargado: "+C.l.length+" paciente"+(C.l.length>1?"s":""))};
   $("bkImp").onclick=()=>{$("bkFile").value="";$("bkFile").click()};
   $("bkFile").onchange=async()=>{const f=$("bkFile").files[0];if(!f)return;let d;try{d=JSON.parse(await f.text())}catch(e){toast("El archivo no es un respaldo válido");return}
@@ -475,6 +477,15 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     const e=document.getElementById("toast");const b=document.createElement("button");b.type="button";b.textContent="Deshacer";b.className="tUndo";
     b.onclick=()=>{flushFrames(true);clearNow();C=old.C;for(const k in old.live)try{localStorage.setItem(k,old.live[k])}catch(_){}put(C);paintName();reloadViews();list();e.hidden=true};
     e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,8000)};
+  // Recordatorio semanal de respaldo
+  function bkAge(){const t=+localStorage.getItem("bkLast")||0;return t?(Date.now()-t)/864e5:null}
+  function bkPaint(){const e=$("bkLast");if(!e)return;const a=bkAge();e.textContent=a==null?"Todavía no hiciste ningún respaldo en este equipo.":a<1?"Último respaldo: hoy.":"Último respaldo: hace "+Math.floor(a)+" día"+(Math.floor(a)===1?"":"s")+".";e.style.color=a==null||a>=7?"#b4532a":""}
+  window.bkPaint=bkPaint;bkPaint();
+  setTimeout(()=>{try{const conDatos=C.l.some(x=>x.id===C.a?(JSON.parse(localStorage.getItem("pac")||"{}")||{}).kg:x.snap&&x.snap.pac&&JSON.parse(x.snap.pac).kg);if(!conDatos)return;
+    const a=bkAge(),hoy=new Date().toDateString();if(a!=null&&a<7)return;if(localStorage.getItem("bkAviso")===hoy)return;localStorage.setItem("bkAviso",hoy);
+    toast(a==null?"Tus pacientes están solo en este equipo. Conviene exportar un respaldo.":"Hace "+Math.floor(a)+" días que no hacés un respaldo.");
+    const e=document.getElementById("toast"),b=document.createElement("button");b.type="button";b.textContent="Hacer respaldo";b.className="tUndo";b.onclick=()=>{e.hidden=true;$("bkExp").click()};
+    e.appendChild(document.createTextNode(" "));e.appendChild(b);clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,9000)}catch(e){}},2500);
   $("vacAll").onclick=()=>{flushFrames(true);const snap=snapNow();vacClose();clearNow();reloadViews();undoToast("Se vaciaron todos los datos de "+cur().nom+".",snap)};
 })();
 
@@ -487,14 +498,14 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     for(const sh of d.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
       for(const r of rules){if(r.media&&/prefers-color-scheme:\s*dark/.test(ORIG.get(r)||r.media.mediaText)){if(!ORIG.has(r))ORIG.set(r,r.media.mediaText);r.media.mediaText=t==="dark"?"all":t==="light"?"not all":ORIG.get(r)}}}
     if(t==="auto")d.documentElement.removeAttribute("data-theme");else d.documentElement.setAttribute("data-theme",t);
-    if(!top)d.documentElement.style.zoom=big?"1.12":"";}
-  function apply(){const t=get("theme")||"auto",big=get("bigtext")==="1";themeDoc(document,t,big,true);
+    if(!top)d.documentElement.style.zoom=["","1.12","1.25"][big]||"";}
+  function apply(){const t=get("theme")||"auto",big=Math.max(0,Math.min(2,+get("bigtext")||0));themeDoc(document,t,big,true);
     document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{if(!m.dataset.orig)m.dataset.orig=m.getAttribute("media")||"";if(t==="auto"){if(m.dataset.orig)m.setAttribute("media",m.dataset.orig)}else{const dark=/dark/.test(m.dataset.orig);m.setAttribute("media",(t==="dark")===dark?"all":"not all")}});
     document.querySelectorAll(".views iframe").forEach(f=>{try{themeDoc(f.contentDocument,t,big)}catch(e){}});
-    $("thSeg").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));$("bigTx").checked=big}
+    $("thSeg").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===t));$("fsSeg").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.f===big))}
   document.querySelectorAll(".views iframe").forEach(f=>f.addEventListener("load",apply));
   $("thSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{try{localStorage.setItem("theme",b.dataset.t)}catch(e){}apply()});
-  $("bigTx").onchange=()=>{try{localStorage.setItem("bigtext",$("bigTx").checked?"1":"0")}catch(e){}apply()};
+  $("fsSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{try{localStorage.setItem("bigtext",b.dataset.f)}catch(e){}apply()});
   window.applyTheme=apply;apply();
 })();
 
@@ -520,7 +531,9 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 /* ---- Buscador ---- */
 (function(){
   const $=id=>document.getElementById(id);
-  const norm=t=>String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+  const norm=t=>String(t||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[«»"“”]/g,"").replace(/\s+/g," ").trim();
+  // sinónimos y siglas de guardia → texto que existe en la app
+  const SYN={gir:"glucosa",vig:"glucosa","flujo de glucosa":"glucosa",fototerapia:"bilirrubina",luminoterapia:"bilirrubina",ictericia:"bilirrubina",bili:"bilirrubina",ta:"tension arterial",tension:"tension arterial",presion:"tension arterial","presion arterial":"tension arterial",hipotension:"tension arterial",p3:"tension arterial",percentil:"tension arterial",tubo:"via aerea",tet:"via aerea",intubar:"via aerea",cateter:"via aerea",umbilical:"via aerea",adrenalina:"adrenalina",rcp:"reanimacion",reanimacion:"reanimacion",vafo:"vafo",hfo:"vafo",oscilatoria:"vafo",simv:"simv",cpap:"cpap",nippv:"nippv","ca/p":"calcio y fosforo","percentil 3":"tension arterial","tubo endotraqueal":"via aerea",fosforo:"calcio y fosforo",np:"parenteral",npt:"parenteral",hidratacion:"parenteral",transfusion:"globulos rojos",plaquetas:"plaquetas",tsv:"taquicardia",arritmia:"taquicardia",ecg:"ecg",eco:"eco",hipotermia:"encefalopatia",ehi:"encefalopatia",abstinencia:"finnegan",sindrome:"finnegan",vanco:"vancomicina",genta:"gentamicina",ampi:"ampicilina"};
   const NAMES={};for(const k in TABS){const b=$(TABS[k][1]);NAMES[k]={n:(b.querySelector(".l")||b).textContent.trim(),st:b.getAttribute("style")||""}}
   const STOP=/^(calcular |copiar |guardar |ver )|^(borrar|calcular|copiar|guardar|nuevo|reiniciar|pausa|seguir|listo|ahora|cerrar|ver|mas|menos|si|no|ok|—|-|\+|−|g|kg|ml|h|min)$/;
   let IDX=null;
@@ -534,6 +547,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
       d.querySelectorAll("select").forEach(sel=>[...sel.options].forEach(o=>{if(o.value!=="")add(sel,o.textContent,"opt",1,{val:o.value})}));
       d.querySelectorAll("button").forEach(e=>{if(e.closest("nav,.nav"))return;add(e,lab(e),"btn",2)});
       d.querySelectorAll("table tr td:first-child,table tr th:first-child").forEach(e=>add(e,e.textContent,"row",3));
+      d.querySelectorAll("label").forEach(e=>{const f=e.htmlFor&&d.getElementById(e.htmlFor);add(f&&!f.hidden?f:e,lab(e),"lbl",2)});
     }}
   function reveal(d,el){
     for(let a=el;a&&a!==d.body;a=a.parentElement){
@@ -546,11 +560,15 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
       else if(r.kind==="btn")el.click();
       setTimeout(()=>{el.scrollIntoView({block:"center",behavior:"smooth"});const o=el.style.outline,t=el.style.transition;el.style.transition="outline-color .6s";el.style.outline="3px solid #f0a37c";setTimeout(()=>{el.style.outline=o;el.style.transition=t},1600)},60)},30)}
   function run(){const q=norm($("busQ").value),R=$("busR");if(!q){R.innerHTML=`<p>Escribí un fármaco (vanco, adrenalina), un cálculo (MAP, GIR, QTc, DCO₂) o una sección (Sarnat, balance).</p>`;return}
-    if(!IDX)build();const w=q.split(" ");
-    const hits=IDX.filter(r=>w.every(x=>r.n.includes(x))).map(r=>({r,s:(r.n.startsWith(q)?0:r.n.split(/[^a-z0-9]/).some(t=>t.startsWith(w[0]))?1:2)*10+r.rank})).sort((a,b)=>a.s-b.s||a.r.txt.length-b.r.txt.length).slice(0,40);
+    if(!IDX)build();
+    const score=(r,qq)=>{const w=qq.split(" "),tk=r.n.split(/[^a-z0-9]+/);if(!w.every(x=>r.n.includes(x)))return null;
+      return (r.n===qq?0:w.every(x=>tk.includes(x))?1:r.n.startsWith(qq)?2:tk.some(t=>t.startsWith(w[0]))?3:4)*10+r.rank};
+    const qs=[q];if(SYN[q]&&SYN[q]!==q)qs.push(SYN[q]);
+    const best=new Map();qs.forEach((qq,i)=>IDX.forEach(r=>{const sc=score(r,qq);if(sc==null)return;const v=sc+(i?5:0);if(!best.has(r)||best.get(r)>v)best.set(r,v)}));
+    const hits=[...best].map(([r,s])=>({r,s})).sort((a,b)=>a.s-b.s||a.r.txt.length-b.r.txt.length).slice(0,40);
     if(!hits.length){R.innerHTML=`<p>Sin resultados para «${$("busQ").value.replace(/</g,"&lt;")}».</p>`;return}
     R.innerHTML="";hits.forEach(({r})=>{const b=document.createElement("button");b.type="button";b.setAttribute("style",NAMES[r.k].st);
-      b.innerHTML=`<span class="tg">${NAMES[r.k].n}</span><span class="tx">${r.txt.replace(/</g,"&lt;")}<small>${{tab:"Pestaña",sec:"Sección",opt:"Opción de lista",btn:"Botón",row:"Fila de tabla"}[r.kind]}</small></span>`;b.onclick=()=>go(r);R.appendChild(b)})}
+      b.innerHTML=`<span class="tg">${NAMES[r.k].n}</span><span class="tx">${r.txt.replace(/</g,"&lt;")}<small>${{tab:"Pestaña",sec:"Sección",opt:"Opción de lista",btn:"Botón",row:"Fila de tabla",lbl:"Campo"}[r.kind]}</small></span>`;b.onclick=()=>go(r);R.appendChild(b)})}
   function open(){IDX=null;let pend=0;for(const k in TABS){const f=$(TABS[k][0]);if(!f.getAttribute("src")){pend++;f.addEventListener("load",()=>{IDX=null;if($("busQ").value)run()},{once:true});loadTab(k)}}$("bus").hidden=false;$("busQ").value="";run();setTimeout(()=>$("busQ").focus(),30);verPaint()}
   function close(){$("bus").hidden=true}
   $("bBus").onclick=open;$("busX").onclick=close;$("bus").addEventListener("click",e=>{if(e.target.id==="bus")close()});

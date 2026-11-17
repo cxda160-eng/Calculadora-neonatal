@@ -1,7 +1,8 @@
 /* Corazón 3D para el simulador de arritmias (Calculadora Neonatal)
    Lee el estado del simulador 2D (window.SIM_API) y lo dibuja sobre un corazón 3D semitransparente:
    cámaras que se iluminan al despolarizarse, sistema de conducción y el impulso viajando por cada vía. */
-import * as THREE from "./lib/three.module.min.js";
+// three.js se carga recién cuando el corazón 3D se ve (no demora la apertura de Cardio)
+let THREE = null;
 
 const API = window.SIM_API;
 let renderer, scene, camera, heart, resize = () => {};
@@ -14,7 +15,7 @@ function webglOK() {
 
 let mode = "3d";
 try { if (localStorage.getItem("sim_hv") === "2d") mode = "2d"; } catch (e) {}
-if (!API || !canvas || !webglOK()) { mode = "2d"; if (seg) seg.hidden = true; }
+if (!API || !canvas || !window.WebGLRenderingContext) { mode = "2d"; if (seg) seg.hidden = true; }
 
 function setMode(m) {
   mode = m;
@@ -23,11 +24,20 @@ function setMode(m) {
   // El SVG sigue en el documento (oculto) porque de ahí se toman las trayectorias
   box2d.classList.toggle("sm-2d-off", m === "3d");
   try { localStorage.setItem("sim_hv", m); } catch (e) {}
-  if (m === "3d") resize();
+  if (m === "3d") { ensure(); resize(); }
 }
 if (seg) seg.querySelectorAll("button").forEach(b => b.onclick = () => setMode(b.dataset.v));
 
-if (API && canvas && webglOK()) init();
+let started = false;
+async function ensure() {
+  if (started || mode !== "3d" || !API || !canvas || canvas.offsetParent === null) return;
+  started = true;
+  if (!webglOK()) { mode = "2d"; if (seg) seg.hidden = true; setMode("2d"); return; }
+  try { THREE = await import("./lib/three.module.min.js"); init(); }
+  catch (e) { started = false; mode = "2d"; if (seg) seg.hidden = true; setMode("2d"); }
+}
+// arrancar cuando el lienzo 3D aparece en pantalla (pestaña Simulador)
+if (canvas && "IntersectionObserver" in window) new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) ensure(); }).observe(canvas);
 setMode(mode);
 
 /* ------------------------------------------------------------------ */
