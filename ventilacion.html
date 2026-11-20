@@ -281,6 +281,17 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
     </ul>
     <p class="note">Basado en: European Consensus Guidelines on the Management of RDS, actualización 2022 (Sweet DG y col., Neonatology 2023); Klingenberg C y col., guía práctica de volumen garantizado (J Perinatol 2011) y revisión Cochrane de ventilación con volumen objetivo (2017); Keszler M y col. sobre VT en menores de 800 g (Arch Dis Child 2009); guías de ventilación con volumen objetivo del NHS. Rangos orientativos: ajustar al protocolo de la unidad.</p>
   </div>
+
+  <div class="card" id="dartCard">
+    <h2>Dexametasona en dosis bajas (protocolo DART)</h2>
+    <p class="note" style="margin-top:0">Para prematuros &lt; 28 semanas o &lt; 1000 g que siguen en ARM después de la primera semana, cuando el equipo decide indicar corticoides. 10 días, 0,89 mg/kg en total, cada 12 h (Doyle y col., Pediatrics 2006).</p>
+    <div class="grid">
+      <div><label for="dartIni">Fecha de inicio (día 1)</label><input id="dartIni" type="date"></div>
+    </div>
+    <div id="dartOut" style="margin-top:10px"></div>
+    <p class="note"><b>Dexametasona ampolla 8 mg/2 mL (4 mg/mL).</b> 1.ª dilución: 0,5 mL de ampolla + 9,5 mL de SF = 2 mg/10 mL (0,2 mg/mL). 2.ª dilución: 1 mL de la 1.ª + 4,5 mL de SF = <b>0,2 mg/5,5 mL (0,036 mg/mL)</b>. El cálculo usa el peso de la barra del paciente y se mantiene los 10 días. Controlar glucemia, TA y signos de perforación intestinal; precaución si recibe ibuprofeno o indometacina al mismo tiempo. Apoyo al cálculo: verificar con el protocolo de la unidad.</p>
+    <p class="note"><b>Referencia de la dosis:</b> Doyle LW, Davis PG, Morley CJ, McPhee A, Carlin JB; DART Study Investigators. Low-dose dexamethasone facilitates extubation among chronically ventilator-dependent infants: a multicenter, international, randomized, controlled trial. <i>Pediatrics</i> 2006;117(1):75–83. doi:10.1542/peds.2004-2843. Esquema: 0,15 mg/kg/día × 3 días, 0,10 × 3, 0,05 × 2 y 0,02 × 2, divididos cada 12 h (0,89 mg/kg en total).</p>
+  </div>
 </section>
 </main>
 <div class="toast" id="toast">Copiado</div>
@@ -435,6 +446,22 @@ function simUrl(){const s=getState(),p=pq(),k=s.k;
   [['pco2',s.pco2],['ph',s.ph],['pao2',s.muestra==='art'?s.pao2:null],['spo2',s.spo2]].forEach(([k,v])=>{if(v!=null&&isFinite(v)&&v>0)q.set(k,v)});
   return 'simvm/index.html?'+q}
 function openSim(){try{CalcNeo.frmFlush&&CalcNeo.frmFlush()}catch(e){}location.replace(simUrl()+'&back=ventilacion.html')}
+
+// ---------- Dexametasona en dosis bajas (DART) ----------
+const DART=[[1,3,0.15],[4,6,0.10],[7,8,0.05],[9,10,0.02]];
+const DART_C=0.2/5.5; // mg/mL de la 2.ª dilución
+function dartCalc(){const o=$('dartOut');if(!o)return;
+  const p=pq(),kg=+p.kg>0?+p.kg:null,ini=$('dartIni').value?new Date($('dartIni').value+'T12:00'):null;
+  if(!kg){o.innerHTML='<p class="note">Cargá el peso en la barra del paciente.</p>';return}
+  const dd=n=>{if(!ini)return'—';const d=new Date(ini);d.setDate(d.getDate()+n-1);return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})};
+  let tot=0,vol=[];const rows=[];
+  DART.forEach(([a,b,mk])=>{for(let d=a;d<=b;d++){const dosis=mk/2*kg,ml=dosis/DART_C;tot+=mk*kg;vol.push(ml*2);
+    rows.push(`<tr><td>${d}</td><td>${dd(d)}</td><td>${fx(mk/2,3)} mg/kg<br><small>${fx(dosis,4)} mg</small></td><td><b>${fx(ml,2)} mL</b><br><small>c/12 h EV</small></td></tr>`)}});
+  o.innerHTML=`<table><tr><th>Día</th><th>Fecha</th><th>Dosis c/12 h</th><th>Volumen</th></tr>${rows.join('')}</table>
+   <p class="note" style="margin-top:6px">Peso ${fx(kg*1000,0)} g (barra del paciente) · total del curso <b>${fx(tot,3)} mg</b> (0,89 mg/kg) · 2.ª dilución 0,036 mg/mL. Por día se usan hasta ${fx(Math.max(...vol),1)} mL de la 2.ª dilución (se preparan 5,5 mL).</p>`;}
+$('dartIni').addEventListener('input',dartCalc);$('dartIni').addEventListener('change',dartCalc);
+addEventListener('message',()=>setTimeout(dartCalc,80));addEventListener('storage',e=>{if(e.key==='pac')dartCalc()});
+setTimeout(dartCalc,400);
 function initSim(){const s=getState();const vg=!!s.m.vg;
   base={vg,vt:s.vtk!=null?Math.round(s.vtk*10)/10:(vg?5:null),pip:s.pip!=null?Math.round(s.pip):18,peep:s.peep!=null?s.peep:5,ti:s.ti?Math.round(s.ti*100)/100:0.35,fr:Math.round(s.frEff||40),pco2:s.pco2||null,kg:s.kg||1,k:s.k};
   if(vg){$('s-1').min=3;$('s-1').max=8;$('s-1').step=0.1;$('s-1').value=base.vt;$('s-l1').textContent='VT objetivo';}
@@ -492,6 +519,6 @@ function applySim(){let q=new URLSearchParams(location.search).get('sim');if(q){
 setTimeout(applySim,300);
 try{const h=location.hash.slice(1);const t=(h==='calc'||h==='guia')?h:localStorage.getItem('vent_tab');if(t&&t!=='calc'&&t!=='sim')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v104"></script>
+<script src="paciente.js?v=v105"></script>
 </body>
 </html>
