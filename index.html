@@ -148,6 +148,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 .bus-f button{flex:none;font-size:.78rem;padding:6px 10px}
 .toast .tUndo{background:none;border:0;color:#ffd27a;font:inherit;font-weight:700;cursor:pointer;padding:2px 0 2px 8px}
 .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:70;background:#2e3147;color:#fff;padding:9px 16px;border-radius:999px;font-size:.85rem;box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
+.leg{font-size:.9rem;line-height:1.45;max-height:60vh;overflow:auto}.leg ul{padding-left:18px;margin:8px 0}.leg li{margin:5px 0}
 </style>
 <style id="tema-vivo">
 /* Tema "pastel vivo": redefine los tokens con colores más saturados, fondo con brillo de color y lectura principal con degradé */
@@ -272,6 +273,23 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <div style="display:flex;gap:8px"><button type="button" class="add" id="resC" style="flex:1">Copiar</button><button type="button" class="add" id="resS" style="flex:1">Compartir</button></div>
   </div>
 </div>
+<div class="mas" id="legM" hidden role="dialog" aria-label="Aviso legal">
+  <div class="mas-in camas">
+    <div class="mas-h"><h2>Aviso legal</h2></div>
+    <div class="leg">
+      <p><b>Calculadora Neonatal es una herramienta de apoyo al cálculo para profesionales de la salud.</b> No es un producto médico registrado ante la ANMAT ni está validada por una institución.</p>
+      <ul>
+        <li>Las dosis, rangos y tablas se tomaron de bibliografía reconocida (guías y consensos de la AAP, la SAP, sociedades europeas y norteamericanas, monografías y artículos revisados por pares), citada en la pestaña <b>Fuentes</b>. Pueden existir errores de transcripción o diferencias con versiones posteriores de esas fuentes.</li>
+        <li><b>No reemplaza</b> el criterio clínico, el protocolo de cada unidad, la indicación médica, la ficha técnica del producto ni el doble chequeo antes de preparar y administrar.</li>
+        <li>La responsabilidad sobre cada indicación es del profesional que la prescribe. Ante cualquier discrepancia, vale la fuente original.</li>
+        <li>Los datos de pacientes se guardan solo en este dispositivo y no se envían a ningún servidor. No cargues nombres ni datos que identifiquen al paciente si el equipo es compartido.</li>
+        <li>Los simuladores y el material educativo usan modelos aproximados: sirven para aprender, no para decidir sobre un paciente real.</li>
+      </ul>
+      <p class="mas-p">Autor: Dr. Carlos Díaz, neonatólogo. Uso gratuito.</p>
+    </div>
+    <button type="button" class="add" id="legOk" style="width:100%;margin-top:10px;border:0;background:var(--accent,#2b7a8c);color:#fff;border-radius:14px;font:inherit;font-weight:700;min-height:50px">Entendido, soy profesional de la salud</button>
+  </div>
+</div>
 <div class="mas" id="mas" hidden role="dialog" aria-label="Todas las pestañas">
   <div class="mas-in">
     <div class="mas-h"><h2>Todas las pestañas</h2><button type="button" class="ib" id="masX" aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
@@ -280,6 +298,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
     <button type="button" class="add" id="resAll" style="margin-top:8px;width:100%;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:14px;font:inherit;font-weight:700;min-height:50px;cursor:pointer">📋 Resumen completo del paciente</button>
     <div class="opt-r"><span>Tema</span><div class="segm" id="thSeg"><button type="button" data-t="auto">Automático</button><button type="button" data-t="light">Claro</button><button type="button" data-t="dark">Oscuro</button></div></div>
     <div class="opt-r" style="flex-wrap:wrap"><span>Letra</span><div class="segm" id="fsSeg"><button type="button" data-f="0">Normal</button><button type="button" data-f="1">Grande</button><button type="button" data-f="2">Muy grande</button></div></div>
+    <button type="button" class="mas-vid" id="legOpen" style="width:100%;background:none;font:inherit;cursor:pointer;color:inherit">⚖️ Aviso legal</button>
     <a class="mas-vid" href="instructivo.html" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Ver el video instructivo</a>
     <div class="mas-f"><span>Versión instalada: <b id="masV">—</b></span><button type="button" id="masUp">Buscar actualización</button></div>
   </div>
@@ -587,6 +606,15 @@ if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!reloaded){reloaded=true;try{sessionStorage.setItem("upd","1")}catch(e){}document.querySelectorAll(".views iframe").forEach(f=>{try{f.contentWindow.CalcNeo.frmFlush(true)}catch(e){}});location.reload();}});
   window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").then(r=>{r.update();document.addEventListener("visibilitychange",()=>{if(!document.hidden)r.update().catch(()=>{})})}).catch(()=>{})});
   try{if(sessionStorage.getItem("upd")){sessionStorage.removeItem("upd");window.addEventListener("load",async()=>toast("Calculadora actualizada a "+await window.appVersion()))}}catch(e){}}
+</script>
+<script>
+/* ---- Aviso legal: se muestra al primer uso y cuando cambia su texto ---- */
+(()=>{const V="1",$=id=>document.getElementById(id),m=$("legM");
+  const open=(must)=>{m.hidden=false;$("legOk").textContent=must?"Entendido, soy profesional de la salud":"Cerrar"};
+  try{if(localStorage.getItem("avisoLegal")!==V)setTimeout(()=>open(true),300)}catch(e){}
+  $("legOk").onclick=()=>{try{localStorage.setItem("avisoLegal",V)}catch(e){}m.hidden=true};
+  $("legOpen").onclick=()=>{const x=$("mas");if(x)x.hidden=true;open(false)};
+})();
 </script>
 </body>
 </html>
