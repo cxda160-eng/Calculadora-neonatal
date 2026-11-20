@@ -38,6 +38,15 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .seg button{flex:1;border:0;background:transparent;font:inherit;font-size:.85rem;color:var(--muted);padding:8px 6px;border-radius:8px;cursor:pointer;min-height:38px}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
 .hint{font-size:.78rem;color:var(--muted);margin:0}
+.catsvg{width:100%;max-width:420px;display:block;margin:12px auto 8px}
+.catsvg .body{fill:#f6efe9;stroke:#cbb8a8;stroke-width:1.5}.catsvg .vb{fill:#fff;fill-opacity:.85;stroke:#b9b2c4}.catsvg .vl{font-size:9px;fill:#7a7290;text-anchor:end}
+.catsvg .zone{fill:#e8505b;fill-opacity:.12}.catsvg .zone2{fill:#e8505b;fill-opacity:.06;stroke:#e8505b;stroke-dasharray:3 3;stroke-opacity:.4}.catsvg .zl{font-size:9.5px;fill:#b0343e;font-weight:700}
+.catsvg .diaf{fill:none;stroke:#8d7d6d;stroke-width:2}.catsvg .heart{fill:#f3c4c8;fill-opacity:.55;stroke:#d98a92}.catsvg .liver{fill:#d9b8a0;fill-opacity:.7;stroke:#b98f70}
+.catsvg .ol{font-size:9px;fill:#6f6680}.catsvg .aorta{fill:none;stroke:#e9a1a6;stroke-width:9;stroke-linecap:round}.catsvg .branch{stroke:#e9a1a6;stroke-width:4}.catsvg .ivc{stroke:#a9c3ea;stroke-width:9;stroke-linecap:round}
+.catsvg .umb{fill:#fff;stroke:#a88f7a;stroke-width:2}.catsvg .uvc{fill:none;stroke:#2f6fd0;stroke-width:3}.catsvg .uac{fill:none;stroke:#d23642;stroke-width:3}
+.catsvg .tipv{fill:#2f6fd0}.catsvg .tipa{fill:#d23642}.catsvg .tv{font-size:9.5px;fill:#2f6fd0;font-weight:700}.catsvg .lead{stroke:#2f6fd0;stroke-width:1}
+.catsvg .tl{font-size:9px;text-anchor:middle}.catsvg .tl .cv{fill:#2f6fd0}.catsvg .tl .ca{fill:#d23642}
+@media (prefers-color-scheme: dark){.catsvg .body{fill:#2a2531;stroke:#5a5163}.catsvg .vb{fill:#3a3444}.catsvg .ol,.catsvg .vl{fill:#b9b0c8}.catsvg .liver{fill:#6b4f3c}.catsvg .heart{fill:#7a3b44}}
 .hint a{color:var(--accent)}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
 .tile{background:var(--sunk);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
@@ -102,6 +111,33 @@ footer{font-size:.75rem;color:var(--muted);text-align:center}
       <p class="hint">Tubo (NRP 9.ª ed.): hasta 1200 g o ≤ 28 sem 2,5 (2,0 opcional en &lt; 750 g) · 1201–2200 g o 29–34 sem 3,0 · &gt; 2200 g o &gt; 34 sem 3,5. Profundidad punta-encía por EG o por peso, o distancia tabique nasal-trago (DNT) + 1 cm; confirmar con auscultación, CO₂ espirado y radiografía si queda colocado. Hoja Miller 1 en término, 0 en prematuros (00 opcional en extremos). Máscara laríngea tamaños 0–1. Catéter venoso de emergencia: 3–4 cm más allá de la pared abdominal hasta que refluya sangre (menos en prematuros extremos). Catéteres umbilicales electivos: fórmula de Shukla-Ferrara.</p>
     </section>
 
+
+    <section class="card">
+      <h2>Catéteres umbilicales</h2>
+      <div class="field" style="max-width:260px;margin-bottom:10px"><label for="cUN">Distancia ombligo–tetilla (cm, opcional)</label><input id="cUN" type="text" inputmode="decimal" autocomplete="off" placeholder="cm"></div>
+      <div class="res" id="rCat"></div>
+      <svg viewBox="0 0 340 400" class="catsvg" role="img" aria-label="Esquema de la posición de los catéteres umbilicales">
+  <path d="M95 30 Q170 8 245 30 L262 120 Q268 250 250 340 Q170 385 90 340 Q72 250 78 120 Z" class="body"/>
+  <rect x="181" y="70" width="40" height="88" class="zone"/><text x="224" y="78" class="zl">Arterial alto</text><text x="224" y="90" class="zl">T6–T9</text>
+  <rect x="181" y="268" width="40" height="41" class="zone2"/><text x="224" y="282" class="zl">Arterial bajo</text><text x="224" y="294" class="zl">L3–L4</text>
+  <path d="M88 150 Q170 120 252 150" class="diaf"/><text x="252" y="164" class="ol">diafragma</text>
+  <path d="M118 52 Q150 40 172 60 Q196 54 205 82 Q200 112 168 128 Q128 118 116 90 Z" class="heart"/><text x="100" y="48" class="ol">corazón</text>
+  <path d="M92 156 Q150 148 186 160 Q182 210 140 222 Q100 214 92 180 Z" class="liver"/><text x="96" y="206" class="ol">hígado</text>
+  <rect x="161" y="70" width="18" height="19" rx="3" class="vb"/><text x="141" y="84" class="vl">T6</text><rect x="161" y="92" width="18" height="19" rx="3" class="vb"/><text x="141" y="106" class="vl">T7</text><rect x="161" y="114" width="18" height="19" rx="3" class="vb"/><text x="141" y="128" class="vl">T8</text><rect x="161" y="136" width="18" height="19" rx="3" class="vb"/><text x="141" y="150" class="vl">T9</text><rect x="161" y="158" width="18" height="19" rx="3" class="vb"/><text x="141" y="172" class="vl">T10</text><rect x="161" y="180" width="18" height="19" rx="3" class="vb"/><text x="141" y="194" class="vl">T11</text><rect x="161" y="202" width="18" height="19" rx="3" class="vb"/><text x="141" y="216" class="vl">T12</text><rect x="161" y="224" width="18" height="19" rx="3" class="vb"/><text x="141" y="238" class="vl">L1</text><rect x="161" y="246" width="18" height="19" rx="3" class="vb"/><text x="141" y="260" class="vl">L2</text><rect x="161" y="268" width="18" height="19" rx="3" class="vb"/><text x="141" y="282" class="vl">L3</text><rect x="161" y="290" width="18" height="19" rx="3" class="vb"/><text x="141" y="304" class="vl">L4</text><rect x="161" y="312" width="18" height="19" rx="3" class="vb"/><text x="141" y="326" class="vl">L5</text>
+  <path d="M187 62 L187 300 M187 300 L172 330 M187 300 L204 330" class="aorta"/>
+  <path d="M187 202 L200 202 M187 230 L207 230 M187 230 L167 230" class="branch"/><text x="226" y="206" class="ol">tronco celíaco (T12)</text><text x="226" y="234" class="ol">renales (L1)</text>
+  <path d="M152 112 L152 160" class="ivc"/>
+  <circle cx="170" cy="318" r="9" class="umb"/><text x="152" y="345" class="ol">ombligo</text>
+  <path d="M170 318 Q166 270 158 236 Q150 205 152 172 L152 140" class="uvc"/><circle cx="152" cy="140" r="5" class="tipv"/>
+  <path d="M174 320 Q200 330 204 330 L187 300 L187 100" class="uac"/><circle cx="187" cy="100" r="5" class="tipa"/>
+  <text x="40" y="128" class="tv">Venoso: unión</text><text x="40" y="140" class="tv">VCI–aurícula</text><text x="40" y="152" class="tv">(T8–T9)</text>
+  <line x1="98" y1="137" x2="147" y2="140" class="lead"/>
+  <text x="196" y="384" class="tl"><tspan class="cv">━ venoso (vena umbilical → conducto venoso → VCI)</tspan></text>
+  <text x="196" y="398" class="tl"><tspan class="ca">━ arterial (arteria umbilical → ilíaca → aorta)</tspan></text>
+</svg>
+      <p class="hint">Esquema orientativo, no a escala. Longitudes desde la base del ombligo: sumá lo que quede de muñón. Confirmar siempre con radiografía o ecografía antes de usar; un catéter fijado se puede retirar, nunca avanzar. Arterial alto: punta entre T6 y T9 (por encima del tronco celíaco). Bajo: L3–L4. Venoso: unión de la vena cava inferior con la aurícula derecha, a nivel del diafragma; nunca en el hígado ni dentro de la aurícula.</p>
+      <p class="hint" style="margin-top:6px"><b>Referencias:</b> Shukla H, Ferrara A. Am J Dis Child 1986;140:786–8 · Wright IM y col. Pediatr Crit Care Med 2008;9:498–501 · Verheij GH y col. Int J Pediatr 2010;2010:873167 (Shukla revisada) · Gupta AO y col. J Perinatol 2015;35:476–80 (ombligo–tetilla − 1 cm).</p>
+    </section>
     <section class="card">
       <h2>Ventilación, compresiones y saturación objetivo</h2>
       <div class="tablewrap"><table id="tSat">
@@ -286,9 +322,20 @@ function calc(){
       ${tile('Profundidad (encía)', `${depth === 5.25 ? '5,0–5,5' : f(depth, 1)}<small>cm</small>`, isFinite(g) ? `según EG ${f(g, 1)} sem · o DNT + 1 cm` : 'según peso · o DNT + 1 cm')}
       ${tile('Hoja de laringoscopio', blade, 'recta (Miller)')}
       ${tile('Máscara laríngea', 'Tamaño 0–1', (w > 0 && w < 1.5) ? 'experiencia limitada en < 1,5 kg; rescate si falla la intubación' : 'vía de rescate; válida durante las compresiones')}
-      ${isFinite(uac) ? tile('Catéter arterial umbilical', `${f(uac, 1)}<small>cm</small>`, 'posición alta (T6–T9)') : ''}
-      ${isFinite(uvc) ? tile('Catéter venoso umbilical', `${f(uvc, 1)}<small>cm</small>`, 'unión VCI-AD · emergencia: 3–4 cm hasta que refluya sangre') : ''}</div>`;
+      ${isFinite(uac) ? tile('Catéteres umbilicales', `${f(uac, 1)} / ${f(uvc, 1)}<small>cm</small>`, 'arterial / venoso (Shukla) · ver tarjeta de catéteres') : ''}</div>`;
   }
+
+  /* ---- Catéteres umbilicales ---- */
+  {const un=v('cUN');
+   if(!(w>0)&&!isFinite(un)) $('rCat').innerHTML=empty('Cargá el peso (o la distancia ombligo–tetilla).');
+   else{const a1=w>0?3*w+9:NaN,a2=w>0?4*w+7:NaN,v1=w>0?(3*w+9)/2+1:NaN,v2=w>0?(3*w+9)/2:NaN,v3=isFinite(un)?un-1:NaN,vlbw=w>0&&w<1.5;
+    $('rCat').innerHTML=`<div class="tiles">
+     ${isFinite(a1)?tile('Arterial alto · Shukla', `${f(a1,1)}<small>cm</small>`, '3 × peso + 9', vlbw?'':'main'):''}
+     ${isFinite(a2)?tile('Arterial alto · Wright', `${f(a2,1)}<small>cm</small>`, '4 × peso + 7'+(vlbw?' · preferida en < 1500 g':''), vlbw?'main':''):''}
+     ${isFinite(v3)?tile('Venoso · ombligo–tetilla − 1', `${f(v3,1)}<small>cm</small>`, 'el método más preciso en los estudios','main'):''}
+     ${isFinite(v1)?tile('Venoso · Shukla', `${f(v1,1)}<small>cm</small>`, '(3 × peso + 9) / 2 + 1 · tiende a quedar alto'):''}
+     ${isFinite(v2)?tile('Venoso · Shukla revisada', `${f(v2,1)}<small>cm</small>`, '(3 × peso + 9) / 2'):''}
+     ${tile('Venoso de emergencia', '3–4<small>cm</small>', 'en sala de partos: hasta que refluya sangre')}</div>`;}}
 
   /* ---- Bilirrubina ---- */
   const tsb = v('bTsb'), alb = v('bAlb');
@@ -394,11 +441,11 @@ function biliChart(phF, exF, escF, hs, tsb, src){
 $('sPre').querySelectorAll('button').forEach(b => b.onclick = () => { preRef = b.dataset.v; try { localStorage.setItem('bili_pre', preRef); } catch (e) {} $('sPre').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); calc(); });
 $('sPre').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === preRef));
 $('tNice').querySelector('tbody').innerHTML = Array.from({length: 15}, (_, i) => 23 + i).map(g => `<tr data-g="${g}"><td>${g} sem</td><td class="n">${f((g * 10 - 100) / UM, 1)} <small>(${g * 10 - 100})</small></td><td class="n">${f(g * 10 / UM, 1)} <small>(${g * 10})</small></td></tr>`).join('');
-['nPeso','nEG','nHoras','bTsb','bAlb','tHtoA','tHtoD','tHtoU','tVol'].forEach(id => $(id).addEventListener('input', calc));
+['nPeso','nEG','nHoras','bTsb','bAlb','tHtoA','tHtoD','tHtoU','tVol','cUN'].forEach(id => $(id).addEventListener('input', calc));
 ['rk1','rk2','rk3','rk4'].forEach(id => $(id).addEventListener('change', calc));
 calc();
 window.customSummary = null;
 </script>
-<script src="paciente.js?v=v106"></script>
+<script src="paciente.js?v=v107"></script>
 </body>
 </html>
