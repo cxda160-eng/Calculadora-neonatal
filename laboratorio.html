@@ -103,7 +103,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 
     <h3>Potasio corregido por pH</h3>
     <div class="alerta" role="note"><span class="ic">⚠️</span><div><b>Estimación aproximada</b>El cambio de K por cada 0,1 de pH varía mucho (≈ 0,2–1,2 mEq/L). Sirve para acidosis metabólica inorgánica (hiperclorémica); es mucho menos válido en acidosis láctica, cetoacidosis o trastornos respiratorios. No reemplaza el valor medido.</div></div>
-    <div class="grid"><label for="kf">mEq/L por cada 0,1 de pH<input id="kf" inputmode="decimal" autocomplete="off" value="0,6"></label></div>
+    <div class="grid"><label for="kf">mEq/L por cada 0,1 de pH <span class="u">vacío = 0,6</span><input id="kf" inputmode="decimal" autocomplete="off" value="0,6" placeholder="0,6"></label></div>
     <div class="res" id="rK"></div>
     <p class="hint">K estimado a pH 7,40 = K medido − factor × (7,40 − pH) ÷ 0,1.</p>
 
@@ -283,7 +283,7 @@ function calc(){
   } else set('rCa', empty('Ca total y albúmina'));
 
   // Potasio corregido por pH
-  const kf = v('kf');
+  const kf = isFinite(v('kf')) && v('kf') > 0 ? v('kf') : 0.6; // si el campo quedó vacío se usa 0,6
   if (ok(k, ph, kf)){
     const kc = k - kf*(7.40-ph)/0.1;
     let txt = Math.abs(ph-7.40) < 0.005 ? 'pH normal: no hay corrección.' :
@@ -432,6 +432,6 @@ $('clr').onclick = () => { document.querySelectorAll('input').forEach(i => { if 
 document.querySelectorAll('input,select').forEach(i => i.addEventListener('input', calc));
 calc();
 </script>
-<script src="paciente.js?v=v111"></script>
+<script src="paciente.js?v=v112"></script>
 </body>
 </html>
