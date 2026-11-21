@@ -1408,6 +1408,18 @@ const ATLAS = [
   {id:'dns', sim:'brasin', n:'Bradicardia y disfunción sinusal', strips:[{lead:'DII', dur:4000, build:({P,beat,mark})=>{ P(80); beat(200); P(980); beat(1100); mark(1850,'pausa'); beat(2600,'n',{label:'escape'}); P(3380); beat(3500); }}],
    crit:['Bradicardia sinusal: P sinusal normal antes de cada QRS con FC baja para la edad.','Disfunción sinusal: pausas o paro sinusal, escapes de la unión (QRS estrecho sin P) o auriculares bajos, incompetencia cronotrópica (FC máxima < 135 lpm en la ergometría), alternancia con taquiarritmias (taqui-bradi).'],
    notas:'La bradicardia sinusal aislada suele ser fisiológica (sueño, deportistas). Causas reversibles: hipoxia, hipotermia, hipotiroidismo, hiperpotasemia, hipercalcemia, hipertensión endocraneana, fármacos (betabloqueantes, bloqueantes cálcicos, digoxina, litio). La disfunción sinusal se ve sobre todo tras cirugías auriculares (Senning, Mustard, Fontan, seno venoso) y en heterotaxia. Con síntomas: marcapasos.'},
+  {id:'tsin', sim:'tsin', n:'Taquicardia sinusal', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=150,i=0;t<3000;t+=320+(i%3)*12,i++){ P(t-110); beat(t,'n',{t:[195,30,.28]}); } }}],
+   crit:['P sinusal normal (positiva en DI, DII y aVF) antes de cada QRS, PR constante.','FC alta para la edad, con variabilidad latido a latido; en el lactante rara vez supera ~220 lpm.','Comienzo y fin graduales.'],
+   notas:'Es el diferencial número uno de la TSV en el neonato: la sinusal varía con el estado del paciente y cambia de a poco; la TSV empieza y termina de golpe y tiene frecuencia fija. La adenosina no la corta (solo bloquea un momento el nodo AV). Se trata la causa: fiebre, dolor, hipovolemia, anemia, sepsis, fármacos.'},
+  {id:'mam', sim:'mam', n:'Marcapasos auricular migratorio', strips:[{lead:'DII', build:({P,beat})=>{ const a=[.16,.12,.07,.03,-.05,-.08,.02,.1]; const pr=[130,122,112,104,96,92,108,124]; for(let i=0,t=200;i<8;i++,t+=370){ P(t-pr[i],{a:a[i]}); beat(t); } }}],
+   crit:['La morfología de la P cambia de forma gradual (al menos tres formas) y el PR varía con ella.','Frecuencia normal o algo baja, RR levemente variable.'],
+   notas:'El marcapasos dominante se desplaza entre el nódulo sinusal, otros sitios auriculares y la unión según el tono vagal. Es benigno, frecuente en el sueño y en deportistas, y desaparece con el ejercicio. A diferencia de la taquicardia auricular caótica, la frecuencia no es alta y los cambios de P son graduales.'},
+  {id:'taqbra', sim:'taqbra', n:'Pausa sinusal y síndrome taqui-bradi', strips:[{lead:'DII', dur:5000, build:({P,beat,mark})=>{ P(80); beat(200); for(let k=0,t=700;k<6;k++,t+=300){ P(t-110,{a:.11}); beat(t,'n',{t:[200,28,.22]}); } mark(2700,'TA'); mark(3200,'pausa'); beat(4300,'esc',{label:'escape'}); }}],
+   crit:['Bradicardia sinusal con salvas de taquicardia auricular de inicio y fin bruscos.','Al terminar la taquicardia aparece una pausa larga, a veces con escape de la unión.','La pausa no es múltiplo del PP (a diferencia del bloqueo sinoauricular).'],
+   notas:'Enfermedad del nódulo sinusal, sobre todo tras cirugías auriculares (Fontan, Senning, Mustard, seno venoso). Al terminar la taquicardia el nódulo enfermo tarda en recuperarse y aparece la pausa sintomática. El tratamiento combina marcapasos (para las pausas) con antiarrítmicos o ablación: los antiarrítmicos solos agravan la bradicardia.'},
+  {id:'elec', sim:'elec', n:'Electrodos invertidos y dextrocardia', strips:[{lead:'DI correcto', dur:1500, build:({P,beat})=>{ P(200); beat(330); P(950); beat(1080); }},{lead:'DI brazos invertidos', dur:1500, build:({P,beat})=>{ P(200,{inv:true}); beat(330,'n',{amp:-1}); P(950,{inv:true}); beat(1080,'n',{amp:-1}); }}],
+   crit:['Brazos invertidos: P, QRS y T negativos en DI; DII y DIII se intercambian, igual que aVR y aVL; precordiales normales.','Dextrocardia en espejo: además, la R disminuye de V1 a V6; se normaliza con precordiales derechas.'],
+   notas:'Una P negativa en DI casi siempre es un error de colocación o una dextrocardia. Si las precordiales progresan normal, el problema son los cables. Antes de informar un eje derecho extremo o una «isquemia lateral», revisá los electrodos y repetí el ECG.'},
   {g:'Bloqueos AV'},
   {id:'bav1', sim:'bav1', n:'Bloqueo AV de 1.er grado', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=300;t<3000;t+=650){ P(t-260); beat(t);} }}],
    crit:['PR prolongado para la edad (> percentil 98: ≈ 150 ms en lactantes, 180 ms en niños, 200 ms en adolescentes).','Toda onda P conduce: relación P:QRS 1:1.'],
@@ -1424,6 +1436,12 @@ const ATLAS = [
   {id:'bav3', sim:'bav', n:'Bloqueo AV completo (3.er grado)', strips:[{lead:'DII', dur:4000, build:({P,beat})=>{ for(let t=100;t<4000;t+=430) P(t); for(let t=400;t<4000;t+=1150) beat(t,'esc'); }}],
    crit:['Disociación AV completa: P regulares y QRS regulares sin relación entre sí.','Frecuencia auricular mayor que la ventricular.','Escape de la unión (QRS estrecho, más rápido) o ventricular (QRS ancho, más lento).'],
    notas:'Congénito: anticuerpos maternos anti-Ro/La, L-TGA, isomerismo izquierdo. Adquirido: posoperatorio (CIV, canal AV, Fallot), miocarditis, Lyme. Riesgo si FC media < 55 lpm en el neonato, < 70 lpm con cardiopatía, QRS ancho, QT largo o disfunción ventricular. Anti-Ro: riesgo ≈ 1 en 20 embarazos y recurrencia 10–16 %. Posquirúrgico: marcapasos si persiste ≥ 7 días. Ver la sección «Bloqueo AV y bradicardia: ¿marcapasos?».'},
+  {id:'union', sim:'union', n:'Ritmo de la unión y disociación AV', strips:[{lead:'DII', build:({P,beat,mark})=>{ for(let t=200;t<3000;t+=760) beat(t,'n',{label:t===200?'unión':''}); [120,960,1800,2640].forEach(t=>P(t)); mark(1840,'P disociada'); }}],
+   crit:['QRS angosto igual al sinusal, regular, sin P delante.','La P puede quedar oculta en el QRS, aparecer justo después (retrógrada) o marchar a su propio ritmo (disociación AV).','Disociación isorrítmica: P y QRS a frecuencias casi iguales, la P entra y sale del QRS.'],
+   notas:'La unión toma el mando cuando el sinusal se enlentece (vagal, sueño, fármacos, posoperatorio). Se diferencia del BAV completo porque una P que llega a tiempo conduce (latido de captura). Se corrige acelerando el sinusal: atropina o estimulación auricular por encima de la frecuencia de la unión.'},
+  {id:'bavpq', sim:'bavpq', n:'BAV completo posquirúrgico', strips:[{lead:'DII', dur:4000, build:({P,beat})=>{ for(let t=60;t<4000;t+=430) P(t); for(let t=400;t<4000;t+=1150) beat(t,'esc',{label:t===400?'escape':''}); }},{lead:'DII · DDD', dur:3000, build:({P,beat,add})=>{ for(let t=60;t<3000;t+=430){ P(t); const q=t+190; add(tt=>ECG.g(tt,q,1.5,1.4)); beat(q,'wide'); } }}],
+   crit:['P regulares sin relación con los QRS (PR variable).','Escape de la unión (angosto) o ventricular (ancho y más lento).','Con marcapasos DDD: espiga ventricular a intervalo fijo después de cada P.'],
+   notas:'Lesión del His por suturas, edema o tracción (CIV, canal AV, TGA corregida, resección subaórtica). Muchas veces se recupera en días: se dejan cables epicárdicos temporarios. Si no se recupera en 7–10 días, marcapasos definitivo. El DDD conserva la sincronía AV y mejora el gasto del corazón recién operado.'},
   {g:'Bloqueos de rama y preexcitación'},
   {id:'brd', sim:'brd', n:'Bloqueo de rama derecha', strips:[{lead:'V1', dur:1600, build:({beat})=>{ beat(300,'rbbbV1'); beat(1000,'rbbbV1'); }},{lead:'V6', dur:1600, build:({beat})=>{ beat(300,'rbbbV6'); beat(1000,'rbbbV6'); }}],
    crit:['QRS ancho para la edad (completo: > 90 ms en < 4 años, > 100 ms de 4 a 16 años, ≥ 120 ms después).','rSR\' (M) en V1; S ancha y empastada en DI y V6.','Eje desviado a la derecha para la edad; T opuesta a la R\' en V1.'],
@@ -1471,6 +1489,9 @@ const ATLAS = [
   {id:'jet', sim:'jet', n:'Taquicardia ectópica de la unión (JET)', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=200;t<3000;t+=300) beat(t); for(let t=80;t<3000;t+=470) P(t); }}],
    crit:['QRS estrecho, igual al sinusal, con frecuencia mayor que la auricular.','Disociación AV (P más lentas e independientes) o conducción retrógrada 1:1.','Inicio gradual; no responde a la adenosina.'],
    notas:'Típica en las primeras 24–48 h tras cirugía cardíaca (cierre de CIV, Fallot, canal AV). Medidas: bajar catecolaminas, normotermia o hipotermia leve (34–35 °C), corregir Mg y K, sedación, amiodarona, estimulación auricular sincronizada.'},
+  {id:'fa', sim:'fa', n:'Fibrilación auricular', strips:[{lead:'DII', build:({beat,add})=>{ add(tt=>.05*Math.sin(tt/21)+.04*Math.sin(tt/33+1)+.03*Math.sin(tt/14+2)); [180,560,1010,1290,1820,2150,2700].forEach(t=>beat(t,'n',{t:[230,34,.22]})); }}],
+   crit:['Sin ondas P: línea de base con ondas f finas e irregulares.','RR irregularmente irregular, QRS angosto si no hay aberrancia ni preexcitación.'],
+   notas:'Rara en el niño sano: pensar en Fontan y cardiopatías operadas, miocardiopatías, hipertiroidismo, QT corto o WPW. Si dura más de 48 h o se desconoce el inicio, anticoagular o descartar trombos antes de cardiovertir. Con preexcitación, ver «FA preexcitada».'},
   {g:'Taquicardias de QRS ancho'},
   {id:'tsvab', sim:'coumel', n:'TSV con aberrancia', strips:[{lead:'V1', build:({beat,mark})=>{ for(let t=200,i=0;t<3000;t+=260,i++) beat(t, i<5?'rbbbV1':'nS', {t:[180,28, i<5?-0.25:0.2]}); mark(1500,'se estrecha, misma FC'); }}],
    crit:['QRS ancho con imagen típica de bloqueo de rama que se normaliza a la misma frecuencia.','En el neonato es más común la aberrancia con imagen de BRI; en niños y adolescentes, de BRD.'],
@@ -1484,6 +1505,12 @@ const ATLAS = [
   {id:'tvlact', sim:'tvlact', n:'TV del lactante (QRS poco ancho)', strips:[{lead:'DII', build:({beat,P,mark})=>{ for(let t=200,i=0;t<3000;t+=220,i++){ beat(t,'vn'); if(i<4) P(t+90,{inv:true,a:0.1,w:10}); } for(let t=1180;t<3000;t+=470) P(t,{a:0.12}); mark(290,'P retrógrada'); }}],
    crit:['QRS de solo 60–80 ms pero distinto del sinusal; FC de hasta 500 lpm.','P retrógradas 1:1 o disociación AV.','No termina con adenosina.'],
    notas:'Siempre comparar con el QRS basal. Causas: miocarditis, QT largo, TVPC, trastornos electrolíticos, hamartomas o tumores ventriculares. Puede resolverse en 1–2 años, pero la TV incesante del lactante tiene una mortalidad de hasta 15 %.'},
+  {id:'mahaim', sim:'mahaim', n:'Fibras de Mahaim (atriofasciculares)', strips:[{lead:'V1', build:({P,beat,mark})=>{ P(80); beat(200); P(700); beat(820); for(let t=1400;t<3000;t+=300) beat(t,'lbbbV1',{t:[220,40,.35]}); mark(1500,'taquicardia BRI'); }}],
+   crit:['En sinusal, preexcitación mínima o ausente.','Taquicardia de QRS ancho, regular, con imagen de BRI y eje izquierdo.','Al estimular la aurícula, el QRS se ensancha de a poco con imagen de BRI.'],
+   notas:'Vía de la aurícula derecha lateral a la rama derecha o al VD, con conducción lenta y decremental y solo anterógrada: la taquicardia es antidrómica. La adenosina puede cortarla; la ablación en el anillo tricuspídeo es curativa. Asociada a la anomalía de Ebstein.'},
+  {id:'tvfallot', sim:'tvfallot', n:'TV en Fallot operado', strips:[{lead:'V1 sinusal', dur:1500, build:({P,beat})=>{ P(80); beat(220,'rbbbV1'); P(830); beat(970,'rbbbV1'); }},{lead:'V1 TV', dur:3000, build:({beat})=>{ for(let t=150;t<3000;t+=300) beat(t,'lbbbV1',{t:[210,38,.35]}); }}],
+   crit:['En sinusal, BRD posquirúrgico, a menudo con QRS ≥ 160–180 ms.','TV monomorfa rápida con imagen de BRI (sale del VD), con eje inferior si nace en el tracto de salida.'],
+   notas:'Macrorreentrada alrededor del parche del tracto de salida, la CIV, la ventriculotomía y el anillo pulmonar. Riesgo mayor con QRS ≥ 180 ms, VD dilatado o disfunción ventricular. Cardioversión si hay inestabilidad; a largo plazo, ablación de los istmos y CDI en los de alto riesgo. Es la principal causa de muerte súbita en el Fallot reparado adulto.'},
   {g:'Extrasístoles'},
   {id:'esv', sim:'eabl', n:'Extrasístole supraventricular', strips:[{lead:'DII', dur:3400, build:({P,beat,mark})=>{ const ts=[300,950,1420,2240,2890]; ts.forEach((t,i)=>{ if(i===2){ P(t-150,{a:0.1,w:14}); beat(t,'n',{label:'ESV'}); } else { P(t-140); beat(t);} }); }}],
    crit:['Latido prematuro con P de morfología distinta y QRS estrecho.','Pausa generalmente no compensadora.','Puede conducir con aberrancia (QRS ancho) o no conducir (P bloqueada).'],
@@ -1506,7 +1533,25 @@ const ATLAS = [
    notas:'Tratamiento: sulfato de magnesio, corregir K y Ca, suspender fármacos que prolongan el QT, estimulación o isoproterenol si es dependiente de pausas, desfibrilación si es sostenida. Ver la calculadora de QTc.'},
   {id:'fv', sim:'fv', n:'Fibrilación ventricular', strips:[{lead:'DII', build:({add})=>{ const r=ECG.rnd(11); const ph=[...Array(5)].map(()=>[r()*6, 0.12+r()*0.2, 0.025+r()*0.02]); add(t=>ph.reduce((s,[p,a,f])=>s+a*Math.sin(f*t+p),0)); }}],
    crit:['Actividad eléctrica caótica, sin QRS identificables.','Sin pulso: paro cardíaco.'],
-   notas:'Desfibrilación 2 J/kg, luego 4 J/kg (hasta 10 J/kg); RCP de alta calidad; adrenalina; amiodarona 5 mg/kg o lidocaína en la FV refractaria (PALS).'}
+   notas:'Desfibrilación 2 J/kg, luego 4 J/kg (hasta 10 J/kg); RCP de alta calidad; adrenalina; amiodarona 5 mg/kg o lidocaína en la FV refractaria (PALS).'},
+  {id:'qtc', sim:'qtc', n:'QT corto', strips:[{lead:'DII', build:({P,beat})=>{ for(let t=200;t<3000;t+=620){ P(t-120); beat(t,'n',{t:[160,22,.6]}); } }}],
+   crit:['QT corto con ST casi ausente: la T, alta y picuda, nace pegada al QRS.','El QT casi no se alarga cuando baja la frecuencia.','ESC 2022: QTc ≤ 360 ms con mutación, antecedente familiar o arritmia ventricular recuperada.'],
+   notas:'Ganancia de función de canales de K repolarizantes: período refractario corto y heterogéneo que favorece la FA temprana y la FV, incluso con muerte súbita en el lactante. Una FA en un niño sin cardiopatía obliga a mirar el QT. CDI tras un paro; la hidroquinidina alarga el QT.'},
+  {id:'tvmio', sim:'tvmio', n:'Arritmias en la miocarditis', strips:[{lead:'DII', dur:4000, build:({P,beat,mark})=>{ const n=(t)=>{ P(t-110,{a:.08}); beat(t,'n',{amp:.4,tinv:true}); }; n(200); n(600); beat(860,'wide',{amp:.6,label:'EV'}); n(1300); for(let t=1700,k=0;k<6;k++,t+=270) beat(t,'wide',{amp:.6,noT:true}); mark(1750,'TV'); n(3500); }}],
+   crit:['Taquicardia sinusal desproporcionada, QRS de bajo voltaje y T aplanadas o negativas.','Extrasístoles multiformes y salvas de TV; también pueden aparecer bloqueos AV.'],
+   notas:'La inflamación genera focos automáticos y zonas de conducción lenta; el edema baja el voltaje. Las catecolaminas necesarias por el bajo gasto aumentan la ectopia. Una TV en un niño con fiebre reciente o bajo gasto obliga a descartar miocarditis (troponina, eco, resonancia).'},
+  {g:'Electrolitos'},
+  {id:'hiperk', sim:'hiperk', n:'Hiperpotasemia, hipopotasemia e hipocalcemia', strips:[{lead:'DII · K creciente', dur:4200, build:({P,beat,add,mark})=>{ P(80); beat(200); mark(200,'normal'); P(830); beat(950,'n',{t:[210,20,.95]}); mark(950,'K 6–7'); P(1580,{a:.07,w:28}); beat(1780,'n',{t:[230,22,.95]}); mark(1780,'K 7–8'); beat(2550,'wide',{t:[230,30,.9]}); mark(2550,'K > 8'); add(tt=>tt>3200&&tt<4150?.85*Math.sin((tt-3200)/150)*Math.sin(Math.PI*(tt-3200)/950):0); mark(3650,'sinusoidal'); }},{lead:'DII · K bajo', dur:1600, build:({P,beat,add,mark})=>{ P(80); beat(200,'n',{t:[260,50,.08]}); add(tt=>ECG.g(tt,620,40,.15)); mark(620,'U'); P(880); beat(1000,'n',{t:[260,50,.08]}); add(tt=>ECG.g(tt,1420,40,.15)); }}],
+   crit:['K ≈ 6–7: T alta, picuda y de base estrecha.','K ≈ 7–8: PR largo, P aplanada, QRS que se ensancha.','K > 8: P ausente y QRS muy ancho fundido con la T (onda sinusoidal), con riesgo de FV o asistolia.','Hipopotasemia: T aplanada, ST descendido, onda U. Hipocalcemia: ST largo y QT prolongado.'],
+   notas:'El calcio no baja el K: estabiliza la membrana y revierte en minutos los cambios del ECG. Para bajar el K, insulina con glucosa y salbutamol; después eliminarlo. En el prematuro extremo es frecuente la hiperpotasemia no oligúrica de los primeros días; descartá la hemólisis de la muestra. Un ECG normal no descarta una hiperpotasemia grave.'},
+  {g:'Marcapasos'},
+  {id:'mcp', sim:'mcp', n:'Marcapasos: captura y fallas', strips:[{lead:'Captura normal', dur:1800, build:({beat,add})=>{ [200,800,1400].forEach(t=>{ add(tt=>ECG.g(tt,t,1.5,1.4)); beat(t+4,'wide'); }); }},{lead:'Falla de captura', dur:1800, build:({beat,add})=>{ [200,800,1400].forEach(t=>add(tt=>ECG.g(tt,t,1.5,1.4))); beat(1000,'wide2',{label:'escape'}); }},{lead:'Subsensado', dur:1800, build:({P,beat,add,mark})=>{ P(80); beat(200); add(tt=>ECG.g(tt,460,1.5,1.4)); mark(460,'espiga en la T'); P(780); beat(900); add(tt=>ECG.g(tt,1300,1.5,1.4)); beat(1304,'wide'); }},{lead:'Sobresensado', dur:1800, build:({beat,add,mark})=>{ add(tt=>ECG.g(tt,150,1.5,1.4)); beat(154,'wide'); add(tt=>tt>500&&tt<1400?.12*Math.sin(tt/3.1)*Math.sin(tt/41):0); mark(950,'ruido → pausa'); add(tt=>ECG.g(tt,1550,1.5,1.4)); beat(1554,'wide'); }}],
+   crit:['Normal: espiga seguida de QRS ancho; si el corazón late solo, el marcapasos se inhibe.','Falla de captura: espiga sin QRS.','Subsensado: espigas a destiempo, incluso sobre la T.','Sobresensado: pausas sin espigas por ruido.'],
+   notas:'Si no captura, subir la salida (mA o V) y revisar cable, umbral, K y fármacos; en los epicárdicos temporarios el umbral sube en pocos días. Si subsensa, hacerlo más sensible (bajar los mV). Si sobresensa, hacerlo menos sensible o pasar a asincrónico (VOO; imán en los definitivos).'},
+  {g:'Paro (PALS)'},
+  {id:'paro', sim:'paro', n:'Bradicardia, asistolia y AESP', strips:[{lead:'Bradicardia', dur:3000, build:({P,beat})=>{ [300,1450,2600].forEach(t=>{ P(t-150); beat(t); }); }},{lead:'Asistolia', dur:2000, build:({add})=>{ add(tt=>.015*Math.sin(tt/90)); }},{lead:'AESP', dur:3000, build:({beat})=>{ [400,1800].forEach(t=>beat(t,'n',{amp:.7,label:'sin pulso'})); }}],
+   crit:['Bradicardia con mala perfusión: FC < 60 lpm pese a buena oxigenación y ventilación → compresiones.','Asistolia: línea isoeléctrica; confirmar en dos derivaciones y con la ganancia alta.','AESP: actividad eléctrica organizada sin pulso palpable.'],
+   notas:'El paro pediátrico suele ser asfíctico: ventilar bien es lo primero. Adrenalina 0,01 mg/kg IV/IO cada 3–5 min; atropina 0,02 mg/kg solo en la bradicardia vagal o por bloqueo AV. Buscá las causas reversibles (H y T); en la AESP, sobre todo hipovolemia, neumotórax y taponamiento.'}
 ];
 
 // Davignon y col. (1979): percentiles 2–98 (media)
@@ -2572,7 +2617,300 @@ function fvStart(){
   addBase(t0,1e12,x=>{ if(x<t0||x>st.fvEnd) return 0; const amp=Math.max(.25,1-(x-t0)/40000); return amp*(.38*Math.sin(x/31+ph[0])+.27*Math.sin(x/19+ph[1])+.2*Math.sin(x/47+ph[2])+.12*Math.sin(x/13+ph[3])); },[.3,.9,.3]);
 }
 
-const LEADS_EXTRA = {fv:["DII","V1"], eabl:["DII","V1"], evp:["DII","V1"], riva:["DII"], tvlact:["DII","V1"], tac:["DII"], iart:["DII","V1"], antid:["DII","V1"], arrsin:["DII"], brasin:["DII"]};
+
+/* ===================== Ritmos agregados (v110) ===================== */
+LEADV["DI'"]=[-1,0,0]; LEADV["DII'"]=[-.5,.866,0]; LEADV["aVR'"]=[.866,-.5,0]; LEADV["V1'"]=[.42,.1,.9]; LEADV["V5'"]=[-.85,.12,.25];
+
+/* Taquicardia sinusal */
+def({id:"tsin",group:"Referencia",name:"Taquicardia sinusal",mech:"au",
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["P sinusal normal (positiva en DI, DII y aVF) antes de cada QRS, con PR constante.","FC alta para la edad pero con variabilidad latido a latido; en el lactante rara vez supera ~220 lpm.","Comienza y termina de forma gradual, a diferencia del inicio y fin bruscos de una TSV."],
+ fisio:["Es la respuesta normal del nódulo sinusal al aumento del tono simpático o de las catecolaminas: la fase 4 se acelera.","Causas en el neonato y el lactante: fiebre, dolor, llanto, hipovolemia, anemia, hipoxia, sepsis, hipertiroidismo y fármacos (cafeína, salbutamol, catecolaminas).","La frecuencia varía con el estado del paciente y cambia de a poco; una TSV por reentrada empieza y termina de golpe y su frecuencia es fija.","La adenosina puede producir un bloqueo AV transitorio que deja ver las P, pero la taquicardia no se corta porque no hay circuito.","No se trata con antiarrítmicos: se corrige la causa. Si persiste sin explicación, buscar una taquicardia auricular con foco cercano al nódulo sinusal."],
+ tip:"Probá la adenosina: el ventrículo se frena un momento y la taquicardia sigue. Después tratá la causa y mirá cómo baja de a poco.",
+ actions:[
+  {label:"Adenosina", run(){ sim.st.ad=sim.t+1700; event(sim.t,"Adenosina"); }},
+  {label:"Tratar la causa", run(){ const st=sim.st; st.goal = st.goal<400 ? 470 : 300; event(sim.t, st.goal>400?"Antitérmico / volumen / analgesia":"Fiebre / dolor / hipovolemia"); }}
+ ],
+ init(){ const st=sim.st; st.cl=300; st.goal=300; st.ad=0; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  st.cl += (st.goal-st.cl)*0.05; const cl = st.cl + 16*Math.sin(t/1300) + (Math.random()-.5)*12;
+  if(st.ad && t<st.ad){ sinus(t,{noAV:true,showBlock:true,PR:105}); sim.next=t+cl*1.4; return; }
+  sinus(t,{PR:105,qt:190,tAmp:.25,tw:30}); sim.next=t+cl; }});
+
+/* Hiperpotasemia y otros trastornos del K y el Ca */
+def({id:"hiperk",group:"Electrolitos",name:"Hiperpotasemia, hipopotasemia e hipocalcemia",mech:"co",
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["K ≈ 6–7 mEq/L: T alta, picuda y de base estrecha.","K ≈ 7–8: PR largo, P aplanada y ancha, QRS que empieza a ensancharse.","K > 8: P ausente y QRS muy ancho que se funde con la T (onda sinusoidal), con riesgo de FV o asistolia.","Hipopotasemia: T aplanada, ST descendido y onda U. Hipocalcemia: ST largo con QT prolongado.","La correlación entre el valor de K y el ECG es imperfecta: un ECG normal no descarta una hiperpotasemia grave."],
+ fisio:["El K extracelular alto hace menos negativo el potencial de reposo de la membrana.","Eso inactiva parte de los canales de Na: la conducción se enlentece en aurículas, nodo y ventrículos (PR largo, P que desaparece, QRS ancho).","La repolarización, en cambio, se acelera porque aumenta la conductancia de K: T picuda y estrecha.","El calcio no baja el potasio: estabiliza la membrana y revierte en minutos los cambios del ECG; su efecto dura 30–60 min.","Para bajar el K: insulina con glucosa y salbutamol lo meten en la célula; después hay que eliminarlo (diuréticos, resinas, diálisis o exanguinotransfusión).","En el prematuro extremo es frecuente la hiperpotasemia no oligúrica de los primeros días; la hemólisis de la muestra puede dar valores falsamente altos.","La hipopotasemia prolonga la repolarización y aparece la onda U; la hipocalcemia alarga la fase 2 del potencial de acción (ST largo) y el QT."],
+ tip:"Subí el potasio paso a paso, dale calcio y mirá cómo se angosta el QRS; después bajalo con insulina y glucosa. Probá también la hipopotasemia y la hipocalcemia.",
+ actions:[
+  {label:"Subir K+", run(){ const st=sim.st; st.hypo=false; st.k=Math.min(4,st.k+1); event(sim.t,["K normal","K ≈ 6,5","K ≈ 7,5","K ≈ 8,5","K > 9"][st.k]); }},
+  {label:"Gluconato de calcio", run(){ sim.st.ca=sim.t+12000; event(sim.t,"Calcio: estabiliza"); }},
+  {label:"Insulina + glucosa / salbutamol", run(){ const st=sim.st; st.k=Math.max(0,st.k-2); event(sim.t,"K baja"); }},
+  {label:"Hipopotasemia", run(){ const st=sim.st; st.hypo=!st.hypo; if(st.hypo) st.k=0; event(sim.t,st.hypo?"K bajo":"K normal"); }},
+  {label:"Hipocalcemia", run(){ const st=sim.st; st.hca=!st.hca; event(sim.t,st.hca?"Ca bajo":"Ca normal"); }}
+ ],
+ init(){ const st=sim.st; st.k=0; st.ca=0; st.hypo=false; st.hca=false; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  let k=st.k; if(st.ca && t<st.ca && k>1) k=1;
+  if(k>=4){ anim("his-r",t,90); anim("his-l",t,90); flash("rv",t+20); flash("lv",t+20);
+    QRS(t,"wide",{k:1.05}); T(t+170,{amp:.85,w:75}); if(!st.lastMark||t-st.lastMark>2000){ mark(t,"onda sinusoidal","#ff8a8a"); st.lastMark=t; } sim.next=t+650; return; }
+  const qt = st.hca ? 380 : (k>=1 ? 215 : 240);
+  if(k===0){ const q=sinus(t,{qt, tAmp: st.hypo?.08:.3, tw: st.hypo?50:38});
+    if(st.hypo && q){ addWave(q+120,[[0,-.07,40]],TV); addWave(q+qt+150,[[0,.15,38]],TV); mark(q+qt+150,"U","#9fd8ff"); } sim.next=t+520; return; }
+  if(k===1){ sinus(t,{qt, tAmp:.85, tw:20}); sim.next=t+520; return; }
+  if(k===2){ sinus(t,{PR:185, pAmp:.07, qrs:"brdInc", qt, tAmp:.9, tw:20}); sim.next=t+560; return; }
+  sinus(t,{PR:200, pAmp:0, qrs:"wide", qt:240, tAmp:.9, tw:26}); sim.next=t+600; }});
+
+/* Bradicardia, asistolia y AESP (PALS) */
+def({id:"paro",group:"Paro y bradicardia (PALS)",name:"Bradicardia, asistolia y AESP",mech:null,
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["Bradicardia con mala perfusión: FC < 60 lpm pese a oxigenación y ventilación adecuadas → compresiones.","Asistolia: línea isoeléctrica; confirmala en más de una derivación y con la ganancia alta.","AESP: actividad eléctrica organizada (acá, QRS angostos y lentos) sin pulso palpable."],
+ fisio:["En pediatría el paro suele ser asfíctico: la hipoxia y la acidosis deprimen el nódulo sinusal y la conducción, y el ritmo cae de bradicardia a AESP y asistolia.","Por eso la ventilación efectiva es la intervención más importante; en el recién nacido la mayoría de las bradicardias responde solo a ventilar bien.","La adrenalina (0,01 mg/kg IV/IO cada 3–5 min) aumenta la presión de perfusión coronaria por su efecto α y la frecuencia por su efecto β.","La atropina (0,02 mg/kg) solo sirve si la bradicardia es vagal o por un bloqueo AV primario; no reemplaza a la adrenalina.","Buscá las causas reversibles (H y T): hipoxia, hipovolemia, acidosis, hipo o hiperpotasemia, hipotermia, hipoglucemia; neumotórax a tensión, taponamiento, tóxicos y trombosis.","En la AESP hay actividad eléctrica sin contracción eficaz: pensá sobre todo en hipovolemia, neumotórax y taponamiento."],
+ tip:"Elegí el ritmo, iniciá la RCP y dale adrenalina; en la bradicardia vagal probá la atropina. Después de dos dosis de adrenalina vuelve el pulso.",
+ actions:[
+  {label:"Bradicardia con pulso", run(){ const st=sim.st; st.mode="br"; st.cl=1200; st.adr=0; event(sim.t,"Bradicardia"); }},
+  {label:"Asistolia", run(){ const st=sim.st; st.mode="as"; st.adr=0; event(sim.t,"Asistolia"); }},
+  {label:"AESP", run(){ const st=sim.st; st.mode="ae"; st.adr=0; event(sim.t,"AESP: sin pulso"); }},
+  {label:"RCP", run(){ const st=sim.st; st.cpr=!st.cpr; st.nc=sim.t; event(sim.t,st.cpr?"RCP":"sin RCP"); }},
+  {label:"Adrenalina 0,01 mg/kg", run(){ const st=sim.st; st.adr++; event(sim.t,"Adrenalina"); if(st.mode==="br") st.cl=Math.max(480,st.cl-300); else if(st.adr>=2){ st.mode="rosc"; st.cpr=false; event(sim.t+400,"Vuelve el pulso"); } }},
+  {label:"Atropina 0,02 mg/kg", run(){ const st=sim.st; if(st.mode==="br"){ st.cl=Math.max(520,st.cl-350); event(sim.t,"Atropina"); } else event(sim.t,"Atropina: sin efecto"); }}
+ ],
+ init(){ const st=sim.st; st.mode="br"; st.cl=1200; st.adr=0; st.cpr=false; st.nc=0; sim.next=200; },
+ step(){ const st=sim.st;
+  if(st.cpr && sim.t>=st.nc){ addWave(sim.t,[[0,.35,40]],[0,1,0]); mark(sim.t,"comp.","#9fd8ff"); st.nc=sim.t+500; }
+  if(sim.t<sim.next)return; const t=sim.next;
+  if(st.mode==="as"){ addWave(t,[[0,.015,60]],[0,1,0]); sim.next=t+700; return; }
+  if(st.mode==="ae"){ anim("his-r",t,70); anim("his-l",t,70); QRS(t,"narrow",{k:.7,mark:"sin pulso"}); T(t+300,{amp:.15,w:45}); sim.next=t+1400; return; }
+  if(st.mode==="rosc"){ sinus(t); sim.next=t+460; return; }
+  sinus(t,{PR:150,qt:300}); sim.next=t+st.cl; }});
+
+/* Ritmo de la unión y disociación AV */
+def({id:"union",group:"Unión AV",name:"Ritmo de la unión y disociación AV",mech:"au",
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["QRS angosto igual al sinusal, regular y sin P delante.","La P puede quedar oculta en el QRS, aparecer justo después (negativa en DII, retrógrada) o seguir su propio ritmo (disociación AV).","Disociación isorrítmica: P y QRS a frecuencias casi iguales; la P se acerca, entra y sale del QRS."],
+ fisio:["La unión AV (nodo compacto bajo y His) tiene automatismo propio, más lento que el sinusal: en el lactante ≈ 50–80 lpm.","Aparece como escape cuando el sinusal se enlentece (tono vagal alto, sueño, fármacos, posoperatorio) o cuando el impulso no llega.","Si el sinusal y la unión laten a frecuencias parecidas, cada uno activa su cámara: disociación AV sin bloqueo, que se corrige al acelerar el sinusal.","Diferencia con el BAV completo: en la disociación por escape, una P que llega a tiempo conduce (latido de captura).","Se pierde la contribución auricular al llenado: en el posoperatorio o con disfunción ventricular baja el gasto; la estimulación auricular por encima de la frecuencia de la unión recupera la sincronía."],
+ tip:"Con el tono vagal alto el sinusal se enlentece y toma el mando la unión: mirá cómo la P camina a través del QRS. Después probá atropina o estimulación auricular.",
+ actions:[
+  {label:"Tono vagal alto", run(){ const st=sim.st; st.vag=!st.vag; st.aai=false; event(sim.t,st.vag?"Vagal":"Tono normal"); }},
+  {label:"Atropina", run(){ const st=sim.st; st.vag=false; event(sim.t,"Atropina"); }},
+  {label:"Estimulación auricular", run(){ const st=sim.st; st.aai=!st.aai; event(sim.t,st.aai?"AAI 115":"sin AAI"); }}
+ ],
+ init(){ const st=sim.st; st.ns=200; st.nj=900; st.lastQ=-1e4; st.vag=true; st.aai=false; },
+ step(){ const st=sim.st; const jCL=800;
+  if(sim.t>=st.ns){ const t=st.ns, q=t+125;
+    if(st.aai) spike(t);
+    if(st.nj<=q+25 || q-st.lastQ<330){ sinus(t,{noAV:true}); }
+    else { sinus(t,{PR:125}); st.lastQ=q; st.nj=Math.max(st.nj,q+jCL); }
+    st.ns = t + (st.aai ? 520 : st.vag ? 860+40*Math.sin(t/2200) : 560); }
+  if(sim.t>=st.nj){ const t=st.nj;
+    if(t-st.lastQ>330){ anim("his-r",t,55); anim("his-l",t,55); flash("rv",t+15); flash("lv",t+15); QRS(t,"narrow",{mark:"unión"}); T(t+240,{amp:.3,w:38}); st.lastQ=t; }
+    st.nj=t+jCL; }
+ }});
+
+/* BAV completo posquirúrgico */
+def({id:"bavpq",group:AVG,name:"BAV completo posquirúrgico",mech:"co",
+ show:["sa-ra","sa-la","av","his-r","his-l","rv-l","rv-r"],lm:["sa","av","his","rvf"],
+ ecg:["P sinusales regulares sin relación con los QRS (PR variable).","Escape de la unión (QRS angosto) o ventricular (ancho y más lento).","Con marcapasos: espiga seguida de QRS ancho; en DDD la espiga ventricular sigue a cada P con un retraso fijo."],
+ fisio:["Lesión del His o del nodo AV por suturas, edema o tracción en el borde de la CIV, el canal AV, la TGA corregida o la resección subaórtica.","Muchas veces se debe al edema y se recupera en los primeros días: por eso se dejan cables epicárdicos temporarios.","Si la conducción AV no se recupera en 7–10 días, está indicado el marcapasos definitivo.","El modo DDD mantiene la sincronía AV, que en el corazón recién operado mejora el gasto; el VVI asegura la frecuencia pero pierde la contribución auricular.","Un BAV transitorio que se recupera deja más riesgo de bloqueo tardío: seguimiento con ECG y Holter."],
+ tip:"Conectá el marcapasos en VVI y después en DDD y mirá la relación de las P con los QRS. Al final simulá que se recupera la conducción.",
+ actions:[
+  {label:"Marcapasos VVI 100", run(){ const st=sim.st; st.pm="vvi"; st.nv=sim.t+100; event(sim.t,"VVI 100"); }},
+  {label:"Marcapasos DDD", run(){ sim.st.pm="ddd"; event(sim.t,"DDD"); }},
+  {label:"Apagar marcapasos", run(){ const st=sim.st; st.pm=""; st.nv=sim.t+400; event(sim.t,"Sin marcapasos"); }},
+  {label:"Recupera la conducción", run(){ const st=sim.st; st.rec=!st.rec; event(sim.t,st.rec?"Conducción AV recuperada":"BAV completo"); }}
+ ],
+ init(){ const st=sim.st; st.ns=200; st.nv=700; st.pm=""; st.rec=false; },
+ step(){ const st=sim.st;
+  if(sim.t>=st.ns){ const t=st.ns;
+    if(st.rec){ sinus(t,{PR:140}); }
+    else if(st.pm==="ddd"){ sinus(t,{noAV:true,showBlock:true}); const q=t+45+150; spike(q-4); anim("rv-l",q,110); anim("rv-r",q,50); flash("rv",q); flash("lv",q+60); QRS(q,"wide"); T(q+330,{amp:-.35,w:48}); }
+    else sinus(t,{noAV:true,showBlock:true});
+    st.ns=t+430; }
+  if(st.rec || st.pm==="ddd") return;
+  if(sim.t>=st.nv){ const t=st.nv;
+    if(st.pm==="vvi"){ spike(t-4); anim("rv-l",t,110); anim("rv-r",t,50); flash("rv",t); flash("lv",t+60); QRS(t,"wide"); T(t+330,{amp:-.35,w:48}); st.nv=t+600; }
+    else { anim("his-r",t,55); anim("his-l",t,55); flash("rv",t+15); flash("lv",t+15); QRS(t+10,"narrow",{mark:"escape"}); T(t+330,{amp:.3,w:40}); st.nv=t+1150; } }
+ }});
+
+/* Marcapasos y sus fallas */
+def({id:"mcp",group:"Marcapasos",name:"Marcapasos: captura, falla de captura y de sensado",mech:null,
+ show:["rv-l","rv-r","sa-ra","sa-la","av","his-r","his-l"],lm:["rvf","sa","av","his"],
+ ecg:["Normal (VVI): espiga seguida de QRS ancho; si el corazón late solo, el marcapasos se inhibe.","Falla de captura: espiga sin QRS detrás.","Subsensado: espigas que caen a destiempo, incluso sobre la T de latidos propios.","Sobresensado: pausas sin espigas, porque el equipo toma el ruido como latidos."],
+ fisio:["Un marcapasos tiene dos funciones: estimular (la espiga tiene que capturar y generar un QRS) y sensar (detectar los latidos propios para no competir con ellos).","Falla de captura: umbral alto (edema o fibrosis en la punta del cable; en el epicárdico temporario el umbral sube en pocos días), cable desplazado o fracturado, batería agotada, hiperpotasemia o antiarrítmicos.","Subsensado: no detecta los latidos propios y dispara igual; una espiga sobre la T puede inducir TV o FV (R sobre T).","Sobresensado: interpreta ruido (miopotenciales, interferencia, cable roto) como latidos y se inhibe; peligroso si el paciente depende del marcapasos.","Conducta: si no captura, subir la salida (mA o V); si subsensa, hacerlo más sensible (bajar el valor en mV); si sobresensa, hacerlo menos sensible o pasar a modo asincrónico (VOO; en los definitivos, con un imán)."],
+ tip:"Elegí cada falla, mirá el trazado y después tocá «Corregir» para ver el ajuste que la resuelve.",
+ actions:[
+  {label:"Normal", run(){ sim.st.mode="ok"; event(sim.t,"Captura y sensado normales"); }},
+  {label:"Falla de captura", run(){ sim.st.mode="capt"; event(sim.t,"Falla de captura"); }},
+  {label:"Subsensado", run(){ sim.st.mode="sub"; event(sim.t,"Subsensado"); }},
+  {label:"Sobresensado", run(){ const st=sim.st; st.mode="sobre"; st.noise=sim.t+200; event(sim.t,"Sobresensado"); }},
+  {label:"Corregir", run(){ const st=sim.st; const fix={capt:"Subir salida (mA)",sub:"Más sensible (bajar mV)",sobre:"Menos sensible / VOO"}[st.mode]; st.mode="ok"; event(sim.t,fix||"Sin falla"); }}
+ ],
+ init(){ const st=sim.st; st.mode="ok"; st.np=300; st.ni=700; st.lastQ=-1e4; st.noise=0; },
+ step(){ const st=sim.st;
+  // ritmo propio: en subsensado, sinusal a 85; en el resto, escape ventricular lento
+  if(sim.t>=st.ni){ const t=st.ni;
+    if(st.mode==="sub"){ const q=sinus(t,{PR:130}); st.lastQ=q; st.ni=t+700; }
+    else if(st.mode==="capt" && t-st.lastQ>900){ anim("rv-l",t,110); flash("rv",t); flash("lv",t+60); QRS(t,"pvcNeg",{mark:"escape"}); T(t+340,{amp:.35,w:50}); st.lastQ=t; st.ni=t+1500; }
+    else st.ni=t+(st.mode==="capt"?300:1500); }
+  if(st.mode==="sobre" && sim.t>=st.noise){ const t0=sim.t; addBase(t0,t0+1600,x=>.12*Math.sin(x/3.1)*Math.sin(x/41),[0,1,0]); mark(t0,"ruido","#ff8a8a"); st.noise=t0+3400; st.np=t0+1900; }
+  if(sim.t>=st.np){ const t=st.np;
+    spike(t);
+    const capt = st.mode!=="capt" && (st.mode!=="sub" || t-st.lastQ>320);
+    if(capt){ anim("rv-l",t+4,110); anim("rv-r",t+4,50); flash("rv",t+4); flash("lv",t+60); QRS(t+4,"wide"); T(t+330,{amp:-.35,w:48}); st.lastQ=t; }
+    else if(st.mode==="sub") mark(t,"no captura","#ff8a8a");
+    st.np=t+600; }
+ }});
+
+/* Fibrilación auricular */
+function faStart(){ const st=sim.st; st.mode="fa"; st.faEnd=Infinity; st.na=sim.t; const t0=sim.t, ph=[Math.random()*6,Math.random()*6,Math.random()*6];
+  addBase(t0,1e12,x=>{ if(x<t0||x>st.faEnd) return 0; return .055*Math.sin(x/21+ph[0])+.04*Math.sin(x/33+ph[1])+.03*Math.sin(x/14+ph[2]); },PV); }
+def({id:"fa",group:"Supraventriculares",name:"Fibrilación auricular",mech:"re",
+ show:["sa-ra","sa-la","la-ra","flutter","av","his-r","his-l"],lm:["av","his"],
+ ecg:["Sin ondas P: línea de base con ondas f finas e irregulares.","RR irregularmente irregular, con QRS angosto si no hay aberrancia ni preexcitación."],
+ fisio:["Múltiples frentes de onda reentran de forma desordenada en las aurículas (≈ 350–600 por minuto), sostenidos por focos en las venas pulmonares y por una aurícula dilatada o fibrosada.","No hay contracción auricular eficaz: se pierde la patada auricular y la sangre se estanca en la orejuela, con riesgo de trombos.","El nodo AV recibe impulsos a destiempo y conduce solo algunos: RR irregularmente irregular.","En pediatría es rara con corazón sano; aparece en adolescentes, en el Fontan y otras cardiopatías operadas, miocardiopatías, hipertiroidismo, QT corto y WPW.","Si dura más de 48 h o se desconoce el inicio, anticoagular o descartar trombos con eco transesofágico antes de cardiovertir.","Con preexcitación el riesgo es distinto: mirá «WPW y FA preexcitada»."],
+ tip:"Mirá la línea de base sin P y los RR desiguales. Controlá la frecuencia y después cardiovertí.",
+ actions:[
+  {label:"Control de frecuencia", run(){ sim.st.rc=!sim.st.rc; event(sim.t,sim.st.rc?"Betabloqueante":"sin control"); }},
+  {label:"Cardioversión sincronizada", run(){ const st=sim.st; if(st.mode!=="fa")return; spike(sim.t); event(sim.t,"CVE 0,5–1 J/kg"); st.mode="sinus"; st.faEnd=sim.t; sim.next=sim.t+700; }},
+  {label:"Volver a FA", run(){ if(sim.st.mode!=="fa"){ faStart(); sim.next=sim.t+300; } }}
+ ],
+ init(){ sim.st.rc=false; faStart(); sim.next=300; },
+ step(){ const st=sim.st;
+  if(st.mode==="fa" && sim.t>=st.na){ const a=["la-ra","flutter"][Math.floor(Math.random()*2)]; anim(a,sim.t,90+Math.random()*60); flash(Math.random()<.5?"ra":"la",sim.t+30); st.na=sim.t+110+Math.random()*80; }
+  if(sim.t<sim.next)return; const t=sim.next;
+  if(st.mode!=="fa"){ sinus(t); sim.next=t+520; return; }
+  anim("av",t,60); anim("his-r",t+60,55); anim("his-l",t+60,55); flash("rv",t+75); flash("lv",t+75); QRS(t+70); T(t+300,{amp:.22,w:34});
+  sim.next = t + (st.rc ? 620+Math.random()*420 : 330+Math.random()*420); }});
+
+/* Pausa sinusal y síndrome taqui-bradi */
+def({id:"taqbra",group:AVG,name:"Pausa sinusal y síndrome taqui-bradi",mech:"co",
+ show:["sa-ra","sa-la","focus-ra","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["Bradicardia sinusal con salvas de taquicardia auricular de inicio y fin bruscos.","Al terminar la taquicardia aparece una pausa larga, a veces con un latido de escape de la unión.","La pausa no es múltiplo del PP (a diferencia del bloqueo sinoauricular)."],
+ fisio:["Enfermedad del nódulo sinusal: el nódulo y la aurícula que lo rodea están dañados (cirugía auricular, Fontan, Senning o Mustard, cierre de CIA seno venoso, miocarditis, canalopatías como SCN5A).","Al terminar una taquicardia auricular, el nódulo enfermo tarda en recuperarse (supresión por sobreestimulación): pausa larga, mareo o síncope.","El tratamiento es combinado: marcapasos para las pausas y antiarrítmicos o ablación para las taquicardias; los antiarrítmicos solos agravan la bradicardia.","Las pausas de pocos segundos durante el sueño pueden ser normales en niños sanos; importan las sintomáticas o muy largas."],
+ tip:"Esperá a que termine la salva y medí la pausa. Después activá el marcapasos auricular y compará.",
+ actions:[{label:"Marcapasos auricular (AAI)", run(){ sim.st.aai=!sim.st.aai; event(sim.t,sim.st.aai?"AAI 80":"sin marcapasos"); }}],
+ init(){ const st=sim.st; st.i=0; st.aai=false; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next; const ph=st.i%16; st.i++;
+  if(ph>=4 && ph<12){ anim("focus-ra",t,80); flash("ra",t+30); flash("la",t+50); P(t+40,{amp:.12,v:[-.2,.7,.4],mark:ph===4?"TA":null}); anim("av",t+70,60); anim("his-r",t+130,55); anim("his-l",t+130,55); QRS(t+140); flash("rv",t+150); flash("lv",t+150); T(t+330,{amp:.2,w:30}); sim.next=t+300; return; }
+  if(ph===12){ if(st.aai){ for(let k=0;k<3;k++){ const s=t+300+k*750; spike(s); sinus(s+5,{}); } mark(t+300,"AAI sin pausa","#9fd8ff"); sim.next=t+300+3*750; }
+    else { block(98,72,t+200,900); mark(t+600,"pausa","#ffd27a"); const e=t+2400; anim("his-r",e,55); anim("his-l",e,55); flash("rv",e+15); flash("lv",e+15); QRS(e,"narrow",{mark:"escape"}); T(e+250,{amp:.3,w:38}); sim.next=e+900; }
+    st.i=13; return; }
+  if(st.aai){ spike(t); sinus(t+5); sim.next=t+750; return; }
+  sinus(t); sim.next=t+1000; }});
+
+/* Marcapasos auricular migratorio */
+def({id:"mam",group:"Supraventriculares",name:"Marcapasos auricular migratorio",mech:"au",
+ show:["sa-ra","sa-la","focus-ra","la-ra","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["La morfología de la P cambia de forma gradual (al menos tres formas) y el PR varía con ella.","Frecuencia normal o algo baja, con RR levemente variable."],
+ fisio:["El marcapasos dominante se desplaza poco a poco entre el nódulo sinusal, otros sitios auriculares y la unión, según el tono vagal.","La P cambia de forma de a poco (no de golpe como en la taquicardia auricular caótica) y el PR se acorta cuanto más cerca del nodo AV está el foco.","Es frecuente y benigno en niños, durante el sueño y en deportistas; desaparece cuando sube el tono simpático.","Diferenciales: taquicardia auricular caótica (frecuencia alta y cambios bruscos) y ritmo de la unión."],
+ tip:"Mirá cómo la P se aplana y se invierte de a poco. Después simulá ejercicio o llanto.",
+ actions:[{label:"Ejercicio / llanto", run(){ sim.st.ex=!sim.st.ex; event(sim.t,sim.st.ex?"Simpático":"Reposo"); }}],
+ init(){ sim.st.ex=false; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.ex){ sinus(t); sim.next=t+430; return; }
+  const ph=(Math.sin(t/3600)+1)/2, v=[.45-.6*ph, .85-1.3*ph, .25+.1*ph], PR=130-50*ph;
+  anim(ph<.35?"sa-ra":ph<.7?"la-ra":"focus-ra",t,80); flash("ra",t+30); flash("la",t+50);
+  P(t+45,{amp:.13,v,mark:ph<.2?"P sinusal":ph>.8?"P baja":null});
+  anim("av",t+70,Math.max(30,PR-70)); const q=t+PR; QRS(q); anim("his-r",q-12,55); anim("his-l",q-12,55); flash("rv",q+10); flash("lv",q+10); T(q+250,{amp:.3,w:38});
+  sim.next=t+720+60*Math.sin(t/1700); }});
+
+/* TV en Fallot operado */
+def({id:"tvfallot",group:"Ventriculares",name:"TV en Fallot operado",mech:"re",
+ show:["rvot-r","rvot-l","rv-l","rv-r","sa-ra","sa-la","av","his-r","his-l"],lm:["rvot","sa","av","his"],
+ ecg:["En sinusal: BRD posquirúrgico, a menudo con QRS ≥ 160–180 ms.","TV monomorfa rápida con imagen de BRI (sale del VD) y, si nace en el tracto de salida, eje inferior.","Puede verse disociación AV."],
+ fisio:["El circuito gira alrededor de cicatrices quirúrgicas: el parche del tracto de salida o de la CIV, la ventriculotomía y el anillo pulmonar, con istmos de conducción lenta entre ellos.","Su riesgo aumenta con los años: QRS ≥ 180 ms, dilatación y disfunción del VD por insuficiencia pulmonar, disfunción del VI, TV inducible y cirugía a mayor edad.","Tratamiento agudo: cardioversión si hay inestabilidad; amiodarona o procainamida si está estable.","A largo plazo: ablación de los istmos (a menudo antes del reemplazo valvular pulmonar) y CDI en los pacientes de alto riesgo.","Es la principal causa de muerte súbita en adultos con Fallot reparado."],
+ tip:"Compará el BRD del ritmo sinusal con la imagen de BRI de la TV. Cardiovertí y volvé a inducirla con una extrasístole.",
+ actions:[
+  {label:"Cardioversión sincronizada", run(){ const st=sim.st; if(st.mode!=="tv")return; spike(sim.t); event(sim.t,"CVE"); st.mode="sinus"; sim.next=sim.t+700; }},
+  {label:"Amiodarona / procainamida", run(){ sim.st.drug=!sim.st.drug; event(sim.t,sim.st.drug?"Antiarrítmico: TV más lenta":"sin antiarrítmico"); }},
+  {label:"Extrasístole ventricular", run(){ const st=sim.st; if(st.mode==="tv")return; st.mode="tv"; event(sim.t,"EV: induce TV"); sim.next=sim.t+200; }}
+ ],
+ init(){ const st=sim.st; st.mode="tv"; st.drug=false; st.ns=200; sim.next=200; },
+ step(){ const st=sim.st;
+  if(st.mode==="tv" && sim.t>=st.ns){ sinus(st.ns,{noAV:true}); st.ns+=560; }
+  if(sim.t<sim.next)return; const t=sim.next;
+  if(st.mode!=="tv"){ const q=sinus(t,{PR:140,qrs:"brd",qt:280}); sim.next=t+600; st.ns=sim.next; return; }
+  anim("rvot-r",t,120); anim("rvot-l",t,90); flash("rv",t); flash("lv",t+60); QRS(t,"pvc",{k:1.05}); T(t+210,{amp:-.3,w:36});
+  sim.next=t+(st.drug?380:300); }});
+
+/* Fibras de Mahaim */
+def({id:"mahaim",group:"Supraventriculares",name:"Fibras de Mahaim (atriofasciculares)",mech:"re",
+ show:["sa-ra","sa-la","av","his-r","his-l","rv-r","rv-l"],lm:["sa","av","his","rvf"],
+ ecg:["En sinusal, preexcitación mínima o ausente.","Al estimular la aurícula más rápido, el QRS se ensancha de a poco con imagen de BRI.","La taquicardia es de QRS ancho, regular, con imagen de BRI y eje izquierdo."],
+ fisio:["Vía accesoria que va de la aurícula derecha lateral a la rama derecha o al VD cerca del ápex, con conducción lenta y decremental, parecida al nodo AV.","Solo conduce de aurícula a ventrículo: la taquicardia típica es antidrómica (baja por la fibra y sube por el His y el nodo).","Como el VD se activa primero, el QRS tiene imagen de BRI con eje izquierdo.","En sinusal el nodo AV gana la carrera y la preexcitación es mínima; al acelerar la aurícula el nodo se enlentece y la fibra activa más ventrículo.","La adenosina puede cortarla; la ablación del potencial de la fibra en el anillo tricuspídeo es curativa. Se asocia a la anomalía de Ebstein."],
+ tip:"Estimulá la aurícula y mirá cómo aparece el BRI; después inducí la taquicardia y cortala con adenosina.",
+ actions:[
+  {label:"Estimulación auricular rápida", run(){ const st=sim.st; st.mode=st.mode==="pace"?"sinus":"pace"; st.n=0; event(sim.t,st.mode==="pace"?"Estimulación auricular":"Sinusal"); }},
+  {label:"Inducir taquicardia", run(){ sim.st.mode="tq"; event(sim.t,"Taquicardia antidrómica"); }},
+  {label:"Adenosina", run(){ const st=sim.st; if(st.mode==="tq"){ st.mode="sinus"; event(sim.t,"Adenosina: termina"); sim.next=sim.t+900; } else event(sim.t,"Adenosina"); }}
+ ],
+ init(){ const st=sim.st; st.mode="sinus"; st.n=0; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.mode==="sinus"){ sinus(t); sim.next=t+560; return; }
+  if(st.mode==="pace"){ st.n++; spike(t); anim("sa-ra",t,70); flash("ra",t+25); P(t+45,{amp:.13});
+    const pre=Math.min(1,st.n/6); anim("rv-r",t+80,90); anim("av",t+70,60+40*pre);
+    const q=t+130; QRS(q,pre>.5?"bri":"normal",{mark:st.n===6?"BRI":null}); T(q+260,{amp:pre>.5?.45:.3,w:40,v:pre>.5?TBY.bri:TV}); sim.next=t+360; return; }
+  anim("rv-r",t,90); anim("rv-l",t+40,90); flash("rv",t); flash("lv",t+60); QRS(t,"bri"); anim("his-r",t+120,60,"retro"); anim("av",t+170,60,"retro"); P(t+220,{amp:-.1}); T(t+230,{amp:.4,w:36,v:TBY.bri});
+  sim.next=t+300; }});
+
+/* QT corto */
+function qtFvStart(){ const st=sim.st; st.mode="fv"; const t0=sim.t; st.fvEnd=Infinity; const ph=[Math.random()*6,Math.random()*6];
+  addBase(t0,1e12,x=>{ if(x<t0||x>st.fvEnd) return 0; return .55*Math.sin(x/31+ph[0])+.3*Math.sin(x/19+ph[1]); },[.3,.9,.3]); }
+def({id:"qtc",group:"Canalopatías",name:"QT corto",mech:"re",
+ show:["sa-ra","sa-la","av","his-r","his-l","lv-r","lv-l"],lm:["sa","av","his","lvf"],
+ ecg:["QT corto con ST casi ausente: la T, alta y picuda, nace pegada al QRS.","El QT casi no se alarga cuando baja la frecuencia.","Criterio ESC 2022: QTc ≤ 360 ms junto con mutación, antecedente familiar o arritmia ventricular recuperada."],
+ fisio:["Ganancia de función de canales de K repolarizantes (KCNH2, KCNQ1, KCNJ2) o pérdida de corrientes de Ca: el potencial de acción y el período refractario se acortan.","Un período refractario corto y heterogéneo permite que frentes de onda muy cercanos reentren: fibrilación auricular a edad temprana y FV.","Puede debutar con muerte súbita, incluso en el lactante; una FA en un niño o adolescente sin cardiopatía obliga a mirar el QT.","Tratamiento: CDI en quienes tuvieron paro o TV; la hidroquinidina alarga el QT y se usa como alternativa o complemento."],
+ tip:"Fijate en el ST que falta. Después dale una extrasístole precoz y mirá qué pasa; el CDI la resuelve.",
+ actions:[
+  {label:"Extrasístole precoz", run(){ const st=sim.st; if(st.mode==="fv")return; anim("lv-r",sim.t,70); flash("lv",sim.t); QRS(sim.t,"pvc",{mark:"EV"}); event(sim.t+250,"FV"); st.pend=sim.t+250; }},
+  {label:"Descarga del CDI", run(){ const st=sim.st; if(st.mode!=="fv")return; spike(sim.t); event(sim.t,"CDI"); st.mode="sinus"; st.fvEnd=sim.t; sim.next=sim.t+800; }}
+ ],
+ init(){ const st=sim.st; st.mode="sinus"; st.pend=0; sim.next=200; },
+ step(){ const st=sim.st;
+  if(st.pend && sim.t>=st.pend){ st.pend=0; qtFvStart(); }
+  if(st.mode==="fv" || sim.t<sim.next) return; const t=sim.next;
+  sinus(t,{qt:175,tAmp:.55,tw:22}); sim.next=t+620; }});
+
+/* TV por miocarditis */
+def({id:"tvmio",group:"Ventriculares",name:"Arritmias en la miocarditis",mech:"re",
+ show:["sa-ra","sa-la","av","his-r","his-l","lv-r","lv-l","rv-l","rv-r"],lm:["sa","av","his","lvf","rvf"],
+ ecg:["Taquicardia sinusal desproporcionada, QRS de bajo voltaje y T aplanadas o negativas.","Extrasístoles ventriculares multiformes y salvas de TV; también pueden aparecer bloqueos AV."],
+ fisio:["La inflamación y la necrosis de los miocitos generan focos automáticos, posdespolarizaciones y zonas de conducción lenta que favorecen la reentrada.","El edema y la pérdida de miocardio bajan el voltaje del QRS; la injuria da cambios del ST-T y puede simular un infarto.","Arritmias frecuentes: taquicardia sinusal, extrasístoles, TV, bloqueos AV (incluso completos) y FV.","Las catecolaminas necesarias por el bajo gasto aumentan la ectopia: es un equilibrio difícil; en los casos graves se usa ECMO.","Una TV en un niño con fiebre reciente o bajo gasto obliga a descartar miocarditis (troponina, eco y resonancia)."],
+ tip:"Subí las catecolaminas y mirá cómo aumentan las extrasístoles y las salvas; después probá amiodarona.",
+ actions:[
+  {label:"Catecolaminas", run(){ sim.st.cat=!sim.st.cat; event(sim.t,sim.st.cat?"Adrenalina en infusión":"sin catecolaminas"); }},
+  {label:"Amiodarona", run(){ sim.st.ami=!sim.st.ami; event(sim.t,sim.st.ami?"Amiodarona":"sin amiodarona"); }},
+  {label:"Cardioversión sincronizada", run(){ const st=sim.st; if(st.run>0){ st.run=0; spike(sim.t); event(sim.t,"CVE"); sim.next=sim.t+600; } }}
+ ],
+ init(){ const st=sim.st; st.cat=false; st.ami=false; st.run=0; sim.next=200; },
+ step(){ const st=sim.st; if(sim.t<sim.next)return; const t=sim.next;
+  if(st.run>0){ st.run--; anim("lv-r",t,80); anim("lv-l",t,45); flash("lv",t); flash("rv",t+50); QRS(t,"pvc",{k:.75}); T(t+200,{amp:-.25,w:34}); sim.next=t+270; return; }
+  const pEV = st.ami ? .05 : st.cat ? .35 : .15, pRun = st.ami ? .0 : st.cat ? .12 : .04;
+  if(Math.random()<pRun){ st.run=6+Math.floor(Math.random()*5); mark(t,"TV","#ff8a8a"); sim.next=t+60; return; }
+  anim("sa-ra",t,70); anim("sa-la",t,90); flash("ra",t+25); flash("la",t+55); P(t+45,{amp:.1}); anim("av",t+70,50);
+  const q=t+115; anim("his-r",q-12,55); anim("his-l",q-12,55); flash("rv",q+10); flash("lv",q+10); QRS(q,"narrow",{k:.45}); T(q+230,{amp:-.12,w:40});
+  if(Math.random()<pEV){ const e=q+260; const neg=Math.random()<.5; anim(neg?"rv-l":"lv-r",e,80); QRS(e,neg?"pvcNeg":"pvc",{k:.7,mark:"EV"}); T(e+250,{amp:neg?.25:-.25,w:40}); sim.next=t+760; return; }
+  sim.next=t+(st.cat?340:400); }});
+
+/* Electrodos invertidos y dextrocardia */
+def({id:"elec",group:"Referencia",name:"Electrodos invertidos y dextrocardia",mech:null,
+ show:["sa-ra","sa-la","av","his-r","his-l"],lm:["sa","av","his"],
+ ecg:["Brazos invertidos: P, QRS y T negativos en DI; DII y DIII se intercambian, igual que aVR y aVL; las precordiales siguen normales.","Dextrocardia en espejo: además, la R disminuye de V1 a V6 (progresión invertida); el trazado se normaliza al colocar las precordiales a la derecha.","Las derivaciones marcadas con ' muestran lo que registra el equipo con ese error o esa anatomía."],
+ fisio:["Una P negativa en DI es casi siempre un error de colocación o una dextrocardia: un ritmo auricular de verdad rara vez lo produce.","Con los electrodos invertidos el corazón es normal: si las precordiales tienen una progresión normal de la R, el problema son los cables.","En la dextrocardia en espejo (situs inversus) el ECG es el reflejo del normal; en la dextroposición el corazón solo está desplazado y el ECG cambia poco.","Antes de informar un eje derecho extremo, una «isquemia lateral» o un ritmo auricular bajo, revisá la colocación de los electrodos y repetí el ECG."],
+ tip:"Alterná entre colocación correcta, brazos invertidos y dextrocardia y compará DI, aVR y las precordiales.",
+ actions:[
+  {label:"Colocación correcta", run(){ setElec("ok"); }},
+  {label:"Brazos invertidos", run(){ setElec("arm"); }},
+  {label:"Dextrocardia", run(){ setElec("dx"); }}
+ ],
+ init(){ sim.next=200; scen.leads=["DI","DII","aVR","V1","V5"]; },
+ step(){ if(sim.t<sim.next)return; sinus(sim.next); sim.next+=560; }});
+function setElec(m){ const L={ok:["DI","DII","aVR","V1","V5"],arm:["DI'","DII'","aVR'","V1","V5"],dx:["DI'","DII'","aVR'","V1'","V5'"]}[m];
+  scen.leads=L; event(sim.t,{ok:"Correcta",arm:"Brazos invertidos",dx:"Dextrocardia"}[m]); $("lead").textContent=L.join(" · "); sizeECG(); }
+
+const LEADS_EXTRA = {fv:["DII","V1"], eabl:["DII","V1"], evp:["DII","V1"], riva:["DII"], tvlact:["DII","V1"], tac:["DII"], iart:["DII","V1"], antid:["DII","V1"], arrsin:["DII"], brasin:["DII"],
+  tsin:["DII","V1"], hiperk:["DII","V2"], paro:["DII"], union:["DII","V1"], bavpq:["DII","V1"], mcp:["DII","V1"], fa:["DII","V1"], taqbra:["DII"], mam:["DII","aVF"], tvfallot:["DII","V1"], mahaim:["DI","DII","V1"], qtc:["DII","V5"], tvmio:["DII","V1","V5"], elec:["DI","DII","aVR","V1","V5"]};
 
 /* ---------- Derivaciones por escenario ---------- */
 const LEADS = {
@@ -2749,7 +3087,7 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 })();
 
 </script>
-<script src="paciente.js?v=v109"></script>
+<script src="paciente.js?v=v110"></script>
 <script src="eco.js?v=v89"></script>
 <script src="arr.js?v=v72"></script>
 <script src="ped.js?v=v74"></script>
