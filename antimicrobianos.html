@@ -606,12 +606,14 @@ function renderSrc(P){
   if (SRC === 'cmp') renderCmp(P);
 }
 document.querySelectorAll('#s-src button').forEach(b => b.onclick = () => { SRC = b.dataset.src; try { localStorage.setItem('atbFuente', SRC); } catch (e) {} render(); });
-['tq','cq'].forEach(id => $(id).addEventListener('input', render));
+// una sola búsqueda para las tres fuentes: lo escrito se mantiene al cambiar de vademécum
+const QS = ['q','tq','cq'];
+QS.forEach(id => $(id).addEventListener('input', () => { const t = $(id).value; QS.forEach(o => { if (o !== id) $(o).value = t; }); try { sessionStorage.setItem('atbQ', t); } catch (e) {} render(); }));
+try { const t = sessionStorage.getItem('atbQ'); if (t) QS.forEach(o => $(o).value = t); } catch (e) {}
 $('onlyDif').addEventListener('change', render);
 ['pPeso','pDias','pEG'].forEach(id => $(id).addEventListener('input', () => { manualCol = null; render(); }));
-$('q').addEventListener('input', render);
 render();
 </script>
-<script src="paciente.js?v=v114"></script>
+<script src="paciente.js?v=v115"></script>
 </body>
 </html>

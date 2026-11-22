@@ -124,7 +124,7 @@
     crecimiento: ["#rRes", "#rTrend"]
   };
   var TITLES = { infusiones: "Infusiones", electrolitos: "Electrolitos", sedoanalgesia: "Sedoanalgesia", insulina: "Insulina",
-    laboratorio: "Laboratorio", antimicrobianos: "Antimicrobianos", cardio: "Cardiología", neo: "RCP · Bilirrubina · Transfusiones", crecimiento: "Crecimiento INTERGROWTH-21st", balance: "Balance hídrico", vafo: "VAFO", ventilacion: "Ventilación convencional" };
+    laboratorio: "Laboratorio", antimicrobianos: "Antimicrobianos", cardio: "Cardiología", neo: "Neonatología clínica", crecimiento: "Crecimiento INTERGROWTH-21st", balance: "Balance hídrico", vafo: "VAFO", ventilacion: "Ventilación convencional" };
 
   function visible(el) {
     if (!el || !el.getClientRects().length) return false;

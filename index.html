@@ -187,7 +187,7 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <button role="tab" id="bNut" aria-selected="false" style="--c:var(--nut);--soft:var(--nut-soft)"><i></i><span class="l">Nutrición</span><span class="s">Nutric.</span></button>
       <button role="tab" id="bLab" aria-selected="false" style="--c:var(--lab);--soft:var(--lab-soft)"><i></i><span class="l">Laboratorio</span><span class="s">Lab</span></button>
       <button role="tab" id="bEcg" aria-selected="false" style="--c:var(--ecg);--soft:var(--ecg-soft)"><i></i><span class="l">Cardiología</span><span class="s">Cardio</span></button>
-      <button role="tab" id="bNeo" aria-selected="false" style="--c:var(--neo);--soft:var(--neo-soft)"><i></i><span class="l">RCP · Bili · Sangre</span><span class="s">RCP+</span></button>
+      <button role="tab" id="bNeo" aria-selected="false" style="--c:var(--neo);--soft:var(--neo-soft)"><i></i><span class="l">Neonatología clínica</span><span class="s">Neo</span></button>
       <button role="tab" id="bCre" aria-selected="false" style="--c:var(--cre);--soft:var(--cre-soft)"><i></i><span class="l">Crecimiento</span><span class="s">Creci.</span></button>
       <button role="tab" id="bNfx" aria-selected="false" style="--c:var(--vad);--soft:var(--vad-soft)"><i></i><span class="l">NeoFax</span><span class="s">NeoFax</span></button>
       <button role="tab" id="bEhi" aria-selected="false" style="--c:var(--ehi);--soft:var(--ehi-soft)"><i></i><span class="l">Encefalopatía</span><span class="s">EHI</span></button>
@@ -393,7 +393,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
 (function(){
   const $=id=>document.getElementById(id);
   const META={};for(const k in TABS){const b=$(TABS[k][1]);META[k]={n:(b.querySelector(".l")||b).textContent.trim(),s:(b.querySelector(".s")||b).textContent.trim(),st:b.getAttribute("style")||""}}
-  META.neo.n="RCP · Bili · Sangre";META.ecg.s="Cardio";META.bal.s="Balance";META.ehi.s="EHI";
+  META.neo.n="Neonatología clínica";META.ecg.s="Cardio";META.bal.s="Balance";META.ehi.s="EHI";
   const GROUPS=[["Fármacos",["inf","sed","atb","ins","nfx"]],["Paciente",["hoj","bal"]],["Cálculos",["ele","nut","lab","ven","vaf"]],["Clínica",["ecg","neo","cre","ehi"]],["Referencias",["fue"]]];
   let FAV;try{FAV=JSON.parse(localStorage.getItem("favs")||"null")}catch(e){}
   if(!Array.isArray(FAV)||!FAV.length)FAV=["inf","atb","bal","ehi"];FAV=FAV.filter(k=>TABS[k]).slice(0,4);
