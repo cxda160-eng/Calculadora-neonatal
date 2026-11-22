@@ -215,6 +215,29 @@ input[type=range]{padding:0;border:0;background:transparent;accent-color:var(--l
     <label><input type="checkbox">Muestra capilar mal tomada (repetir o correlacionar con TcCO₂)</label>
   </div>
 
+  <div class="card chk" id="alVt">
+    <h2>Alarma «VThf no alcanzado» (VAFO + VG)</h2>
+    <p class="note" style="margin-top:0">Salta cuando el equipo llega a la <b>amplitud máxima</b> y aun así no entrega el VThf programado. Revisá en este orden:</p>
+    <p class="note"><b>1. Obstrucción o fuga</b></p>
+    <label><input type="checkbox">Secreciones o tubo acodado: aspirar y revisar el circuito</label>
+    <label><input type="checkbox">Tubo selectivo, alto o chico para el peso (Rx, auscultación simétrica)</label>
+    <label><input type="checkbox">Fuga &gt; 30–40 %: el VThf medido sale bajo y es poco confiable</label>
+    <label><input type="checkbox">Sensor de flujo sucio o con agua: calibrar o cambiar</label>
+    <p class="note"><b>2. Cambió el pulmón</b></p>
+    <label><input type="checkbox">Neumotórax (si cayó la SpO₂ o subió la pCO₂ de golpe: transiluminar o Rx)</label>
+    <label><input type="checkbox">Atelectasia o volumen pulmonar bajo: optimizar la MAP (Rx 8–9 espacios)</label>
+    <label><input type="checkbox">Derrame, edema, broncoespasmo o secreciones espesas</label>
+    <label><input type="checkbox">Distensión abdominal que limita el diafragma</label>
+    <p class="note"><b>3. Programación que no se puede alcanzar</b></p>
+    <label><input type="checkbox">Amplitud máxima muy justa: subirla de a 5 cmH₂O</label>
+    <label><input type="checkbox">Frecuencia alta: bajar 1–2 Hz (más volumen por ciclo con la misma amplitud; el DCO₂ = f × VThf² suele subir)</label>
+    <label><input type="checkbox">I:E 1:2 → 1:1 aumenta el volumen por ciclo</label>
+    <label><input type="checkbox">VThf objetivo alto o calculado con un peso viejo (habitual 1,5–2,5 mL/kg)</label>
+    <p class="note"><b>4. El paciente</b></p>
+    <label><input type="checkbox">Respiraciones espontáneas vigorosas o agitación: valorar sedoanalgesia</label>
+    <p class="note">Si los gases están bien y solo suena la alarma, lo más común es la amplitud máxima justa o la frecuencia alta. Si además empeoraron los gases, buscá primero tubo, secreciones y neumotórax. En Calculadora → Sugerencias te avisa cuando la amplitud está al tope.</p>
+  </div>
+
   <div class="card">
     <h2>Índices de oxigenación</h2>
     <ul>
@@ -295,7 +318,7 @@ function sugerir(s,dc,oi,osi){
   const vg=s.modo==='vg';
 
   if(ampTope && vg) out.push(card('alert','La amplitud está al tope',
-    `El equipo probablemente no entrega el VT programado. Primero subí la amplitud máxima (de a 5 cmH₂O). Si no alcanza, bajá la frecuencia 1–2 Hz para que llegue al volumen. Revisá también el tubo (secreciones, acodamiento).`));
+    `El equipo probablemente no entrega el VT programado. Primero subí la amplitud máxima (de a 5 cmH₂O). Si no alcanza, bajá la frecuencia 1–2 Hz para que llegue al volumen. Revisá también el tubo (secreciones, acodamiento). <a href="#" onclick="document.querySelector('nav button[data-tab=guia]').click();setTimeout(()=>document.getElementById('alVt').scrollIntoView({behavior:'smooth'}),100);return false" style="color:var(--accent)">Ver lista completa de la alarma</a>.`));
 
   if(s.pco2!=null && dc!=null){
     const acid = s.ph!=null && s.ph<7.20;
@@ -408,6 +431,6 @@ function applySim(){let q=new URLSearchParams(location.search).get('sim');if(q){
 setTimeout(applySim,300);
 try{const h=location.hash.slice(1);const t=(h==='calc'||h==='guia')?h:localStorage.getItem('vafo_tab');if(t&&t!=='calc'&&t!=='sim')document.querySelector(`nav button[data-tab="${t}"]`).click()}catch(e){}
 </script>
-<script src="paciente.js?v=v112"></script>
+<script src="paciente.js?v=v113"></script>
 </body>
 </html>
