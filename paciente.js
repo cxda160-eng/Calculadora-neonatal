@@ -5,6 +5,9 @@
   "use strict";
   var KEY = "pac";
   var page = (location.pathname.split("/").pop() || "index.html").replace(".html", "");
+  // colores de semáforo comunes a todas las pestañas
+  try { document.documentElement.classList.add("p-" + page);
+    if (!document.querySelector('link[href^="semaforo.css"]')) { var l = document.createElement("link"); l.rel = "stylesheet"; l.href = "semaforo.css?v=1"; document.head.appendChild(l); } } catch (e) {}
 
   // Campos de cada pestaña: [selector, tipo, unidad]
   var FIELDS = {

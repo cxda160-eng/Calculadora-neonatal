@@ -92,7 +92,7 @@ table.lg{width:100%;border-collapse:collapse;font-size:.76rem}
     <div class="row"><label for="pAnt">Peso anterior<small>opcional · peso del día previo</small></label><div class="f"><input id="pAnt" inputmode="numeric" placeholder="0"><span>g</span></div></div>
     <div class="row"><label for="pNac">Peso de nacimiento<small>opcional</small></label><div class="f"><input id="pNac" inputmode="numeric" placeholder="0"><span>g</span></div></div>
     <div><div style="font-size:.92rem;margin-bottom:6px">Horas del balance</div>
-      <div class="seg" id="hs"><button data-h="3">3 h</button><button data-h="6">6 h</button><button data-h="8">8 h</button><button data-h="12">12 h</button><button data-h="24" aria-pressed="true">24 h</button><button data-h="otra">Otra</button></div>
+      <div class="seg" id="hs"><button data-h="3">3 h</button><button data-h="6">6 h</button><button data-h="12">12 h</button><button data-h="24" aria-pressed="true">24 h</button><button data-h="otra">Otra</button></div>
       <div class="row" id="hOtraRow" hidden style="margin-top:10px"><label for="hOtra">Horas del balance<small>escribí las horas que necesites (por ejemplo 4, 10 o 18)</small></label><div class="f"><input id="hOtra" inputmode="decimal" placeholder="0"><span>h</span></div></div></div>
   </section>
 
@@ -317,6 +317,6 @@ function lgText(){
 window.addEventListener("storage",ev=>{if(ev.key==="balLog")lgRender()});
 lgRender();
 </script>
-<script src="paciente.js?v=v115"></script>
+<script src="paciente.js?v=v116"></script>
 </body>
 </html>

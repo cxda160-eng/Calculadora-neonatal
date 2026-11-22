@@ -1,0 +1,25 @@
+/* Calculadora Neonatal · colores de semáforo para advertencias y resultados
+   ROJO = peligro / fuera de rango / acción urgente · AMARILLO = precaución / revisar · VERDE = dentro de lo esperado
+   Se carga en todas las pestañas desde paciente.js (y directo en NeoFax y EHI). */
+:root{--sem-r-bg:#fde3e1;--sem-r-fg:#8f1d14;--sem-r-b:#d93025;--sem-a-bg:#fff3c4;--sem-a-fg:#6b4d00;--sem-a-b:#e0a800;--sem-v-bg:#def3e4;--sem-v-fg:#1b6332;--sem-v-b:#2e9d4f}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sem-r-bg:#4a1f1d;--sem-r-fg:#ffb4ac;--sem-r-b:#ff6b5e;--sem-a-bg:#43380f;--sem-a-fg:#ffe08a;--sem-a-b:#f2c230;--sem-v-bg:#173a25;--sem-v-fg:#9ce3b2;--sem-v-b:#4cc276}}
+:root[data-theme="dark"]{--sem-r-bg:#4a1f1d;--sem-r-fg:#ffb4ac;--sem-r-b:#ff6b5e;--sem-a-bg:#43380f;--sem-a-fg:#ffe08a;--sem-a-b:#f2c230;--sem-v-bg:#173a25;--sem-v-fg:#9ce3b2;--sem-v-b:#4cc276}
+
+/* ROJO */
+.pill.crit,.bdg.crit,.alert.bad,.alerta,.note.danger,.pill.I,
+.p-balance .k.bad,.p-cardio .crit:not(.crit-g),.p-crecimiento .crit,.p-ehi .crit,
+.p-vafo .sug.alert,.p-ventilacion .sug.alert{
+  background:var(--sem-r-bg)!important;color:var(--sem-r-fg)!important;border-left:4px solid var(--sem-r-b)!important}
+/* AMARILLO */
+.pill.warn,.bdg.warn,.note.warn,.pill.V,.pill.or,.badge.dif,
+.p-infusiones .alert:not(.bad):not(.info),.p-electrolitos .alert:not(.bad):not(.info),
+.p-balance .k.warn,.p-crecimiento .warn,.p-ehi .warn,.p-nutricion .warn:not(.pill),
+.p-vafo .sug.warn,.p-ventilacion .sug.warn{
+  background:var(--sem-a-bg)!important;color:var(--sem-a-fg)!important;border-left:4px solid var(--sem-a-b)!important}
+/* VERDE */
+.pill.ok,.bdg.ok,.badge.eq,
+.p-balance .k.ok,.p-cardio .ok,.p-crecimiento .ok,.p-ehi .ok,.p-nutricion .ok:not(.pill),
+.p-vafo .sug.ok,.p-ventilacion .sug.ok{
+  background:var(--sem-v-bg)!important;color:var(--sem-v-fg)!important;border-left:4px solid var(--sem-v-b)!important}
+/* los números dentro de las tarjetas de balance toman el color del semáforo */
+.p-balance .k.bad .v,.p-balance .k.warn .v,.p-balance .k.ok .v,.p-balance .k.bad .n,.p-balance .k.warn .n,.p-balance .k.ok .n{color:inherit!important}
