@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Reanimación, bilirrubina y transfusiones</title>
+<title>Neonatología clínica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Azeret+Mono:wght@500;700&display=swap">
 <style>
@@ -38,6 +38,11 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid 
 .seg button{flex:1;border:0;background:transparent;font:inherit;font-size:.85rem;color:var(--muted);padding:8px 6px;border-radius:8px;cursor:pointer;min-height:38px}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}
 .hint{font-size:.78rem;color:var(--muted);margin:0}
+.tb{width:100%;border-collapse:collapse;font-size:.82rem}.tb th,.tb td{text-align:left;padding:6px 5px;border-bottom:1px solid var(--line);vertical-align:top}.tb th{color:var(--muted);font-weight:600}
+.det summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0;min-height:40px}
+.chk label,.chkl{flex-direction:row;align-items:flex-start;gap:10px;font-size:.9rem;color:var(--fg);padding:8px 0;border-bottom:1px solid var(--line)}
+.chk input[type=checkbox],.chkl input[type=checkbox]{width:22px;height:22px;flex:none;margin-top:1px}
+label.sc select{font-size:.85rem}
 .catsvg{width:100%;max-width:420px;display:block;margin:12px auto 8px}
 .catsvg .body{fill:#f6efe9;stroke:#cbb8a8;stroke-width:1.5}.catsvg .vb{fill:#fff;fill-opacity:.85;stroke:#b9b2c4}.catsvg .vl{font-size:9px;fill:#7a7290;text-anchor:end}
 .catsvg .zone{fill:#e8505b;fill-opacity:.12}.catsvg .zone2{fill:#e8505b;fill-opacity:.06;stroke:#e8505b;stroke-dasharray:3 3;stroke-opacity:.4}.catsvg .zl{font-size:9.5px;fill:#b0343e;font-weight:700}
@@ -77,8 +82,8 @@ footer{font-size:.75rem;color:var(--muted);text-align:center}
 <body>
 <div class="wrap">
   <header>
-    <h1>Reanimación · Bilirrubina · Transfusiones</h1>
-    <p>Dosis y materiales de sala de partos, umbrales de luminoterapia y volúmenes de hemoderivados. El peso y la EG se toman de la barra de paciente.</p>
+    <h1>Neonatología clínica</h1>
+    <p>Reanimación, bilirrubina, transfusiones, sepsis precoz y NEC, puntajes de dificultad respiratoria y gravedad, y seguimiento del prematuro (ROP, eco cerebral, vacunas, TSH, pesquisas). El peso y la EG se toman de la barra de paciente.</p>
   </header>
 
   <div class="card">
@@ -95,6 +100,156 @@ footer{font-size:.75rem;color:var(--muted);text-align:center}
     <button type="button" data-v="rcp" aria-pressed="true">Reanimación</button>
     <button type="button" data-v="bili" aria-pressed="false">Bilirrubina</button>
     <button type="button" data-v="tx" aria-pressed="false">Transfusiones</button>
+  </div>
+  <div class="modsel" id="modo2" role="group" aria-label="Más secciones" style="position:static;margin-top:-6px">
+    <button type="button" data-v="sep" aria-pressed="false">Sepsis y NEC</button>
+    <button type="button" data-v="sc" aria-pressed="false">Puntajes</button>
+    <button type="button" data-v="seg" aria-pressed="false">Seguimiento</button>
+  </div>
+
+
+  <!-- ===================== SEPSIS Y NEC ===================== -->
+  <div class="mod" id="m-sep" hidden>
+    <section class="card" id="kaiser">
+      <h2>Riesgo de sepsis precoz (calculadora de Kaiser)</h2>
+      <p class="hint" style="margin-top:-4px">Solo para nacidos con ≥ 34 semanas. Modelo original (Puopolo 2011 y Kuzniewicz 2017). La EG se toma del paciente.</p>
+      <div class="grid">
+        <label for="kInc">Incidencia local <span class="u">/1000 NV</span><select id="kInc"><option value="40.0528">0,3</option><option value="40.3415">0,4</option><option value="40.5656" selected>0,5 (CDC)</option><option value="40.7489">0,6</option></select></label>
+        <label for="kTemp">T° materna máx. <span class="u">°C</span><input id="kTemp" inputmode="decimal" autocomplete="off" placeholder="37,2"></label>
+        <label for="kRom">Bolsa rota <span class="u">horas</span><input id="kRom" inputmode="decimal" autocomplete="off" placeholder="6"></label>
+        <label for="kGbs">EGB materno<select id="kGbs"><option value="neg">Negativo</option><option value="pos">Positivo</option><option value="unk">Desconocido</option></select></label>
+        <label for="kAtb" style="grid-column:1/-1">Antibióticos intraparto<select id="kAtb"><option value="0">Ninguno, o cualquiera &lt; 2 h antes del parto</option><option value="1">Específicos para EGB ≥ 2 h antes</option><option value="1b">Amplio espectro 2–3,9 h antes</option><option value="2">Amplio espectro ≥ 4 h antes</option></select></label>
+        <label for="kCli" style="grid-column:1/-1">Estado del bebé<select id="kCli"><option value="0.41">Buen aspecto (sin alteraciones persistentes)</option><option value="5">Dudoso (1 alteración &gt; 4 h o ≥ 2 alteraciones &gt; 2 h)</option><option value="21.2">Enfermo (soporte respiratorio, inotrópicos, encefalopatía o depresión perinatal, O₂ &gt; 2 h)</option></select></label>
+      </div>
+      <div class="res" id="rKai"></div>
+      <p class="hint">Dudoso: taquicardia (≥ 160), taquipnea (≥ 60), inestabilidad térmica (≥ 38 o &lt; 36,4 °C) o dificultad respiratoria sin O₂. Amplio espectro: ampicilina + gentamicina, cefalosporinas, carbapenemes o cualquier combinación con un antibiótico de amplio espectro. Los umbrales de conducta (&lt; 1, 1–3 y ≥ 3 por 1000) son los del estudio de implementación; verificá los casos dudosos con la calculadora oficial (neonatalsepsiscalculator.kaiserpermanente.org) y con el protocolo de tu unidad. No aplica a prematuros &lt; 34 semanas.</p>
+    </section>
+
+    <section class="card">
+      <h2>Enterocolitis necrotizante (Bell modificado)</h2>
+      <label for="necE">Estadio<select id="necE">
+        <option value="">Elegí el estadio…</option>
+        <option value="IA">IA · sospecha</option><option value="IB">IB · sospecha con sangre roja en heces</option>
+        <option value="IIA">IIA · confirmada, leve</option><option value="IIB">IIB · confirmada, moderada</option>
+        <option value="IIIA">IIIA · avanzada, intestino intacto</option><option value="IIIB">IIIB · avanzada, perforación</option></select></label>
+      <div class="res" id="rNec"></div>
+      <details class="det"><summary>Tabla completa de estadios</summary>
+        <table class="tb"><tr><th>Estadio</th><th>Sistémico</th><th>Intestinal</th><th>Radiología</th></tr>
+        <tr><td>IA</td><td>Inestabilidad térmica, apneas, bradicardia, letargo</td><td>Residuo gástrico, distensión leve, vómitos, sangre oculta</td><td>Normal o dilatación, íleo leve</td></tr>
+        <tr><td>IB</td><td>Igual que IA</td><td>Sangre roja en heces</td><td>Igual que IA</td></tr>
+        <tr><td>IIA</td><td>Igual que IA</td><td>+ ausencia de ruidos, con o sin dolor</td><td>Dilatación, íleo, neumatosis</td></tr>
+        <tr><td>IIB</td><td>+ acidosis metabólica leve, trombocitopenia leve</td><td>+ dolor definido, con o sin celulitis o masa en FID</td><td>+ gas portal, con o sin ascitis</td></tr>
+        <tr><td>IIIA</td><td>+ hipotensión, bradicardia, apneas graves, acidosis mixta, CID, neutropenia</td><td>+ peritonitis, dolor y distensión marcados</td><td>+ ascitis</td></tr>
+        <tr><td>IIIB</td><td>Igual que IIIA</td><td>Igual que IIIA</td><td>+ neumoperitoneo</td></tr></table>
+      </details>
+      <p class="hint">Bell MJ y col. Ann Surg 1978; modificado por Walsh MC, Kliegman RM. Pediatr Clin North Am 1986. Duración de ayuno y antibióticos orientativa: seguí el protocolo de tu unidad y la evolución clínica y radiológica.</p>
+    </section>
+  </div>
+
+  <!-- ===================== PUNTAJES ===================== -->
+  <div class="mod" id="m-sc" hidden>
+    <section class="card">
+      <h2>Silverman-Andersen</h2>
+      <div class="grid" style="grid-template-columns:1fr"><label class="sc">Movimientos tórax-abdomen<select data-sc="sil"><option value="0">0 · rítmicos y regulares</option><option value="1">1 · tórax inmóvil, abdomen se mueve</option><option value="2">2 · disociación (balanceo)</option></select></label>
+<label class="sc">Tiraje intercostal<select data-sc="sil"><option value="0">0 · no</option><option value="1">1 · apenas visible</option><option value="2">2 · marcado</option></select></label>
+<label class="sc">Retracción xifoidea<select data-sc="sil"><option value="0">0 · no</option><option value="1">1 · apenas visible</option><option value="2">2 · marcada</option></select></label>
+<label class="sc">Aleteo nasal<select data-sc="sil"><option value="0">0 · no</option><option value="1">1 · mínimo</option><option value="2">2 · marcado</option></select></label>
+<label class="sc">Quejido espiratorio<select data-sc="sil"><option value="0">0 · no</option><option value="1">1 · audible con estetoscopio</option><option value="2">2 · audible sin estetoscopio</option></select></label>
+</div>
+      <div class="res" id="rSil"></div>
+      <p class="hint">0 sin dificultad · 1–3 leve · 4–6 moderada · ≥ 7 grave. Pensado para el prematuro con dificultad respiratoria; registrá la evolución cada hora mientras se ajusta el soporte.</p>
+    </section>
+    <section class="card">
+      <h2>Downes</h2>
+      <div class="grid" style="grid-template-columns:1fr"><label class="sc">Frecuencia respiratoria<select data-sc="dow"><option value="0">0 · < 60 /min</option><option value="1">1 · 60–80 /min</option><option value="2">2 · > 80 /min o apnea</option></select></label>
+<label class="sc">Cianosis<select data-sc="dow"><option value="0">0 · no</option><option value="1">1 · en aire ambiente, cede con FiO₂ ≤ 40 %</option><option value="2">2 · con FiO₂ > 40 %</option></select></label>
+<label class="sc">Retracciones<select data-sc="dow"><option value="0">0 · no</option><option value="1">1 · leves</option><option value="2">2 · moderadas o graves</option></select></label>
+<label class="sc">Quejido<select data-sc="dow"><option value="0">0 · no</option><option value="1">1 · audible con estetoscopio</option><option value="2">2 · audible sin estetoscopio</option></select></label>
+<label class="sc">Entrada de aire<select data-sc="dow"><option value="0">0 · buena, bilateral</option><option value="1">1 · disminuida</option><option value="2">2 · ausente o casi</option></select></label>
+</div>
+      <div class="res" id="rDow"></div>
+      <p class="hint">&lt; 4 leve · 4–7 moderada · &gt; 7 grave, con insuficiencia respiratoria inminente (valorar gases y escalar el soporte). Más usado en el recién nacido de término.</p>
+    </section>
+    <section class="card">
+      <h2>SNAPPE-II (gravedad al ingreso)</h2>
+      <p class="hint" style="margin-top:-4px">Peores valores de las primeras 12 h de internación.</p>
+      <div class="grid" style="grid-template-columns:1fr"><label class="sc">TA media más baja<select data-sc="snp"><option value="0">≥ 30 mmHg · 0</option><option value="9">20–29 mmHg · 9</option><option value="19">< 20 mmHg · 19</option></select></label>
+<label class="sc">Temperatura más baja<select data-sc="snp"><option value="0">> 35,6 °C · 0</option><option value="8">35–35,6 °C · 8</option><option value="15">< 35 °C · 15</option></select></label>
+<label class="sc">PaO₂ / FiO₂ (FiO₂ en %)<select data-sc="snp"><option value="0">≥ 2,5 · 0</option><option value="5">1–2,49 · 5</option><option value="16">0,3–0,99 · 16</option><option value="28">< 0,3 · 28</option></select></label>
+<label class="sc">pH más bajo<select data-sc="snp"><option value="0">≥ 7,20 · 0</option><option value="7">7,10–7,19 · 7</option><option value="16">< 7,10 · 16</option></select></label>
+<label class="sc">Convulsiones múltiples<select data-sc="snp"><option value="0">no · 0</option><option value="19">sí · 19</option></select></label>
+<label class="sc">Diuresis<select data-sc="snp"><option value="0">≥ 1 mL/kg/h · 0</option><option value="5">0,1–0,9 mL/kg/h · 5</option><option value="18">< 0,1 mL/kg/h · 18</option></select></label>
+<label class="sc">Peso al nacer<select data-sc="snp"><option value="0">≥ 1000 g · 0</option><option value="10">750–999 g · 10</option><option value="17">< 750 g · 17</option></select></label>
+<label class="sc">Pequeño para la EG (< p3)<select data-sc="snp"><option value="0">no · 0</option><option value="12">sí · 12</option></select></label>
+<label class="sc">Apgar a los 5 min<select data-sc="snp"><option value="0">≥ 7 · 0</option><option value="18">< 7 · 18</option></select></label>
+</div>
+      <div class="res" id="rSnp"></div>
+      <p class="hint">Richardson DK y col. J Pediatr 2001;138:92–100. Rango 0–162. Mayor puntaje, mayor riesgo de muerte; sirve para comparar gravedad entre pacientes y unidades, no para decidir conductas individuales. La mortalidad asociada a cada valor depende de la población: no se muestra un porcentaje.</p>
+    </section>
+  </div>
+
+  <!-- ===================== SEGUIMIENTO DEL PREMATURO ===================== -->
+  <div class="mod" id="m-seg" hidden>
+    <section class="card">
+      <h2>Pesquisa de retinopatía (ROP)</h2>
+      <label class="chkl"><input type="checkbox" id="ropRf"> Recibió O₂ &gt; 72 h o tiene factores de riesgo (ARM, transfusiones, hipoxia/hiperoxia, shock, apneas, reanimación, acidosis, sepsis)</label>
+      <div class="res" id="rRop"></div>
+      <p class="hint">CEFEN-SAP y Grupo ROP Argentina (Ministerio de Salud): pesquisar a todos los ≤ 32 semanas y/o ≤ 1500 g, y a los mayores con O₂ &gt; 72 h o factores de riesgo. Primer examen a las 4 semanas de vida y no después de las 32 semanas posmenstruales; en los ≤ 27 semanas, a las 31 semanas posmenstruales. La frecuencia la define el oftalmólogo según el hallazgo (ICROP3).</p>
+    </section>
+
+    <section class="card">
+      <h2>Ecografía cerebral</h2>
+      <div class="res" id="rEco"></div>
+      <details class="det"><summary>Clasificación de la hemorragia (Papile) y leucomalacia</summary>
+        <table class="tb"><tr><th>Grado</th><th>Hallazgo</th></tr>
+        <tr><td>I</td><td>Hemorragia de la matriz germinal (subependimaria)</td></tr>
+        <tr><td>II</td><td>Intraventricular sin dilatación ventricular</td></tr>
+        <tr><td>III</td><td>Intraventricular con dilatación ventricular</td></tr>
+        <tr><td>IV*</td><td>Infarto hemorrágico periventricular (parénquima)</td></tr></table>
+        <p class="hint">*Hoy se describe como infarto venoso periventricular más que como extensión de la hemorragia (Volpe). Leucomalacia periventricular (de Vries): 1 ecodensidad ≥ 7 días · 2 quistes pequeños frontoparietales · 3 quistes extensos parietooccipitales · 4 quistes subcorticales.</p>
+      </details>
+      <p class="hint">AAP (Hand y col., Pediatrics 2020) y Sociedad Canadiense de Pediatría (2020). Adelantar o repetir si hay deterioro clínico, convulsiones, caída del hematocrito o aumento del perímetro cefálico.</p>
+    </section>
+
+    <section class="card chk">
+      <h2>Pesquisas y controles antes del alta</h2>
+      <label><input type="checkbox"> Pesquisa neonatal (Ley 26.279): muestra después de las 36–48 h de vida y con alimentación; en prematuros, transfundidos o con NP, repetir según el programa</label>
+      <label><input type="checkbox"> Audición (Ley 25.415): otoemisiones; en internados &gt; 5 días en UCIN o con factores de riesgo, PEATC automatizados</label>
+      <label><input type="checkbox"> Oximetría de pulso para cardiopatías congénitas críticas (≥ 24 h, mano derecha y un pie): pasa si ≥ 95 % en ambos y diferencia ≤ 3; repetir una vez si 90–94 % o diferencia &gt; 3; &lt; 90 % → ecocardiograma</label>
+      <label><input type="checkbox"> Fondo de ojo (ROP) indicado o completo, con turno de control</label>
+      <label><input type="checkbox"> Ecografía cerebral de término si correspondía</label>
+      <label><input type="checkbox"> Vacunas: hepatitis B y BCG; nirsevimab o palivizumab si cumple criterios</label>
+      <label><input type="checkbox"> Segunda TSH en prematuros y bajo peso</label>
+      <label><input type="checkbox"> Hemoglobina, ferritina y suplementos (hierro, vitamina D, multivitamínicos) indicados</label>
+      <label><input type="checkbox"> Prueba de silla de auto en &lt; 37 semanas (según protocolo de la unidad)</label>
+      <label><input type="checkbox"> Derivación a seguimiento de alto riesgo y turnos (neurodesarrollo, oftalmología, audición)</label>
+      <label><input type="checkbox"> Pautas de sueño seguro, lactancia y signos de alarma explicadas a la familia</label>
+    </section>
+
+    <section class="card">
+      <h2>Inmunizaciones del recién nacido</h2>
+      <div class="res" id="rVac"></div>
+      <p class="hint">Calendario Nacional de Vacunación (Argentina). VSR: estrategia nacional 2025–2026 (vacuna materna entre las 32 y 36 semanas de gestación; nirsevimab para prematuros ≤ 32 semanas o &lt; 1500 g hasta los 6 meses; &lt; 29 semanas y &lt; 1000 g hasta los 12 meses; y menores de 12 meses con cardiopatía o enfermedad pulmonar crónica según lineamientos). Verificá la circular vigente de tu jurisdicción.</p>
+    </section>
+
+    <section class="card">
+      <h2>Función tiroidea en el prematuro</h2>
+      <div class="res" id="rTsh"></div>
+      <p class="hint">AAP (Rose y col., Pediatrics 2023). En prematuros, bajo peso, enfermos críticos, gemelos del mismo sexo o con exposición a yodo, la TSH puede subir tarde: repetir la pesquisa a las 2–4 semanas. Si se confirma el hipotiroidismo (TSH alta con T4L baja), levotiroxina 10–15 mcg/kg/día sin esperar estudios de imagen.</p>
+    </section>
+
+    <section class="card">
+      <h2>Lactancia: calostro y conservación de la leche</h2>
+      <table class="tb"><tr><th>Día</th><th>Volumen por toma (término)</th></tr>
+        <tr><td>1</td><td>≈ 2–10 mL</td></tr><tr><td>2</td><td>≈ 5–15 mL</td></tr><tr><td>3</td><td>≈ 15–30 mL</td></tr><tr><td>4–5</td><td>≈ 30–60 mL</td></tr></table>
+      <table class="tb"><tr><th>Leche extraída</th><th>Conservación</th></tr>
+        <tr><td>Ambiente (≤ 25 °C)</td><td>hasta 4 h</td></tr>
+        <tr><td>Heladera (4 °C)</td><td>hasta 4 días</td></tr>
+        <tr><td>Freezer (−18 °C)</td><td>ideal 6 meses, aceptable hasta 12</td></tr>
+        <tr><td>Descongelada en heladera</td><td>usar en 24 h; no volver a congelar</td></tr>
+        <tr><td>Sobrante de una toma</td><td>descartar dentro de las 2 h</td></tr></table>
+      <p class="hint">Volúmenes orientativos para el bebé de término sano; en el prematuro se indica por kg (ver Nutrición → Enteral). Conservación: CDC (actualizado 2024); para el prematuro internado seguí el protocolo del lactario de tu unidad, que suele ser más estricto. Calostro orofaríngeo: 0,1–0,2 mL en cada mejilla cada 2–3 h desde el primer día.</p>
+    </section>
   </div>
 
   <!-- ===================== REANIMACIÓN ===================== -->
@@ -280,10 +435,10 @@ const pill = (cls, t) => `<div class="pill ${cls}"><span>${t}</span></div>`;
 const empty = t => `<div class="empty">${t}</div>`;
 
 let modo = 'rcp';
-try { const m = localStorage.getItem('neo_mod'); if (['rcp','bili','tx'].includes(m)) modo = m; } catch (e) {}
-function setModo(m){ modo = m; $('modo').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === m));
-  ['rcp','bili','tx'].forEach(k => $('m-' + k).hidden = k !== m); try { localStorage.setItem('neo_mod', m); } catch (e) {} }
-$('modo').querySelectorAll('button').forEach(b => b.onclick = () => setModo(b.dataset.v));
+try { const m = localStorage.getItem('neo_mod'); if (['rcp','bili','tx','sep','sc','seg'].includes(m)) modo = m; } catch (e) {}
+function setModo(m){ modo = m; document.querySelectorAll('#modo button,#modo2 button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === m));
+  ['rcp','bili','tx','sep','sc','seg'].forEach(k => $('m-' + k).hidden = k !== m); try { localStorage.setItem('neo_mod', m); } catch (e) {} }
+document.querySelectorAll('#modo button,#modo2 button').forEach(b => b.onclick = () => setModo(b.dataset.v));
 setModo(modo);
 
 function calc(){
@@ -336,6 +491,54 @@ function calc(){
      ${isFinite(v1)?tile('Venoso · Shukla', `${f(v1,1)}<small>cm</small>`, '(3 × peso + 9) / 2 + 1 · tiende a quedar alto'):''}
      ${isFinite(v2)?tile('Venoso · Shukla revisada', `${f(v2,1)}<small>cm</small>`, '(3 × peso + 9) / 2'):''}
      ${tile('Venoso de emergencia', '3–4<small>cm</small>', 'en sala de partos: hasta que refluya sangre')}</div>`;}}
+
+
+  /* ---- Sepsis precoz (Kaiser, modelo original) ---- */
+  {const tc=v('kTemp'), rom=v('kRom');
+   if(!isFinite(eg)) $('rKai').innerHTML=empty('Cargá la EG del paciente.');
+   else if(eg<34) $('rKai').innerHTML=pill('warn','La calculadora de Kaiser no está validada en menores de 34 semanas: seguí el protocolo de sepsis del prematuro de tu unidad.');
+   else if(!isFinite(tc)||!isFinite(rom)) $('rKai').innerHTML=empty('Cargá la temperatura materna máxima y las horas de bolsa rota.');
+   else{
+     const tf=tc*9/5+32, ga=eg, romI=Math.pow(rom+0.05,0.2), gbs=$('kGbs').value, atb=$('kAtb').value;
+     const a1=(atb==='1'||atb==='1b')?1:0, a2=atb==='2'?1:0;
+     const bx=+$('kInc').value+0.8680*tf-6.9325*ga+0.0877*ga*ga+1.2256*romI-1.0488*a1-1.1861*a2+(gbs==='pos'?0.5771:0)+(gbs==='unk'?0.0427:0);
+     const p0=1/(1+Math.exp(-bx)), lr=+$('kCli').value, od=p0/(1-p0)*lr, p1=od/(1+od), r0=p0*1000, r1=p1*1000;
+     let rec,cls;
+     if(lr===21.2||r1>=3){rec='Antibióticos empíricos (con hemocultivo previo).';cls='crit';}
+     else if(r1>=1){rec='Hemocultivo y control de signos vitales cada 4 h durante 24 h.';cls='warn';}
+     else{rec=(r0>=1||lr===5)?'Sin hemocultivo ni antibióticos; signos vitales cada 4 h durante 24 h.':'Cuidados de rutina.';cls='ok';}
+     $('rKai').innerHTML=`<div class="tiles">${tile('Riesgo al nacer',`${f(r0,2)}<small>/1000</small>`,'solo factores maternos')}${tile('Riesgo según el bebé',`${f(r1,2)}<small>/1000</small>`,$('kCli').selectedOptions[0].textContent.split(' (')[0],'main')}</div>`+pill(cls,rec)+(tc>=38?pill('info','Fiebre materna ≥ 38 °C: evaluá también corioamnionitis (triple I) según el protocolo de la unidad.'):'');}}
+
+  /* ---- NEC ---- */
+  {const NEC={IA:['Ayuno y SOG abierta 2–3 días','Hemocultivo; antibióticos 2–3 días hasta descartar','Rx abdominal seriada'],IB:['Igual que IA'],IIA:['Ayuno 7–10 días con NP','Antibióticos 7–10 días','Rx cada 6–12 h al inicio'],IIB:['Ayuno 14 días con NP','Antibióticos 14 días','Sostén: volumen, corregir acidosis; consultar a cirugía'],IIIA:['Igual que IIB más soporte hemodinámico y ventilatorio','Inotrópicos, corrección de CID','Consulta quirúrgica urgente; paracentesis si hay duda'],IIIB:['Cirugía: laparotomía o drenaje peritoneal','Antibióticos 14 días y soporte intensivo']};
+   const e=$('necE').value; $('rNec').innerHTML=e?pill(e[0]==='I'&&e.length===2?'warn':e.startsWith('III')?'crit':'warn','<b>Estadio '+e+'</b><br>'+NEC[e].map(x=>'• '+x).join('<br>')):empty('Elegí el estadio para ver la conducta orientativa.');}
+
+  /* ---- Puntajes ---- */
+  const sc=n=>[...document.querySelectorAll(`[data-sc="${n}"]`)].reduce((a,x)=>a+(+x.value),0);
+  {const t=sc('sil');$('rSil').innerHTML='<div class="tiles">'+tile('Silverman-Andersen',`${t}<small>/10</small>`,t===0?'sin dificultad':t<=3?'dificultad leve':t<=6?'dificultad moderada':'dificultad grave',t>=7?'red':'main')+'</div>';}
+  {const t=sc('dow');$('rDow').innerHTML='<div class="tiles">'+tile('Downes',`${t}<small>/10</small>`,t<4?'leve':t<=7?'moderada':'grave: insuficiencia respiratoria inminente',t>7?'red':'main')+'</div>';}
+  {const t=sc('snp');$('rSnp').innerHTML='<div class="tiles">'+tile('SNAPPE-II',`${t}`,t<20?'gravedad baja':t<40?'gravedad intermedia':'gravedad alta',t>=40?'red':'main')+'</div>';}
+
+  /* ---- Seguimiento ---- */
+  const dvS=isFinite(hs)?hs/24:NaN, gN=w>0?w*1000:NaN;
+  {if(!isFinite(eg)&&!(gN>0)) $('rRop').innerHTML=empty('Cargá peso al nacer y EG.');
+   else{const ind=(isFinite(eg)&&eg<=32)||(gN>0&&gN<=1500)||$('ropRf').checked;
+     if(!ind) $('rRop').innerHTML=pill('ok','No cumple criterios de pesquisa de ROP (> 32 semanas, > 1500 g y sin factores de riesgo).');
+     else{let first='';if(isFinite(eg)){const pmaFirst=eg<=27?31:Math.min(32,eg+4),dias=Math.round((pmaFirst-eg)*7);first=`Primer fondo de ojo a las <b>${f(pmaFirst,0)} semanas posmenstruales</b> (≈ ${dias} días de vida)`+(isFinite(dvS)?(dvS>=dias?' · <b>ya corresponde</b>':` · faltan ≈ ${Math.max(0,Math.round(dias-dvS))} días`):'')+'.';}
+       $('rRop').innerHTML=pill('warn','<b>Requiere pesquisa de ROP.</b> '+first);}}}
+  {if(!isFinite(eg)) $('rEco').innerHTML=empty('Cargá la EG.');
+   else if(eg<32){const L=['Primera: días 4–7 (o antes si hay inestabilidad); la mayoría de las HIV ocurren en las primeras 72 h','Control: días 7–14 y a las 4–6 semanas de vida (lesión de sustancia blanca)'];if(eg<=30)L.push('Al alta o a las 36–40 semanas posmenstruales');if(eg<26)L.push('Repetir a término en los &lt; 26 semanas');$('rEco').innerHTML=pill('warn','<b>Pesquisa de rutina indicada</b> ('+f(eg,1)+' semanas):<br>'+L.map(x=>'• '+x).join('<br>'));}
+   else if(eg<37) $('rEco').innerHTML=pill('info','32–36 semanas: solo si hay factores de riesgo (asfixia, ARM, hipotensión, sepsis, NEC, alteración neurológica) — días 4–7 y control a las 4–6 semanas si la primera es anormal.');
+   else $('rEco').innerHTML=pill('ok','Término: solo por indicación clínica.');}
+  {if(!(gN>0)&&!isFinite(eg)) $('rVac').innerHTML=empty('Cargá el peso y la EG.');
+   else{const L=[];L.push('<b>Hepatitis B:</b> en las primeras 12 h de vida, cualquier peso. Madre HBsAg positiva o desconocida: además gammaglobulina anti-HB en las primeras 12 h. En &lt; 2000 g esta dosis no cuenta para el esquema (AAP): completar 3 dosis más.');
+     L.push(gN>0&&gN<2000?'<b>BCG:</b> diferir hasta alcanzar 2000 g (aplicar antes del alta).':'<b>BCG:</b> antes del egreso de la maternidad.');
+     const nir=(isFinite(eg)&&eg<=32)||(gN>0&&gN<1500), nir12=isFinite(eg)&&eg<29&&gN>0&&gN<1000;
+     L.push(nir12?'<b>VSR:</b> cumple criterio de nirsevimab hasta los 12 meses (&lt; 29 semanas y &lt; 1000 g).':nir?'<b>VSR:</b> cumple criterio de nirsevimab hasta los 6 meses (≤ 32 semanas o &lt; 1500 g), aunque la madre esté vacunada.':'<b>VSR:</b> protegido si la madre recibió la vacuna entre las 32 y 36 semanas al menos 14 días antes del parto; si no, nirsevimab según la estrategia vigente.');
+     L.push('<b>Calendario:</b> a los 2 meses de edad cronológica, sin corregir por prematurez (rotavirus: primera dosis antes de las 14 semanas y 6 días).');
+     $('rVac').innerHTML=L.map(x=>pill('info',x)).join('');}}
+  {const pre=(isFinite(eg)&&eg<37)||(gN>0&&gN<2500);
+   $('rTsh').innerHTML=pre?pill('warn','<b>Repetir la pesquisa de TSH a las 2–4 semanas de vida</b>'+(isFinite(dvS)&&dvS<14?` (faltan ≈ ${Math.round(14-dvS)} días para las 2 semanas)`:'')+(gN>0&&gN<1500?'; en &lt; 1500 g muchos programas repiten también a las 4–6 semanas o al alcanzar 1500 g.':'.')):pill('ok','Sin indicación de repetir la pesquisa por EG o peso (salvo gemelos del mismo sexo, enfermedad crítica o exposición a yodo).');}
 
   /* ---- Bilirrubina ---- */
   const tsb = v('bTsb'), alb = v('bAlb');
@@ -441,11 +644,13 @@ function biliChart(phF, exF, escF, hs, tsb, src){
 $('sPre').querySelectorAll('button').forEach(b => b.onclick = () => { preRef = b.dataset.v; try { localStorage.setItem('bili_pre', preRef); } catch (e) {} $('sPre').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); calc(); });
 $('sPre').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x.dataset.v === preRef));
 $('tNice').querySelector('tbody').innerHTML = Array.from({length: 15}, (_, i) => 23 + i).map(g => `<tr data-g="${g}"><td>${g} sem</td><td class="n">${f((g * 10 - 100) / UM, 1)} <small>(${g * 10 - 100})</small></td><td class="n">${f(g * 10 / UM, 1)} <small>(${g * 10})</small></td></tr>`).join('');
-['nPeso','nEG','nHoras','bTsb','bAlb','tHtoA','tHtoD','tHtoU','tVol','cUN'].forEach(id => $(id).addEventListener('input', calc));
+['nPeso','nEG','nHoras','bTsb','bAlb','tHtoA','tHtoD','tHtoU','tVol','cUN','kTemp','kRom'].forEach(id => $(id).addEventListener('input', calc));
+['kInc','kGbs','kAtb','kCli','necE','ropRf'].forEach(id => $(id).addEventListener('change', calc));
+document.querySelectorAll('[data-sc]').forEach(x => x.addEventListener('change', calc));
 ['rk1','rk2','rk3','rk4'].forEach(id => $(id).addEventListener('change', calc));
 calc();
 window.customSummary = null;
 </script>
-<script src="paciente.js?v=v113"></script>
+<script src="paciente.js?v=v114"></script>
 </body>
 </html>
