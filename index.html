@@ -60,6 +60,7 @@ body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);
 @media (max-width:420px){.pac input{width:52px}.pac .clr{padding:8px 9px}.pac .clr .t{display:none}.pac .clr .x{display:inline}.pac .in{gap:5px;flex-wrap:nowrap}.pac .u button{padding:7px 4px;min-width:24px}.pac label{gap:2px}.pac input{width:50px}}
 .views{flex:1;position:relative;min-height:0}
 .views iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
+body.fsx .views{position:fixed;inset:0;z-index:9999}
 @media (max-width:600px){.brand span{display:none}.seg{min-width:0;max-width:none}.seg button{font-size:.82rem;padding:8px 4px;gap:5px}}
 @media (max-width:900px){.brand span{display:none}}
 .bar .seg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;max-width:980px}
@@ -224,23 +225,23 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 </div>
 <div class="toast" id="toast" hidden></div>
 <div class="views">
-  <iframe id="vInf" data-src="infusiones.html" title="Calculadora de infusiones"></iframe>
-  <iframe id="vEle" data-src="electrolitos.html" title="Calculadora de electrolitos" hidden></iframe>
-  <iframe id="vSed" data-src="sedoanalgesia.html" title="Sedoanalgesia neonatal" hidden></iframe>
-  <iframe id="vNut" data-src="nutricion.html" title="Nutrición parenteral" hidden></iframe>
-  <iframe id="vIns" data-src="insulina.html" title="Infusión de insulina" hidden></iframe>
-  <iframe id="vLab" data-src="laboratorio.html" title="Laboratorio: valores corregidos" hidden></iframe>
-  <iframe id="vEcg" data-src="cardio.html" title="Cardiología" hidden></iframe>
-  <iframe id="vAtb" data-src="antimicrobianos.html" title="Antimicrobianos neonatales" hidden></iframe>
-  <iframe id="vNeo" data-src="neo.html" title="Neonatología clínica" hidden></iframe>
-  <iframe id="vCre" data-src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
-  <iframe id="vNfx" data-src="neofax.html" title="NeoFax" hidden></iframe>
-  <iframe id="vEhi" data-src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
-  <iframe id="vHoj" data-src="hoja.html" title="Hoja del día" hidden></iframe>
-  <iframe id="vBal" data-src="balance.html" title="Balance hídrico" hidden></iframe>
-  <iframe id="vVaf" data-src="vafo.html" title="VAFO: ventilación de alta frecuencia" hidden></iframe>
-  <iframe id="vVen" data-src="ventilacion.html" title="Ventilación convencional" hidden></iframe>
-  <iframe id="vFue" data-src="fuentes.html" title="Fuentes y alcance" hidden></iframe>
+  <iframe id="vInf" allow="fullscreen" allowfullscreen data-src="infusiones.html" title="Calculadora de infusiones"></iframe>
+  <iframe id="vEle" allow="fullscreen" allowfullscreen data-src="electrolitos.html" title="Calculadora de electrolitos" hidden></iframe>
+  <iframe id="vSed" allow="fullscreen" allowfullscreen data-src="sedoanalgesia.html" title="Sedoanalgesia neonatal" hidden></iframe>
+  <iframe id="vNut" allow="fullscreen" allowfullscreen data-src="nutricion.html" title="Nutrición parenteral" hidden></iframe>
+  <iframe id="vIns" allow="fullscreen" allowfullscreen data-src="insulina.html" title="Infusión de insulina" hidden></iframe>
+  <iframe id="vLab" allow="fullscreen" allowfullscreen data-src="laboratorio.html" title="Laboratorio: valores corregidos" hidden></iframe>
+  <iframe id="vEcg" allow="fullscreen" allowfullscreen data-src="cardio.html" title="Cardiología" hidden></iframe>
+  <iframe id="vAtb" allow="fullscreen" allowfullscreen data-src="antimicrobianos.html" title="Antimicrobianos neonatales" hidden></iframe>
+  <iframe id="vNeo" allow="fullscreen" allowfullscreen data-src="neo.html" title="Neonatología clínica" hidden></iframe>
+  <iframe id="vCre" allow="fullscreen" allowfullscreen data-src="crecimiento.html" title="Crecimiento INTERGROWTH-21st" hidden></iframe>
+  <iframe id="vNfx" allow="fullscreen" allowfullscreen data-src="neofax.html" title="NeoFax" hidden></iframe>
+  <iframe id="vEhi" allow="fullscreen" allowfullscreen data-src="ehi.html" title="Encefalopatía neonatal" hidden></iframe>
+  <iframe id="vHoj" allow="fullscreen" allowfullscreen data-src="hoja.html" title="Hoja del día" hidden></iframe>
+  <iframe id="vBal" allow="fullscreen" allowfullscreen data-src="balance.html" title="Balance hídrico" hidden></iframe>
+  <iframe id="vVaf" allow="fullscreen" allowfullscreen data-src="vafo.html" title="VAFO: ventilación de alta frecuencia" hidden></iframe>
+  <iframe id="vVen" allow="fullscreen" allowfullscreen data-src="ventilacion.html" title="Ventilación convencional" hidden></iframe>
+  <iframe id="vFue" allow="fullscreen" allowfullscreen data-src="fuentes.html" title="Fuentes y alcance" hidden></iframe>
 </div>
 <nav class="bn" id="bn" aria-label="Pestañas favoritas"></nav>
 <div class="mas" id="camas" hidden role="dialog" aria-label="Pacientes">
@@ -364,6 +365,7 @@ for(const k in TABS)document.getElementById(TABS[k][1]).addEventListener("click"
     $("gPeso").placeholder="g";const wv=num($("gPeso").value);$("gPeso").classList.toggle("kgwarn",wv>0&&wv<100);$("gPeso").title=wv>0&&wv<100?"El peso va en gramos (ej.: 1500)":"";
   }
   function live(p){if(p.nac){const h=(Date.now()-Date.parse(p.nac))/36e5;if(isFinite(h)&&h>=0)return{h,dias:h/24}}return{h:null,dias:p.dias}}
+  window.addEventListener("message",e=>{if(e.data&&e.data.type==="fs3")document.body.classList.toggle("fsx",!!e.data.on)});
   function broadcast(p,except){document.querySelectorAll(".views iframe").forEach(f=>{if(f.contentWindow&&f.contentWindow!==except)f.contentWindow.postMessage({type:"pac",pac:p},"*")});}
   function fromBar(){
     const p=read(),w=num($("gPeso").value),eg=num($("gEG").value),d=num($("gDias").value);

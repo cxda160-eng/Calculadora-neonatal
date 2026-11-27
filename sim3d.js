@@ -6,6 +6,8 @@ let THREE = null;
 
 const API = window.SIM_API;
 let renderer, scene, camera, heart, resize = () => {};
+const CAM = { zoom: 1, follow: false, baseZ: 9.2 };
+const clampZ = z => Math.max(1, Math.min(5, z));
 const canvas = document.getElementById("sm-canvas");
 const box3d = document.getElementById("sm-3d"), box2d = document.getElementById("sm-2d"), seg = document.getElementById("sm-hv");
 
@@ -221,20 +223,43 @@ function init() {
 
   /* ---------- Interacción: girar arrastrando ---------- */
   const rot = { x: 0.12, y: -0.35, vx: 0, vy: 0, drag: false, lx: 0, ly: 0, idle: 0 };
-  canvas.addEventListener("pointerdown", e => { rot.drag = true; rot.lx = e.clientX; rot.ly = e.clientY; rot.idle = 0; canvas.setPointerCapture(e.pointerId); });
+  const ptrs = new Map(); let pinch0 = 0, zoom0 = 1;
+  const pd = () => { const [a, b] = [...ptrs.values()]; return Math.hypot(a.x - b.x, a.y - b.y); };
+  canvas.addEventListener("pointerdown", e => {
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); canvas.setPointerCapture(e.pointerId); rot.idle = 0;
+    if (ptrs.size === 2) { rot.drag = false; pinch0 = pd(); zoom0 = CAM.zoom; }
+    else { rot.drag = true; rot.lx = e.clientX; rot.ly = e.clientY; }
+  });
   canvas.addEventListener("pointermove", e => {
+    if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 2 && pinch0) { CAM.zoom = clampZ(zoom0 * pd() / pinch0); return; }
     if (!rot.drag) return;
     const dx = e.clientX - rot.lx, dy = e.clientY - rot.ly; rot.lx = e.clientX; rot.ly = e.clientY;
     rot.vy = dx * 0.008; rot.vx = dy * 0.008; rot.y += rot.vy; rot.x = Math.max(-1.2, Math.min(1.2, rot.x + rot.vx));
   });
-  const end = () => { rot.drag = false; };
+  const end = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch0 = 0; if (!ptrs.size) rot.drag = false; };
   canvas.addEventListener("pointerup", end); canvas.addEventListener("pointercancel", end);
-  canvas.addEventListener("dblclick", () => { rot.x = 0.12; rot.y = -0.35; rot.vx = rot.vy = 0; });
+  canvas.addEventListener("wheel", e => { e.preventDefault(); CAM.zoom = clampZ(CAM.zoom * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+  canvas.addEventListener("dblclick", () => { rot.x = 0.12; rot.y = -0.35; rot.vx = rot.vy = 0; CAM.zoom = 1; });
+
+  /* ---------- Cámara: zoom manual y seguimiento del impulso ---------- */
+  const HOME = new THREE.Vector3(0, 0, 0), tgt = HOME.clone(), want = new THREE.Vector3(), lastHead = new THREE.Vector3();
+  let curZ = 1, lastHeadAt = -1e9;
+  function placeCam(head, now) {
+    if (CAM.follow && head) { head.getWorldPosition(lastHead); lastHeadAt = now; }
+    const tracking = CAM.follow && now - lastHeadAt < 1800;
+    want.copy(tracking ? lastHead : HOME);
+    const zWant = tracking ? Math.max(CAM.zoom, 2.8) : CAM.zoom;
+    const k = tracking ? 0.09 : 0.06;
+    tgt.lerp(want, k); curZ += (zWant - curZ) * k;
+    camera.position.set(tgt.x, tgt.y + 0.15 / curZ, tgt.z + CAM.baseZ / curZ);
+    camera.lookAt(tgt);
+  }
 
   resize = function () {
     const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
     renderer.setSize(w, h, false); camera.aspect = w / h;
-    camera.position.z = w / h < 0.85 ? 10.4 : 9.2; camera.updateProjectionMatrix();
+    CAM.baseZ = w / h < 0.85 ? 10.4 : 9.2; camera.updateProjectionMatrix();
   };
   window.addEventListener("resize", resize);
 
@@ -244,14 +269,14 @@ function init() {
     requestAnimationFrame(frame);
     if (mode !== "3d" || canvas.offsetParent === null) return;
     const dt = Math.min(50, now - last); last = now;
-    if (canvas.width !== Math.round(canvas.clientWidth * renderer.getPixelRatio())) resize();
+    if (canvas.width !== Math.round(canvas.clientWidth * renderer.getPixelRatio()) || canvas.height !== Math.round(canvas.clientHeight * renderer.getPixelRatio())) resize();
 
     // giro con inercia y oscilación suave cuando no se toca
     if (!rot.drag) { rot.y += rot.vy; rot.x += rot.vx; rot.vx *= 0.92; rot.vy *= 0.92; rot.idle += dt;
       if (rot.idle > 2500) rot.y += Math.sin(now / 2400) * 0.0016; }
     pivot.rotation.set(rot.x, rot.y, 0);
 
-    const sim = API.sim; if (!sim) { renderer.render(scene, camera); return; }
+    const sim = API.sim; if (!sim) { placeCam(null, now); renderer.render(scene, camera); return; }
     const t = sim.t;
 
     // cámaras: brillo al despolarizarse
@@ -268,7 +293,7 @@ function init() {
     for (const id in LM) { const g = API.lmEls[id] && API.lmEls[id].g; LM[id].visible = !!g && g.style.display !== "none"; }
 
     // impulsos: cabeza brillante + estela
-    let n = 0;
+    let n = 0, head = null, headT0 = -1e9;
     for (const a of sim.anims) {
       if (t < a.t0 || t > a.t0 + a.dur + 60) continue;
       const pts = SAMPLES[a.path]; if (!pts) continue;
@@ -277,6 +302,7 @@ function init() {
       for (let k = 0; k < 7; k++) {
         const s = sprite(n++), ff = fr - k * 0.045; if (ff < 0) { s.visible = false; continue; }
         s.visible = true; s.material.map = tex; s.position.copy(at(pts, ff));
+        if (k === 0 && fr < 1 && a.t0 >= headT0) { headT0 = a.t0; head = s; }
         const sc = (k === 0 ? 0.55 : 0.36 - k * 0.035); s.scale.set(sc, sc, 1); s.material.opacity = fade * (k === 0 ? 1 : 0.55 - k * 0.07);
       }
     }
@@ -287,8 +313,41 @@ function init() {
     for (const bl of sim.blocks) { if (t < bl.t0 || t > bl.t0 + bl.dur) continue; const s = blockSprite(b++); s.visible = true; s.position.copy(to3(bl.x, bl.y)); }
     for (let i = b; i < blocks.length; i++) blocks[i].visible = false;
 
+    placeCam(head, now);
     renderer.render(scene, camera);
   }
   resize();
   requestAnimationFrame(frame);
 }
+
+/* ---------- Controles: seguir impulso, pausa y pantalla completa ---------- */
+(() => {
+  const box = document.getElementById("sm-3d"); if (!box) return;
+  const $ = id => document.getElementById(id);
+  const fol = $("sm3-follow"), play = $("sm3-play"), fs = $("sm3-fs"), x = $("sm3-x"), name = $("sm3-name"), mainPlay = $("play");
+  fol && fol.addEventListener("click", () => { CAM.follow = !CAM.follow; fol.setAttribute("aria-pressed", CAM.follow); });
+  const syncPlay = () => { if (play && mainPlay) play.textContent = /Pausa/i.test(mainPlay.textContent) ? "⏸" : "▶"; };
+  play && play.addEventListener("click", () => { mainPlay && mainPlay.click(); syncPlay(); });
+  setInterval(syncPlay, 700);
+  const parentMsg = on => { try { if (window.parent !== window) window.parent.postMessage({ type: "fs3", on }, "*"); } catch (e) {} };
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  function setName() { const sel = $("sm-arrsel"); if (name) name.textContent = sel && sel.selectedOptions[0] ? sel.selectedOptions[0].textContent : "Corazón 3D"; }
+  function enter() {
+    setName(); box.classList.add("fs3"); parentMsg(true); document.documentElement.style.overflow = "hidden";
+    const req = box.requestFullscreen || box.webkitRequestFullscreen;
+    if (req) { try { const p = req.call(box); p && p.catch && p.catch(() => {}); } catch (e) {} }
+    try { screen.orientation && screen.orientation.unlock && screen.orientation.unlock(); } catch (e) {}
+    setTimeout(resize, 60); setTimeout(resize, 400);
+  }
+  function exit() {
+    box.classList.remove("fs3"); parentMsg(false); document.documentElement.style.overflow = "";
+    if (fsEl()) { const ex = document.exitFullscreen || document.webkitExitFullscreen; try { const p = ex.call(document); p && p.catch && p.catch(() => {}); } catch (e) {} }
+    setTimeout(resize, 60); setTimeout(resize, 400);
+  }
+  fs && fs.addEventListener("click", enter);
+  x && x.addEventListener("click", exit);
+  const onFs = () => { if (!fsEl() && box.classList.contains("fs3")) exit(); };
+  document.addEventListener("fullscreenchange", onFs); document.addEventListener("webkitfullscreenchange", onFs);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && box.classList.contains("fs3")) exit(); });
+  const sel = $("sm-arrsel"); sel && sel.addEventListener("change", setName);
+})();

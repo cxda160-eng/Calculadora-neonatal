@@ -23,3 +23,10 @@
   background:var(--sem-v-bg)!important;color:var(--sem-v-fg)!important;border-left:4px solid var(--sem-v-b)!important}
 /* los números dentro de las tarjetas de balance toman el color del semáforo */
 .p-balance .k.bad .v,.p-balance .k.warn .v,.p-balance .k.ok .v,.p-balance .k.bad .n,.p-balance .k.warn .n,.p-balance .k.ok .n{color:inherit!important}
+
+/* ---- Estabilidad en el celular: la página no se desplaza de costado (con letra grande o pantallas angostas) ---- */
+html,body{max-width:100%;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none}
+table{max-width:100%}
+td,th{overflow-wrap:anywhere}
+.grid>*,.row>*,.field,.patient>*,label{min-width:0}
+input,select,textarea{max-width:100%}
