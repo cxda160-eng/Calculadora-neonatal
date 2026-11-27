@@ -6,7 +6,7 @@ let THREE = null;
 
 const API = window.SIM_API;
 let renderer, scene, camera, heart, resize = () => {};
-const CAM = { zoom: 1, follow: false, baseZ: 9.2 };
+const CAM = { zoom: 1, baseZ: 9.2, R: 0 };
 const clampZ = z => Math.max(1, Math.min(5, z));
 const canvas = document.getElementById("sm-canvas");
 const box3d = document.getElementById("sm-3d"), box2d = document.getElementById("sm-2d"), seg = document.getElementById("sm-hv");
@@ -242,24 +242,22 @@ function init() {
   canvas.addEventListener("wheel", e => { e.preventDefault(); CAM.zoom = clampZ(CAM.zoom * Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
   canvas.addEventListener("dblclick", () => { rot.x = 0.12; rot.y = -0.35; rot.vx = rot.vy = 0; CAM.zoom = 1; });
 
-  /* ---------- Cámara: zoom manual y seguimiento del impulso ---------- */
-  const HOME = new THREE.Vector3(0, 0, 0), tgt = HOME.clone(), want = new THREE.Vector3(), lastHead = new THREE.Vector3();
-  let curZ = 1, lastHeadAt = -1e9;
-  function placeCam(head, now) {
-    if (CAM.follow && head) { head.getWorldPosition(lastHead); lastHeadAt = now; }
-    const tracking = CAM.follow && now - lastHeadAt < 1800;
-    want.copy(tracking ? lastHead : HOME);
-    const zWant = tracking ? Math.max(CAM.zoom, 2.8) : CAM.zoom;
-    const k = tracking ? 0.09 : 0.06;
-    tgt.lerp(want, k); curZ += (zWant - curZ) * k;
-    camera.position.set(tgt.x, tgt.y + 0.15 / curZ, tgt.z + CAM.baseZ / curZ);
-    camera.lookAt(tgt);
+  /* ---------- Cámara: encuadre al dispositivo y zoom manual ---------- */
+  const HOME = new THREE.Vector3(0, 0.2, 0);
+  let curZ = 1;
+  function placeCam() {
+    curZ += (CAM.zoom - curZ) * 0.15;
+    camera.position.set(0, 0.2 + 0.15 / curZ, CAM.baseZ / curZ);
+    camera.lookAt(HOME);
   }
 
   resize = function () {
     const w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return;
     renderer.setSize(w, h, false); camera.aspect = w / h;
-    CAM.baseZ = w / h < 0.85 ? 10.4 : 9.2; camera.updateProjectionMatrix();
+    // distancia para que todo el corazón (con margen, aun girado) entre en el ancho y el alto de la pantalla
+    const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), th = tv * camera.aspect;
+    CAM.baseZ = Math.max(3.0 / tv, 2.15 / th);
+    camera.updateProjectionMatrix();
   };
   window.addEventListener("resize", resize);
 
@@ -276,7 +274,7 @@ function init() {
       if (rot.idle > 2500) rot.y += Math.sin(now / 2400) * 0.0016; }
     pivot.rotation.set(rot.x, rot.y, 0);
 
-    const sim = API.sim; if (!sim) { placeCam(null, now); renderer.render(scene, camera); return; }
+    const sim = API.sim; if (!sim) { placeCam(); renderer.render(scene, camera); return; }
     const t = sim.t;
 
     // cámaras: brillo al despolarizarse
@@ -293,7 +291,7 @@ function init() {
     for (const id in LM) { const g = API.lmEls[id] && API.lmEls[id].g; LM[id].visible = !!g && g.style.display !== "none"; }
 
     // impulsos: cabeza brillante + estela
-    let n = 0, head = null, headT0 = -1e9;
+    let n = 0;
     for (const a of sim.anims) {
       if (t < a.t0 || t > a.t0 + a.dur + 60) continue;
       const pts = SAMPLES[a.path]; if (!pts) continue;
@@ -302,7 +300,6 @@ function init() {
       for (let k = 0; k < 7; k++) {
         const s = sprite(n++), ff = fr - k * 0.045; if (ff < 0) { s.visible = false; continue; }
         s.visible = true; s.material.map = tex; s.position.copy(at(pts, ff));
-        if (k === 0 && fr < 1 && a.t0 >= headT0) { headT0 = a.t0; head = s; }
         const sc = (k === 0 ? 0.55 : 0.36 - k * 0.035); s.scale.set(sc, sc, 1); s.material.opacity = fade * (k === 0 ? 1 : 0.55 - k * 0.07);
       }
     }
@@ -313,7 +310,7 @@ function init() {
     for (const bl of sim.blocks) { if (t < bl.t0 || t > bl.t0 + bl.dur) continue; const s = blockSprite(b++); s.visible = true; s.position.copy(to3(bl.x, bl.y)); }
     for (let i = b; i < blocks.length; i++) blocks[i].visible = false;
 
-    placeCam(head, now);
+    placeCam();
     renderer.render(scene, camera);
   }
   resize();
@@ -324,8 +321,7 @@ function init() {
 (() => {
   const box = document.getElementById("sm-3d"); if (!box) return;
   const $ = id => document.getElementById(id);
-  const fol = $("sm3-follow"), play = $("sm3-play"), fs = $("sm3-fs"), x = $("sm3-x"), name = $("sm3-name"), mainPlay = $("play");
-  fol && fol.addEventListener("click", () => { CAM.follow = !CAM.follow; fol.setAttribute("aria-pressed", CAM.follow); });
+  const play = $("sm3-play"), fs = $("sm3-fs"), x = $("sm3-x"), name = $("sm3-name"), mainPlay = $("play");
   const syncPlay = () => { if (play && mainPlay) play.textContent = /Pausa/i.test(mainPlay.textContent) ? "⏸" : "▶"; };
   play && play.addEventListener("click", () => { mainPlay && mainPlay.click(); syncPlay(); });
   setInterval(syncPlay, 700);

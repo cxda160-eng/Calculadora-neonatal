@@ -192,8 +192,8 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
 .sm3-bar button[aria-pressed="true"]{background:#0a7ea4;border-color:#7fe3ff}
 #sm3-fs{font-size:1.05rem;padding:4px 10px}
 .sm3-top{display:none}
-#sm-3d.fs3{position:fixed;inset:0;z-index:9999;background:#050509;padding:0;margin:0}
-#sm-3d.fs3 #sm-canvas{width:100vw;height:100vh;height:100dvh;border-radius:0}
+#sm-3d.fs3{position:fixed;inset:0;overflow:hidden;z-index:9999;background:#050509;padding:0;margin:0}
+#sm-3d.fs3 #sm-canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 #sm-3d.fs3 .sm3-hint{display:none}
 #sm-3d.fs3 .sm3-bar{top:auto;right:50%;transform:translateX(50%);bottom:calc(16px + env(safe-area-inset-bottom))}
 #sm-3d.fs3 .sm3-bar button{font-size:.95rem;min-height:42px;padding:8px 14px}
@@ -767,7 +767,6 @@ body{background:linear-gradient(180deg,var(--glow) 0,transparent 320px) no-repea
       <div id="sm-3d" hidden>
         <canvas id="sm-canvas" aria-label="Corazón en 3D con el sistema de conducción; arrastrá para girarlo"></canvas>
         <div class="sm3-bar">
-          <button type="button" id="sm3-follow" aria-pressed="false" title="La cámara se acerca y sigue al impulso">🔍 Seguir impulso</button>
           <button type="button" id="sm3-play" title="Pausar / reanudar">⏸</button>
           <button type="button" id="sm3-fs" title="Pantalla completa" aria-label="Pantalla completa">⛶</button>
         </div>
@@ -3106,10 +3105,10 @@ window.SIM_API = { get sim(){ return sim; }, get scen(){ return scen; }, PATHS, 
 })();
 
 </script>
-<script src="paciente.js?v=v117"></script>
+<script src="paciente.js?v=v118"></script>
 <script src="eco.js?v=v89"></script>
 <script src="arr.js?v=v72"></script>
 <script src="ped.js?v=v74"></script>
-<script type="module" src="sim3d.js?v=v117"></script>
+<script type="module" src="sim3d.js?v=v118"></script>
 </body>
 </html>
